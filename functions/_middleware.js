@@ -1,0 +1,97 @@
+const markdown = `---
+title: inish.in
+description: The founder surface behind Tiny Studio. Products first, current bets early, context after that.
+---
+
+# inish.in
+
+I keep building products that start calm and get more serious.
+
+## Positioning
+
+- Products first.
+- The sharper one first.
+- Current bets early.
+- Context after that.
+- Builder surface, not a personal-brand page.
+
+## Current product emphasis
+
+- 0509 / Five to Nine: proof-backed competitor monitoring and change alerts.
+- Tiny Studio: the calmer operating product and company surface.
+- Promptly and Drishti: app/product lanes under Tiny Studio.
+
+## Contact
+
+Email: me@inish.in
+
+## Product truth
+
+inish.in should stay a clear founder/product surface. It should not make product, security, compliance, traction, or capability claims beyond what the linked products can prove.
+`;
+
+function wantsMarkdown(request) {
+  const accept = request.headers.get("Accept") || "";
+  return accept.toLowerCase().includes("text/markdown");
+}
+
+function isPageRequest(url) {
+  return url.pathname === "/" || url.pathname === "/index.html" || (!url.pathname.includes(".") && !url.pathname.startsWith("/assets/"));
+}
+
+function robotsText(origin) {
+  return [
+    "User-agent: *",
+    "Content-Signal: search=yes, ai-input=yes, ai-train=no",
+    "Allow: /",
+    "",
+    `Sitemap: ${origin}/sitemap.xml`,
+    "",
+  ].join("\n");
+}
+
+function sitemapXml(origin) {
+  const paths = ["/", "/llms.txt"];
+  const urls = paths.map((path) => `<url><loc>${origin}${path}</loc></url>`).join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
+}
+
+export async function onRequest(context) {
+  const request = context.request;
+  const url = new URL(request.url);
+
+  if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/robots.txt") {
+    return new Response(request.method === "HEAD" ? null : robotsText(url.origin), {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8"
+      }
+    });
+  }
+
+  if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/sitemap.xml") {
+    return new Response(request.method === "HEAD" ? null : sitemapXml(url.origin), {
+      headers: {
+        "Content-Type": "application/xml; charset=utf-8"
+      }
+    });
+  }
+
+  if ((request.method === "GET" || request.method === "HEAD") && wantsMarkdown(request) && isPageRequest(url)) {
+    return new Response(request.method === "HEAD" ? null : markdown, {
+      headers: {
+        "Content-Type": "text/markdown; charset=utf-8",
+        "Vary": "Accept",
+        "Content-Signal": "search=yes, ai-input=yes"
+      }
+    });
+  }
+
+  const response = await context.next();
+  const headers = new Headers(response.headers);
+  headers.append("Vary", "Accept");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}

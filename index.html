@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>inish.in</title>
+    <link rel="alternate" type="text/markdown" href="https://inish.in/" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" />
+    <meta
+      name="description"
+      content="The founder surface behind Tiny Studio. Products first, current bets early, context after that."
+    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap"
+      rel="stylesheet"
+    >
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f1e7;
+        --bg-soft: #fcf8f1;
+        --surface: rgba(255, 255, 255, 0.78);
+        --ink: #1a2233;
+        --muted: #627286;
+        --line: rgba(26, 34, 51, 0.1);
+        --line-strong: rgba(26, 34, 51, 0.18);
+        --accent: #1f7268;
+        --shadow:
+          0 1px 2px rgba(26, 34, 51, 0.02),
+          0 20px 44px rgba(26, 34, 51, 0.05);
+        --radius-lg: 28px;
+        --radius-md: 18px;
+        --radius-pill: 999px;
+        --container: 1160px;
+        --sans: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+        --mono: "IBM Plex Mono", "SFMono-Regular", ui-monospace, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at top left, rgba(31, 114, 104, 0.08), transparent 24%),
+          radial-gradient(circle at top right, rgba(219, 202, 172, 0.26), transparent 26%),
+          linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 42%, #efe5d8 100%);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .skip-link {
+        position: absolute;
+        top: -48px;
+        left: 16px;
+        z-index: 30;
+        padding: 10px 14px;
+        border-radius: var(--radius-pill);
+        background: var(--ink);
+        color: #fff;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .skip-link:focus {
+        top: 16px;
+      }
+
+      .shell {
+        width: min(calc(100% - 36px), var(--container));
+        margin: 0 auto;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(26, 34, 51, 0.08);
+        background: rgba(252, 248, 241, 0.84);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      .site-header .shell {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 16px 0;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        border: 1px solid var(--line-strong);
+        background: rgba(255, 255, 255, 0.8);
+        font-family: var(--mono);
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        box-shadow: var(--shadow);
+      }
+
+      .brand-copy strong,
+      .brand-copy span {
+        display: block;
+      }
+
+      .brand-copy strong {
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+
+      .brand-copy span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .top-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .top-nav a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        transition: color 160ms ease;
+      }
+
+      .top-nav a:hover,
+      .top-nav a:focus-visible,
+      .text-link:hover,
+      .text-link:focus-visible,
+      .note-list a:hover,
+      .note-list a:focus-visible,
+      .footer-links a:hover,
+      .footer-links a:focus-visible {
+        color: var(--ink);
+        outline: none;
+      }
+
+      .eyebrow,
+      .status-label,
+      .bet-mark,
+      .note-index {
+        margin: 0;
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        color: var(--ink);
+        font-family: var(--serif);
+        font-weight: 500;
+        letter-spacing: -0.05em;
+        line-height: 0.92;
+        text-wrap: balance;
+      }
+
+      h1 {
+        margin-top: 14px;
+        font-size: clamp(3.3rem, 7vw, 6.6rem);
+        max-width: 9ch;
+      }
+
+      h2 {
+        margin-top: 12px;
+        font-size: clamp(2.35rem, 4vw, 4.4rem);
+        max-width: 11ch;
+      }
+
+      h3 {
+        font-size: clamp(1.7rem, 2.1vw, 2.4rem);
+      }
+
+      p {
+        margin: 0;
+      }
+
+      .hero,
+      .bets,
+      .context,
+      .thinking,
+      .footer {
+        position: relative;
+      }
+
+      .hero {
+        padding: 94px 0 62px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.74fr);
+        gap: 60px;
+        align-items: start;
+      }
+
+      .hero-lead,
+      .section-copy,
+      .status-item p,
+      .support-bet p,
+      .principles li,
+      .note-list p,
+      .footer-copy {
+        color: var(--muted);
+      }
+
+      .hero-lead {
+        margin-top: 26px;
+        max-width: 37rem;
+        font-size: 1.16rem;
+      }
+
+      .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        margin-top: 30px;
+      }
+
+      .button,
+      .text-link {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition:
+          transform 160ms ease,
+          background-color 160ms ease,
+          border-color 160ms ease,
+          color 160ms ease;
+      }
+
+      .button {
+        padding: 0 22px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-pill);
+        background: var(--ink);
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        box-shadow:
+          0 8px 18px rgba(26, 34, 51, 0.12),
+          0 2px 4px rgba(26, 34, 51, 0.1);
+      }
+
+      .button:hover,
+      .button:focus-visible {
+        transform: translateY(-1px);
+        background: #121927;
+        outline: none;
+      }
+
+      .text-link {
+        color: var(--muted);
+        font-size: 0.98rem;
+        font-weight: 500;
+        letter-spacing: -0.02em;
+      }
+
+      .hero-status {
+        padding-left: 28px;
+        border-left: 1px solid var(--line-strong);
+      }
+
+      .status-item {
+        padding: 16px 0 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .status-item:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .status-item strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 1.32rem;
+        font-weight: 600;
+        letter-spacing: -0.05em;
+      }
+
+      .status-item p {
+        margin-top: 8px;
+      }
+
+      .bets {
+        padding: 12px 0 84px;
+      }
+
+      .section-head {
+        display: grid;
+        grid-template-columns: minmax(0, 0.78fr) minmax(280px, 0.72fr);
+        gap: 40px;
+        align-items: end;
+        padding: 28px 0 34px;
+        border-top: 1px solid var(--line-strong);
+      }
+
+      .section-copy {
+        max-width: 30rem;
+        font-size: 1.02rem;
+      }
+
+      .bets-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 34px;
+        align-items: start;
+      }
+
+      .lead-bet {
+        padding: 30px 30px 32px;
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--accent);
+        border-radius: var(--radius-lg);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(250, 245, 237, 0.94));
+        box-shadow: var(--shadow);
+      }
+
+      .lead-bet h3 {
+        margin-top: 14px;
+      }
+
+      .lead-bet p {
+        margin-top: 18px;
+        max-width: 34rem;
+        color: var(--muted);
+      }
+
+      .bet-points {
+        margin: 20px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .bet-points li {
+        padding-top: 10px;
+        border-top: 1px solid rgba(26, 34, 51, 0.08);
+      }
+
+      .support-bets {
+        display: grid;
+      }
+
+      .support-bet {
+        padding: 22px 0 24px;
+        border-top: 1px solid var(--line);
+      }
+
+      .support-bet:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .support-bet h3 {
+        margin-top: 10px;
+        font-size: 1.8rem;
+      }
+
+      .support-bet p {
+        margin-top: 10px;
+        max-width: 28rem;
+      }
+
+      .context {
+        padding: 0 0 84px;
+      }
+
+      .context-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 44px;
+        padding-top: 30px;
+        border-top: 1px solid var(--line-strong);
+      }
+
+      .context-copy p {
+        margin-top: 18px;
+        max-width: 31rem;
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .principles {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 14px;
+      }
+
+      .principles li {
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        font-size: 1rem;
+      }
+
+      .thinking {
+        padding: 0 0 88px;
+      }
+
+      .thinking-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.76fr) minmax(0, 1.24fr);
+        gap: 44px;
+        padding-top: 30px;
+        border-top: 1px solid var(--line-strong);
+      }
+
+      .thinking-copy p {
+        margin-top: 18px;
+        max-width: 29rem;
+        color: var(--muted);
+      }
+
+      .note-list {
+        display: grid;
+      }
+
+      .note-list a {
+        display: grid;
+        grid-template-columns: 56px minmax(0, 1fr);
+        gap: 18px;
+        padding: 24px 0;
+        border-top: 1px solid var(--line);
+        text-decoration: none;
+      }
+
+      .note-list a:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .note-list strong {
+        display: block;
+        font-size: 1.28rem;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+      }
+
+      .note-list p {
+        margin-top: 8px;
+      }
+
+      .footer {
+        padding: 0 0 64px;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+        gap: 40px;
+        padding-top: 30px;
+        border-top: 1px solid var(--line-strong);
+      }
+
+      .footer-copy {
+        margin-top: 18px;
+        max-width: 30rem;
+      }
+
+      .footer-links-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .footer-links-grid h3 {
+        font-family: var(--sans);
+        font-size: 1rem;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+      }
+
+      .footer-links {
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+      }
+
+      .footer-links a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      @media (max-width: 1024px) {
+        .hero-grid,
+        .section-head,
+        .bets-grid,
+        .context-grid,
+        .thinking-grid,
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-status {
+          padding-left: 0;
+          padding-top: 24px;
+          border-left: 0;
+          border-top: 1px solid var(--line-strong);
+        }
+
+        .footer-links-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 720px) {
+        .shell {
+          width: min(calc(100% - 28px), var(--container));
+        }
+
+        .site-header .shell {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .top-nav {
+          gap: 14px;
+        }
+
+        .hero {
+          padding: 64px 0 50px;
+        }
+
+        .lead-bet {
+          padding: 24px 20px 26px;
+        }
+
+        .note-list a {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        .footer-links-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <div class="shell">
+        <a class="brand" href="/">
+          <span class="brand-mark" aria-hidden="true">N</span>
+          <span class="brand-copy">
+            <strong>inish.in</strong>
+            <span>Founder surface behind Tiny Studio</span>
+          </span>
+        </a>
+
+        <nav class="top-nav" aria-label="Primary">
+          <a href="#bets">Current bets</a>
+          <a href="#context">Context</a>
+          <a href="#thinking">Thinking</a>
+          <a href="https://tinystudio.in/">Tiny Studio</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="shell hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">inish.in</p>
+            <h1>I keep building products that start calm and get more serious.</h1>
+            <p class="hero-lead">
+              This is the founder surface behind Tiny Studio. Products first,
+              current bets early, context after that.
+            </p>
+            <div class="action-row">
+              <a class="button" href="#bets">See current bets</a>
+              <a class="text-link" href="https://tinystudio.in/">Go to Tiny Studio</a>
+            </div>
+          </div>
+
+          <aside class="hero-status" aria-label="What is active right now">
+            <article class="status-item">
+              <p class="status-label">Leading bet</p>
+              <strong>0509</strong>
+              <p>The sharper software bet. More operational, more evidence-driven.</p>
+            </article>
+
+            <article class="status-item">
+              <p class="status-label">Consumer lane</p>
+              <strong>Promptly and Drishti</strong>
+              <p>The calmer side of the work still matters and still stays live.</p>
+            </article>
+
+            <article class="status-item">
+              <p class="status-label">Company layer</p>
+              <strong><a href="https://tinystudio.in/">Tiny Studio</a></strong>
+              <p>The company front door. This site is the founder layer behind it.</p>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="bets" id="bets">
+        <div class="shell">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Current bets</p>
+              <h2>Products first. The sharper one first.</h2>
+            </div>
+            <p class="section-copy">
+              The strongest proof that I am actually building is real product
+              work. Start there, then earn the right to talk about the rest.
+            </p>
+          </div>
+
+          <div class="bets-grid">
+            <article class="lead-bet">
+              <p class="bet-mark">0509</p>
+              <h3>The sharper bet right now.</h3>
+              <p>
+                A competitor-monitoring product for growth teams. The point is
+                to show what changed, why it matters, and what the proof says,
+                not to wrap the work in generic analytics noise.
+              </p>
+              <ul class="bet-points">
+                <li>Built around meaningful change, not activity for its own sake</li>
+                <li>Trying to make alerts easier to trust, not just easier to send</li>
+                <li>More serious than the consumer-app lane, still connected to it</li>
+              </ul>
+              <div class="action-row">
+                <a class="button" href="mailto:me@inish.in?subject=0509">Ask about 0509</a>
+                <a class="text-link" href="https://tinystudio.in/#teams">See the company view</a>
+              </div>
+            </article>
+
+            <div class="support-bets">
+              <article class="support-bet">
+                <p class="bet-mark">Promptly</p>
+                <h3>The calmer operating product.</h3>
+                <p>
+                  Bookings, reminders, payment proof, and day-of clarity for
+                  solo professionals who need something reliable.
+                </p>
+              </article>
+
+              <article class="support-bet">
+                <p class="bet-mark">Drishti</p>
+                <h3>The more reflective lane.</h3>
+                <p>
+                  A mindful screen-time app built around pauses, intention
+                  checks, and less guilt-heavy friction.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="context" id="context">
+        <div class="shell context-grid">
+          <div class="context-copy">
+            <p class="eyebrow">Context</p>
+            <h2>The pattern in the work matters more than the category.</h2>
+            <p>
+              I keep drifting toward products with clearer stakes. Some of them
+              become calmer consumer apps. Some of them become more operational
+              software. The job is still the same: make the product easier to trust.
+            </p>
+          </div>
+
+          <ul class="principles">
+            <li>I like products with a real job, not vague ambition.</li>
+            <li>I care more about proof and clarity than feature theater.</li>
+            <li>I want the work to feel current without turning loud or fake.</li>
+            <li>Tiny Studio is the company layer. This site is where the builder voice sits.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="thinking" id="thinking">
+        <div class="shell thinking-grid">
+          <div class="thinking-copy">
+            <p class="eyebrow">Thinking</p>
+            <h2>Short notes, not a content machine.</h2>
+            <p>
+              Enough thinking to add trust and shape. Not enough to swamp the
+              product layer.
+            </p>
+          </div>
+
+          <div class="note-list">
+            <a href="mailto:me@inish.in?subject=What%20changed%20with%20proof">
+              <span class="note-index">01</span>
+              <div>
+                <strong>What changed, not just what exists</strong>
+                <p>The difference between noisy monitoring and useful product signal.</p>
+              </div>
+            </a>
+
+            <a href="mailto:me@inish.in?subject=Consumer%20calm%20and%20operator%20clarity">
+              <span class="note-index">02</span>
+              <div>
+                <strong>Consumer calm, operator clarity</strong>
+                <p>Why the consumer-app lane and the sharper SaaS lane still belong together.</p>
+              </div>
+            </a>
+
+            <a href="mailto:me@inish.in?subject=Current%20bets">
+              <span class="note-index">03</span>
+              <div>
+                <strong>Current bets</strong>
+                <p>What is moving, what is stalling, and what is starting to look more real.</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="shell footer-grid">
+        <div>
+          <p class="eyebrow">inish.in</p>
+          <h2>Builder surface, not a personal-brand page.</h2>
+          <p class="footer-copy">
+            A shorter path into the current work: what is live, what is getting
+            sharper, and where to go next.
+          </p>
+        </div>
+
+        <div class="footer-links-grid">
+          <div>
+            <h3>Products</h3>
+            <ul class="footer-links">
+              <li><a href="mailto:me@inish.in?subject=0509">0509</a></li>
+              <li><a href="https://tinystudio.in/promptly/">Promptly</a></li>
+              <li><a href="https://tinystudio.in/drishti/">Drishti</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3>Paths</h3>
+            <ul class="footer-links">
+              <li><a href="https://tinystudio.in/">Tiny Studio</a></li>
+              <li><a href="#bets">Current bets</a></li>
+              <li><a href="#thinking">Thinking</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3>Contact</h3>
+            <ul class="footer-links">
+              <li><a href="mailto:me@inish.in">me@inish.in</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
