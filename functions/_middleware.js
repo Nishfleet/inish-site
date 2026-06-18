@@ -21,6 +21,13 @@ I keep building products that start calm and get more serious.
 - Tiny Studio: the calmer operating product and company surface.
 - Promptly and Drishti: app/product lanes under Tiny Studio.
 
+## Applied AI operating principle
+
+- All serious projects should move toward self-serve, agent-assisted workflows.
+- Useful agents need workflow-specific context, safe tools, model routing, and clear human approval gates.
+- Customer service, onboarding, fulfillment, reporting, growth, and proof surfaces should become easier to run without founder-led explanation.
+- Approval stays explicit for money, private data, security, legal exposure, public claims, and deploys.
+
 ## Contact
 
 Email: me@inish.in
