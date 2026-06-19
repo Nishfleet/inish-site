@@ -222,6 +222,7 @@
       .hero,
       .bets,
       .context,
+      .agent-brief,
       .thinking,
       .footer {
         position: relative;
@@ -242,6 +243,7 @@
       .section-copy,
       .status-item p,
       .support-bet p,
+      .agent-card p,
       .principles li,
       .note-list p,
       .footer-copy {
@@ -446,6 +448,53 @@
         font-size: 1rem;
       }
 
+      .agent-brief {
+        padding: 0 0 84px;
+      }
+
+      .agent-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+        gap: 44px;
+        padding-top: 30px;
+        border-top: 1px solid var(--line-strong);
+      }
+
+      .agent-copy p {
+        margin-top: 18px;
+        max-width: 32rem;
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .agent-cards {
+        display: grid;
+        gap: 16px;
+      }
+
+      .agent-card {
+        padding: 18px 0 20px;
+        border-top: 1px solid var(--line);
+      }
+
+      .agent-card:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .agent-card h3 {
+        font-family: var(--sans);
+        font-size: 1.08rem;
+        font-weight: 600;
+        line-height: 1.18;
+        letter-spacing: -0.03em;
+      }
+
+      .agent-card p {
+        margin-top: 8px;
+        max-width: 34rem;
+      }
+
       .thinking {
         padding: 0 0 88px;
       }
@@ -541,6 +590,7 @@
         .section-head,
         .bets-grid,
         .context-grid,
+        .agent-grid,
         .thinking-grid,
         .footer-grid {
           grid-template-columns: 1fr;
@@ -607,6 +657,7 @@
         <nav class="top-nav" aria-label="Primary">
           <a href="#bets">Current bets</a>
           <a href="#context">Context</a>
+          <a href="#agent-brief">Agent brief</a>
           <a href="#thinking">Thinking</a>
           <a href="https://tinystudio.in/">Tiny Studio</a>
         </nav>
@@ -722,9 +773,52 @@
           <ul class="principles">
             <li>I like products with a real job, not vague ambition.</li>
             <li>I care more about proof and clarity than feature theater.</li>
+            <li>Applied AI should make the work self-serve and agent-assisted, not just add a chat box.</li>
             <li>I want the work to feel current without turning loud or fake.</li>
             <li>Tiny Studio is the company layer. This site is where the builder voice sits.</li>
           </ul>
+        </div>
+      </section>
+
+      <section class="agent-brief" id="agent-brief">
+        <div class="shell agent-grid">
+          <div class="agent-copy">
+            <p class="eyebrow">Agent brief</p>
+            <h2>A cleaner handoff for useful AI work.</h2>
+            <p>
+              Every serious project should become easier to use without a meeting:
+              clear context in, bounded agent work out, and a human gate where the
+              stakes are money, privacy, security, legal exposure, or public claims.
+            </p>
+          </div>
+
+          <div class="agent-cards">
+            <article class="agent-card">
+              <h3>Self-serve first</h3>
+              <p>
+                Onboarding, support, fulfillment, reporting, and proof should be
+                available as product surfaces, not only as founder-led explanation.
+              </p>
+            </article>
+
+            <article class="agent-card">
+              <h3>Agentic where it matters</h3>
+              <p>
+                Agents should gather context, draft or execute bounded workflow
+                steps, and route work between cheaper models and frontier models
+                based on risk and required intelligence.
+              </p>
+            </article>
+
+            <article class="agent-card">
+              <h3>Human gates stay explicit</h3>
+              <p>
+                The system can move faster only when approval points are clear:
+                payments, private data, security, legal exposure, public copy, and
+                deploys stay owner-reviewed.
+              </p>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -794,6 +888,7 @@
             <ul class="footer-links">
               <li><a href="https://tinystudio.in/">Tiny Studio</a></li>
               <li><a href="#bets">Current bets</a></li>
+              <li><a href="#agent-brief">Agent brief</a></li>
               <li><a href="#thinking">Thinking</a></li>
             </ul>
           </div>
