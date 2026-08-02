@@ -26,7 +26,9 @@ Publish one useful, source-backed edition to `https://inish.in/daily/`, then sen
 
 - Prefer usefulness over hype or raw popularity.
 - Summaries must be original, factual, and understandable without opening the source.
-- `why_it_matters` must connect the item to Nish's products, workflows, design, agents, or business.
+- `why_it_matters` is rendered as “Why read.” Explain the reader value neutrally; do not force a connection to Nish or mention his private work.
+- Favor serious developer and AI stories with the depth and editorial tone of The Daily Diff: systems, agents, infrastructure, security, research, and useful open-source tools.
+- Write substantial summaries that explain the core mechanism or finding. Avoid hype, shallow launch copy, and generic “this changes everything” claims.
 - Link to the primary source whenever one exists.
 - Never publish private notes, repository contents, credentials, customer data, rumors, or personal agent memory.
 - Do not invent numbers, quotes, capabilities, or outcomes.
