@@ -32,6 +32,10 @@ I keep building products that start calm and get more serious.
 
 Email: me@inish.in
 
+## Nish Daily
+
+The daily signal newspaper at /daily/ curates useful developments in AI, building, design, product, and business. Each item links to its original source.
+
 ## Product truth
 
 inish.in should stay a clear founder/product surface. It should not make product, security, compliance, traction, or capability claims beyond what the linked products can prove.
@@ -58,7 +62,7 @@ function robotsText(origin) {
 }
 
 function sitemapXml(origin) {
-  const paths = ["/", "/llms.txt"];
+  const paths = ["/", "/daily/", "/daily/feed.xml", "/llms.txt"];
   const urls = paths.map((path) => `<url><loc>${origin}${path}</loc></url>`).join("");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
 }
