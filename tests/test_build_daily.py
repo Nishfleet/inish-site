@@ -66,6 +66,31 @@ class BuildDailyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "duplicate"):
                 builder.load_editions()
 
+    def test_rejects_extra_private_fields(self):
+        payload = edition()
+        payload["private_notes"] = "must never reach latest.json"
+        self.write(payload)
+        with patch.object(builder, "EDITIONS", self.editions):
+            with self.assertRaisesRegex(ValueError, "edition fields"):
+                builder.load_editions()
+
+    def test_rejects_blank_required_copy(self):
+        payload = edition()
+        payload["stories"][0]["why_it_matters"] = ""
+        self.write(payload)
+        with patch.object(builder, "EDITIONS", self.editions):
+            with self.assertRaisesRegex(ValueError, "why_it_matters"):
+                builder.load_editions()
+
+    def test_prunes_removed_generated_editions(self):
+        self.write(edition())
+        stale = self.daily / "archive" / "2026-07-31"
+        stale.mkdir(parents=True)
+        (stale / "index.html").write_text("stale")
+        with patch.object(builder, "EDITIONS", self.editions), patch.object(builder, "DAILY", self.daily):
+            builder.main()
+        self.assertFalse(stale.exists())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,6 +6,7 @@ from __future__ import annotations
 import datetime as dt
 import html
 import json
+import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -13,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT / "daily"
 SECTIONS = {"AI & agents", "Build & ship", "Design & product", "Business & growth"}
+EDITION_FIELDS = {"date", "editor_note", "stories"}
+STORY_FIELDS = {"title", "url", "source", "section", "summary", "why_it_matters"}
 
 
 def esc(value: object) -> str:
@@ -20,6 +23,8 @@ def esc(value: object) -> str:
 
 
 def validate_url(value: object) -> str:
+    if not isinstance(value, str):
+        raise ValueError("Story URL must be a string")
     url = str(value)
     parsed = urlparse(url)
     if parsed.scheme != "https" or not parsed.netloc:
@@ -27,30 +32,52 @@ def validate_url(value: object) -> str:
     return url
 
 
+def validate_text(value: object, field: str, minimum: int, maximum: int) -> str:
+    if not isinstance(value, str):
+        raise ValueError(f"{field} must be a string")
+    text = value.strip()
+    if not minimum <= len(text) <= maximum:
+        raise ValueError(f"{field} must contain {minimum}-{maximum} characters")
+    return text
+
+
 def load_editions() -> list[dict]:
     editions = []
     for path in sorted(EDITIONS.glob("*.json"), reverse=True):
         edition = json.loads(path.read_text())
+        if set(edition) != EDITION_FIELDS:
+            raise ValueError(f"{path}: edition fields must be exactly {sorted(EDITION_FIELDS)}")
         day = dt.date.fromisoformat(edition["date"])
         if path.stem != day.isoformat():
             raise ValueError(f"Edition filename/date mismatch: {path}")
         stories = edition.get("stories", [])
         if not 5 <= len(stories) <= 15:
             raise ValueError(f"{path}: expected 5-15 stories")
+        clean_stories = []
         seen = set()
         for story in stories:
-            missing = {"title", "url", "source", "section", "summary", "why_it_matters"} - story.keys()
-            if missing:
-                raise ValueError(f"{path}: missing story fields {sorted(missing)}")
+            if not isinstance(story, dict) or set(story) != STORY_FIELDS:
+                raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
             url = validate_url(story["url"])
             if url in seen:
                 raise ValueError(f"{path}: duplicate URL {url}")
-            if story["section"] not in SECTIONS:
-                raise ValueError(f"{path}: unsupported section {story['section']}")
-            if not 25 <= len(story["summary"]) <= 700:
-                raise ValueError(f"{path}: summary length is not useful")
+            section = validate_text(story["section"], "section", 2, 40)
+            if section not in SECTIONS:
+                raise ValueError(f"{path}: unsupported section {section}")
             seen.add(url)
-        editions.append(edition)
+            clean_stories.append({
+                "title": validate_text(story["title"], "title", 5, 200),
+                "url": url,
+                "source": validate_text(story["source"], "source", 2, 100),
+                "section": section,
+                "summary": validate_text(story["summary"], "summary", 25, 700),
+                "why_it_matters": validate_text(story["why_it_matters"], "why_it_matters", 20, 500),
+            })
+        editions.append({
+            "date": day.isoformat(),
+            "editor_note": validate_text(edition["editor_note"], "editor_note", 20, 1000),
+            "stories": clean_stories,
+        })
     if not editions:
         raise ValueError("No editions found")
     return editions
@@ -166,6 +193,14 @@ def main() -> None:
     (DAILY / "feed.xml").write_text(rss(editions), encoding="utf-8")
     archive_root = DAILY / "archive"
     archive_root.mkdir(parents=True, exist_ok=True)
+    live_dates = {edition["date"] for edition in editions}
+    for child in archive_root.iterdir():
+        if child.is_dir() and child.name not in live_dates:
+            try:
+                dt.date.fromisoformat(child.name)
+            except ValueError:
+                continue
+            shutil.rmtree(child)
     (archive_root / "index.html").write_text(archive_page(editions), encoding="utf-8")
     (DAILY / "sitemap.xml").write_text(sitemap(editions), encoding="utf-8")
     for edition in editions:
