@@ -20,8 +20,8 @@ Publish one useful, source-backed edition to `https://inish.in/daily/`, then sen
 5. Run `python3 scripts/build_daily.py` and `python3 -m unittest discover -s tests -v`.
 6. Review the rendered page for empty copy, duplicates, unsupported claims, and broken source URLs.
 7. Commit only the edition and generated daily files with `daily: publish YYYY-MM-DD`, then push `main`.
-8. Wait for `https://inish.in/daily/latest.json` to report today's date. If it does not update, report the deploy failure and do not claim success.
-9. Telegram Nish: edition date, the live link, story count, and the three strongest headlines. Keep it concise.
+8. Run `scripts/deploy_daily.sh`. It deploys Cloudflare Pages from the VPS, requires a clean `main` equal to `origin/main`, compares the complete live JSON with the generated edition, and sends Nish the verified Telegram link.
+9. Report success only when the deploy script prints `verified_live`. Otherwise report the exact failing stage without claiming publication.
 
 ## Editorial rules
 
