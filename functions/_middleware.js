@@ -32,6 +32,10 @@ I keep building products that start calm and get more serious.
 
 Email: me@inish.in
 
+## Nish Daily
+
+The daily signal newspaper at /daily/ curates useful developments in AI, building, design, product, and business. Each item links to its original source.
+
 ## Product truth
 
 inish.in should stay a clear founder/product surface. It should not make product, security, compliance, traction, or capability claims beyond what the linked products can prove.
@@ -42,8 +46,8 @@ function wantsMarkdown(request) {
   return accept.toLowerCase().includes("text/markdown");
 }
 
-function isPageRequest(url) {
-  return url.pathname === "/" || url.pathname === "/index.html" || (!url.pathname.includes(".") && !url.pathname.startsWith("/assets/"));
+function isFounderPage(url) {
+  return url.pathname === "/" || url.pathname === "/index.html";
 }
 
 function robotsText(origin) {
@@ -53,12 +57,13 @@ function robotsText(origin) {
     "Allow: /",
     "",
     `Sitemap: ${origin}/sitemap.xml`,
+    `Sitemap: ${origin}/daily/sitemap.xml`,
     "",
   ].join("\n");
 }
 
 function sitemapXml(origin) {
-  const paths = ["/", "/llms.txt"];
+  const paths = ["/", "/daily/", "/daily/archive/", "/daily/feed.xml", "/llms.txt"];
   const urls = paths.map((path) => `<url><loc>${origin}${path}</loc></url>`).join("");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
 }
@@ -83,7 +88,7 @@ export async function onRequest(context) {
     });
   }
 
-  if ((request.method === "GET" || request.method === "HEAD") && wantsMarkdown(request) && isPageRequest(url)) {
+  if ((request.method === "GET" || request.method === "HEAD") && wantsMarkdown(request) && isFounderPage(url)) {
     return new Response(request.method === "HEAD" ? null : markdown, {
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",

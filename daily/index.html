@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nish Daily — 2026-08-02</title>
+  <meta name="description" content="Nish's daily signal feed for AI, building, design, product, and business.">
+  <link rel="alternate" type="application/rss+xml" title="Nish Daily" href="https://inish.in/daily/feed.xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#stories">Skip to stories</a>
+  <header class="masthead">
+    <div class="masthead-top"><a href="/">inish.in</a><span>Sunday, 02 August 2026</span><span>12 stories</span></div>
+    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">The useful bits from AI, code, design, product, and business—selected for what Nish is building now.</p></div>
+    <nav class="filters" aria-label="Filter stories">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="AI &amp; agents">AI &amp; agents</button><button data-filter="Build &amp; ship">Build &amp; ship</button><button data-filter="Business &amp; growth">Business &amp; growth</button><button data-filter="Design &amp; product">Design &amp; product</button>
+    </nav>
+  </header>
+  <main id="stories" class="stories">
+    <section class="edition-note"><span>Editor’s note</span><p>Today’s edition is about the systems around modern software: the harnesses that make agents capable, the sandboxes that keep them contained, the memory and hardware bottlenecks that limit them, and the engineering practices that decide whether any of it survives production.</p></section>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">01</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>Medley / HN</span></div>
+          <h2><a href="https://www.medley.sh/blog/the-harness-is-the-capability-multiplier" rel="noopener noreferrer">The harness is the capability multiplier</a></h2>
+          <p>Strong models can still fail long tasks when context gets lost, verification checks the wrong thing, or execution stops before the result survives a cold start. Medley describes a contract-driven task graph with separate planning, execution, and acceptance roles, plus a learning loop that turns completed traces into bounded improvements to the harness.</p>
+          <p class="why"><strong>Why read:</strong> A useful architecture-level explanation of why better orchestration and verification can produce larger gains than simply swapping in a newer model.</p>
+          <a class="source-link" href="https://www.medley.sh/blog/the-harness-is-the-capability-multiplier" rel="noopener noreferrer">Read at medley.sh ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">02</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>Embrace The Red / HN</span></div>
+          <h2><a href="https://embracethered.com/blog/posts/2026/defcon-talk-copirate-365/" rel="noopener noreferrer">A Copilot exploit chain reached tools, data, and long-term memory</a></h2>
+          <p>This DEF CON write-up breaks down a chain of Microsoft Copilot vulnerabilities, including covert data exfiltration, delayed tool invocation, and persistent prompt injection through memory. The individual weaknesses become far more serious when connected across previews, tools, and stored context.</p>
+          <p class="why"><strong>Why read:</strong> A concrete threat model for any agent that can browse untrusted content, call tools, and retain memory across sessions.</p>
+          <a class="source-link" href="https://embracethered.com/blog/posts/2026/defcon-talk-copirate-365/" rel="noopener noreferrer">Read at embracethered.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="Build &amp; ship">
+        <div class="story-number">03</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Build &amp; ship</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/sqliteai/waste" rel="noopener noreferrer">WASTE runs Kimi K3 beyond available RAM by streaming weights from NVMe</a></h2>
+          <p>WASTE is a dependency-free C inference engine that keeps a model’s shared trunk in memory while streaming only activated experts from fast storage. The project demonstrates the full 2.78-trillion-parameter Kimi K3 on hardware that cannot hold all weights in RAM, trading speed for accessibility instead of refusing to run.</p>
+          <p class="why"><strong>Why read:</strong> An unusually clear example of systems engineering turning an apparent hardware limit into an I/O and caching problem.</p>
+          <a class="source-link" href="https://github.com/sqliteai/waste" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">04</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/TencentCloud/CubeSandbox" rel="noopener noreferrer">CubeSandbox gives AI agents fast hardware-isolated execution</a></h2>
+          <p>Tencent’s CubeSandbox is a lightweight sandbox service for running untrusted agent code with RustVMM and KVM isolation. It targets quick startup, low per-sandbox memory overhead, concurrent workloads, and a path from a single host to a multi-node deployment.</p>
+          <p class="why"><strong>Why read:</strong> Agent autonomy becomes much more practical when risky execution happens inside a cheap disposable boundary instead of the main VPS or workstation.</p>
+          <a class="source-link" href="https://github.com/TencentCloud/CubeSandbox" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="Build &amp; ship">
+        <div class="story-number">05</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Build &amp; ship</span><span>Joshlf / HN</span></div>
+          <h2><a href="https://joshlf.com/posts/safety-unsafe-world/" rel="noopener noreferrer">What Fuchsia’s Rust network stack learned about safety in an unsafe world</a></h2>
+          <p>Netstack3 is Fuchsia’s next-generation networking stack, implemented in Rust across dozens of protocols and a large production codebase. The post focuses on the gap between language-level safety and real system safety: unsafe boundaries still exist, invariants still need proof, and testing must cover behavior that types cannot express.</p>
+          <p class="why"><strong>Why read:</strong> A serious engineering account of how teams preserve safety properties when clean abstractions meet drivers, protocols, performance, and legacy interfaces.</p>
+          <a class="source-link" href="https://joshlf.com/posts/safety-unsafe-world/" rel="noopener noreferrer">Read at joshlf.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">06</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>arXiv</span></div>
+          <h2><a href="https://arxiv.org/abs/2607.26598v1" rel="noopener noreferrer">Living-Harness turns agent failures into procedural repairs</a></h2>
+          <p>Living-Harness treats an agent’s operating procedure as something that can evolve from completed trajectories and evaluator feedback. It stores episodic failure-and-recovery evidence alongside a state graph, then proposes bounded changes intended to prevent repeated breakdowns without retraining the base model.</p>
+          <p class="why"><strong>Why read:</strong> It is directly about compounding workflow knowledge: the valuable unit is a proven repair that changes future behavior, not another saved transcript.</p>
+          <a class="source-link" href="https://arxiv.org/abs/2607.26598v1" rel="noopener noreferrer">Read at arxiv.org ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">07</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>arXiv</span></div>
+          <h2><a href="https://arxiv.org/abs/2607.26637v1" rel="noopener noreferrer">Filesystem memory helps agents search cheaply—but decays without maintenance</a></h2>
+          <p>This study examines filesystem-based memory as an evolving store rather than a passive folder of notes. Better organization can reduce retrieval cost, but current agents struggle to maintain that structure as the store grows; the choice of tools can reshape memory health as much as changing the model.</p>
+          <p class="why"><strong>Why read:</strong> A useful warning for shared agent vaults: synchronization preserves files, while curation and maintenance determine whether the knowledge remains usable.</p>
+          <a class="source-link" href="https://arxiv.org/abs/2607.26637v1" rel="noopener noreferrer">Read at arxiv.org ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">08</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>arXiv</span></div>
+          <h2><a href="https://arxiv.org/abs/2607.27309v1" rel="noopener noreferrer">SIGIL compiles prose agent skills into typed executable harnesses</a></h2>
+          <p>SIGIL moves control flow out of prose instructions and into a typed intermediate representation. Instead of asking a model to reinterpret the procedure on every run, a compiled harness owns sequencing and required steps while the model handles the semantic work inside those boundaries.</p>
+          <p class="why"><strong>Why read:</strong> A strong pattern for recurring automations where skipped steps matter more than conversational flexibility.</p>
+          <a class="source-link" href="https://arxiv.org/abs/2607.27309v1" rel="noopener noreferrer">Read at arxiv.org ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="Build &amp; ship">
+        <div class="story-number">09</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Build &amp; ship</span><span>CapyToolkit / HN</span></div>
+          <h2><a href="https://capytoolkit.com/blog/buying-guides/npu-tops-vs-memory-bandwidth-local-llm-ai-pc/" rel="noopener noreferrer">Memory bandwidth—not NPU TOPS—usually limits local LLM speed</a></h2>
+          <p>Local language-model decoding repeatedly moves large weights through memory, so advertised accelerator TOPS can be a poor predictor of real token speed. This guide shows how RAM capacity and bandwidth shape which models fit and how quickly they decode, with practical comparisons across consumer hardware.</p>
+          <p class="why"><strong>Why read:</strong> A better way to evaluate AI hardware before spending money on a machine whose headline accelerator number hides the actual bottleneck.</p>
+          <a class="source-link" href="https://capytoolkit.com/blog/buying-guides/npu-tops-vs-memory-bandwidth-local-llm-ai-pc/" rel="noopener noreferrer">Read at capytoolkit.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="Build &amp; ship">
+        <div class="story-number">10</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Build &amp; ship</span><span>Headroom / HN</span></div>
+          <h2><a href="https://extraheadroom.com/" rel="noopener noreferrer">Headroom compresses coding-agent context instead of deleting it</a></h2>
+          <p>Headroom sits between coding agents and model providers, replacing bulky boilerplate and tool output with compact reversible references. The model can request original content when needed, aiming to reduce repeated token traffic without permanently throwing context away.</p>
+          <p class="why"><strong>Why read:</strong> An interesting context-engineering approach for long Codex and Claude sessions, where tool noise can consume more budget than the actual problem.</p>
+          <a class="source-link" href="https://extraheadroom.com/" rel="noopener noreferrer">Read at extraheadroom.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="Business &amp; growth">
+        <div class="story-number">11</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Business &amp; growth</span><span>Mergify / HN</span></div>
+          <h2><a href="https://mergify.com/reports/state-of-merge-queues-2026" rel="noopener noreferrer">Data from 200,000 merges challenges assumptions about AI-written code</a></h2>
+          <p>Mergify’s report analyzes merge behavior across a large pull-request dataset and argues that AI-assisted changes broke main less often than human-only changes after controlling for several factors. It also shows integration risk rising sharply with team size, strengthening the case for serialized merge queues.</p>
+          <p class="why"><strong>Why read:</strong> Useful evidence for separating the quality of AI-assisted changes from the process used to integrate many individually green changes.</p>
+          <a class="source-link" href="https://mergify.com/reports/state-of-merge-queues-2026" rel="noopener noreferrer">Read at mergify.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story" data-section="AI &amp; agents">
+        <div class="story-number">12</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/toolshedlabs-hash/nightshift" rel="noopener noreferrer">Nightshift packages practical guardrails for unattended coding agents</a></h2>
+          <p>Nightshift is a collection of patterns and small tools for running coding agents while nobody is watching. It emphasizes bounded work, visible receipts, loop prevention, cost control, and recovery over another large orchestration framework.</p>
+          <p class="why"><strong>Why read:</strong> Exactly the kind of boring operational layer that determines whether overnight autonomy produces reviewed work or an expensive mystery.</p>
+          <a class="source-link" href="https://github.com/toolshedlabs-hash/nightshift" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+  </main>
+  <footer>
+    <div><strong>Recent editions</strong><div class="archive-links"><a href="archive/2026-08-02/">2026-08-02</a><a href="archive/">Full archive →</a></div></div>
+    <div class="footer-links"><a href="feed.xml">RSS</a><a href="latest.json">JSON</a><a href="/">About Nish</a></div>
+    <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
+  </footer>
+  <script src="app.js" defer></script>
+</body>
+</html>

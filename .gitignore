@@ -1,2 +1,5 @@
 .DS_Store
 .wrangler/
+data/candidates/
+__pycache__/
+*.pyc

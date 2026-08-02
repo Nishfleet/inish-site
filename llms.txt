@@ -1,5 +1,12 @@
 # inish.in
 
+## Nish Daily
+
+- Daily signal newspaper: https://inish.in/daily/
+- RSS: https://inish.in/daily/feed.xml
+- JSON: https://inish.in/daily/latest.json
+- Stories always link to their original sources.
+
 inish.in is Nish's founder surface behind Tiny Studio.
 
 Positioning:

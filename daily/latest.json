@@ -1,0 +1,102 @@
+{
+  "date": "2026-08-02",
+  "editor_note": "Today’s edition is about the systems around modern software: the harnesses that make agents capable, the sandboxes that keep them contained, the memory and hardware bottlenecks that limit them, and the engineering practices that decide whether any of it survives production.",
+  "stories": [
+    {
+      "title": "The harness is the capability multiplier",
+      "url": "https://www.medley.sh/blog/the-harness-is-the-capability-multiplier",
+      "source": "Medley / HN",
+      "section": "AI & agents",
+      "summary": "Strong models can still fail long tasks when context gets lost, verification checks the wrong thing, or execution stops before the result survives a cold start. Medley describes a contract-driven task graph with separate planning, execution, and acceptance roles, plus a learning loop that turns completed traces into bounded improvements to the harness.",
+      "why_it_matters": "A useful architecture-level explanation of why better orchestration and verification can produce larger gains than simply swapping in a newer model."
+    },
+    {
+      "title": "A Copilot exploit chain reached tools, data, and long-term memory",
+      "url": "https://embracethered.com/blog/posts/2026/defcon-talk-copirate-365/",
+      "source": "Embrace The Red / HN",
+      "section": "AI & agents",
+      "summary": "This DEF CON write-up breaks down a chain of Microsoft Copilot vulnerabilities, including covert data exfiltration, delayed tool invocation, and persistent prompt injection through memory. The individual weaknesses become far more serious when connected across previews, tools, and stored context.",
+      "why_it_matters": "A concrete threat model for any agent that can browse untrusted content, call tools, and retain memory across sessions."
+    },
+    {
+      "title": "WASTE runs Kimi K3 beyond available RAM by streaming weights from NVMe",
+      "url": "https://github.com/sqliteai/waste",
+      "source": "GitHub",
+      "section": "Build & ship",
+      "summary": "WASTE is a dependency-free C inference engine that keeps a model’s shared trunk in memory while streaming only activated experts from fast storage. The project demonstrates the full 2.78-trillion-parameter Kimi K3 on hardware that cannot hold all weights in RAM, trading speed for accessibility instead of refusing to run.",
+      "why_it_matters": "An unusually clear example of systems engineering turning an apparent hardware limit into an I/O and caching problem."
+    },
+    {
+      "title": "CubeSandbox gives AI agents fast hardware-isolated execution",
+      "url": "https://github.com/TencentCloud/CubeSandbox",
+      "source": "GitHub",
+      "section": "AI & agents",
+      "summary": "Tencent’s CubeSandbox is a lightweight sandbox service for running untrusted agent code with RustVMM and KVM isolation. It targets quick startup, low per-sandbox memory overhead, concurrent workloads, and a path from a single host to a multi-node deployment.",
+      "why_it_matters": "Agent autonomy becomes much more practical when risky execution happens inside a cheap disposable boundary instead of the main VPS or workstation."
+    },
+    {
+      "title": "What Fuchsia’s Rust network stack learned about safety in an unsafe world",
+      "url": "https://joshlf.com/posts/safety-unsafe-world/",
+      "source": "Joshlf / HN",
+      "section": "Build & ship",
+      "summary": "Netstack3 is Fuchsia’s next-generation networking stack, implemented in Rust across dozens of protocols and a large production codebase. The post focuses on the gap between language-level safety and real system safety: unsafe boundaries still exist, invariants still need proof, and testing must cover behavior that types cannot express.",
+      "why_it_matters": "A serious engineering account of how teams preserve safety properties when clean abstractions meet drivers, protocols, performance, and legacy interfaces."
+    },
+    {
+      "title": "Living-Harness turns agent failures into procedural repairs",
+      "url": "https://arxiv.org/abs/2607.26598v1",
+      "source": "arXiv",
+      "section": "AI & agents",
+      "summary": "Living-Harness treats an agent’s operating procedure as something that can evolve from completed trajectories and evaluator feedback. It stores episodic failure-and-recovery evidence alongside a state graph, then proposes bounded changes intended to prevent repeated breakdowns without retraining the base model.",
+      "why_it_matters": "It is directly about compounding workflow knowledge: the valuable unit is a proven repair that changes future behavior, not another saved transcript."
+    },
+    {
+      "title": "Filesystem memory helps agents search cheaply—but decays without maintenance",
+      "url": "https://arxiv.org/abs/2607.26637v1",
+      "source": "arXiv",
+      "section": "AI & agents",
+      "summary": "This study examines filesystem-based memory as an evolving store rather than a passive folder of notes. Better organization can reduce retrieval cost, but current agents struggle to maintain that structure as the store grows; the choice of tools can reshape memory health as much as changing the model.",
+      "why_it_matters": "A useful warning for shared agent vaults: synchronization preserves files, while curation and maintenance determine whether the knowledge remains usable."
+    },
+    {
+      "title": "SIGIL compiles prose agent skills into typed executable harnesses",
+      "url": "https://arxiv.org/abs/2607.27309v1",
+      "source": "arXiv",
+      "section": "AI & agents",
+      "summary": "SIGIL moves control flow out of prose instructions and into a typed intermediate representation. Instead of asking a model to reinterpret the procedure on every run, a compiled harness owns sequencing and required steps while the model handles the semantic work inside those boundaries.",
+      "why_it_matters": "A strong pattern for recurring automations where skipped steps matter more than conversational flexibility."
+    },
+    {
+      "title": "Memory bandwidth—not NPU TOPS—usually limits local LLM speed",
+      "url": "https://capytoolkit.com/blog/buying-guides/npu-tops-vs-memory-bandwidth-local-llm-ai-pc/",
+      "source": "CapyToolkit / HN",
+      "section": "Build & ship",
+      "summary": "Local language-model decoding repeatedly moves large weights through memory, so advertised accelerator TOPS can be a poor predictor of real token speed. This guide shows how RAM capacity and bandwidth shape which models fit and how quickly they decode, with practical comparisons across consumer hardware.",
+      "why_it_matters": "A better way to evaluate AI hardware before spending money on a machine whose headline accelerator number hides the actual bottleneck."
+    },
+    {
+      "title": "Headroom compresses coding-agent context instead of deleting it",
+      "url": "https://extraheadroom.com/",
+      "source": "Headroom / HN",
+      "section": "Build & ship",
+      "summary": "Headroom sits between coding agents and model providers, replacing bulky boilerplate and tool output with compact reversible references. The model can request original content when needed, aiming to reduce repeated token traffic without permanently throwing context away.",
+      "why_it_matters": "An interesting context-engineering approach for long Codex and Claude sessions, where tool noise can consume more budget than the actual problem."
+    },
+    {
+      "title": "Data from 200,000 merges challenges assumptions about AI-written code",
+      "url": "https://mergify.com/reports/state-of-merge-queues-2026",
+      "source": "Mergify / HN",
+      "section": "Business & growth",
+      "summary": "Mergify’s report analyzes merge behavior across a large pull-request dataset and argues that AI-assisted changes broke main less often than human-only changes after controlling for several factors. It also shows integration risk rising sharply with team size, strengthening the case for serialized merge queues.",
+      "why_it_matters": "Useful evidence for separating the quality of AI-assisted changes from the process used to integrate many individually green changes."
+    },
+    {
+      "title": "Nightshift packages practical guardrails for unattended coding agents",
+      "url": "https://github.com/toolshedlabs-hash/nightshift",
+      "source": "GitHub",
+      "section": "AI & agents",
+      "summary": "Nightshift is a collection of patterns and small tools for running coding agents while nobody is watching. It emphasizes bounded work, visible receipts, loop prevention, cost control, and recovery over another large orchestration framework.",
+      "why_it_matters": "Exactly the kind of boring operational layer that determines whether overnight autonomy produces reviewed work or an expensive mystery."
+    }
+  ]
+}
