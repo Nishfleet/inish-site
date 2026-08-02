@@ -45,8 +45,10 @@ class BuildDailyTests(unittest.TestCase):
             builder.main()
         self.assertTrue((self.daily / "index.html").exists())
         self.assertTrue((self.daily / "archive" / "2026-08-02" / "index.html").exists())
+        self.assertTrue((self.daily / "archive" / "index.html").exists())
         self.assertEqual(json.loads((self.daily / "latest.json").read_text())["date"], "2026-08-02")
         self.assertIn("https://inish.in/daily/archive/2026-08-02/", (self.daily / "feed.xml").read_text())
+        self.assertIn("https://inish.in/daily/archive/2026-08-02/", (self.daily / "sitemap.xml").read_text())
 
     def test_rejects_non_https_links(self):
         payload = edition()

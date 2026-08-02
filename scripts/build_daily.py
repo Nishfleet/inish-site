@@ -103,7 +103,7 @@ def page(edition: dict, archive: list[dict], relative_root: str = "") -> str:
 {cards}
   </main>
   <footer>
-    <div><strong>Archive</strong><div class="archive-links">{archive_links}</div></div>
+    <div><strong>Recent editions</strong><div class="archive-links">{archive_links}<a href="{relative_root}archive/">Full archive →</a></div></div>
     <div class="footer-links"><a href="{relative_root}feed.xml">RSS</a><a href="{relative_root}latest.json">JSON</a><a href="/">About Nish</a></div>
     <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
   </footer>
@@ -124,6 +124,39 @@ def rss(editions: list[dict]) -> str:
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish Daily</title><link>https://inish.in/daily/</link><description>Nish's daily signal feed.</description>" + "".join(items) + "</channel></rss>\n"
 
 
+def archive_page(editions: list[dict]) -> str:
+    links = "\n".join(
+        f'<li><a href="{esc(item["date"])}/"><span>{esc(item["date"])}</span><strong>{len(item["stories"])} stories</strong></a></li>'
+        for item in editions
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nish Daily — Archive</title>
+  <meta name="description" content="Every edition of Nish Daily.">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="archive-page">
+  <header class="masthead">
+    <div class="masthead-top"><a href="/">inish.in</a><span>Every edition</span><span>{len(editions)} total</span></div>
+    <div class="title-row"><div><p class="kicker">Nish Daily</p><h1>Archive</h1></div><p class="dek">Developer and AI signal, one morning at a time.</p></div>
+  </header>
+  <main><ol class="edition-list">{links}</ol></main>
+  <footer><div class="footer-links"><a href="../">Latest edition</a><a href="../feed.xml">RSS</a><a href="../latest.json">JSON</a></div></footer>
+</body>
+</html>
+"""
+
+
+def sitemap(editions: list[dict]) -> str:
+    urls = ["https://inish.in/daily/", "https://inish.in/daily/archive/"]
+    urls.extend(f'https://inish.in/daily/archive/{edition["date"]}/' for edition in editions)
+    body = "".join(f"<url><loc>{esc(url)}</loc></url>" for url in urls)
+    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
+
+
 def main() -> None:
     editions = load_editions()
     latest = editions[0]
@@ -131,6 +164,10 @@ def main() -> None:
     (DAILY / "index.html").write_text(page(latest, editions), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (DAILY / "feed.xml").write_text(rss(editions), encoding="utf-8")
+    archive_root = DAILY / "archive"
+    archive_root.mkdir(parents=True, exist_ok=True)
+    (archive_root / "index.html").write_text(archive_page(editions), encoding="utf-8")
+    (DAILY / "sitemap.xml").write_text(sitemap(editions), encoding="utf-8")
     for edition in editions:
         target = DAILY / "archive" / edition["date"]
         target.mkdir(parents=True, exist_ok=True)
