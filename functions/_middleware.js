@@ -50,6 +50,26 @@ function isFounderPage(url) {
   return url.pathname === "/" || url.pathname === "/index.html";
 }
 
+function isPublicPath(pathname) {
+  const publicPaths = new Set([
+    "/",
+    "/index.html",
+    "/llms.txt",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/daily/",
+    "/daily/index.html",
+    "/daily/app.js",
+    "/daily/styles.css",
+    "/daily/latest.json",
+    "/daily/feed.xml",
+    "/daily/sitemap.xml",
+    "/daily/archive/",
+    "/daily/archive/index.html"
+  ]);
+  return publicPaths.has(pathname) || /^\/daily\/archive\/\d{4}-\d{2}-\d{2}\/(?:index\.html)?$/.test(pathname);
+}
+
 function robotsText(origin) {
   return [
     "User-agent: *",
@@ -71,6 +91,10 @@ function sitemapXml(origin) {
 export async function onRequest(context) {
   const request = context.request;
   const url = new URL(request.url);
+
+  if (!isPublicPath(url.pathname)) {
+    return new Response("Not found", { status: 404 });
+  }
 
   if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/robots.txt") {
     return new Response(request.method === "HEAD" ? null : robotsText(url.origin), {
