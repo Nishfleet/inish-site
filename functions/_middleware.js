@@ -46,8 +46,8 @@ function wantsMarkdown(request) {
   return accept.toLowerCase().includes("text/markdown");
 }
 
-function isPageRequest(url) {
-  return url.pathname === "/" || url.pathname === "/index.html" || (!url.pathname.includes(".") && !url.pathname.startsWith("/assets/"));
+function isFounderPage(url) {
+  return url.pathname === "/" || url.pathname === "/index.html";
 }
 
 function robotsText(origin) {
@@ -87,7 +87,7 @@ export async function onRequest(context) {
     });
   }
 
-  if ((request.method === "GET" || request.method === "HEAD") && wantsMarkdown(request) && isPageRequest(url)) {
+  if ((request.method === "GET" || request.method === "HEAD") && wantsMarkdown(request) && isFounderPage(url)) {
     return new Response(request.method === "HEAD" ? null : markdown, {
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
