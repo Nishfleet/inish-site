@@ -1,3 +1,37 @@
+/* Self-hosted so every visitor sees the same masthead. Archivo and Space Mono
+   are SIL Open Font License 1.1; see /fonts/OFL.txt. */
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/archivo-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Archivo";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/archivo-400-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/archivo-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/space-mono-700.woff2") format("woff2");
+}
+
 :root {
   --paper: #f4efe5;
   --paper-deep: #ebe3d4;
@@ -5,9 +39,9 @@
   --muted: #5c656b;
   --rule: #bdb5a8;
   --red: #a33b31;
-  --serif: "Iowan Old Style", "Baskerville", "Palatino Linotype", georgia, serif;
-  --sans: "Lato", "Trebuchet MS", ui-sans-serif, system-ui, sans-serif;
-  --mono: "SFMono-Regular", consolas, "Liberation Mono", monospace;
+  --display: "Archivo", "Helvetica Neue", helvetica, arial, sans-serif;
+  --text: "Archivo", "Helvetica Neue", helvetica, arial, sans-serif;
+  --mono: "Space Mono", ui-monospace, "SFMono-Regular", consolas, monospace;
 }
 
 * {
@@ -24,7 +58,7 @@ body {
   margin: 0 auto;
   padding: 0 32px;
   background: var(--paper);
-  font-family: var(--sans);
+  font-family: var(--text);
   line-height: 1.52;
 }
 
@@ -85,15 +119,15 @@ body {
 
 h1 {
   margin: 0;
-  font: 700 clamp(64px, 11vw, 136px)/0.76 var(--serif);
-  letter-spacing: -0.075em;
+  font: 700 clamp(64px, 11vw, 136px)/0.82 var(--display);
+  letter-spacing: -0.06em;
 }
 
 .dek {
   max-width: 34ch;
   margin: 0 0 3px;
   color: #3d474e;
-  font: italic 20px/1.32 var(--serif);
+  font: italic 20px/1.32 var(--display);
 }
 
 .filters {
@@ -158,7 +192,7 @@ a:focus-visible {
 .edition-note p {
   max-width: 82ch;
   margin: 0;
-  font: italic 20px/1.38 var(--serif);
+  font: italic 20px/1.38 var(--display);
 }
 
 .story {
@@ -214,8 +248,8 @@ a:focus-visible {
 
 .story h2 {
   margin: 11px 0 13px;
-  font: 700 clamp(25px, 2.8vw, 38px)/1.03 var(--serif);
-  letter-spacing: -0.035em;
+  font: 700 clamp(25px, 2.8vw, 38px)/1.06 var(--display);
+  letter-spacing: -0.022em;
   text-wrap: balance;
 }
 
@@ -286,7 +320,7 @@ a:focus-visible {
 .story .take {
   border-left-color: var(--red);
   color: var(--ink);
-  font: 17px/1.42 var(--serif);
+  font: 17px/1.42 var(--display);
 }
 
 .story .caveat {

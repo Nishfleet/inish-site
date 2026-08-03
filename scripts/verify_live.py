@@ -57,12 +57,22 @@ def main() -> int:
     cache_token = f"{args.commit}-{time.time_ns()}"
     failures: list[str] = []
 
+    # A missing font file fails silently in the browser: the page still renders,
+    # just in whatever face the visitor's OS happens to own. Verify the bytes.
+    fonts = {
+        f"/fonts/{path.name}": f"fonts/{path.name}"
+        for path in sorted((args.root / "fonts").glob("*.woff2"))
+    }
+    if not fonts:
+        failures.append("fonts: no woff2 files found to verify")
+
     for path, relative in {
         "/": "index.html",
         "/app.js": "app.js",
         "/styles.css": "styles.css",
         "/latest.json": "latest.json",
         "/feed.xml": "feed.xml",
+        **fonts,
     }.items():
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
         expected = (args.root / relative).read_bytes()
@@ -71,7 +81,7 @@ def main() -> int:
         if status != 200 or body != expected:
             failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
-    for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml"):
+    for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml", *fonts):
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method="HEAD")
         if status != 200 or body:
             failures.append(f"HEAD {path}: expected empty 200, got {status} and {len(body)} bytes")

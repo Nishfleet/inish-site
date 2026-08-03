@@ -8,6 +8,11 @@ const publicPaths = new Set([
   "/sitemap.xml"
 ]);
 
+// Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
+// future face does not need a middleware edit, and tight enough that it cannot
+// serve anything but a woff2 from this one directory.
+const fontPath = /^\/fonts\/[a-z0-9-]+\.woff2$/;
+
 const redirects = new Map([
   ["/index.html", "/"],
   ["/daily", "/"],
@@ -28,7 +33,7 @@ export async function onRequest(context) {
     destination.search = url.search;
     return Response.redirect(destination, 301);
   }
-  if (!publicPaths.has(url.pathname)) {
+  if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
     return new Response("Not found", {
       status: 404,
       headers: { "Cache-Control": "no-store" }

@@ -359,6 +359,7 @@ def page(edition: dict) -> str:
   <title>Nish Daily — {esc(edition['date'])}</title>
   <meta name="description" content="Nish's daily signal feed for AI, building, design, product, and business.">
   <link rel="alternate" type="application/rss+xml" title="Nish Daily" href="https://inish.in/feed.xml">
+  <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
