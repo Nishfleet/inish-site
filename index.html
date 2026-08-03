@@ -11,133 +11,100 @@
 <body>
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
-    <div class="masthead-top"><a href="/">inish.in</a><span>Monday, 03 August 2026</span><span>11 stories</span></div>
-    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">The useful bits from AI, code, design, product, and business—selected for what Nish is building now.</p></div>
+    <div class="masthead-top"><a href="/">inish.in</a><span>Monday, 03 August 2026</span><span>70 scanned · 8 kept</span></div>
+    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">A daily cut of AI, code, design, product, and business, chosen for ideas worth testing.</p></div>
     <nav class="filters" aria-label="Filter stories">
       <button class="active" data-filter="all">All</button>
       <button data-filter="AI &amp; agents">AI &amp; agents</button><button data-filter="Build &amp; ship">Build &amp; ship</button><button data-filter="Business &amp; growth">Business &amp; growth</button><button data-filter="Design &amp; product">Design &amp; product</button>
     </nav>
   </header>
   <main id="stories" class="stories">
-    <section class="edition-note"><span>Editor’s note</span><p>Today’s signal is about the layer around the model: durable scopes, reusable skills, local inference, and interfaces that earn trust one state at a time. The useful pattern is not more autonomy in the abstract; it is autonomy bounded by explicit tools, evidence, and recovery paths.</p></section>
+    <section class="edition-note"><span>Editor’s note</span><p>Today’s edition asks what keeps an agent or interface trustworthy after the first impressive result. The answers are boundaries, reviewed procedures, honest hardware limits, visible interaction states, and tests that leave room for failure.</p></section>
 
-      <article class="story" data-section="AI &amp; agents">
+      <article class="story story-lead" data-section="AI &amp; agents">
         <div class="story-number">01</div>
         <div class="story-body">
-          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/yc-software/qm" rel="noopener noreferrer">qm makes agent work a shared, scoped system</a></h2>
-          <p>qm is a TypeScript harness for startups that gives each person and room its own scoped memory, files, permissions, crons, web apps, and durable sandbox. It keeps private and shared work separate while letting teams collaborate in Slack and on the web, and it can drive multiple agent harnesses instead of locking a deployment to one vendor.</p>
-          <p class="why"><strong>Why read:</strong> A concrete architecture for moving an agent from one-person assistant to a company surface without making every memory, file, and permission global.</p>
-          <a class="source-link" href="https://github.com/yc-software/qm" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="AI &amp; agents">
-        <div class="story-number">02</div>
-        <div class="story-body">
-          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/microsoft/skill-recorder" rel="noopener noreferrer">Skill Recorder turns one observed task into a reusable procedure</a></h2>
-          <p>Microsoft’s Skill Recorder captures a work session, reconstructs an intent plus ordered steps with Copilot CLI, and lets the user review that analysis before producing a SKILL.md procedure or scheduled Automation. It favors native agent tools such as gh or web_fetch over replaying clicks, so the recording can generalize beyond the original screen.</p>
-          <p class="why"><strong>Why read:</strong> A useful pattern for turning tacit operating knowledge into reviewed procedures instead of leaving it trapped in a one-off screen recording.</p>
-          <a class="source-link" href="https://github.com/microsoft/skill-recorder" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="Build &amp; ship">
-        <div class="story-number">03</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Build &amp; ship</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/micro/mu" rel="noopener noreferrer">Mu puts a broad tool surface behind one MCP endpoint</a></h2>
-          <p>Mu exposes 67 tools for news, search, mail, markets, files, calendars, apps, and more through one MCP endpoint. The project emphasizes that the underlying services are real capabilities rather than wrappers around another catalog, and it can run as a hosted service or a self-hosted Go binary.</p>
-          <p class="why"><strong>Why read:</strong> The single connection and authorization boundary gives agents a coherent tool surface while keeping the underlying services in one operator-controlled system.</p>
-          <a class="source-link" href="https://github.com/micro/mu" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="Build &amp; ship">
-        <div class="story-number">04</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Build &amp; ship</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/sqliteai/waste" rel="noopener noreferrer">WASTE makes storage bandwidth part of the inference design</a></h2>
-          <p>WASTE is a dependency-free C engine for mixture-of-experts models that keeps the shared trunk in RAM and streams selected experts from NVMe. Its README reports running the full 2.78-trillion-parameter Kimi K3 on a 64 GB MacBook Pro at roughly 0.6 tokens per second, with a bounded cache trading speed against memory.</p>
-          <p class="why"><strong>Why read:</strong> A clear systems lesson: a model that does not fit in RAM can become an I/O and caching problem rather than an automatic reason to give up.</p>
-          <a class="source-link" href="https://github.com/sqliteai/waste" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="AI &amp; agents">
-        <div class="story-number">05</div>
-        <div class="story-body">
-          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/QwenAudio/qwen-audio-agent" rel="noopener noreferrer">Qwen Audio keeps the conversation open while work continues</a></h2>
-          <p>Qwen Audio Agent is a real-time voice runtime designed to keep foreground conversation alive while a background agent uses tools or works through a task. The project supports ACP-connected agents, WebUI and terminal interfaces, a macOS desktop surface, task tracking, local profiles, and cross-session memory; its README lists Hermes among supported integrations.</p>
-          <p class="why"><strong>Why read:</strong> A concrete interaction model for assistants that do not make the user choose between talking and waiting for work to finish.</p>
-          <a class="source-link" href="https://github.com/QwenAudio/qwen-audio-agent" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="Design &amp; product">
-        <div class="story-number">06</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Design &amp; product</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/ddoemonn/interior" rel="noopener noreferrer">interior treats the half-second after a click as product infrastructure</a></h2>
-          <p>Interior is a copy-in React collection of micro-interactions built around headless hooks and optional styled examples. Its design notes reserve space before state changes arrive, model motion after the physical event, treat keyboard input as a complete path, handle abandoned gestures, and preserve information when reduced motion is enabled.</p>
-          <p class="why"><strong>Why read:</strong> A compact reminder that polish is not decoration: predictable transitions and complete input paths are part of whether an interface feels trustworthy.</p>
-          <a class="source-link" href="https://github.com/ddoemonn/interior" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="Business &amp; growth">
-        <div class="story-number">07</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Business &amp; growth</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/talivia-group/talivia" rel="noopener noreferrer">Talivia packages revenue context into self-hosted analytics</a></h2>
-          <p>Talivia’s open-source edition combines web analytics, Session Replay, collaborators, shared analytics, import/export, and revenue connections for Stripe, LemonSqueezy, Polar, Dodo, Yolfi, or manual payments. It is a self-hosted subset of Talivia Cloud, built around PostgreSQL with documented backup requirements before upgrades.</p>
-          <p class="why"><strong>Why read:</strong> For a founder, connecting behavior, replay, and customer revenue in one self-hosted surface can shorten the path from traffic signal to product decision.</p>
-          <a class="source-link" href="https://github.com/talivia-group/talivia" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="Business &amp; growth">
-        <div class="story-number">08</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Business &amp; growth</span><span>GitHub</span></div>
-          <h2><a href="https://github.com/trycompai/crm" rel="noopener noreferrer">This CRM makes evidence quality a first-class data model</a></h2>
-          <p>TryCompAI’s CRM is organized around a durable research agent rather than a chat box attached to a database. Incoming events become queued work, the agent decides what to investigate, and tools record observed evidence instead of guessing facts about people; weak evidence stays a human-reviewed suggestion.</p>
-          <p class="why"><strong>Why read:</strong> A strong operational rule for founder systems: a blank field is safer than a confident but unsupported customer fact.</p>
-          <a class="source-link" href="https://github.com/trycompai/crm" rel="noopener noreferrer">Read at github.com ↗</a>
-        </div>
-      </article>
-
-      <article class="story" data-section="AI &amp; agents">
-        <div class="story-number">09</div>
-        <div class="story-body">
           <div class="story-meta"><span>AI &amp; agents</span><span>Stack Overflow Blog</span></div>
-          <h2><a href="https://stackoverflow.blog/2026/07/29/developers-are-attached-to-tools-because-tools-encode-trust/" rel="noopener noreferrer">Agentic tools need process boundaries, not just faster output</a></h2>
-          <p>Stack Overflow’s essay argues that developer tools earn trust by making workflows predictable, while agentic tools are faster, more opaque, and less predictable. Existing linters, tests, CI, and team habits encode an older development process, so validating AI-generated code can take longer even when production is faster.</p>
-          <p class="why"><strong>Why read:</strong> A useful lens for evaluating agent products: reliability comes from clear boundaries and verification habits, not from output speed alone.</p>
+          <h2><a href="https://stackoverflow.blog/2026/07/29/developers-are-attached-to-tools-because-tools-encode-trust/" rel="noopener noreferrer">Agent speed is not the same as a trustworthy workflow</a></h2>
+          <p>Stack Overflow’s essay says developer tools become trusted when their workflows stay predictable. Agentic tools can produce more, faster, but they are harder to inspect; linters, tests, CI, and team habits still carry the older process, so checking generated code may erase some of the speed gain.</p>
+          <p class="why"><strong>Nish's angle:</strong> Speed is a poor substitute for a visible handoff, a testable result, and a way back when an agent gets it wrong.</p>
           <a class="source-link" href="https://stackoverflow.blog/2026/07/29/developers-are-attached-to-tools-because-tools-encode-trust/" rel="noopener noreferrer">Read at stackoverflow.blog ↗</a>
         </div>
       </article>
 
-      <article class="story" data-section="Design &amp; product">
-        <div class="story-number">10</div>
+      <article class="story story-feature" data-section="AI &amp; agents">
+        <div class="story-number">02</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/yc-software/qm" rel="noopener noreferrer">qm separates agent work by person and room</a></h2>
+          <p>qm is a TypeScript harness for startups that gives each person and room its own scoped memory, files, permissions, crons, web apps, and persistent sandbox. It keeps private and shared work separate while teams collaborate in Slack and on the web, and it can drive multiple agent harnesses instead of locking a deployment to one vendor.</p>
+          <p class="why"><strong>Nish's angle:</strong> The separation is the point: shared work can grow without turning every file or memory into a company-wide default.</p>
+          <a class="source-link" href="https://github.com/yc-software/qm" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-feature" data-section="AI &amp; agents">
+        <div class="story-number">03</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI &amp; agents</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/microsoft/skill-recorder" rel="noopener noreferrer">Skill Recorder turns a watched task into reviewed instructions</a></h2>
+          <p>Microsoft’s Skill Recorder records a work session, uses Copilot CLI to reconstruct the intent and ordered steps, then lets the user review them before it writes a SKILL.md procedure or scheduled Automation. It favors native tools such as gh and web_fetch over replaying clicks, which gives the result a chance to work beyond the original screen.</p>
+          <p class="why"><strong>Nish's angle:</strong> Recorded know-how matters more when a person can inspect the procedure before an agent runs it.</p>
+          <a class="source-link" href="https://github.com/microsoft/skill-recorder" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-brief" data-section="Build &amp; ship">
+        <div class="story-number">04</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Build &amp; ship</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/sqliteai/waste" rel="noopener noreferrer">WASTE runs a 2.78-trillion-parameter model from a 64 GB Mac</a></h2>
+          <p>WASTE is a dependency-free C engine for mixture-of-experts models. It holds the shared trunk in RAM and streams selected experts from NVMe; its README reports running Kimi K3 on a 64 GB MacBook Pro at about 0.6 tokens per second, with a bounded cache balancing speed and memory.</p>
+          <p class="why"><strong>Nish's angle:</strong> The bottleneck shifts from “does it fit?” to storage bandwidth, cache behavior, and a speed trade-off a local machine can expose.</p>
+          <a class="source-link" href="https://github.com/sqliteai/waste" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-brief" data-section="Design &amp; product">
+        <div class="story-number">05</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Design &amp; product</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/ddoemonn/interior" rel="noopener noreferrer">Interior makes the wait after a click part of the design</a></h2>
+          <p>Interior is a copy-in React collection of micro-interactions built on headless hooks with optional styled examples. Its notes reserve space before state changes arrive, match motion to the physical event, treat keyboard input as a full path, handle abandoned gestures, and preserve information when reduced motion is on.</p>
+          <p class="why"><strong>Nish's angle:</strong> Trust grows in the small transitions: people should know what changed, what is pending, and what happens if they stop halfway.</p>
+          <a class="source-link" href="https://github.com/ddoemonn/interior" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-brief" data-section="Business &amp; growth">
+        <div class="story-number">06</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Business &amp; growth</span><span>GitHub</span></div>
+          <h2><a href="https://github.com/talivia-group/talivia" rel="noopener noreferrer">Talivia ties product behavior to revenue data</a></h2>
+          <p>Talivia’s open-source edition combines web analytics, Session Replay, collaborators, shared analytics, import/export, and revenue connections for Stripe, LemonSqueezy, Polar, Dodo, Yolfi, or manual payments. It is a self-hosted subset of Talivia Cloud, runs on PostgreSQL, and documents backups before upgrades.</p>
+          <p class="why"><strong>Nish's angle:</strong> Analytics gets sharper when a visit, a replay, and a payment can be read in the same conversation.</p>
+          <a class="source-link" href="https://github.com/talivia-group/talivia" rel="noopener noreferrer">Read at github.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-brief" data-section="Design &amp; product">
+        <div class="story-number">07</div>
         <div class="story-body">
           <div class="story-meta"><span>Design &amp; product</span><span>Little Language Models</span></div>
-          <h2><a href="https://littlelanguagemodels.com/how-to-structure-your-sites-after-a-big-acquisition/" rel="noopener noreferrer">Acquisition websites get clearer when organized around user goals</a></h2>
-          <p>Little Language Models recommends starting a multi-company website redesign with user goals rather than product ownership. Cross-company teams write goals for one another, group navigation and content around the actions users need to take, test labels and hierarchy with a small user group, and think horizontally about reusable content across pages.</p>
-          <p class="why"><strong>Why read:</strong> The method turns a rebrand debate into an information-architecture exercise grounded in user jobs, which is a durable way to integrate multiple products.</p>
+          <h2><a href="https://littlelanguagemodels.com/how-to-structure-your-sites-after-a-big-acquisition/" rel="noopener noreferrer">Acquisition sites should start with user jobs</a></h2>
+          <p>Little Language Models says a multi-company redesign should begin with user goals, not product ownership. Teams write goals for one another, group navigation and content around the actions people need, test labels and hierarchy with a small user group, and reuse content horizontally across pages.</p>
+          <p class="why"><strong>Nish's angle:</strong> A merger is an information-architecture problem before it is a branding problem: start with what people came to do.</p>
           <a class="source-link" href="https://littlelanguagemodels.com/how-to-structure-your-sites-after-a-big-acquisition/" rel="noopener noreferrer">Read at littlelanguagemodels.com ↗</a>
         </div>
       </article>
 
-      <article class="story" data-section="Design &amp; product">
-        <div class="story-number">11</div>
+      <article class="story story-brief" data-section="Design &amp; product">
+        <div class="story-number">08</div>
         <div class="story-body">
-          <div class="story-meta"><span>Design &amp; product</span><span>Hacker News / Karpathy</span></div>
-          <h2><a href="https://twitter.com/karpathy/status/2083749667410727319" rel="noopener noreferrer">The Pelican benchmark is a useful test of spatial reasoning</a></h2>
-          <p>Karpathy’s Pelican post sparked a large Hacker News discussion about whether models can build a convincing pelican-on-a-bike scene through code and spatial reasoning rather than a video-generation pipeline. Commenters split between treating it as a fun, difficult benchmark and arguing that the format is already saturated, but the disagreement points to the need for tests with visible room to improve.</p>
-          <p class="why"><strong>Why read:</strong> A compact, inspectable visual task can expose consistency failures that polished generated media hides, making it more useful than a demo judged only by vibes.</p>
+          <div class="story-meta"><span>Design &amp; product</span><span>Karpathy</span></div>
+          <h2><a href="https://twitter.com/karpathy/status/2083749667410727319" rel="noopener noreferrer">Pelican makes spatial reasoning visible</a></h2>
+          <p>Karpathy’s Pelican post presents a pelican-on-a-bike scene as a test of whether models can build a convincing result through code and spatial reasoning rather than a video-generation pipeline. The task makes the model’s handling of objects and their relationships visible instead of hiding it inside a polished video.</p>
+          <p class="why"><strong>Nish's angle:</strong> A small scene you can inspect beats a polished demo when the goal is to see where a model loses track of space.</p>
           <a class="source-link" href="https://twitter.com/karpathy/status/2083749667410727319" rel="noopener noreferrer">Read at twitter.com ↗</a>
         </div>
       </article>
