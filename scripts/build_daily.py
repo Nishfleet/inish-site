@@ -17,7 +17,8 @@ DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
 ASSETS = ("app.js", "styles.css")
 SECTIONS = {"AI & agents", "Build & ship", "Design & product", "Business & growth"}
-EDITION_FIELDS = {"date", "editor_note", "stories"}
+REQUIRED_EDITION_FIELDS = {"date", "editor_note", "stories"}
+OPTIONAL_EDITION_FIELDS = {"candidate_count"}
 STORY_FIELDS = {"title", "url", "source", "section", "summary", "why_it_matters"}
 
 
@@ -56,16 +57,32 @@ def validate_text(value: object, field: str, minimum: int, maximum: int) -> str:
 
 def load_editions() -> list[dict]:
     editions = []
-    for path in sorted(EDITIONS.glob("*.json"), reverse=True):
+    edition_paths = sorted(EDITIONS.glob("*.json"), reverse=True)
+    for index, path in enumerate(edition_paths):
         edition = json.loads(path.read_text())
-        if set(edition) != EDITION_FIELDS:
-            raise ValueError(f"{path}: edition fields must be exactly {sorted(EDITION_FIELDS)}")
+        fields = set(edition)
+        allowed_fields = REQUIRED_EDITION_FIELDS | OPTIONAL_EDITION_FIELDS
+        if not REQUIRED_EDITION_FIELDS <= fields or fields - allowed_fields:
+            raise ValueError(
+                f"{path}: edition fields must include {sorted(REQUIRED_EDITION_FIELDS)} "
+                f"and may include {sorted(OPTIONAL_EDITION_FIELDS)}"
+            )
+        if index == 0 and "candidate_count" not in fields:
+            raise ValueError(f"{path}: latest edition requires candidate_count")
         day = dt.date.fromisoformat(edition["date"])
         if path.stem != day.isoformat():
             raise ValueError(f"Edition filename/date mismatch: {path}")
         stories = edition.get("stories", [])
+        if not isinstance(stories, list):
+            raise ValueError(f"{path}: stories must be a list")
         if not 5 <= len(stories) <= 15:
             raise ValueError(f"{path}: expected 5-15 stories")
+        if "candidate_count" in edition:
+            candidate_count = edition["candidate_count"]
+            if isinstance(candidate_count, bool) or not isinstance(candidate_count, int) or candidate_count <= 0:
+                raise ValueError(f"{path}: candidate_count must be a positive non-bool integer")
+            if candidate_count < len(stories):
+                raise ValueError(f"{path}: candidate_count must be at least the kept story count")
         clean_stories = []
         seen = set()
         for story in stories:
@@ -86,35 +103,54 @@ def load_editions() -> list[dict]:
                 "summary": validate_text(story["summary"], "summary", 25, 700),
                 "why_it_matters": validate_text(story["why_it_matters"], "why_it_matters", 20, 500),
             })
-        editions.append({
-            "date": day.isoformat(),
+        clean_edition = {"date": day.isoformat()}
+        if "candidate_count" in edition:
+            clean_edition["candidate_count"] = edition["candidate_count"]
+        clean_edition.update({
             "editor_note": validate_text(edition["editor_note"], "editor_note", 20, 1000),
             "stories": clean_stories,
         })
+        editions.append(clean_edition)
     if not editions:
         raise ValueError("No editions found")
+    if not 7 <= len(editions[0]["stories"]) <= 9:
+        raise ValueError(f"Latest edition must contain 7-9 stories; found {len(editions[0]['stories'])}")
     return editions
 
 
-def story_card(story: dict, index: int) -> str:
+def story_card(story: dict, index: int, prominence: str) -> str:
     domain = urlparse(story["url"]).netloc.removeprefix("www.")
     return f"""
-      <article class="story" data-section="{esc(story['section'])}">
+      <article class="story story-{esc(prominence)}" data-section="{esc(story['section'])}">
         <div class="story-number">{index:02d}</div>
         <div class="story-body">
           <div class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></div>
           <h2><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></h2>
           <p>{esc(story['summary'])}</p>
-          <p class="why"><strong>Why read:</strong> {esc(story['why_it_matters'])}</p>
+          <p class="why"><strong>Nish's angle:</strong> {esc(story['why_it_matters'])}</p>
           <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} ↗</a>
         </div>
       </article>"""
 
 
+def prominence_for(index: int) -> str:
+    if index == 1:
+        return "lead"
+    if index in (2, 3):
+        return "feature"
+    return "brief"
+
+
 def page(edition: dict) -> str:
     date = dt.date.fromisoformat(edition["date"])
     title_date = date.strftime("%A, %d %B %Y")
-    cards = "\n".join(story_card(story, index) for index, story in enumerate(edition["stories"], 1))
+    kept_count = len(edition["stories"])
+    candidate_count = edition.get("candidate_count")
+    count_label = f"{candidate_count} scanned · {kept_count} kept" if candidate_count is not None else f"{kept_count} kept"
+    cards = "\n".join(
+        story_card(story, index, prominence_for(index))
+        for index, story in enumerate(edition["stories"], 1)
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -128,8 +164,8 @@ def page(edition: dict) -> str:
 <body>
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
-    <div class="masthead-top"><a href="/">inish.in</a><span>{esc(title_date)}</span><span>{len(edition['stories'])} stories</span></div>
-    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">The useful bits from AI, code, design, product, and business—selected for what Nish is building now.</p></div>
+    <div class="masthead-top"><a href="/">inish.in</a><span>{esc(title_date)}</span><span>{esc(count_label)}</span></div>
+    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">A daily cut of AI, code, design, product, and business, chosen for ideas worth testing.</p></div>
     <nav class="filters" aria-label="Filter stories">
       <button class="active" data-filter="all">All</button>
       {''.join(f'<button data-filter="{esc(section)}">{esc(section)}</button>' for section in sorted(SECTIONS))}
