@@ -50,7 +50,18 @@ Fewer stories is always the correct answer to a weak day. Six checked items beat
 
 Prefer a named, checkable source for a claim: "Bessemer, tracking 200+ AI vendors" beats "a report says". When the best available account is a secondary one, say so in the caveat rather than dressing it up.
 
-`fetch_candidates.py` tags every candidate with an `evidence_class`:
+`fetch_candidates.py` pulls from sources chosen for this reader, and tags each candidate with a `lens` naming the section it most likely feeds:
+
+- **AI** — OpenAI's own newsroom and TechCrunch's AI desk. OpenAI's feed is the primary source for its own launches and pricing; use it rather than a trade-press rewrite.
+- **Demand signals** — Google News queries for funding rounds and enterprise AI spending, plus r/startups and r/Entrepreneur.
+- **Product ideas** — Product Hunt, Show HN, and r/SaaS. What people are launching, and what founders say they will pay for.
+- **Tools** — Hacker News, Lobsters, GitHub. This lane is deliberately last: it produces the engineer-facing stories that made earlier editions useless, so hold it to the "would this change what Nish does next week" test.
+
+The `lens` is a hint from the fetcher, not a verdict. Put a story in the section that fits it after you have read it.
+
+Reddit serves its JSON API 403 to anything automated, so those subreddits come through RSS with a browser user-agent and deliberate pauses. Reddit rate-limits hard; a 429 there is normal, non-fatal, and reported in `source_errors`.
+
+Each candidate also carries an `evidence_class`:
 
 - `independent` — surfaced by a third party rather than by its own author. Prefer these, but check the comment count before treating one as validated: a submission nobody replied to has been seen, not argued about. The comment threads attached to Hacker News candidates are where the real objections live; read them before writing the caveat.
 - `self-reported` — the only account of it is the author's own. A company blog announcing its own success is marketing. It can run, but only if you verified something beyond the pitch, and it can never be the lead.

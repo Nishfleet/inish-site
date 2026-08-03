@@ -1,17 +1,17 @@
 {
   "date": "2026-08-03",
-  "candidate_count": 125,
+  "candidate_count": 214,
   "editor_note": "New shape from today: this is written for me, not for engineers. What AI now costs, how companies are charging for it, where people are already paying, and one for fun. Anything I could not check against a real number was left out.",
   "stories": [
     {
       "title": "OpenAI cut the price of its cheap model by 80%",
-      "url": "https://influencermagazine.uk/2026/07/openai-slashes-prices-on-smaller-ai-models-as-enterprise-clients-rethink-technology-spending/",
-      "source": "Influencer Magazine",
+      "url": "https://openai.com/index/advancing-the-price-performance-frontier-with-gpt-5-6",
+      "source": "OpenAI",
       "section": "AI",
-      "summary": "OpenAI cut what it charges for its smaller models. These providers bill by the token — roughly a chunk of a word — and the cheapest option now costs a fifth of what it did last month. The company says this comes from efficiency gains, but it lands while business customers are openly pushing back on how much AI costs them.",
-      "fact": "From 30 July 2026 Luna costs $0.20 per million input tokens and $1.20 per million output, down from $1.00 and $6.00. Mid-tier Terra fell 20%; the top model was left alone.",
-      "take": "I run my agents on exactly this tier, so Luna at a fifth of the old price changes what I can afford to leave working overnight.",
-      "caveat": "This is a trade-press write-up and I could not find OpenAI's own announcement, so treat the figures as reported rather than confirmed."
+      "summary": "OpenAI found ways to run its models more cheaply and has passed the saving on. The cheap tier now costs a fifth of what it did; the middle tier is a fifth cheaper. If you pay for Codex, this also changes how your usage is counted against that subscription, so the saving arrives whether or not you do anything.",
+      "fact": "From 30 July 2026 GPT-5.6 Luna costs 80% less and Terra 20% less. OpenAI claims Luna matches last year's top models at roughly 6 cents on the dollar per task, at nearly nine times the speed.",
+      "take": "I pay for Codex, so a Luna price cut lands on my bill without me changing a thing — and it makes leaving agents running overnight a much easier call.",
+      "caveat": "The six-cents and nine-times figures are OpenAI's own, measured on its own tests. A cheaper model that needs three attempts is not actually cheaper."
     },
     {
       "title": "Why AI prices are falling, and who was making the money",
