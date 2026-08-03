@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-USER_AGENT = "inish-daily/1.0 (+https://inish.in/daily/)"
+USER_AGENT = "inish-daily/1.0 (+https://inish.in/)"
 
 
 def get_json(url: str) -> dict:

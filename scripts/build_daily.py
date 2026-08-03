@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Validate editions and render the static Nish Daily site, archive, JSON, and RSS."""
+"""Validate editions and render the latest Nish Daily feed at the site root."""
 
 from __future__ import annotations
 
 import datetime as dt
 import html
+import ipaddress
 import json
 import shutil
 from pathlib import Path
@@ -12,7 +13,9 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
-DAILY = ROOT / "daily"
+DAILY = ROOT
+LEGACY_DAILY = ROOT / "daily"
+ASSETS = ("app.js", "styles.css")
 SECTIONS = {"AI & agents", "Build & ship", "Design & product", "Business & growth"}
 EDITION_FIELDS = {"date", "editor_note", "stories"}
 STORY_FIELDS = {"title", "url", "source", "section", "summary", "why_it_matters"}
@@ -27,8 +30,18 @@ def validate_url(value: object) -> str:
         raise ValueError("Story URL must be a string")
     url = str(value)
     parsed = urlparse(url)
-    if parsed.scheme != "https" or not parsed.netloc:
+    hostname = parsed.hostname
+    if parsed.scheme != "https" or not parsed.netloc or not hostname or parsed.username or parsed.password:
         raise ValueError(f"Only public HTTPS story URLs are allowed: {url}")
+    try:
+        address = ipaddress.ip_address(hostname)
+    except ValueError:
+        lowered = hostname.lower().rstrip(".")
+        if "." not in lowered or lowered == "localhost" or lowered.endswith((".localhost", ".local", ".internal")):
+            raise ValueError(f"Only public HTTPS story URLs are allowed: {url}") from None
+    else:
+        if not address.is_global:
+            raise ValueError(f"Only public HTTPS story URLs are allowed: {url}")
     return url
 
 
@@ -98,13 +111,10 @@ def story_card(story: dict, index: int) -> str:
       </article>"""
 
 
-def page(edition: dict, archive: list[dict], relative_root: str = "") -> str:
+def page(edition: dict) -> str:
     date = dt.date.fromisoformat(edition["date"])
     title_date = date.strftime("%A, %d %B %Y")
     cards = "\n".join(story_card(story, index) for index, story in enumerate(edition["stories"], 1))
-    archive_links = "\n".join(
-        f'<a href="{relative_root}archive/{esc(item["date"])}/">{esc(item["date"])}</a>' for item in archive[:14]
-    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -112,8 +122,8 @@ def page(edition: dict, archive: list[dict], relative_root: str = "") -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nish Daily — {esc(edition['date'])}</title>
   <meta name="description" content="Nish's daily signal feed for AI, building, design, product, and business.">
-  <link rel="alternate" type="application/rss+xml" title="Nish Daily" href="https://inish.in/daily/feed.xml">
-  <link rel="stylesheet" href="{relative_root}styles.css">
+  <link rel="alternate" type="application/rss+xml" title="Nish Daily" href="https://inish.in/feed.xml">
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <a class="skip" href="#stories">Skip to stories</a>
@@ -130,83 +140,58 @@ def page(edition: dict, archive: list[dict], relative_root: str = "") -> str:
 {cards}
   </main>
   <footer>
-    <div><strong>Recent editions</strong><div class="archive-links">{archive_links}<a href="{relative_root}archive/">Full archive →</a></div></div>
-    <div class="footer-links"><a href="{relative_root}feed.xml">RSS</a><a href="{relative_root}latest.json">JSON</a><a href="/">About Nish</a></div>
+    <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a></div>
     <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
   </footer>
-  <script src="{relative_root}app.js" defer></script>
+  <script src="/app.js" defer></script>
 </body>
 </html>
 """
 
 
 def rss(editions: list[dict]) -> str:
-    items = []
-    for edition in editions[:30]:
-        day = dt.date.fromisoformat(edition["date"])
-        link = f"https://inish.in/daily/archive/{day.isoformat()}/"
-        description = html.escape(edition["editor_note"])
-        published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
-        items.append(f"<item><title>Nish Daily — {day.isoformat()}</title><link>{link}</link><guid>{link}</guid><pubDate>{published}</pubDate><description>{description}</description></item>")
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish Daily</title><link>https://inish.in/daily/</link><description>Nish's daily signal feed.</description>" + "".join(items) + "</channel></rss>\n"
+    edition = editions[0]
+    day = dt.date.fromisoformat(edition["date"])
+    link = "https://inish.in/"
+    description = html.escape(edition["editor_note"])
+    published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
+    guid = f"inish-daily-{day.isoformat()}"
+    item = f"<item><title>Nish Daily — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish Daily</title><link>https://inish.in/</link><description>Nish's daily signal feed.</description>" + item + "</channel></rss>\n"
 
 
-def archive_page(editions: list[dict]) -> str:
-    links = "\n".join(
-        f'<li><a href="{esc(item["date"])}/"><span>{esc(item["date"])}</span><strong>{len(item["stories"])} stories</strong></a></li>'
-        for item in editions
-    )
-    return f"""<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nish Daily — Archive</title>
-  <meta name="description" content="Every edition of Nish Daily.">
-  <link rel="stylesheet" href="../styles.css">
-</head>
-<body class="archive-page">
-  <header class="masthead">
-    <div class="masthead-top"><a href="/">inish.in</a><span>Every edition</span><span>{len(editions)} total</span></div>
-    <div class="title-row"><div><p class="kicker">Nish Daily</p><h1>Archive</h1></div><p class="dek">Developer and AI signal, one morning at a time.</p></div>
-  </header>
-  <main><ol class="edition-list">{links}</ol></main>
-  <footer><div class="footer-links"><a href="../">Latest edition</a><a href="../feed.xml">RSS</a><a href="../latest.json">JSON</a></div></footer>
-</body>
-</html>
-"""
-
-
-def sitemap(editions: list[dict]) -> str:
-    urls = ["https://inish.in/daily/", "https://inish.in/daily/archive/"]
-    urls.extend(f'https://inish.in/daily/archive/{edition["date"]}/' for edition in editions)
-    body = "".join(f"<url><loc>{esc(url)}</loc></url>" for url in urls)
+def sitemap() -> str:
+    body = '<url><loc>https://inish.in/</loc></url>'
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
+
+
+def copy_assets() -> None:
+    for name in ASSETS:
+        source = LEGACY_DAILY / name
+        destination = DAILY / name
+        if source.is_file() and source.resolve() != destination.resolve():
+            shutil.copyfile(source, destination)
+        elif not destination.is_file():
+            raise FileNotFoundError(f"Missing Nish Daily asset: {source}")
 
 
 def main() -> None:
     editions = load_editions()
     latest = editions[0]
-    DAILY.mkdir(exist_ok=True)
-    (DAILY / "index.html").write_text(page(latest, editions), encoding="utf-8")
+    DAILY.mkdir(parents=True, exist_ok=True)
+    copy_assets()
+    archive_roots = [DAILY / "archive"]
+    if DAILY == ROOT:
+        archive_roots.append(LEGACY_DAILY / "archive")
+    for archive_root in set(archive_roots):
+        if archive_root.is_symlink() or archive_root.is_file():
+            archive_root.unlink()
+        elif archive_root.is_dir():
+            shutil.rmtree(archive_root)
+    (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (DAILY / "feed.xml").write_text(rss(editions), encoding="utf-8")
-    archive_root = DAILY / "archive"
-    archive_root.mkdir(parents=True, exist_ok=True)
-    live_dates = {edition["date"] for edition in editions}
-    for child in archive_root.iterdir():
-        if child.is_dir() and child.name not in live_dates:
-            try:
-                dt.date.fromisoformat(child.name)
-            except ValueError:
-                continue
-            shutil.rmtree(child)
-    (archive_root / "index.html").write_text(archive_page(editions), encoding="utf-8")
-    (DAILY / "sitemap.xml").write_text(sitemap(editions), encoding="utf-8")
-    for edition in editions:
-        target = DAILY / "archive" / edition["date"]
-        target.mkdir(parents=True, exist_ok=True)
-        (target / "index.html").write_text(page(edition, editions, "../../"), encoding="utf-8")
+    (DAILY / "sitemap.xml").write_text(sitemap(), encoding="utf-8")
     print(f"built {len(editions)} edition(s); latest={latest['date']} stories={len(latest['stories'])}")
 
 
