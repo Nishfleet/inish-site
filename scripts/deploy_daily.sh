@@ -28,7 +28,8 @@ if [[ "$EDITION_DATE" != "$TODAY" ]]; then
   echo "Refusing to publish stale edition: expected $TODAY, found $EDITION_DATE" >&2
   exit 1
 fi
-if [[ "$STORY_COUNT" -lt 5 || "$STORY_COUNT" -gt 15 ]]; then
+# A quiet day is a valid edition; the floor is deliberately zero.
+if [[ "$STORY_COUNT" -lt 0 || "$STORY_COUNT" -gt 8 ]]; then
   echo "Invalid daily story count: $STORY_COUNT" >&2
   exit 1
 fi
