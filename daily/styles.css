@@ -264,30 +264,81 @@ a:focus-visible {
   line-height: 1.46;
 }
 
-.story .why {
+.story .fact,
+.story .take,
+.story .caveat {
   max-width: 72ch;
-  margin-top: 16px;
-  border-left: 2px solid var(--red);
-  padding-left: 12px;
+  margin: 0;
+  padding: 7px 0 7px 13px;
+  border-left: 2px solid var(--rule);
   color: #404a51;
   font-size: 14px;
 }
 
-.story-brief .why {
-  margin-top: 12px;
-  font-size: 13px;
+.story .fact {
+  margin-top: 15px;
+  border-left-color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
 }
 
-.story .why strong {
-  color: var(--red);
-  font: 700 10px/1.2 var(--mono);
-  letter-spacing: 0.06em;
+.story .take {
+  border-left-color: var(--red);
+  color: var(--ink);
+  font: 17px/1.42 var(--serif);
+}
+
+.story .caveat {
+  padding-bottom: 9px;
+  font-size: 13.5px;
+  font-style: italic;
+}
+
+.story-lead .take {
+  font-size: 20px;
+}
+
+.story-brief .fact {
+  margin-top: 12px;
+  font-size: 11.5px;
+}
+
+.story-brief .take {
+  font-size: 15px;
+}
+
+.story-brief .caveat {
+  font-size: 12.5px;
+}
+
+.story .fact strong,
+.story .take strong,
+.story .caveat strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font: 700 9.5px/1.2 var(--mono);
+  font-style: normal;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
+}
+
+.story .take strong {
+  color: var(--red);
+}
+
+.quiet-day h2 {
+  max-width: 24ch;
+}
+
+.quiet-day p {
+  font-size: 17px;
 }
 
 .source-link {
   display: inline-block;
-  margin-top: 2px;
+  margin-top: 14px;
   color: var(--red);
   font: 700 11px/1.2 var(--mono);
   text-decoration: none;

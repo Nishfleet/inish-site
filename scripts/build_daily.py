@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Validate editions and render the latest Nish Daily feed at the site root."""
+"""Validate editions and render the latest Nish Daily feed at the site root.
+
+The validator is the editorial gate. An edition that reads like generic AI copy
+should fail here rather than reach inish.in, so most of this file is refusal
+logic: every story must carry a checkable detail, every take must be first
+person and anchored to that story, and nothing may repeat itself or a recent
+edition.
+"""
 
 from __future__ import annotations
 
@@ -7,6 +14,7 @@ import datetime as dt
 import html
 import ipaddress
 import json
+import re
 import shutil
 from pathlib import Path
 from urllib.parse import urlparse
@@ -17,13 +25,96 @@ DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
 ASSETS = ("app.js", "styles.css")
 SECTIONS = {"AI & agents", "Build & ship", "Design & product", "Business & growth"}
-REQUIRED_EDITION_FIELDS = {"date", "editor_note", "stories"}
-OPTIONAL_EDITION_FIELDS = {"candidate_count"}
-STORY_FIELDS = {"title", "url", "source", "section", "summary", "why_it_matters"}
+REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
+STORY_FIELDS = {"title", "url", "source", "section", "summary", "fact", "take", "caveat"}
+
+MAX_STORIES = 8
+MAX_PER_SECTION = 4
+MAX_PER_DOMAIN = 3
+REPEAT_WINDOW_DAYS = 30
+SHARED_PHRASE_LENGTH = 6
+
+FIRST_PERSON = re.compile(r"\b(I|I'm|I'd|I've|I'll|my|me|mine)\b")
+# Deliberately excludes the bare apostrophe: "the project's approach" is a
+# contraction, not a quotation, and must not satisfy the fact gate on its own.
+QUOTED = re.compile(r"[\"“”]")
+WORD = re.compile(r"[a-z0-9][a-z0-9'+.-]*")
+
+# Openers that produce an aphorism true of any story. Cheap to check, and every
+# one of these was published before the gate existed.
+APHORISM_OPENERS = (
+    "the point is",
+    "the real question",
+    "the interesting part",
+    "trust grows",
+    "speed is",
+    "this matters because",
+    "what matters is",
+    "the bottleneck",
+    "it turns out",
+)
+
+# Ordinary words carry no evidence that a take is about its own story.
+ANCHOR_STOPWORDS = {
+    "about", "after", "again", "against", "agent", "agents", "already", "also", "another",
+    "anything", "around", "because", "been", "before", "being", "better", "between", "both",
+    "build", "building", "built", "cannot", "code", "could", "data", "does", "doing",
+    "done", "down", "during", "each", "else", "enough", "even", "ever", "every", "everything",
+    "from", "gets", "give", "goes", "going", "good", "have", "here", "how", "into", "just",
+    "keep", "kind", "know", "less", "like", "little", "long", "look", "made", "make", "makes",
+    "many", "might", "model", "models", "more", "most", "much", "must", "need", "needs", "never",
+    "next", "nothing", "often", "once", "only", "other", "over", "own", "part", "people",
+    "point", "pretty", "probably", "product", "project", "really", "right", "same", "seems",
+    "sees", "should", "since", "some", "someone", "something", "still", "such", "take", "takes",
+    "than", "that", "their", "them", "then", "there", "these", "they", "thing", "things", "think",
+    "this", "those", "through", "time", "tool", "tools", "under", "until", "used", "uses",
+    "using", "very", "want", "well", "were", "what", "when", "where", "which", "while", "who",
+    "why", "will", "with", "without", "work", "working", "works", "would", "your",
+}
 
 
 def esc(value: object) -> str:
     return html.escape(str(value), quote=True)
+
+
+def words(text: str) -> list[str]:
+    # Inner dots and hyphens are kept on purpose so "1.8s", "v2.1", and
+    # "six-week" survive; trailing ones are punctuation, not part of the word.
+    cleaned = []
+    for match in WORD.findall(text.lower()):
+        word = match.strip(".-'")
+        if word.endswith("'s"):
+            word = word[:-2]  # so "postmark's" still anchors to "postmark"
+        if word:
+            cleaned.append(word)
+    return cleaned
+
+
+def singular(word: str) -> str:
+    """Enough stemming that a plural in the take still matches a singular headline."""
+    if len(word) >= 5 and word.endswith("s") and not word.endswith(("ss", "us", "is")):
+        return word[:-1]
+    return word
+
+
+def anchors(text: str) -> set[str]:
+    return {
+        singular(word)
+        for word in words(text)
+        if len(word) >= 4 and word not in ANCHOR_STOPWORDS
+    }
+
+
+def phrases(text: str, length: int = SHARED_PHRASE_LENGTH) -> set[str]:
+    tokens = words(text)
+    return {" ".join(tokens[index:index + length]) for index in range(len(tokens) - length + 1)}
+
+
+def canonical_url(url: str) -> str:
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    path = parsed.path.rstrip("/").lower()
+    return f"{host}{path}"
 
 
 def validate_url(value: object) -> str:
@@ -51,71 +142,160 @@ def validate_text(value: object, field: str, minimum: int, maximum: int) -> str:
         raise ValueError(f"{field} must be a string")
     text = value.strip()
     if not minimum <= len(text) <= maximum:
-        raise ValueError(f"{field} must contain {minimum}-{maximum} characters")
+        raise ValueError(f"{field} must contain {minimum}-{maximum} characters; found {len(text)}")
     return text
 
 
-def load_editions() -> list[dict]:
-    editions = []
-    edition_paths = sorted(EDITIONS.glob("*.json"), reverse=True)
-    for index, path in enumerate(edition_paths):
-        edition = json.loads(path.read_text())
-        fields = set(edition)
-        allowed_fields = REQUIRED_EDITION_FIELDS | OPTIONAL_EDITION_FIELDS
-        if not REQUIRED_EDITION_FIELDS <= fields or fields - allowed_fields:
+def validate_fact(value: object) -> str:
+    """A story earns its place with one detail a reader could go and check."""
+    text = validate_text(value, "fact", 15, 240)
+    if not any(character.isdigit() for character in text) and not QUOTED.search(text):
+        raise ValueError(
+            f"fact must carry a checkable detail — a number, version, date, price, or a quote "
+            f"lifted from the source: {text!r}"
+        )
+    return text
+
+
+def validate_take(value: object, anchor_pool: set[str]) -> str:
+    """First person, and demonstrably about this story rather than any story."""
+    text = validate_text(value, "take", 25, 260)
+    if not FIRST_PERSON.search(text):
+        raise ValueError(f"take must be written in the first person: {text!r}")
+    lowered = text.lower()
+    for opener in APHORISM_OPENERS:
+        if lowered.startswith(opener):
+            raise ValueError(f"take opens with the aphorism pattern {opener!r}: {text!r}")
+    if not anchors(text) & anchor_pool:
+        raise ValueError(
+            f"take shares no specific term with its own headline or fact, so it reads as generic: {text!r}"
+        )
+    return text
+
+
+def check_edition_repetition(stories: list[dict]) -> None:
+    """Catch the tell of generated copy: the same sentence shape, eight times."""
+    seen_phrases: dict[str, int] = {}
+    seen_openers: dict[str, int] = {}
+    seen_facts: dict[str, int] = {}
+    for index, story in enumerate(stories, 1):
+        body = " ".join((story["summary"], story["take"], story["caveat"]))
+        for phrase in phrases(body):
+            if phrase in seen_phrases:
+                raise ValueError(
+                    f"stories {seen_phrases[phrase]} and {index} share the phrase {phrase!r}"
+                )
+            seen_phrases[phrase] = index
+
+        opener = " ".join(words(story["take"])[:2])
+        if opener and opener in seen_openers:
             raise ValueError(
-                f"{path}: edition fields must include {sorted(REQUIRED_EDITION_FIELDS)} "
-                f"and may include {sorted(OPTIONAL_EDITION_FIELDS)}"
+                f"stories {seen_openers[opener]} and {index} both open their take with {opener!r}"
             )
-        if index == 0 and "candidate_count" not in fields:
-            raise ValueError(f"{path}: latest edition requires candidate_count")
-        day = dt.date.fromisoformat(edition["date"])
-        if path.stem != day.isoformat():
-            raise ValueError(f"Edition filename/date mismatch: {path}")
-        stories = edition.get("stories", [])
-        if not isinstance(stories, list):
-            raise ValueError(f"{path}: stories must be a list")
-        if not 5 <= len(stories) <= 15:
-            raise ValueError(f"{path}: expected 5-15 stories")
-        if "candidate_count" in edition:
-            candidate_count = edition["candidate_count"]
-            if isinstance(candidate_count, bool) or not isinstance(candidate_count, int) or candidate_count <= 0:
-                raise ValueError(f"{path}: candidate_count must be a positive non-bool integer")
-            if candidate_count < len(stories):
-                raise ValueError(f"{path}: candidate_count must be at least the kept story count")
-        clean_stories = []
-        seen = set()
-        for story in stories:
-            if not isinstance(story, dict) or set(story) != STORY_FIELDS:
-                raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
-            url = validate_url(story["url"])
-            if url in seen:
-                raise ValueError(f"{path}: duplicate URL {url}")
-            section = validate_text(story["section"], "section", 2, 40)
-            if section not in SECTIONS:
-                raise ValueError(f"{path}: unsupported section {section}")
-            seen.add(url)
-            clean_stories.append({
-                "title": validate_text(story["title"], "title", 5, 200),
-                "url": url,
-                "source": validate_text(story["source"], "source", 2, 100),
-                "section": section,
-                "summary": validate_text(story["summary"], "summary", 25, 700),
-                "why_it_matters": validate_text(story["why_it_matters"], "why_it_matters", 20, 500),
-            })
-        clean_edition = {"date": day.isoformat()}
-        if "candidate_count" in edition:
-            clean_edition["candidate_count"] = edition["candidate_count"]
-        clean_edition.update({
-            "editor_note": validate_text(edition["editor_note"], "editor_note", 20, 1000),
-            "stories": clean_stories,
-        })
-        editions.append(clean_edition)
-    if not editions:
+        seen_openers[opener] = index
+
+        fact_key = " ".join(words(story["fact"]))
+        if fact_key in seen_facts:
+            raise ValueError(f"stories {seen_facts[fact_key]} and {index} repeat the same fact")
+        seen_facts[fact_key] = index
+
+
+def check_edition_balance(stories: list[dict]) -> None:
+    sections: dict[str, int] = {}
+    domains: dict[str, int] = {}
+    for story in stories:
+        section = story["section"]
+        sections[section] = sections.get(section, 0) + 1
+        if sections[section] > MAX_PER_SECTION:
+            raise ValueError(f"more than {MAX_PER_SECTION} stories in section {section}")
+        domain = (urlparse(story["url"]).hostname or "").lower().removeprefix("www.")
+        domains[domain] = domains.get(domain, 0) + 1
+        if domains[domain] > MAX_PER_DOMAIN:
+            raise ValueError(
+                f"more than {MAX_PER_DOMAIN} stories from {domain}; an edition of one source is a scrape, not a read"
+            )
+
+
+def load_history(latest_date: dt.date) -> dict[str, str]:
+    """Recent URLs, so the feed cannot rediscover what it ran days ago."""
+    published: dict[str, str] = {}
+    cutoff = latest_date - dt.timedelta(days=REPEAT_WINDOW_DAYS)
+    for path in sorted(EDITIONS.glob("*.json")):
+        try:
+            day = dt.date.fromisoformat(path.stem)
+        except ValueError as error:
+            raise ValueError(f"Edition filename must be a date: {path}") from error
+        if day >= latest_date or day < cutoff:
+            continue
+        edition = json.loads(path.read_text())
+        for story in edition.get("stories", []):
+            url = story.get("url")
+            if isinstance(url, str):
+                published.setdefault(canonical_url(url), day.isoformat())
+    return published
+
+
+def load_latest() -> dict:
+    edition_paths = sorted(EDITIONS.glob("*.json"), reverse=True)
+    if not edition_paths:
         raise ValueError("No editions found")
-    if not 7 <= len(editions[0]["stories"]) <= 9:
-        raise ValueError(f"Latest edition must contain 7-9 stories; found {len(editions[0]['stories'])}")
-    return editions
+    path = edition_paths[0]
+    edition = json.loads(path.read_text())
+    if set(edition) != REQUIRED_EDITION_FIELDS:
+        raise ValueError(f"{path}: edition fields must be exactly {sorted(REQUIRED_EDITION_FIELDS)}")
+    day = dt.date.fromisoformat(edition["date"])
+    if path.stem != day.isoformat():
+        raise ValueError(f"Edition filename/date mismatch: {path}")
+
+    stories = edition["stories"]
+    if not isinstance(stories, list):
+        raise ValueError(f"{path}: stories must be a list")
+    if len(stories) > MAX_STORIES:
+        raise ValueError(f"{path}: at most {MAX_STORIES} stories; found {len(stories)}")
+
+    candidate_count = edition["candidate_count"]
+    if isinstance(candidate_count, bool) or not isinstance(candidate_count, int) or candidate_count <= 0:
+        raise ValueError(f"{path}: candidate_count must be a positive non-bool integer")
+    if candidate_count < len(stories):
+        raise ValueError(f"{path}: candidate_count must be at least the kept story count")
+
+    published = load_history(day)
+    clean_stories = []
+    seen: set[str] = set()
+    for story in stories:
+        if not isinstance(story, dict) or set(story) != STORY_FIELDS:
+            raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
+        url = validate_url(story["url"])
+        key = canonical_url(url)
+        if key in seen:
+            raise ValueError(f"{path}: duplicate URL {url}")
+        if key in published:
+            raise ValueError(f"{path}: {url} already ran on {published[key]}")
+        section = validate_text(story["section"], "section", 2, 40)
+        if section not in SECTIONS:
+            raise ValueError(f"{path}: unsupported section {section}")
+        seen.add(key)
+        title = validate_text(story["title"], "title", 5, 200)
+        fact = validate_fact(story["fact"])
+        clean_stories.append({
+            "title": title,
+            "url": url,
+            "source": validate_text(story["source"], "source", 2, 100),
+            "section": section,
+            "summary": validate_text(story["summary"], "summary", 25, 700),
+            "fact": fact,
+            "take": validate_take(story["take"], anchors(f"{title} {fact}")),
+            "caveat": validate_text(story["caveat"], "caveat", 20, 240),
+        })
+
+    check_edition_repetition(clean_stories)
+    check_edition_balance(clean_stories)
+    return {
+        "date": day.isoformat(),
+        "candidate_count": candidate_count,
+        "editor_note": validate_text(edition["editor_note"], "editor_note", 20, 400),
+        "stories": clean_stories,
+    }
 
 
 def story_card(story: dict, index: int, prominence: str) -> str:
@@ -127,7 +307,9 @@ def story_card(story: dict, index: int, prominence: str) -> str:
           <div class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></div>
           <h2><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></h2>
           <p>{esc(story['summary'])}</p>
-          <p class="why"><strong>Nish's angle:</strong> {esc(story['why_it_matters'])}</p>
+          <p class="fact"><strong>Checked</strong> {esc(story['fact'])}</p>
+          <p class="take"><strong>Nish</strong> {esc(story['take'])}</p>
+          <p class="caveat"><strong>But</strong> {esc(story['caveat'])}</p>
           <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} ↗</a>
         </div>
       </article>"""
@@ -145,12 +327,30 @@ def page(edition: dict) -> str:
     date = dt.date.fromisoformat(edition["date"])
     title_date = date.strftime("%A, %d %B %Y")
     kept_count = len(edition["stories"])
-    candidate_count = edition.get("candidate_count")
-    count_label = f"{candidate_count} scanned · {kept_count} kept" if candidate_count is not None else f"{kept_count} kept"
-    cards = "\n".join(
-        story_card(story, index, prominence_for(index))
-        for index, story in enumerate(edition["stories"], 1)
-    )
+    count_label = f"{edition['candidate_count']} scanned · {kept_count} kept"
+    if edition["stories"]:
+        cards = "\n".join(
+            story_card(story, index, prominence_for(index))
+            for index, story in enumerate(edition["stories"], 1)
+        )
+        # Only sections that ran today: a filter that leads to an empty page is a
+        # promise the edition did not keep.
+        present = [section for section in sorted(SECTIONS) if any(s["section"] == section for s in edition["stories"])]
+        filters = f"""
+    <nav class="filters" aria-label="Filter stories">
+      <button class="active" data-filter="all">All</button>
+      {''.join(f'<button data-filter="{esc(section)}">{esc(section)}</button>' for section in present)}
+    </nav>"""
+    else:
+        cards = """
+      <article class="story story-lead quiet-day">
+        <div class="story-number">00</div>
+        <div class="story-body">
+          <h2>Nothing cleared the bar today</h2>
+          <p>Every candidate was a launch post, a repost, or something I could not check. A short edition beats a padded one.</p>
+        </div>
+      </article>"""
+        filters = ""
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -165,11 +365,7 @@ def page(edition: dict) -> str:
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
     <div class="masthead-top"><a href="/">inish.in</a><span>{esc(title_date)}</span><span>{esc(count_label)}</span></div>
-    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">A daily cut of AI, code, design, product, and business, chosen for ideas worth testing.</p></div>
-    <nav class="filters" aria-label="Filter stories">
-      <button class="active" data-filter="all">All</button>
-      {''.join(f'<button data-filter="{esc(section)}">{esc(section)}</button>' for section in sorted(SECTIONS))}
-    </nav>
+    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">Read, checked, and argued with by hand. Nothing runs unless there is a fact under it.</p></div>{filters}
   </header>
   <main id="stories" class="stories">
     <section class="edition-note"><span>Editor’s note</span><p>{esc(edition['editor_note'])}</p></section>
@@ -185,8 +381,7 @@ def page(edition: dict) -> str:
 """
 
 
-def rss(editions: list[dict]) -> str:
-    edition = editions[0]
+def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
     link = "https://inish.in/"
     description = html.escape(edition["editor_note"])
@@ -212,8 +407,7 @@ def copy_assets() -> None:
 
 
 def main() -> None:
-    editions = load_editions()
-    latest = editions[0]
+    latest = load_latest()
     DAILY.mkdir(parents=True, exist_ok=True)
     copy_assets()
     archive_roots = [DAILY / "archive"]
@@ -226,9 +420,9 @@ def main() -> None:
             shutil.rmtree(archive_root)
     (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (DAILY / "feed.xml").write_text(rss(editions), encoding="utf-8")
+    (DAILY / "feed.xml").write_text(rss(latest), encoding="utf-8")
     (DAILY / "sitemap.xml").write_text(sitemap(), encoding="utf-8")
-    print(f"built {len(editions)} edition(s); latest={latest['date']} stories={len(latest['stories'])}")
+    print(f"built latest={latest['date']} stories={len(latest['stories'])} scanned={latest['candidate_count']}")
 
 
 if __name__ == "__main__":
