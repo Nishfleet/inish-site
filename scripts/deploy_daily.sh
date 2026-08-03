@@ -21,8 +21,8 @@ if [[ "$HEAD_SHA" != "$REMOTE_SHA" ]]; then
   exit 1
 fi
 
-EDITION_DATE="$(jq -er '.date' daily/latest.json)"
-STORY_COUNT="$(jq -er '.stories | length' daily/latest.json)"
+EDITION_DATE="$(jq -er '.date' latest.json)"
+STORY_COUNT="$(jq -er '.stories | length' latest.json)"
 TODAY="$(TZ=Asia/Kolkata date +%F)"
 if [[ "$EDITION_DATE" != "$TODAY" ]]; then
   echo "Refusing to publish stale edition: expected $TODAY, found $EDITION_DATE" >&2
@@ -35,7 +35,6 @@ fi
 
 WORK_DIR="$(mktemp -d /tmp/inish-daily-deploy.XXXXXX)"
 PUBLIC_DIR="$WORK_DIR/public"
-LIVE_JSON="$WORK_DIR/live.json"
 # shellcheck disable=SC2329  # Invoked by trap.
 cleanup() {
   rm -rf "$WORK_DIR"
@@ -45,8 +44,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 mkdir -p "$PUBLIC_DIR"
-cp index.html llms.txt robots.txt sitemap.xml "$PUBLIC_DIR/"
-cp -R daily functions "$PUBLIC_DIR/"
+cp index.html 404.html app.js styles.css latest.json feed.xml robots.txt sitemap.xml _redirects "$PUBLIC_DIR/"
 
 (cd "$PUBLIC_DIR" && npx --yes wrangler pages deploy . \
   --project-name inish-site \
@@ -55,39 +53,15 @@ cp -R daily functions "$PUBLIC_DIR/"
   --commit-message "Publish Nish Daily $EDITION_DATE" \
   --commit-dirty=false)
 
-SENSITIVE_PATHS=(
-  "AGENTS.md"
-  "MEMORY.md"
-  "ERRORS.md"
-  "automation/HERMES_DAILY.md"
-  "scripts/build_daily.py"
-  "tests/test_build_daily.py"
-  "data/editions/$EDITION_DATE.json"
-  "data/candidates/$EDITION_DATE.json"
-)
-
-private_paths_are_hidden() {
-  local sensitive_path status
-  for sensitive_path in "${SENSITIVE_PATHS[@]}"; do
-    status="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 \
-      "https://inish.in/$sensitive_path?deploy=$HEAD_SHA")"
-    if [[ "$status" != "404" ]]; then
-      return 1
-    fi
-  done
-}
-
 for _ in {1..12}; do
-  if curl -fsS --max-time 15 https://inish.in/daily/latest.json >"$LIVE_JSON" 2>/dev/null \
-    && diff -q <(jq -S . daily/latest.json) <(jq -S . "$LIVE_JSON") >/dev/null \
-    && private_paths_are_hidden; then
+  if python3 scripts/verify_live.py --root "$ROOT" --edition-date "$EDITION_DATE" --commit "$HEAD_SHA"; then
     hermes send --to telegram:1144372019 --quiet \
-      "Nish Daily is live — $EDITION_DATE, $STORY_COUNT stories: https://inish.in/daily/"
+      "Nish Daily is live — $EDITION_DATE, $STORY_COUNT stories: https://inish.in/"
     echo "verified_live date=$EDITION_DATE stories=$STORY_COUNT commit=$HEAD_SHA"
     exit 0
   fi
   sleep 5
 done
 
-echo "Cloudflare deployed, but the custom domain did not match daily/latest.json." >&2
+echo "Cloudflare deployed, but the custom domain failed the feed-only route checks." >&2
 exit 1
