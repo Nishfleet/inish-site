@@ -3,126 +3,113 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nish Daily — 2026-08-03</title>
-  <meta name="description" content="Nish's daily signal feed for AI, building, design, product, and business.">
-  <link rel="alternate" type="application/rss+xml" title="Nish Daily" href="https://inish.in/feed.xml">
+  <title>Nish's Daily Reads — 2026-08-03</title>
+  <meta name="description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
+  <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
-    <div class="masthead-top"><a href="/">inish.in</a><span>Monday, 03 August 2026</span><span>125 scanned · 8 kept</span></div>
-    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">Read, checked, and argued with by hand. Nothing runs unless there is a fact under it.</p></div>
+    <div class="masthead-top"><a href="/">inish.in</a><span>Monday, 03 August 2026</span><span>125 scanned · 7 kept</span></div>
+    <div class="title-row"><div><p class="kicker">Built for one reader</p><h1>Nish's Daily Reads</h1></div><p class="dek">AI, product ideas, and where demand is building. Plain words, point first, nothing here unless there is a fact under it.</p></div>
     <nav class="filters" aria-label="Filter stories">
       <button class="active" data-filter="all">All</button>
-      <button data-filter="AI &amp; agents">AI &amp; agents</button><button data-filter="Build &amp; ship">Build &amp; ship</button><button data-filter="Design &amp; product">Design &amp; product</button>
+      <button data-filter="AI">AI</button><button data-filter="Demand signals">Demand signals</button><button data-filter="Product ideas">Product ideas</button><button data-filter="Tools">Tools</button><button data-filter="Wildcard">Wildcard</button>
     </nav>
   </header>
   <main id="stories" class="stories">
-    <section class="edition-note"><span>Editor’s note</span><p>Eight of 125 candidates survived opening the source. A frontier model release and a post about JSON precision were dropped because their pages would not render enough for me to check a single number. The best thing I read today is an argument against how I currently pick models.</p></section>
+    <section class="edition-note"><span>Editor’s note</span><p>New shape from today: this is written for me, not for engineers. What AI now costs, how companies are charging for it, where people are already paying, and one for fun. Anything I could not check against a real number was left out.</p></section>
 
-      <article class="story story-lead" data-section="AI &amp; agents">
+      <article class="story story-lead" data-section="AI">
         <div class="story-number">01</div>
         <div class="story-body">
-          <div class="story-meta"><span>AI &amp; agents</span><span>Martin Alderson</span></div>
-          <h2><a href="https://martinalderson.com/posts/speed-vs-intelligence/" rel="noopener noreferrer">Picking models on speed, not intelligence</a></h2>
-          <p>Alderson argues the frontier is now good enough at ordinary daily work that throughput decides which model you actually reach for. He breaks an agent turn into its parts to show where the waiting really goes, and why a much faster model does not produce a proportionally faster loop.</p>
-          <p class="fact"><strong>Checked</strong> His breakdown puts a 50 tok/s agent turn at 65 seconds — 40s inference, 15s tool calls, 10s review — while 250 tok/s only reaches 33 seconds. A 5x model speedup buys a 2x turn.</p>
-          <p class="take"><strong>Nish</strong> I route my fleet on capability first, and this is the sharpest argument against me: at 5% of Opus pricing, GLM5.2 finishes turns that Opus never gets around to starting.</p>
-          <p class="caveat"><strong>But</strong> He is benchmarking his own feel, not a task suite. Nothing here shows the cheap fast model finishing the work — only finishing the tokens.</p>
+          <div class="story-meta"><span>AI</span><span>Influencer Magazine</span></div>
+          <h2><a href="https://influencermagazine.uk/2026/07/openai-slashes-prices-on-smaller-ai-models-as-enterprise-clients-rethink-technology-spending/" rel="noopener noreferrer">OpenAI cut the price of its cheap model by 80%</a></h2>
+          <p>OpenAI cut what it charges for its smaller models. These providers bill by the token — roughly a chunk of a word — and the cheapest option now costs a fifth of what it did last month. The company says this comes from efficiency gains, but it lands while business customers are openly pushing back on how much AI costs them.</p>
+          <p class="fact"><strong>Checked</strong> From 30 July 2026 Luna costs $0.20 per million input tokens and $1.20 per million output, down from $1.00 and $6.00. Mid-tier Terra fell 20%; the top model was left alone.</p>
+          <p class="take"><strong>Nish</strong> I run my agents on exactly this tier, so Luna at a fifth of the old price changes what I can afford to leave working overnight.</p>
+          <p class="caveat"><strong>But</strong> This is a trade-press write-up and I could not find OpenAI&#x27;s own announcement, so treat the figures as reported rather than confirmed.</p>
+          <a class="source-link" href="https://influencermagazine.uk/2026/07/openai-slashes-prices-on-smaller-ai-models-as-enterprise-clients-rethink-technology-spending/" rel="noopener noreferrer">Read at influencermagazine.uk ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-feature" data-section="AI">
+        <div class="story-number">02</div>
+        <div class="story-body">
+          <div class="story-meta"><span>AI</span><span>Martin Alderson</span></div>
+          <h2><a href="https://martinalderson.com/posts/the-upcoming-ai-margin-collapse-part-1-glm-5-2/" rel="noopener noreferrer">Why AI prices are falling, and who was making the money</a></h2>
+          <p>The big labs make most of their profit not from building models but from renting them out afterwards, where the markup is very large. Cheaper open rivals have now got close enough on quality that the markup is getting hard to justify. That is the pressure behind the cuts in the story above.</p>
+          <p class="fact"><strong>Checked</strong> He puts frontier lab pricing near $25 per million tokens on roughly a 90% gross margin, while the open GLM5.2 runs about $4.40 — under 20% of Opus&#x27;s retail price.</p>
+          <p class="take"><strong>Nish</strong> If the margin really is 90%, every price cut I am offered is a fight for my business rather than a favour, and I should keep moving.</p>
+          <p class="caveat"><strong>But</strong> These are one analyst&#x27;s estimates worked out from public price lists, not audited accounts. Nobody outside the labs knows the true cost of serving a request.</p>
+          <a class="source-link" href="https://martinalderson.com/posts/the-upcoming-ai-margin-collapse-part-1-glm-5-2/" rel="noopener noreferrer">Read at martinalderson.com ↗</a>
+        </div>
+      </article>
+
+      <article class="story story-feature" data-section="Tools">
+        <div class="story-number">03</div>
+        <div class="story-body">
+          <div class="story-meta"><span>Tools</span><span>Martin Alderson</span></div>
+          <h2><a href="https://martinalderson.com/posts/speed-vs-intelligence/" rel="noopener noreferrer">Picking your AI on speed, not brains</a></h2>
+          <p>The top models are now good enough at ordinary work, so the one that answers fastest is often the better buy. He also shows why a much faster model does not make the whole job much faster: waiting on the model is only part of the time, and the rest does not speed up with it.</p>
+          <p class="fact"><strong>Checked</strong> A task at 50 tokens a second takes 65 seconds start to finish; at 250 it still takes 33. Making the model five times quicker made the actual job only twice as fast.</p>
+          <p class="take"><strong>Nish</strong> I pick on brains every time, and this says I am paying for cleverness I never actually use on most of my day&#x27;s tasks.</p>
+          <p class="caveat"><strong>But</strong> He is timing his own working day rather than running a formal test, and a quick answer that is wrong costs more than a slow one that is right.</p>
           <a class="source-link" href="https://martinalderson.com/posts/speed-vs-intelligence/" rel="noopener noreferrer">Read at martinalderson.com ↗</a>
         </div>
       </article>
 
-      <article class="story story-feature" data-section="Build &amp; ship">
-        <div class="story-number">02</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Build &amp; ship</span><span>Chris Morgan</span></div>
-          <h2><a href="https://chrismorgan.info/atom%3Erss" rel="noopener noreferrer">Atom beats RSS in the places that actually break</a></h2>
-          <p>Morgan&#x27;s case is not about elegance. RSS 2.0 never said whether a description field holds plain text or HTML, so every reader has to guess, and the guess is where real feeds break. Atom&#x27;s type attribute makes each field declare what it contains.</p>
-          <p class="fact"><strong>Checked</strong> RSS 2.0 defines no encoding semantics for description or title, and Morgan links a tally of nine mutually incompatible formats shipped under the RSS name.</p>
-          <p class="take"><strong>Nish</strong> My own feed.xml is RSS 2.0 and drops the editor note straight into a description field, so this post is about my bug, not someone else&#x27;s.</p>
-          <p class="caveat"><strong>But</strong> He admits upfront there is no survey or testing behind it, and readers have quietly coped with this ambiguity for twenty years.</p>
-          <a class="source-link" href="https://chrismorgan.info/atom%3Erss" rel="noopener noreferrer">Read at chrismorgan.info ↗</a>
-        </div>
-      </article>
-
-      <article class="story story-feature" data-section="Build &amp; ship">
-        <div class="story-number">03</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Build &amp; ship</span><span>LocalAI</span></div>
-          <h2><a href="https://localai.io/blog/why-we-write-our-own-engines/" rel="noopener noreferrer">LocalAI rewrites engines in C++ when the install is the problem</a></h2>
-          <p>The team sets out when it ports an upstream inference stack instead of wrapping it. The trigger is never speed — it is that shipping the original means resolving a Python dependency tree on the user&#x27;s machine against whatever CUDA and glibc that machine happens to carry.</p>
-          <p class="fact"><strong>Checked</strong> Installing vLLM produces a 9.1 GiB virtualenv; their vllm.cpp port produces a 66 MiB binary. llama.cpp, whisper.cpp and MLX stay wrapped.</p>
-          <p class="take"><strong>Nish</strong> That GiB-to-MiB gap is the failure mode behind half my broken deploys, and LocalAI is refreshingly blunt that the small binary costs CPU throughput.</p>
-          <p class="caveat"><strong>But</strong> Their own figures show SCRFD detection at 0.83x on one thread and 0.69x on eight, so the port is measurably slower where it matters most.</p>
-          <a class="source-link" href="https://localai.io/blog/why-we-write-our-own-engines/" rel="noopener noreferrer">Read at localai.io ↗</a>
-        </div>
-      </article>
-
-      <article class="story story-brief" data-section="AI &amp; agents">
+      <article class="story story-brief" data-section="Product ideas">
         <div class="story-number">04</div>
         <div class="story-body">
-          <div class="story-meta"><span>AI &amp; agents</span><span>arXiv</span></div>
-          <h2><a href="https://arxiv.org/abs/2607.28271" rel="noopener noreferrer">A COBOL-to-Java loop that writes its own tests</a></h2>
-          <p>The paper introduces Locksmith, an iterative loop that synthesises tests for legacy COBOL and its translated Java, then checks that both run identically under deterministic parity. Hacker News retitled this as a story about migrated bugs; the paper is about coverage.</p>
-          <p class="fact"><strong>Checked</strong> It reports 91.90% branch coverage on an internal production-like COBOL program, across three case studies ranging from 430 to 4,114 source lines.</p>
-          <p class="take"><strong>Nish</strong> Three programs topping out at 4,114 lines is a demo rather than a migration, and I would keep it well away from anything that moves money.</p>
-          <p class="caveat"><strong>But</strong> Parity checks only ever cover cases the loop chose to generate. Nothing external audited what it never thought to try.</p>
-          <a class="source-link" href="https://arxiv.org/abs/2607.28271" rel="noopener noreferrer">Read at arxiv.org ↗</a>
+          <div class="story-meta"><span>Product ideas</span><span>Korix</span></div>
+          <h2><a href="https://korixinc.com/learning-center/ai-pricing-models-2026" rel="noopener noreferrer">How AI companies charge is changing fast</a></h2>
+          <p>Charging a flat monthly fee per user is dying out for AI products, because two customers paying the same can cost you wildly different amounts to serve. What is replacing it: a base subscription plus a bill for going over an allowance, the way a phone plan works.</p>
+          <p class="fact"><strong>Checked</strong> Bessemer, tracking 200+ AI vendors, puts hybrid pricing at 41% in 2026 against 27% in 2025, while per-seat pricing fell from 21% to 15% of SaaS in a year.</p>
+          <p class="take"><strong>Nish</strong> Everything I sell is priced per user, and a fall from 21% to 15% in a single year says I am pricing on last year&#x27;s playbook.</p>
+          <p class="caveat"><strong>But</strong> This summarises Bessemer&#x27;s report rather than being the report, and counting vendors is not counting revenue — plenty of money still sits in per-seat deals.</p>
+          <a class="source-link" href="https://korixinc.com/learning-center/ai-pricing-models-2026" rel="noopener noreferrer">Read at korixinc.com ↗</a>
         </div>
       </article>
 
-      <article class="story story-brief" data-section="Build &amp; ship">
+      <article class="story story-brief" data-section="Demand signals">
         <div class="story-number">05</div>
         <div class="story-body">
-          <div class="story-meta"><span>Build &amp; ship</span><span>Ankur Sethi</span></div>
-          <h2><a href="https://ankursethi.com/blog/prevent-cognitive-debt-by-manually-retyping-llm-generated-code/" rel="noopener noreferrer">Retyping every generated line by hand</a></h2>
-          <p>Sethi instructs assistants to show proposed edits in chat rather than apply them, then types each line into his editor himself. His argument is that typing builds a spatial map of where things live, which repays itself later in sharper prompts and earlier detection of bad design.</p>
-          <p class="fact"><strong>Checked</strong> He states the cost plainly: the habit leaves him &quot;probably only 2x faster&quot; than working with no LLM at all.</p>
-          <p class="take"><strong>Nish</strong> Sethi is right that I am not genuinely faster inside repos I never read, though surrendering that much throughput to fix it is a steep price.</p>
-          <p class="caveat"><strong>But</strong> One developer, no measurement behind the 2x, and no evidence that the comprehension he gains survives a month away from the code.</p>
-          <a class="source-link" href="https://ankursethi.com/blog/prevent-cognitive-debt-by-manually-retyping-llm-generated-code/" rel="noopener noreferrer">Read at ankursethi.com ↗</a>
+          <div class="story-meta"><span>Demand signals</span><span>Slopfix</span></div>
+          <h2><a href="https://odra.dev/slopfix/" rel="noopener noreferrer">Businesses will pay $10,000 to delete AI&#x27;s code</a></h2>
+          <p>A three-person team sells exactly one thing: a week of tearing out the bloat that AI coding tools leave behind. It is a real service at a real price, and it only exists because so many companies now own software nobody on the team understands.</p>
+          <p class="fact"><strong>Checked</strong> The offer is &quot;One week. Three senior engineers. $10,000&quot;, paid in proportion to the result, with one example cutting a codebase from 100,000 lines to 35,000.</p>
+          <p class="take"><strong>Nish</strong> This is the sharpest demand signal I have seen all week: three engineers making a living cleaning up after the tools I use every single day.</p>
+          <p class="caveat"><strong>But</strong> They publish no client count and no revenue, so it shows people will pay the asking price, not that the market behind it is big.</p>
+          <a class="source-link" href="https://odra.dev/slopfix/" rel="noopener noreferrer">Read at odra.dev ↗</a>
         </div>
       </article>
 
-      <article class="story story-brief" data-section="Design &amp; product">
+      <article class="story story-brief" data-section="Demand signals">
         <div class="story-number">06</div>
         <div class="story-body">
-          <div class="story-meta"><span>Design &amp; product</span><span>ykvm.com</span></div>
-          <h2><a href="https://ykvm.com/2026/07/swiftui-a-story-of-mediocrity/" rel="noopener noreferrer">SwiftUI at seven years, from someone still shipping it</a></h2>
-          <p>A long complaint from a developer who has used the framework since launch. The data-flow model was rebuilt around Observation and still leaves you unable to say why a view re-rendered, while ordinary layout keeps demanding GeometryReader escapes that undo the declarative promise.</p>
-          <p class="fact"><strong>Checked</strong> Dismissing the keyboard on scroll needed iOS 16 in SwiftUI; UIKit had it from iOS 7. The image caching API was still in beta as of July 2026.</p>
-          <p class="take"><strong>Nish</strong> A caching API still in beta in July 2026 is the detail that would stop me putting a photo-heavy screen in SwiftUI, seven years into the framework.</p>
-          <p class="caveat"><strong>But</strong> This is one developer&#x27;s frustration, and the UIKit comparison skips how much boilerplate the old keyboard handling actually demanded.</p>
-          <a class="source-link" href="https://ykvm.com/2026/07/swiftui-a-story-of-mediocrity/" rel="noopener noreferrer">Read at ykvm.com ↗</a>
+          <div class="story-meta"><span>Demand signals</span><span>Lumenova</span></div>
+          <h2><a href="https://www.lumenova.ai/blog/enterprise-ai-adoption-news/" rel="noopener noreferrer">AI budgets are still growing, fast</a></h2>
+          <p>Company spending on AI is not slowing down. The forecast covers the whole stack — the machines, the software, the services, and the newer tools that do work on their own. For anyone selling to businesses, the budget is sitting there.</p>
+          <p class="fact"><strong>Checked</strong> Gartner forecasts $2.59 trillion of worldwide AI spending in 2026, up 47% year over year, in a press release dated 19 May 2026.</p>
+          <p class="take"><strong>Nish</strong> A 47% rise in spending tells me money is not what is stopping my buyers, so when something of mine does not sell, that one is on me.</p>
+          <p class="caveat"><strong>But</strong> A forecast is not a receipt, and this total is mostly hardware and consulting — very different from budget available for a small software product.</p>
+          <a class="source-link" href="https://www.lumenova.ai/blog/enterprise-ai-adoption-news/" rel="noopener noreferrer">Read at lumenova.ai ↗</a>
         </div>
       </article>
 
-      <article class="story story-brief" data-section="AI &amp; agents">
+      <article class="story story-brief" data-section="Wildcard">
         <div class="story-number">07</div>
         <div class="story-body">
-          <div class="story-meta"><span>AI &amp; agents</span><span>FROGS</span></div>
-          <h2><a href="https://frogs.vaguespac.es/" rel="noopener noreferrer">A benchmark that asks 14 models to draw a frog</a></h2>
-          <p>The prompt is a frog with a Habsburg jaw, drawn as SVG, three attempts per model per month. The output worth reading is not the pictures but the annotations, where you can watch which systems editorialise about anatomy and mood instead of drawing what was asked.</p>
-          <p class="fact"><strong>Checked</strong> All 42 runs across 14 models produced a valid SVG in August 2026, and the page publishes no numeric score whatsoever.</p>
-          <p class="take"><strong>Nish</strong> A benchmark where every single run passes measures nothing, which is precisely why I would keep it open beside a leaderboard I am tempted to believe.</p>
-          <p class="caveat"><strong>But</strong> Three attempts per model per month is small enough that one odd sample rewrites the narrative, and taste is doing all the grading.</p>
+          <div class="story-meta"><span>Wildcard</span><span>FROGS</span></div>
+          <h2><a href="https://frogs.vaguespac.es/" rel="noopener noreferrer">A benchmark where everyone passes and nobody scores</a></h2>
+          <p>Someone asks fourteen AI models, three times a month, to draw a frog with a Habsburg jaw. The fun is not really the drawings. It is watching which models cannot resist editorialising about the frog&#x27;s chin instead of simply drawing what was asked.</p>
+          <p class="fact"><strong>Checked</strong> All 42 attempts across 14 models produced a valid drawing in August 2026, and the site publishes no score of any kind.</p>
+          <p class="take"><strong>Nish</strong> I read leaderboards as though they were a score, and 42 out of 42 is a fine reminder that a test everyone passes is measuring nothing.</p>
+          <p class="caveat"><strong>But</strong> Three attempts per model per month, judged purely on taste, so it is a curiosity rather than evidence about any of the models in it.</p>
           <a class="source-link" href="https://frogs.vaguespac.es/" rel="noopener noreferrer">Read at frogs.vaguespac.es ↗</a>
-        </div>
-      </article>
-
-      <article class="story story-brief" data-section="Design &amp; product">
-        <div class="story-number">08</div>
-        <div class="story-body">
-          <div class="story-meta"><span>Design &amp; product</span><span>The Pudding</span></div>
-          <h2><a href="https://pudding.cool/2026/07/essential-words/" rel="noopener noreferrer">Seventy years of the words we teach learners</a></h2>
-          <p>The Pudding sets the 1953 General Service List against its 2023 replacement, using concreteness ratings and semantic tagging to show what a language&#x27;s essential vocabulary quietly stopped including as it grew.</p>
-          <p class="fact"><strong>Checked</strong> The list went from 2,284 to 2,809 words while the most concrete entries fell from 21% of the total to 14%; coverage of general English rose from about 84% to over 90%.</p>
-          <p class="take"><strong>Nish</strong> Trading concrete words for wider coverage is exactly the bargain I make writing product copy, and this piece finally shows me the bill.</p>
-          <p class="caveat"><strong>But</strong> Concreteness scores come from a 2014 dataset and the two lists were assembled by different teams for different aims, so part of the shift is method rather than culture.</p>
-          <a class="source-link" href="https://pudding.cool/2026/07/essential-words/" rel="noopener noreferrer">Read at pudding.cool ↗</a>
         </div>
       </article>
   </main>
