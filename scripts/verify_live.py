@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import time
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urljoin, urlparse
@@ -14,6 +16,22 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+_CLOUDFLARE_BEACON = re.compile(
+    rb'^<script type="module" src="https://static\.cloudflareinsights\.com/beacon\.min\.js/[A-Za-z0-9._-]+" '
+    rb'integrity="sha512-[A-Za-z0-9+/=]+" data-cf-beacon=\'\{[^\'\r\n]*\}\' '
+    rb'crossorigin="anonymous"></script>\r?\n?',
+    re.MULTILINE,
+)
+
+
+def without_cloudflare_beacon(body: bytes) -> bytes:
+    matches = list(_CLOUDFLARE_BEACON.finditer(body))
+    if len(matches) != 1:
+        return body
+    match = matches[0]
+    return body[:match.start()] + body[match.end():]
 
 
 def fetch(base: str, path: str, *, method: str = "GET") -> tuple[int, bytes, str | None]:
@@ -36,6 +54,7 @@ def main() -> int:
     parsed_base = urlparse(args.base)
     if parsed_base.scheme != "https" or not parsed_base.netloc or parsed_base.username or parsed_base.password:
         parser.error("--base must be a public HTTPS origin")
+    cache_token = f"{args.commit}-{time.time_ns()}"
     failures: list[str] = []
 
     for path, relative in {
@@ -45,17 +64,19 @@ def main() -> int:
         "/latest.json": "latest.json",
         "/feed.xml": "feed.xml",
     }.items():
-        status, body, _ = fetch(args.base, f"{path}?deploy={args.commit}")
+        status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
         expected = (args.root / relative).read_bytes()
+        if path == "/":
+            body = without_cloudflare_beacon(body)
         if status != 200 or body != expected:
             failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
     for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml"):
-        status, body, _ = fetch(args.base, f"{path}?deploy={args.commit}", method="HEAD")
+        status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method="HEAD")
         if status != 200 or body:
             failures.append(f"HEAD {path}: expected empty 200, got {status} and {len(body)} bytes")
 
-    status, body, _ = fetch(args.base, f"/latest.json?deploy={args.commit}")
+    status, body, _ = fetch(args.base, f"/latest.json?deploy={cache_token}")
     if status == 200:
         try:
             if json.loads(body)["date"] != args.edition_date:
@@ -75,9 +96,10 @@ def main() -> int:
         "/daily/sitemap.xml": "/sitemap.xml",
     }
     for path, target in redirects.items():
-        expected_location = urljoin(args.base, target)
+        request_path = f"{path}?deploy={cache_token}"
+        expected_location = urljoin(args.base, f"{target}?deploy={cache_token}")
         for method in ("GET", "HEAD"):
-            status, body, location = fetch(args.base, path, method=method)
+            status, body, location = fetch(args.base, request_path, method=method)
             actual_location = urljoin(args.base, location or "")
             if status != 301 or actual_location != expected_location or (method == "HEAD" and body):
                 failures.append(
@@ -117,7 +139,7 @@ def main() -> int:
         ])
     for path in removed:
         for method in ("GET", "HEAD"):
-            status, body, _ = fetch(args.base, f"{path}?deploy={args.commit}", method=method)
+            status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method=method)
             if status != 404 or (method == "HEAD" and body):
                 failures.append(f"{method} {path}: expected empty 404, got {status} and {len(body)} bytes")
 
@@ -126,7 +148,7 @@ def main() -> int:
         "/sitemap.xml": (args.root / "sitemap.xml").read_bytes(),
     }
     for path, expected in metadata.items():
-        status, body, _ = fetch(args.base, f"{path}?deploy={args.commit}")
+        status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
         if status != 200 or body != expected:
             failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
