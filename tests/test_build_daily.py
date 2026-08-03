@@ -13,7 +13,7 @@ SAMPLE_STORIES = [
         "title": "Ratchet ships deterministic replays",
         "url": "https://ratchet.example/launch",
         "source": "Ratchet",
-        "section": "AI & agents",
+        "section": "AI",
         "summary": "Ratchet records tool calls and replays them against a pinned snapshot of the environment.",
         "fact": "Replay of a 240-step trace finished in 1.8s against the pinned snapshot.",
         "take": "I want Ratchet pointed at my overnight runs before trusting another unattended lane.",
@@ -23,7 +23,7 @@ SAMPLE_STORIES = [
         "title": "Postmark publishes five years of bounce data",
         "url": "https://postmark.example/bounces",
         "source": "Postmark",
-        "section": "Business & growth",
+        "section": "Demand signals",
         "summary": "An email provider released aggregate delivery outcomes covering a large sender population.",
         "fact": "Hard bounces sat at 0.42% across 19 billion messages.",
         "take": "My list is nowhere near Postmark scale, so a 0.42% floor reads aspirational to me.",
@@ -33,7 +33,7 @@ SAMPLE_STORIES = [
         "title": "Grid layout gets a subgrid escape hatch",
         "url": "https://layout.example/subgrid",
         "source": "Layout Weekly",
-        "section": "Design & product",
+        "section": "Product ideas",
         "summary": "A walkthrough of aligning nested cards to an outer track without redefining columns.",
         "fact": "Subgrid support reached 94% of tracked browsers in the July 2026 table.",
         "take": "Subgrid kills the wrapper divs I keep hand-adding to card grids every single build.",
@@ -43,7 +43,7 @@ SAMPLE_STORIES = [
         "title": "SQLite adds a page-level checksum mode",
         "url": "https://dbnotes.example/checksums",
         "source": "DB Notes",
-        "section": "Build & ship",
+        "section": "Tools",
         "summary": "An opt-in pragma stores a checksum per page and refuses reads when one fails to match.",
         "fact": "The pragma costs roughly 3% on write throughput in the maintainer's own benchmark.",
         "take": "SQLite checksums at a 3% write cost buy me corruption detection on my VPS disk.",
@@ -53,7 +53,7 @@ SAMPLE_STORIES = [
         "title": "A registry outage traced to one expired token",
         "url": "https://status.example/incident-4412",
         "source": "Status Example",
-        "section": "Build & ship",
+        "section": "Tools",
         "summary": "A package registry postmortem walks through a credential expiry that stalled publishes.",
         "fact": "Publishing was degraded for 71 minutes and the token had been unrotated for 14 months.",
         "take": "Fourteen months of drift is the part that worries me, not the 71-minute outage itself.",
@@ -63,7 +63,7 @@ SAMPLE_STORIES = [
         "title": "Pricing page test moves annual conversion",
         "url": "https://growthlog.example/annual-toggle",
         "source": "Growth Log",
-        "section": "Business & growth",
+        "section": "Demand signals",
         "summary": "A team defaulted its pricing toggle to annual billing and published the resulting split.",
         "fact": "Annual selection rose from 22% to 31% over a six-week test with 4,100 visitors.",
         "take": "Nine points from a default is real, though 4,100 visitors leaves me wanting a rerun.",
@@ -73,7 +73,7 @@ SAMPLE_STORIES = [
         "title": "Screen reader survey shows heading reliance",
         "url": "https://a11ynotes.example/survey",
         "source": "A11y Notes",
-        "section": "Design & product",
+        "section": "Product ideas",
         "summary": "A long-running accessibility survey published how respondents navigate unfamiliar pages.",
         "fact": "68% of respondents said headings are their first navigation method on a new page.",
         "take": "Headings beating landmarks at 68% changes how I would order my own page structure.",
@@ -83,7 +83,7 @@ SAMPLE_STORIES = [
         "title": "Local model runner adds speculative decoding",
         "url": "https://runner.example/speculative",
         "source": "Runner",
-        "section": "AI & agents",
+        "section": "AI",
         "summary": "A desktop inference tool added draft-model speculation behind a configuration flag.",
         "fact": "The changelog claims 1.7x faster decoding on an M4 Pro with a 1B draft model.",
         "take": "A 1.7x claim from a changelog is not a benchmark, so I would measure Runner myself.",
@@ -250,7 +250,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_rejects_an_edition_dominated_by_one_section(self):
         payload = edition(stories=5)
         for item in payload["stories"]:
-            item["section"] = "AI & agents"
+            item["section"] = "AI"
         self.assertRejects(payload, "more than 4 stories in section")
 
     def fresh_urls(self, payload):

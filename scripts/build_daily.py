@@ -24,7 +24,7 @@ EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
 ASSETS = ("app.js", "styles.css")
-SECTIONS = {"AI & agents", "Build & ship", "Design & product", "Business & growth"}
+SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
 STORY_FIELDS = {"title", "url", "source", "section", "summary", "fact", "take", "caveat"}
 
@@ -356,9 +356,9 @@ def page(edition: dict) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nish Daily — {esc(edition['date'])}</title>
-  <meta name="description" content="Nish's daily signal feed for AI, building, design, product, and business.">
-  <link rel="alternate" type="application/rss+xml" title="Nish Daily" href="https://inish.in/feed.xml">
+  <title>Nish's Daily Reads — {esc(edition['date'])}</title>
+  <meta name="description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
+  <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
 </head>
@@ -366,7 +366,7 @@ def page(edition: dict) -> str:
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
     <div class="masthead-top"><a href="/">inish.in</a><span>{esc(title_date)}</span><span>{esc(count_label)}</span></div>
-    <div class="title-row"><div><p class="kicker">A personal signal newspaper</p><h1>Nish Daily</h1></div><p class="dek">Read, checked, and argued with by hand. Nothing runs unless there is a fact under it.</p></div>{filters}
+    <div class="title-row"><div><p class="kicker">Built for one reader</p><h1>Nish's Daily Reads</h1></div><p class="dek">AI, product ideas, and where demand is building. Plain words, point first, nothing here unless there is a fact under it.</p></div>{filters}
   </header>
   <main id="stories" class="stories">
     <section class="edition-note"><span>Editor’s note</span><p>{esc(edition['editor_note'])}</p></section>
@@ -388,8 +388,8 @@ def rss(edition: dict) -> str:
     description = html.escape(edition["editor_note"])
     published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"inish-daily-{day.isoformat()}"
-    item = f"<item><title>Nish Daily — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish Daily</title><link>https://inish.in/</link><description>Nish's daily signal feed.</description>" + item + "</channel></rss>\n"
+    item = f"<item><title>Nish's Daily Reads — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish's Daily Reads</title><link>https://inish.in/</link><description>A daily read for a founder: AI, product ideas, and demand signals.</description>" + item + "</channel></rss>\n"
 
 
 def sitemap() -> str:
@@ -404,7 +404,7 @@ def copy_assets() -> None:
         if source.is_file() and source.resolve() != destination.resolve():
             shutil.copyfile(source, destination)
         elif not destination.is_file():
-            raise FileNotFoundError(f"Missing Nish Daily asset: {source}")
+            raise FileNotFoundError(f"Missing Daily Reads asset: {source}")
 
 
 def main() -> None:

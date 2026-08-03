@@ -1,87 +1,77 @@
 {
   "date": "2026-08-03",
   "candidate_count": 125,
-  "editor_note": "Eight of 125 candidates survived opening the source. A frontier model release and a post about JSON precision were dropped because their pages would not render enough for me to check a single number. The best thing I read today is an argument against how I currently pick models.",
+  "editor_note": "New shape from today: this is written for me, not for engineers. What AI now costs, how companies are charging for it, where people are already paying, and one for fun. Anything I could not check against a real number was left out.",
   "stories": [
     {
-      "title": "Picking models on speed, not intelligence",
+      "title": "OpenAI cut the price of its cheap model by 80%",
+      "url": "https://influencermagazine.uk/2026/07/openai-slashes-prices-on-smaller-ai-models-as-enterprise-clients-rethink-technology-spending/",
+      "source": "Influencer Magazine",
+      "section": "AI",
+      "summary": "OpenAI cut what it charges for its smaller models. These providers bill by the token — roughly a chunk of a word — and the cheapest option now costs a fifth of what it did last month. The company says this comes from efficiency gains, but it lands while business customers are openly pushing back on how much AI costs them.",
+      "fact": "From 30 July 2026 Luna costs $0.20 per million input tokens and $1.20 per million output, down from $1.00 and $6.00. Mid-tier Terra fell 20%; the top model was left alone.",
+      "take": "I run my agents on exactly this tier, so Luna at a fifth of the old price changes what I can afford to leave working overnight.",
+      "caveat": "This is a trade-press write-up and I could not find OpenAI's own announcement, so treat the figures as reported rather than confirmed."
+    },
+    {
+      "title": "Why AI prices are falling, and who was making the money",
+      "url": "https://martinalderson.com/posts/the-upcoming-ai-margin-collapse-part-1-glm-5-2/",
+      "source": "Martin Alderson",
+      "section": "AI",
+      "summary": "The big labs make most of their profit not from building models but from renting them out afterwards, where the markup is very large. Cheaper open rivals have now got close enough on quality that the markup is getting hard to justify. That is the pressure behind the cuts in the story above.",
+      "fact": "He puts frontier lab pricing near $25 per million tokens on roughly a 90% gross margin, while the open GLM5.2 runs about $4.40 — under 20% of Opus's retail price.",
+      "take": "If the margin really is 90%, every price cut I am offered is a fight for my business rather than a favour, and I should keep moving.",
+      "caveat": "These are one analyst's estimates worked out from public price lists, not audited accounts. Nobody outside the labs knows the true cost of serving a request."
+    },
+    {
+      "title": "Picking your AI on speed, not brains",
       "url": "https://martinalderson.com/posts/speed-vs-intelligence/",
       "source": "Martin Alderson",
-      "section": "AI & agents",
-      "summary": "Alderson argues the frontier is now good enough at ordinary daily work that throughput decides which model you actually reach for. He breaks an agent turn into its parts to show where the waiting really goes, and why a much faster model does not produce a proportionally faster loop.",
-      "fact": "His breakdown puts a 50 tok/s agent turn at 65 seconds — 40s inference, 15s tool calls, 10s review — while 250 tok/s only reaches 33 seconds. A 5x model speedup buys a 2x turn.",
-      "take": "I route my fleet on capability first, and this is the sharpest argument against me: at 5% of Opus pricing, GLM5.2 finishes turns that Opus never gets around to starting.",
-      "caveat": "He is benchmarking his own feel, not a task suite. Nothing here shows the cheap fast model finishing the work — only finishing the tokens."
+      "section": "Tools",
+      "summary": "The top models are now good enough at ordinary work, so the one that answers fastest is often the better buy. He also shows why a much faster model does not make the whole job much faster: waiting on the model is only part of the time, and the rest does not speed up with it.",
+      "fact": "A task at 50 tokens a second takes 65 seconds start to finish; at 250 it still takes 33. Making the model five times quicker made the actual job only twice as fast.",
+      "take": "I pick on brains every time, and this says I am paying for cleverness I never actually use on most of my day's tasks.",
+      "caveat": "He is timing his own working day rather than running a formal test, and a quick answer that is wrong costs more than a slow one that is right."
     },
     {
-      "title": "Atom beats RSS in the places that actually break",
-      "url": "https://chrismorgan.info/atom%3Erss",
-      "source": "Chris Morgan",
-      "section": "Build & ship",
-      "summary": "Morgan's case is not about elegance. RSS 2.0 never said whether a description field holds plain text or HTML, so every reader has to guess, and the guess is where real feeds break. Atom's type attribute makes each field declare what it contains.",
-      "fact": "RSS 2.0 defines no encoding semantics for description or title, and Morgan links a tally of nine mutually incompatible formats shipped under the RSS name.",
-      "take": "My own feed.xml is RSS 2.0 and drops the editor note straight into a description field, so this post is about my bug, not someone else's.",
-      "caveat": "He admits upfront there is no survey or testing behind it, and readers have quietly coped with this ambiguity for twenty years."
+      "title": "How AI companies charge is changing fast",
+      "url": "https://korixinc.com/learning-center/ai-pricing-models-2026",
+      "source": "Korix",
+      "section": "Product ideas",
+      "summary": "Charging a flat monthly fee per user is dying out for AI products, because two customers paying the same can cost you wildly different amounts to serve. What is replacing it: a base subscription plus a bill for going over an allowance, the way a phone plan works.",
+      "fact": "Bessemer, tracking 200+ AI vendors, puts hybrid pricing at 41% in 2026 against 27% in 2025, while per-seat pricing fell from 21% to 15% of SaaS in a year.",
+      "take": "Everything I sell is priced per user, and a fall from 21% to 15% in a single year says I am pricing on last year's playbook.",
+      "caveat": "This summarises Bessemer's report rather than being the report, and counting vendors is not counting revenue — plenty of money still sits in per-seat deals."
     },
     {
-      "title": "LocalAI rewrites engines in C++ when the install is the problem",
-      "url": "https://localai.io/blog/why-we-write-our-own-engines/",
-      "source": "LocalAI",
-      "section": "Build & ship",
-      "summary": "The team sets out when it ports an upstream inference stack instead of wrapping it. The trigger is never speed — it is that shipping the original means resolving a Python dependency tree on the user's machine against whatever CUDA and glibc that machine happens to carry.",
-      "fact": "Installing vLLM produces a 9.1 GiB virtualenv; their vllm.cpp port produces a 66 MiB binary. llama.cpp, whisper.cpp and MLX stay wrapped.",
-      "take": "That GiB-to-MiB gap is the failure mode behind half my broken deploys, and LocalAI is refreshingly blunt that the small binary costs CPU throughput.",
-      "caveat": "Their own figures show SCRFD detection at 0.83x on one thread and 0.69x on eight, so the port is measurably slower where it matters most."
+      "title": "Businesses will pay $10,000 to delete AI's code",
+      "url": "https://odra.dev/slopfix/",
+      "source": "Slopfix",
+      "section": "Demand signals",
+      "summary": "A three-person team sells exactly one thing: a week of tearing out the bloat that AI coding tools leave behind. It is a real service at a real price, and it only exists because so many companies now own software nobody on the team understands.",
+      "fact": "The offer is \"One week. Three senior engineers. $10,000\", paid in proportion to the result, with one example cutting a codebase from 100,000 lines to 35,000.",
+      "take": "This is the sharpest demand signal I have seen all week: three engineers making a living cleaning up after the tools I use every single day.",
+      "caveat": "They publish no client count and no revenue, so it shows people will pay the asking price, not that the market behind it is big."
     },
     {
-      "title": "A COBOL-to-Java loop that writes its own tests",
-      "url": "https://arxiv.org/abs/2607.28271",
-      "source": "arXiv",
-      "section": "AI & agents",
-      "summary": "The paper introduces Locksmith, an iterative loop that synthesises tests for legacy COBOL and its translated Java, then checks that both run identically under deterministic parity. Hacker News retitled this as a story about migrated bugs; the paper is about coverage.",
-      "fact": "It reports 91.90% branch coverage on an internal production-like COBOL program, across three case studies ranging from 430 to 4,114 source lines.",
-      "take": "Three programs topping out at 4,114 lines is a demo rather than a migration, and I would keep it well away from anything that moves money.",
-      "caveat": "Parity checks only ever cover cases the loop chose to generate. Nothing external audited what it never thought to try."
+      "title": "AI budgets are still growing, fast",
+      "url": "https://www.lumenova.ai/blog/enterprise-ai-adoption-news/",
+      "source": "Lumenova",
+      "section": "Demand signals",
+      "summary": "Company spending on AI is not slowing down. The forecast covers the whole stack — the machines, the software, the services, and the newer tools that do work on their own. For anyone selling to businesses, the budget is sitting there.",
+      "fact": "Gartner forecasts $2.59 trillion of worldwide AI spending in 2026, up 47% year over year, in a press release dated 19 May 2026.",
+      "take": "A 47% rise in spending tells me money is not what is stopping my buyers, so when something of mine does not sell, that one is on me.",
+      "caveat": "A forecast is not a receipt, and this total is mostly hardware and consulting — very different from budget available for a small software product."
     },
     {
-      "title": "Retyping every generated line by hand",
-      "url": "https://ankursethi.com/blog/prevent-cognitive-debt-by-manually-retyping-llm-generated-code/",
-      "source": "Ankur Sethi",
-      "section": "Build & ship",
-      "summary": "Sethi instructs assistants to show proposed edits in chat rather than apply them, then types each line into his editor himself. His argument is that typing builds a spatial map of where things live, which repays itself later in sharper prompts and earlier detection of bad design.",
-      "fact": "He states the cost plainly: the habit leaves him \"probably only 2x faster\" than working with no LLM at all.",
-      "take": "Sethi is right that I am not genuinely faster inside repos I never read, though surrendering that much throughput to fix it is a steep price.",
-      "caveat": "One developer, no measurement behind the 2x, and no evidence that the comprehension he gains survives a month away from the code."
-    },
-    {
-      "title": "SwiftUI at seven years, from someone still shipping it",
-      "url": "https://ykvm.com/2026/07/swiftui-a-story-of-mediocrity/",
-      "source": "ykvm.com",
-      "section": "Design & product",
-      "summary": "A long complaint from a developer who has used the framework since launch. The data-flow model was rebuilt around Observation and still leaves you unable to say why a view re-rendered, while ordinary layout keeps demanding GeometryReader escapes that undo the declarative promise.",
-      "fact": "Dismissing the keyboard on scroll needed iOS 16 in SwiftUI; UIKit had it from iOS 7. The image caching API was still in beta as of July 2026.",
-      "take": "A caching API still in beta in July 2026 is the detail that would stop me putting a photo-heavy screen in SwiftUI, seven years into the framework.",
-      "caveat": "This is one developer's frustration, and the UIKit comparison skips how much boilerplate the old keyboard handling actually demanded."
-    },
-    {
-      "title": "A benchmark that asks 14 models to draw a frog",
+      "title": "A benchmark where everyone passes and nobody scores",
       "url": "https://frogs.vaguespac.es/",
       "source": "FROGS",
-      "section": "AI & agents",
-      "summary": "The prompt is a frog with a Habsburg jaw, drawn as SVG, three attempts per model per month. The output worth reading is not the pictures but the annotations, where you can watch which systems editorialise about anatomy and mood instead of drawing what was asked.",
-      "fact": "All 42 runs across 14 models produced a valid SVG in August 2026, and the page publishes no numeric score whatsoever.",
-      "take": "A benchmark where every single run passes measures nothing, which is precisely why I would keep it open beside a leaderboard I am tempted to believe.",
-      "caveat": "Three attempts per model per month is small enough that one odd sample rewrites the narrative, and taste is doing all the grading."
-    },
-    {
-      "title": "Seventy years of the words we teach learners",
-      "url": "https://pudding.cool/2026/07/essential-words/",
-      "source": "The Pudding",
-      "section": "Design & product",
-      "summary": "The Pudding sets the 1953 General Service List against its 2023 replacement, using concreteness ratings and semantic tagging to show what a language's essential vocabulary quietly stopped including as it grew.",
-      "fact": "The list went from 2,284 to 2,809 words while the most concrete entries fell from 21% of the total to 14%; coverage of general English rose from about 84% to over 90%.",
-      "take": "Trading concrete words for wider coverage is exactly the bargain I make writing product copy, and this piece finally shows me the bill.",
-      "caveat": "Concreteness scores come from a 2014 dataset and the two lists were assembled by different teams for different aims, so part of the shift is method rather than culture."
+      "section": "Wildcard",
+      "summary": "Someone asks fourteen AI models, three times a month, to draw a frog with a Habsburg jaw. The fun is not really the drawings. It is watching which models cannot resist editorialising about the frog's chin instead of simply drawing what was asked.",
+      "fact": "All 42 attempts across 14 models produced a valid drawing in August 2026, and the site publishes no score of any kind.",
+      "take": "I read leaderboards as though they were a score, and 42 out of 42 is a fine reminder that a test everyone passes is measuring nothing.",
+      "caveat": "Three attempts per model per month, judged purely on taste, so it is a curiosity rather than evidence about any of the models in it."
     }
   ]
 }
