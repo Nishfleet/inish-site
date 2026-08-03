@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import time
 import html
 import json
 import subprocess
@@ -23,6 +24,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 USER_AGENT = "inish-daily/1.0 (+https://inish.in/)"
+
+# Reddit serves its JSON API 403 to anything that looks automated, but the RSS
+# feeds still answer 200 for a browser user-agent. It rate-limits hard, so the
+# subreddits are fetched slowly and one failure never sinks the run.
+BROWSER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
+REDDIT_SUBS = (("SaaS", "Product ideas"), ("startups", "Demand signals"), ("Entrepreneur", "Demand signals"))
+REDDIT_PAUSE = 4.0
+REDDIT_RETRIES = 3
 
 # What kind of proof exists for a candidate:
 #   independent   - surfaced by a third party rather than its own author. Check
@@ -97,6 +109,7 @@ def hacker_news() -> list[dict]:
         stories.append({
             "source": "Hacker News",
             "evidence_class": INDEPENDENT,
+            "lens": "Tools",
             "title": title,
             "url": hit.get("url") or f"https://news.ycombinator.com/item?id={hit['objectID']}",
             "discussion_url": f"https://news.ycombinator.com/item?id={hit['objectID']}",
@@ -117,6 +130,7 @@ def lobsters() -> list[dict]:
         {
             "source": "Lobsters",
             "evidence_class": INDEPENDENT,
+            "lens": "Tools",
             "title": item.get("title", ""),
             "url": item.get("url") or item.get("short_id_url", ""),
             "discussion_url": item.get("comments_url", ""),
@@ -138,6 +152,7 @@ def github(day: dt.date) -> list[dict]:
         {
             "source": "GitHub",
             "evidence_class": SELF_REPORTED,
+            "lens": "Tools",
             "title": item["full_name"],
             "url": item["html_url"],
             "description": item.get("description") or "",
@@ -154,24 +169,91 @@ def github(day: dt.date) -> list[dict]:
     ]
 
 
-def arxiv() -> list[dict]:
-    query = urllib.parse.quote("cat:cs.AI OR cat:cs.HC OR cat:cs.SE")
-    url = f"https://export.arxiv.org/api/query?search_query={query}&start=0&max_results=30&sortBy=submittedDate&sortOrder=descending"
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+def feed(url: str, source: str, lens: str, evidence: str, limit: int = 20, agent: str = USER_AGENT) -> list[dict]:
+    """Parse an RSS or Atom feed into candidates."""
+    request = urllib.request.Request(url, headers={"User-Agent": agent})
     with urllib.request.urlopen(request, timeout=25) as response:
         root = ET.fromstring(response.read())
+
     ns = {"atom": "http://www.w3.org/2005/Atom"}
     items = []
-    for entry in root.findall("atom:entry", ns):
-        title = " ".join((entry.findtext("atom:title", default="", namespaces=ns)).split())
-        summary = " ".join((entry.findtext("atom:summary", default="", namespaces=ns)).split())
-        url = entry.findtext("atom:id", default="", namespaces=ns)
+
+    for node in root.findall(".//item")[:limit]:
+        title = (node.findtext("title") or "").strip()
+        link = (node.findtext("link") or "").strip()
+        if title and link.startswith("https://"):
+            items.append({
+                "source": source,
+                "evidence_class": evidence,
+                "lens": lens,
+                "title": " ".join(strip_tags(title).split()),
+                "url": link,
+                "description": strip_tags(node.findtext("description") or "")[:600],
+                "published": (node.findtext("pubDate") or "").strip(),
+            })
+
+    for node in root.findall("atom:entry", ns)[:limit]:
+        title = " ".join((node.findtext("atom:title", default="", namespaces=ns)).split())
+        link_node = node.find("atom:link", ns)
+        link = (link_node.get("href") if link_node is not None else "") or ""
+        if title and link.startswith("https://"):
+            items.append({
+                "source": source,
+                "evidence_class": evidence,
+                "lens": lens,
+                "title": title,
+                "url": link,
+                "description": strip_tags(node.findtext("atom:summary", default="", namespaces=ns))[:600],
+                "published": node.findtext("atom:updated", default="", namespaces=ns),
+            })
+    return items
+
+
+def google_news(query: str, lens: str) -> list[dict]:
+    """Google News is the only broad, key-free way to reach non-developer press."""
+    encoded = urllib.parse.quote(query)
+    url = f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
+    return feed(url, "Google News", lens, INDEPENDENT, limit=15)
+
+
+def reddit() -> list[dict]:
+    """Where people say out loud what they want and what they will pay for."""
+    items: list[dict] = []
+    failures: list[str] = []
+    for index, (sub, lens) in enumerate(REDDIT_SUBS):
+        if index:
+            time.sleep(REDDIT_PAUSE)
+        url = f"https://www.reddit.com/r/{sub}/top/.rss?t=day"
+        for attempt in range(REDDIT_RETRIES):
+            try:
+                items.extend(feed(url, f"r/{sub}", lens, INDEPENDENT, 15, agent=BROWSER_AGENT))
+                break
+            except Exception as exc:
+                if attempt == REDDIT_RETRIES - 1:
+                    failures.append(f"r/{sub}: {type(exc).__name__}")
+                else:
+                    time.sleep(REDDIT_PAUSE * (attempt + 2))
+    if failures and not items:
+        raise RuntimeError("; ".join(failures))
+    return items
+
+
+def show_hn() -> list[dict]:
+    """People launching things: the cleanest read on what someone thinks is wanted."""
+    payload = get_json("https://hn.algolia.com/api/v1/search?tags=show_hn&hitsPerPage=25")
+    items = []
+    for hit in payload.get("hits", []) if isinstance(payload, dict) else []:
+        title = hit.get("title") or hit.get("story_title")
+        if not title:
+            continue
         items.append({
-            "source": "arXiv",
-            "evidence_class": PREPRINT,
+            "source": "Show HN",
+            "evidence_class": SELF_REPORTED,
+            "lens": "Product ideas",
             "title": title,
-            "url": url,
-            "description": summary,
+            "url": hit.get("url") or f"https://news.ycombinator.com/item?id={hit['objectID']}",
+            "discussion_url": f"https://news.ycombinator.com/item?id={hit['objectID']}",
+            "signals": {"points": hit.get("points", 0), "comments": hit.get("num_comments", 0)},
         })
     return items
 
@@ -188,9 +270,16 @@ def main() -> int:
     errors: list[str] = []
     for name, loader in (
         ("hacker_news", hacker_news),
+        ("show_hn", show_hn),
         ("lobsters", lobsters),
         ("github", lambda: github(day)),
-        ("arxiv", arxiv),
+        ("openai_news", lambda: feed("https://openai.com/news/rss.xml", "OpenAI", "AI", SELF_REPORTED, 12)),
+        ("techcrunch_ai", lambda: feed("https://techcrunch.com/category/artificial-intelligence/feed/", "TechCrunch", "AI", INDEPENDENT, 20)),
+        ("product_hunt", lambda: feed("https://www.producthunt.com/feed", "Product Hunt", "Product ideas", SELF_REPORTED, 20)),
+        ("news_ai", lambda: google_news("AI model release OR pricing OR capability when:3d", "AI")),
+        ("news_funding", lambda: google_news("AI startup raises funding round when:3d", "Demand signals")),
+        ("news_adoption", lambda: google_news("companies spending on AI agents adoption budget when:7d", "Demand signals")),
+        ("reddit", reddit),
     ):
         try:
             candidates.extend(loader())
@@ -198,21 +287,26 @@ def main() -> int:
             errors.append(f"{name}: {type(exc).__name__}: {exc}")
 
     by_class: dict[str, int] = {}
+    by_lens: dict[str, int] = {}
     for candidate in candidates:
         key = candidate["evidence_class"]
         by_class[key] = by_class.get(key, 0) + 1
+        lens = candidate.get("lens", "unsorted")
+        by_lens[lens] = by_lens.get(lens, 0) + 1
 
     payload = {
         "date": day.isoformat(),
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "candidate_count": len(candidates),
         "by_evidence_class": by_class,
+        "by_lens": by_lens,
         "source_errors": errors,
         "candidates": candidates,
     }
     output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
     print(output)
-    print(f"candidates={len(candidates)} by_class={by_class} source_errors={len(errors)}")
+    print(f"candidates={len(candidates)} by_class={by_class}")
+    print(f"by_lens={by_lens} source_errors={len(errors)}")
     return 0 if candidates else 1
 
 
