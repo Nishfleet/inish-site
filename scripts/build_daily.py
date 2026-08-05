@@ -235,6 +235,37 @@ def load_history(latest_date: dt.date) -> dict[str, str]:
     return published
 
 
+def validate_story(story: object, path: Path, published: dict[str, str], seen: set[str]) -> dict:
+    """Normalize one story and gate it against history and its own fields.
+
+    Returns the cleaned story; raises on a story that must not run.
+    """
+    if not isinstance(story, dict) or set(story) != STORY_FIELDS:
+        raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
+    url = validate_url(story["url"])
+    key = canonical_url(url)
+    if key in seen:
+        raise ValueError(f"{path}: duplicate URL {url}")
+    if key in published:
+        raise ValueError(f"{path}: {url} already ran on {published[key]}")
+    section = validate_text(story["section"], "section", 2, 40)
+    if section not in SECTIONS:
+        raise ValueError(f"{path}: unsupported section {section}")
+    seen.add(key)
+    title = validate_text(story["title"], "title", 5, 200)
+    fact = validate_fact(story["fact"])
+    return {
+        "title": title,
+        "url": url,
+        "source": validate_text(story["source"], "source", 2, 100),
+        "section": section,
+        "summary": validate_text(story["summary"], "summary", 25, 700),
+        "fact": fact,
+        "take": validate_take(story["take"], anchors(f"{title} {fact}")),
+        "caveat": validate_text(story["caveat"], "caveat", 20, 240),
+    }
+
+
 def load_latest() -> dict:
     edition_paths = sorted(EDITIONS.glob("*.json"), reverse=True)
     if not edition_paths:
@@ -263,30 +294,7 @@ def load_latest() -> dict:
     clean_stories = []
     seen: set[str] = set()
     for story in stories:
-        if not isinstance(story, dict) or set(story) != STORY_FIELDS:
-            raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
-        url = validate_url(story["url"])
-        key = canonical_url(url)
-        if key in seen:
-            raise ValueError(f"{path}: duplicate URL {url}")
-        if key in published:
-            raise ValueError(f"{path}: {url} already ran on {published[key]}")
-        section = validate_text(story["section"], "section", 2, 40)
-        if section not in SECTIONS:
-            raise ValueError(f"{path}: unsupported section {section}")
-        seen.add(key)
-        title = validate_text(story["title"], "title", 5, 200)
-        fact = validate_fact(story["fact"])
-        clean_stories.append({
-            "title": title,
-            "url": url,
-            "source": validate_text(story["source"], "source", 2, 100),
-            "section": section,
-            "summary": validate_text(story["summary"], "summary", 25, 700),
-            "fact": fact,
-            "take": validate_take(story["take"], anchors(f"{title} {fact}")),
-            "caveat": validate_text(story["caveat"], "caveat", 20, 240),
-        })
+        clean_stories.append(validate_story(story, path, published, seen))
 
     check_edition_repetition(clean_stories)
     check_edition_balance(clean_stories)
