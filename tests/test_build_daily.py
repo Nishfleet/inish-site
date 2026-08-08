@@ -122,6 +122,7 @@ class BuildDailyTests(unittest.TestCase):
         self.legacy_daily.mkdir()
         (self.legacy_daily / "app.js").write_text("app")
         (self.legacy_daily / "styles.css").write_text("styles")
+        (self.legacy_daily / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
 
     def tearDown(self):
         self.temp.cleanup()
@@ -153,7 +154,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_builds_latest_feed_at_root(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "latest.json", "feed.xml", "sitemap.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
         self.assertFalse((self.public / "archive").exists())
         self.assertNotIn("archive", (self.public / "index.html").read_text())
@@ -182,6 +183,25 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(page.count("<strong>But</strong>"), 6)
         self.assertNotIn("Nish's angle", page)
         self.assertIn("70 scanned · 6 kept", page)
+
+    def test_head_carries_social_share_metadata(self):
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.svg">', head)
+        self.assertIn(
+            '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
+            'and early signals of demand \u2014 in plain words.">',
+            head,
+        )
+        self.assertIn('<meta property="og:image:type" content="image/svg+xml">', head)
+        self.assertIn('<meta property="og:image:width" content="1200">', head)
+        self.assertIn('<meta property="og:image:height" content="630">', head)
+        self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.svg">', head)
+        self.assertEqual(head.count("https://inish.in/og-image.svg"), 2)
+        # The build copies the share card to the root alongside app.js and styles.css.
+        self.assertTrue((self.public / "og-image.svg").is_file())
 
     def test_quiet_day_publishes_a_short_edition(self):
         self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
