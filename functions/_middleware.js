@@ -2,6 +2,8 @@ const publicPaths = new Set([
   "/",
   "/app.js",
   "/styles.css",
+  "/apple-touch-icon.png", // iOS home-screen icon, referenced by the generated head
+  "/og-image.svg", // social share card, referenced by the generated head
   "/latest.json",
   "/feed.xml",
   "/robots.txt",

@@ -1,0 +1,37 @@
+# The test gate for pull requests.
+#
+# main became protected on 2026-08-08 requiring only `classify` - the review-gate
+# labeller, which passes regardless of whether the code works. With Phase 3
+# auto-merge armed, that let a green-looking PR land untested. This workflow adds
+# the real gate: the repository's own unittest suite. Keep the job name `test`
+# stable; branch protection requires it by exact name.
+name: Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
+        with:
+          python-version: '3.12'
+
+      - name: Run the unit tests
+        # No third-party dependencies: the suite is stdlib unittest only.
+        run: python3 -m unittest discover -s tests -v
