@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Verify the complete public route contract for feed-only inish.in."""
+"""Verify the complete public route contract for feed-only inish.in.
+
+The canonical feeds (latest.json and feed.xml) are additionally compared whole
+against the accepted local edition, so a stale or mismatched live hostname
+fails with the observed date and story mismatch instead of a generic byte diff.
+"""
 
 from __future__ import annotations
 
@@ -7,6 +12,7 @@ import argparse
 import json
 import re
 import time
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urljoin, urlparse
@@ -42,6 +48,80 @@ def fetch(base: str, path: str, *, method: str = "GET") -> tuple[int, bytes, str
             return response.status, response.read(), response.headers.get("Location")
     except HTTPError as error:
         return error.code, error.read(), error.headers.get("Location")
+
+
+def json_feed_mismatch(local: bytes, live: bytes) -> str | None:
+    """Compare the complete canonical JSON feed against the accepted edition.
+
+    Returns None when the live edition is exactly the accepted edition, or a
+    specific failure line naming the observed date and story count when live
+    delivery has gone stale. A stale hostname is a failure here, never a reason
+    to overwrite the last accepted edition.
+    """
+    try:
+        expected = json.loads(local)
+        observed = json.loads(live)
+    except json.JSONDecodeError:
+        return "live_feed_parity /latest.json: live body is not valid JSON"
+    if expected == observed:
+        return None
+    expected_stories = expected.get("stories")
+    observed_stories = observed.get("stories")
+    if not isinstance(expected_stories, list) or not isinstance(observed_stories, list):
+        return (
+            "live_feed_parity /latest.json: live body is not a complete edition "
+            f"(expected date={expected.get('date')!r} stories={expected_stories!r}, "
+            f"observed date={observed.get('date')!r} stories={observed_stories!r})"
+        )
+    if (expected.get("date"), len(expected_stories)) != (observed.get("date"), len(observed_stories)):
+        return (
+            "live_feed_parity: expected edition "
+            f"{expected.get('date')} with {len(expected_stories)} stories, "
+            f"live serves {observed.get('date')} with {len(observed_stories)} stories"
+        )
+    expected_urls = [story.get("url") for story in expected_stories]
+    observed_urls = [story.get("url") for story in observed_stories]
+    return (
+        "live_feed_parity /latest.json: live edition carries the accepted date and "
+        "story count but differs in content "
+        f"(expected urls {expected_urls!r}, live urls {observed_urls!r})"
+    )
+
+
+def rss_item(body: bytes) -> tuple[str, str, str, str, str]:
+    """(title, guid, link, pubDate, description) of the single channel item."""
+    root = ET.fromstring(body)
+    item = root.find("./channel/item")
+    if item is None:
+        raise ValueError("missing <item>")
+    identity = []
+    for tag in ("title", "guid", "link", "pubDate", "description"):
+        element = item.find(tag)
+        if element is None or element.text is None:
+            raise ValueError(f"missing <{tag}>")
+        identity.append(element.text)
+    return tuple(identity)  # type: ignore[return-value]
+
+
+def rss_feed_mismatch(local: bytes, live: bytes) -> str | None:
+    """Compare the complete canonical RSS feed against the accepted edition.
+
+    Returns None when the live item is exactly the accepted item, or a specific
+    failure line naming the observed guid when live delivery is stale.
+    """
+    try:
+        expected = rss_item(local)
+        observed = rss_item(live)
+    except (ET.ParseError, ValueError) as error:
+        return f"live_feed_parity /feed.xml: feed is not a valid single-item RSS ({error})"
+    if expected == observed:
+        return None
+    if expected[1] != observed[1]:
+        return f"live_feed_parity: expected RSS item {expected[1]}, live serves {observed[1]}"
+    return (
+        "live_feed_parity /feed.xml: RSS item carries the accepted guid but "
+        "differs in content; refusing to call a mismatched feed live"
+    )
 
 
 def main() -> int:
@@ -86,13 +166,18 @@ def main() -> int:
         if status != 200 or body:
             failures.append(f"HEAD {path}: expected empty 200, got {status} and {len(body)} bytes")
 
-    status, body, _ = fetch(args.base, f"/latest.json?deploy={cache_token}")
-    if status == 200:
-        try:
-            if json.loads(body)["date"] != args.edition_date:
-                failures.append("/latest.json: edition date mismatch")
-        except (KeyError, json.JSONDecodeError):
-            failures.append("/latest.json: invalid JSON")
+    # Complete canonical feed parity: both feeds must agree with the accepted
+    # local edition as data, not just as bytes, so a stale live hostname fails
+    # with the observed date/story mismatch and a named stage.
+    for path, relative in (("/latest.json", "latest.json"), ("/feed.xml", "feed.xml")):
+        status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
+        if status != 200:
+            failures.append(f"live_feed_parity {path}: expected 200, got {status}")
+            continue
+        expected = (args.root / relative).read_bytes()
+        mismatch = json_feed_mismatch(expected, body) if relative == "latest.json" else rss_feed_mismatch(expected, body)
+        if mismatch is not None:
+            failures.append(mismatch)
 
     redirects = {
         "/index.html": "/",
