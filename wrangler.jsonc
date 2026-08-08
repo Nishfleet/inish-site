@@ -1,0 +1,19 @@
+{
+  "name": "inish-site",
+  "main": "worker.js",
+  "compatibility_date": "2026-08-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  // Apex host patterns are required: "inish.in/*" alone does not match "/".
+  "routes": [
+    { "pattern": "inish.in", "zone_name": "inish.in" },
+    { "pattern": "inish.in/*", "zone_name": "inish.in" },
+    { "pattern": "www.inish.in", "zone_name": "inish.in" },
+    { "pattern": "www.inish.in/*", "zone_name": "inish.in" }
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/*"]
+  }
+}

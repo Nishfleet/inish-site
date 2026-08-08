@@ -7,6 +7,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEPLOY_SCRIPT = ROOT / "scripts" / "deploy_daily.sh"
 BUILD_SCRIPT = ROOT / "scripts" / "build_daily.py"
+WORKER = ROOT / "worker.js"
+MIDDLEWARE = ROOT / "functions" / "_middleware.js"
+WRANGLER = ROOT / "wrangler.jsonc"
 
 # Root static assets referenced by the generated head: the social share card
 # (og:image / twitter:image) and the iOS home-screen icon. Both are pinned at
@@ -14,10 +17,13 @@ BUILD_SCRIPT = ROOT / "scripts" / "build_daily.py"
 SHARE_CARD = "og-image.svg"
 HOME_SCREEN_ICON = "apple-touch-icon.png"
 
-# The deploy script copies the root files into the payload on one line ending
-# with "$PUBLIC_DIR/". The line may wrap with trailing backslashes, and the
-# directory copies (`cp -R`) are separate lines.
-ROOT_COPY_LINE = re.compile(r'^cp (?!-R )((?:[A-Za-z0-9._-]+ +)+)"\$PUBLIC_DIR/"$', re.MULTILINE)
+# The deploy script copies the root files into the payload from SNAPSHOT_ROOT
+# on lines ending with "$PUBLIC_DIR/". The line may wrap with trailing
+# backslashes, and the directory copies (`cp -R`) are separate lines.
+ROOT_COPY_LINE = re.compile(
+    r'^cp (?:\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"\s+)+\"\$PUBLIC_DIR/\"$',
+    re.MULTILINE,
+)
 
 # Every asset the generated head points at, rendered by build_daily.py as
 # content="https://inish.in/path" or href="/path".
@@ -32,7 +38,7 @@ def payload_root_files() -> list[str]:
         raise AssertionError(
             f"expected exactly one root-file cp line in {DEPLOY_SCRIPT}, found {len(matches)}"
         )
-    return matches[0].group(1).split()
+    return re.findall(r'\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"', matches[0].group(0))
 
 
 def head_root_assets() -> set[str]:
@@ -79,20 +85,57 @@ class DeployDailyTests(unittest.TestCase):
     def test_payload_comes_from_an_origin_main_snapshot_not_the_workdir(self):
         # The deploy contract: the payload and the verifier read a pristine
         # origin/main snapshot, so a publisher workdir left on a topic branch
-        # (which previously stalled live delivery for days) cannot leak local
-        # files into the deploy or block it on a branch gate.
+        # cannot leak local files into the deploy or block it on a branch gate.
         script = DEPLOY_SCRIPT.read_text()
         self.assertIn("git fetch --quiet origin main", script)
         self.assertIn('ACCEPTED_SHA="$(git rev-parse FETCH_HEAD)"', script)
         self.assertIn("git archive --format=tar FETCH_HEAD", script)
         self.assertIn('--root "$SNAPSHOT_ROOT"', script)
+        # Every static root file must be copied from the snapshot path, never CWD.
+        self.assertIn('"$SNAPSHOT_ROOT/index.html"', script)
+        self.assertIn('"$SNAPSHOT_ROOT/latest.json"', script)
+        self.assertNotRegex(
+            script,
+            r'^cp (?!.*\$SNAPSHOT_ROOT)(?!-R ).*index\.html',
+            msg="root copy must not fall back to workdir-relative paths",
+        )
+
+    def test_deploy_uses_workers_not_pages(self):
+        # Pages:Edit is unavailable on the fleet token; Workers deploy is the
+        # path that can actually put origin/main on inish.in.
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn("wrangler deploy", script)
+        self.assertNotIn("pages deploy", script)
+        self.assertTrue(WORKER.is_file(), "worker.js must exist at the repo root")
+        self.assertTrue(WRANGLER.is_file(), "wrangler.jsonc must exist at the repo root")
+        wrangler = WRANGLER.read_text()
+        self.assertIn('"inish.in"', wrangler)
+        self.assertIn('"inish.in/*"', wrangler)
+        self.assertIn('"ASSETS"', wrangler)
+
+    def test_worker_and_pages_middleware_share_the_route_contract(self):
+        # Keep the two edge sources honest: allowlist, redirects, HSTS string.
+        worker = WORKER.read_text()
+        middleware = MIDDLEWARE.read_text()
+        for needle in (
+            '"/og-image.svg"',
+            '"/apple-touch-icon.png"',
+            'max-age=31536000; includeSubDomains',
+            "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)",
+            '["/daily", "/"]',
+        ):
+            self.assertIn(needle, worker)
+            self.assertIn(needle, middleware)
+
+    def test_deploy_loads_fleet_token_when_env_is_empty(self):
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn("/home/nish/.config/fleet-console/cf.env", script)
+        self.assertIn("CLOUDFLARE_API_TOKEN", script)
 
     def test_deploy_refuses_to_roll_live_back_to_an_older_edition(self):
         # The freshness gate: the accepted edition may be older than today only
         # when it is still newer than what the live hostname serves (recovery
-        # deploy); publishing content older than live must fail loudly. The old
-        # "edition date must equal today" gate is gone because it blocked the
-        # recovery deploy entirely.
+        # deploy); publishing content older than live must fail loudly.
         script = DEPLOY_SCRIPT.read_text()
         self.assertIn('LIVE_EDITION_DATE="$(curl -fsS --max-time 15 https://inish.in/latest.json | jq -er \'.date\')"', script)
         self.assertIn('[[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]', script)
