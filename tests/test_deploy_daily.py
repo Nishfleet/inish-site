@@ -76,6 +76,36 @@ class DeployDailyTests(unittest.TestCase):
             for name in sorted(required):
                 self.assertTrue((payload / name).is_file(), f"payload missing {name}")
 
+    def test_payload_comes_from_an_origin_main_snapshot_not_the_workdir(self):
+        # The deploy contract: the payload and the verifier read a pristine
+        # origin/main snapshot, so a publisher workdir left on a topic branch
+        # (which previously stalled live delivery for days) cannot leak local
+        # files into the deploy or block it on a branch gate.
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn("git fetch --quiet origin main", script)
+        self.assertIn('ACCEPTED_SHA="$(git rev-parse FETCH_HEAD)"', script)
+        self.assertIn("git archive --format=tar FETCH_HEAD", script)
+        self.assertIn('--root "$SNAPSHOT_ROOT"', script)
+
+    def test_deploy_refuses_to_roll_live_back_to_an_older_edition(self):
+        # The freshness gate: the accepted edition may be older than today only
+        # when it is still newer than what the live hostname serves (recovery
+        # deploy); publishing content older than live must fail loudly. The old
+        # "edition date must equal today" gate is gone because it blocked the
+        # recovery deploy entirely.
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn('LIVE_EDITION_DATE="$(curl -fsS --max-time 15 https://inish.in/latest.json | jq -er \'.date\')"', script)
+        self.assertIn('[[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]', script)
+        self.assertIn("Refusing to roll the live site back", script)
+        self.assertNotIn("Refusing to publish stale edition", script)
+
+    def test_fail_loudly_behaviour_is_kept(self):
+        # A stale or mismatched live hostname still fails with a named stage,
+        # no Telegram notification, and the accepted edition left untouched.
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn("the accepted edition failed live verification. Failing stage:", script)
+        self.assertIn("it is NOT confirmed live.", script)
+
 
 if __name__ == "__main__":
     unittest.main()
