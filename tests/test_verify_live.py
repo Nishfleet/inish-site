@@ -1,5 +1,6 @@
 import io
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -261,6 +262,45 @@ class LiveVerifierTests(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertIn("GET /archive: expected empty 404", output)
         self.assertNotIn("live_feed_parity", output)
+
+
+class MiddlewareContractTests(unittest.TestCase):
+    """The HSTS regression gate: the Pages middleware must keep serving a
+    Strict-Transport-Security header on every response path so the HTTPS-only
+    policy cannot silently regress. Source-text contract, like the deploy-script
+    tests below, because the suite is stdlib-only and CI has no Node runtime."""
+
+    MIDDLEWARE = Path(__file__).resolve().parents[1] / "functions" / "_middleware.js"
+
+    def test_hsts_set_on_redirect_404_and_passthrough_responses(self):
+        source = self.MIDDLEWARE.read_text()
+        # Definition plus the three call sites: redirect, 404, and passthrough.
+        self.assertEqual(source.count("withSecurityHeaders("), 4)
+
+    def test_redirect_stays_301_with_location_query_and_hsts(self):
+        source = self.MIDDLEWARE.read_text()
+        self.assertIn("status: 301", source)
+        self.assertIn("Location: destination.href", source)
+        self.assertIn("destination.search = url.search", source)
+        # The redirect is built by hand so its headers stay mutable; the built-in
+        # helper returns immutable headers and the runtime 500s when HSTS is
+        # attached to them.
+        self.assertIn("new Response(null, {", source)
+
+    def test_hsts_value_is_explicit_without_preload(self):
+        source = self.MIDDLEWARE.read_text()
+        self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', source)
+        header = re.search(r'hstsHeader = "([^"]+)"', source)
+        self.assertIsNotNone(header, "HSTS value must be explicit")
+        self.assertIn("max-age=31536000", header.group(1))
+        self.assertIn("includeSubDomains", header.group(1))
+        self.assertNotIn("preload", header.group(1))
+
+    def test_public_allowlist_and_redirect_semantics_kept(self):
+        source = self.MIDDLEWARE.read_text()
+        self.assertIn("publicPaths", source)
+        self.assertIn('["/daily", "/"]', source)
+        self.assertIn("status: 404", source)
 
 
 class DeployScriptContractTests(unittest.TestCase):
