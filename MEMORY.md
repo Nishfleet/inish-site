@@ -5,6 +5,7 @@ Use this file for durable project truth Codex cannot reliably infer from code al
 ## Decisions
 
 - inish.in is the public home of Nish Daily. The feed itself is the root page.
+- The daily deploy (`deploy_daily.sh`) takes the accepted edition from a pristine snapshot of `origin/main` fetched inside the script, never from the local workdir, so a checkout left on a topic branch cannot stall live delivery. Its only freshness gate is refusing to roll the live site back to an edition older than what the live hostname serves; whole live parity is enforced loudly by `verify_live.py`.
 - The edition is gated on quality, not count. `build_daily.py` accepts 0-8 stories and a day where nothing survives being checked is a valid edition. Never pad to hit a number.
 - Every story carries a `fact` (a checkable detail from the source), a first-person `take`, and a `caveat`. The builder enforces all three and refuses to render generic copy — that validator is the editorial policy, so weakening it to make a run pass defeats its whole purpose.
 - Keep only the current feed plus its RSS, JSON, robots, sitemap, CSS, and JavaScript endpoints. Do not publish founder/product pages, LLM pages, or edition archives.
