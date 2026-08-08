@@ -15,7 +15,7 @@ Publish one source-backed edition to `https://inish.in/`, then send Nish the ver
 5. Run `python3 scripts/build_daily.py`, `python3 -m unittest discover -s tests -v`, and `python3 -m py_compile scripts/build_daily.py`.
 6. Review the rendered page for the candidate proof, empty copy, duplicates, unsupported claims, functional filters, and broken source URLs.
 7. Commit only the edition and generated root feed files with `daily: publish YYYY-MM-DD`, then push `main`.
-8. Run `scripts/deploy_daily.sh`. It deploys Cloudflare Pages from the VPS, requires a clean `main` equal to `origin/main`, compares the complete live site with the generated feed-only route contract, and sends Nish the verified Telegram link.
+8. Run `scripts/deploy_daily.sh`. It deploys Cloudflare Pages from the VPS, requires a clean `main` equal to `origin/main`, compares the complete live site and canonical feed data (latest.json and feed.xml) with the generated feed-only route contract — a stale or mismatched live edition fails with the observed date/story mismatch — and sends Nish the verified Telegram link.
 9. Report success only when the deploy script prints `verified_live`. Otherwise report the exact failing stage without claiming publication.
 
 ## Who this is for

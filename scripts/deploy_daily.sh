@@ -56,8 +56,9 @@ cp -R fonts "$PUBLIC_DIR/"
   --commit-message "Publish Nish Daily $EDITION_DATE" \
   --commit-dirty=false)
 
+VERIFY_STAGE=""
 for _ in {1..12}; do
-  if python3 scripts/verify_live.py --root "$ROOT" --edition-date "$EDITION_DATE" --commit "$HEAD_SHA"; then
+  if VERIFY_STAGE="$(python3 scripts/verify_live.py --root "$ROOT" --edition-date "$EDITION_DATE" --commit "$HEAD_SHA" 2>&1)"; then
     hermes send --to telegram:1144372019 --quiet \
       "Nish Daily is live — $EDITION_DATE, $STORY_COUNT stories: https://inish.in/"
     echo "verified_live date=$EDITION_DATE stories=$STORY_COUNT commit=$HEAD_SHA"
@@ -66,5 +67,7 @@ for _ in {1..12}; do
   sleep 5
 done
 
-echo "Cloudflare deployed, but the custom domain failed the feed-only route checks." >&2
+echo "Cloudflare deployed, but the accepted edition failed live verification. Failing stage:" >&2
+printf '%s\n' "$VERIFY_STAGE" >&2
+echo "The accepted edition in the repository was left untouched; it is NOT confirmed live." >&2
 exit 1
