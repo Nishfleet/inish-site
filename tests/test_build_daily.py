@@ -236,6 +236,51 @@ class BuildDailyTests(unittest.TestCase):
                 head = (self.public / "index.html").read_text().split("</head>", 1)[0]
                 self.assertEqual(head.count('<link rel="canonical" href="https://inish.in/">'), 1)
 
+    def test_filters_expose_selected_state_and_announce_count(self):
+        # The merged filter accessibility contract must live in the renderer,
+        # not just in a committed index.html: exactly one button is
+        # aria-pressed=true (the active All filter), every other filter is
+        # explicitly false, and a polite live region announces the initial
+        # visible count so the static markup matches app.js's runtime updates.
+        for payload in (
+            edition(stories=3),
+            edition(stories=1),
+            edition(stories=0, editor_note="Nothing today survived a second look at the source."),
+        ):
+            with self.subTest(stories=len(payload["stories"])):
+                self.write(payload)
+                self.build()
+                page = (self.public / "index.html").read_text()
+                if not payload["stories"]:
+                    self.assertNotIn("data-filter", page)
+                    self.assertNotIn("filter-status", page)
+                    continue
+                filters = page.split('<nav class="filters"', 1)[1].split("</nav>", 1)[0]
+                self.assertEqual(filters.count('aria-pressed="true"'), 1)
+                self.assertIn(
+                    '<button class="active" data-filter="all" aria-pressed="true">All</button>',
+                    filters,
+                )
+                pressed_false = filters.count('aria-pressed="false"')
+                self.assertGreaterEqual(pressed_false, 1)
+                # Every filter button except All carries an explicit false state.
+                self.assertEqual(filters.count("<button"), pressed_false + 1)
+                self.assertIn('id="filter-status" role="status" aria-live="polite"', page)
+                count = len(payload["stories"])
+                noun = "story" if count == 1 else "stories"
+                self.assertIn(f">Showing all {count} {noun}<", page)
+
+    def test_footer_links_the_owned_studio(self):
+        # The merged outbound identity link is part of the renderer, so the
+        # next daily publish cannot silently drop it from the footer.
+        self.write(edition())
+        self.build()
+        footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
+        self.assertIn(
+            '<p class="identity"><a href="https://tinystudio.in/" rel="noopener noreferrer">Tiny Studio ↗</a> — Nish\'s studio.</p>',
+            footer,
+        )
+
     def test_quiet_day_publishes_a_short_edition(self):
         self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
         self.build()

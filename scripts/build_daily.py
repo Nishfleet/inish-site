@@ -349,11 +349,17 @@ def page(edition: dict) -> str:
         # Only sections that ran today: a filter that leads to an empty page is a
         # promise the edition did not keep.
         present = [section for section in sorted(SECTIONS) if any(s["section"] == section for s in edition["stories"])]
+        # The merged filter accessibility contract: exactly one button is
+        # aria-pressed=true (the active All filter), every other filter is
+        # explicitly false, and a polite live region announces the initial
+        # visible count so the static markup matches app.js's runtime updates.
+        status_noun = "story" if kept_count == 1 else "stories"
         filters = f"""
     <nav class="filters" aria-label="Filter stories">
-      <button class="active" data-filter="all">All</button>
-      {''.join(f'<button data-filter="{esc(section)}">{esc(section)}</button>' for section in present)}
-    </nav>"""
+      <button class="active" data-filter="all" aria-pressed="true">All</button>
+      {''.join(f'<button data-filter="{esc(section)}" aria-pressed="false">{esc(section)}</button>' for section in present)}
+    </nav>
+    <p class="visually-hidden" id="filter-status" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;">Showing all {kept_count} {status_noun}</p>"""
     else:
         cards = """
       <article class="story story-lead quiet-day">
@@ -396,6 +402,7 @@ def page(edition: dict) -> str:
   </main>
   <footer>
     <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a></div>
+    <p class="identity"><a href="https://tinystudio.in/" rel="noopener noreferrer">Tiny Studio ↗</a> — Nish's studio.</p>
     <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
   </footer>
   <script src="/app.js" defer></script>
