@@ -362,6 +362,7 @@ def page(edition: dict) -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nish's Daily Reads — {esc(edition['date'])}</title>
+  <link rel="canonical" href="https://inish.in/">
   <meta name="description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
   <meta property="og:image" content="https://inish.in/og-image.svg">
   <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
