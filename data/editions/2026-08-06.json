@@ -1,0 +1,67 @@
+{
+  "date": "2026-08-06",
+  "candidate_count": 237,
+  "editor_note": "I opened the strongest candidates across AI, product, demand, tools, and security. Six survived because each had a concrete detail in a readable primary source. I dropped the rest when they were only pitches, too technical for this feed, or not checkable from the source page.",
+  "stories": [
+    {
+      "title": "Meta's coding agent works on several features at once",
+      "url": "https://techcrunch.com/2026/08/05/meta-launches-muse-code-an-ai-agent-for-large-code-bases/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Meta released Muse Code in beta, a terminal tool for large software projects. It can plan changes, write code, check the result, and split a big job across smaller agents working in parallel.",
+      "fact": "In testing, Meta said Muse Code built 6 game features at the same time without collisions.",
+      "take": "I care less about another coding-agent launch than the work model: Muse Code running 6 isolated jobs together could make overnight product work much more practical.",
+      "caveat": "It is still in beta, and the source does not show an independent benchmark against Codex or Claude Code."
+    },
+    {
+      "title": "AI search is sending Shopify stores more buyers",
+      "url": "https://techcrunch.com/2026/08/05/shopify-says-ai-search-is-driving-more-traffic-and-sales-not-replacing-google/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Shopify says AI search is adding traffic and orders instead of replacing traditional search. Its view is that AI agents understand a buyer's full constraint set, then send the buyer closer to the right product.",
+      "fact": "Shopify said AI-driven traffic and orders to its stores rose 3x year over year in the second quarter.",
+      "take": "I would build Shopify pages that answer a real constraint, not pages that win one keyword. AI shopping is a distribution change and a merchandising test at the same time.",
+      "caveat": "This is Shopify's earnings-call account, reported by TechCrunch, so the result is not an independent measurement across all merchants."
+    },
+    {
+      "title": "Google gives Demis Hassabis a wider AI science role",
+      "url": "https://blog.google/company-news/inside-google/message-ceo/next-chapter-ai-momentum/",
+      "source": "Google",
+      "section": "AI",
+      "summary": "Google says Demis Hassabis will become Chair of Google DeepMind and Chief Scientist of Alphabet while continuing to lead Isomorphic Labs. Google frames the change as a way to push both frontier AI and scientific work faster.",
+      "fact": "Google says the Gemini app has reached more than 950 million monthly users.",
+      "take": "I read the important signal as organizational: Google is putting its most visible AI research leader closer to the company-wide science agenda while still keeping him attached to DeepMind.",
+      "caveat": "The user number and the strategic rationale come from Google's own announcement, not an outside audit."
+    },
+    {
+      "title": "Cloudflare open-sources a controlled operating layer for agents",
+      "url": "https://blog.cloudflare.com/cloudflare-os/",
+      "source": "Cloudflare",
+      "section": "Tools",
+      "summary": "Cloudflare OS is an open platform for building internal apps and agent workflows around a company's own systems. The design puts small service-specific Gatekeepers between an agent and sensitive tools, so access can be narrowed and approvals can be required.",
+      "fact": "Cloudflare says, \"Cloudflare OS is available today\" as open source and can be deployed into a customer's own Cloudflare account.",
+      "take": "For me, Cloudflare OS is the kind of infrastructure that matters: not another chatbot, but a way to turn company rules and permissions into reusable product behavior.",
+      "caveat": "The source is a product announcement, and the managed dashboard version is described as future work rather than a shipped service."
+    },
+    {
+      "title": "A small model matches a frontier model for search at 100 times lower cost",
+      "url": "https://neon.com/blog/how-castform-neon-beats-frontier-models-on-price-and-efficiency",
+      "source": "Neon",
+      "section": "Demand signals",
+      "summary": "Neon and Castform describe a 4-billion-parameter open model trained to search company data through Neon's database tools. They say the approach matches GPT-5.6 Sol on their retrieval task while costing far less per request.",
+      "fact": "Neon's example says a typical multi-step search with GPT-5.6 Sol costs about $0.03 and that the open model costs 100 times less.",
+      "take": "I see the business opportunity as more than a cheaper model. It is making private company data usable for training without forcing every search step through an expensive frontier model.",
+      "caveat": "The comparison is a company case study on a specific retrieval task, not a general claim that small models beat frontier models everywhere."
+    },
+    {
+      "title": "A hidden instruction can make Atlassian Rovo leak company data",
+      "url": "https://www.promptarmor.com/resources/atlassian-rovo-exfiltrates-data",
+      "source": "PromptArmor",
+      "section": "Wildcard",
+      "summary": "PromptArmor describes a zero-click attack against Atlassian Rovo. A hidden instruction in an uploaded file can cause the agent to send Jira or Confluence content to an attacker's website through a URL it opens itself.",
+      "fact": "PromptArmor says it disclosed the issue to Atlassian on May 23, 2026, and published the report on August 5 after follow-ups.",
+      "take": "my Rovo security rule for every agent product is simple: a tool that opens a URL is still an outbound data channel, even when web search is switched off.",
+      "caveat": "The report is from the security researcher who found the issue, and it says Atlassian had not communicated a fix by publication."
+    }
+  ]
+}

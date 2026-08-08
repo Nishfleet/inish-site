@@ -23,7 +23,12 @@ ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
-ASSETS = ("app.js", "styles.css")
+# app.js and styles.css are the legacy daily assets; og-image.svg is the static
+# social share card referenced by the generated head, so it must be copied to
+# the root alongside them on every build. apple-touch-icon.png is pinned at the
+# root: it has no daily/ source, so the entry below is a presence check that
+# fails the build loudly if the committed icon ever goes missing.
+ASSETS = ("app.js", "styles.css", "og-image.svg", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
 STORY_FIELDS = {"title", "url", "source", "section", "summary", "fact", "take", "caveat"}
@@ -366,6 +371,14 @@ def page(edition: dict) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nish's Daily Reads — {esc(edition['date'])}</title>
   <meta name="description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
+  <meta property="og:image" content="https://inish.in/og-image.svg">
+  <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
+  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://inish.in/og-image.svg">
+  <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
