@@ -4,20 +4,43 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Load the VPS fleet Cloudflare token when the environment has none.
+# Preference order:
+#   1. CLOUDFLARE_API_TOKEN already exported
+#   2. fleet-console/cf.env (Workers-capable token used by fleet-release)
+#   3. ~/.inish-cf-token (Pages:Edit drop-file; optional, kept for recovery)
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+  if [[ -r /home/nish/.config/fleet-console/cf.env ]]; then
+    # shellcheck disable=SC1091
+    set -a
+    source /home/nish/.config/fleet-console/cf.env
+    set +a
+  fi
+fi
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" && -r "${INISH_CF_TOKEN_FILE:-/home/nish/.inish-cf-token}" ]]; then
+  CLOUDFLARE_API_TOKEN="$(tr -d '[:space:]' < "${INISH_CF_TOKEN_FILE:-/home/nish/.inish-cf-token}")"
+  export CLOUDFLARE_API_TOKEN
+fi
+if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+  echo "No Cloudflare API token: set CLOUDFLARE_API_TOKEN, provide fleet-console/cf.env, or write ~/.inish-cf-token" >&2
+  exit 1
+fi
+
 # The deploy payload and the accepted edition are taken from a pristine snapshot
 # of origin/main, never from the local checkout: the publisher workdir can
-# legitimately sit on a topic branch (auto-ship refreshes PR branches there), and
-# the old hard "must run from main + HEAD equals origin/main" gate turned exactly
-# that into a multi-day live staleness stall. Fetching the accepted tree keeps
-# the payload exact by construction and makes the deploy path independent of
-# which branch the workdir happens to be on. The workdir still has to be a
-# checkout of this repository so git can reach origin.
+# legitimately sit on a topic branch, and the old hard "must run from main +
+# HEAD equals origin/main" gate turned exactly that into a multi-day live
+# staleness stall. Fetching the accepted tree keeps the payload exact by
+# construction and makes the deploy path independent of which branch the
+# workdir happens to be on. The workdir still has to be a checkout of this
+# repository so git can reach origin.
 git fetch --quiet origin main
 ACCEPTED_SHA="$(git rev-parse FETCH_HEAD)"
 
 WORK_DIR="$(mktemp -d /tmp/inish-daily-deploy.XXXXXX)"
 SNAPSHOT_ROOT="$WORK_DIR/snapshot"
-PUBLIC_DIR="$WORK_DIR/public"
+DEPLOY_ROOT="$WORK_DIR/deploy"
+PUBLIC_DIR="$DEPLOY_ROOT/public"
 # shellcheck disable=SC2329  # Invoked by trap.
 cleanup() {
   rm -rf "$WORK_DIR"
@@ -31,13 +54,22 @@ mkdir -p "$SNAPSHOT_ROOT" "$PUBLIC_DIR"
 # from the same snapshot, so uncommitted or topic-branch files cannot leak into
 # what gets deployed or verified.
 git archive --format=tar FETCH_HEAD | tar -x -C "$SNAPSHOT_ROOT"
-# The generated head points at the root share card (og:image/twitter:image) and
-# the home-screen icon, so both must ride in the payload with the daily assets.
+
+# Root static assets referenced by the generated head, plus the daily feed
+# surface. Copied ONLY from the snapshot — never from the workdir CWD.
 # data/editions and the rest of the tree stay out of the payload: archives are
-# intentionally unpublished.
-cp index.html 404.html app.js styles.css og-image.svg apple-touch-icon.png \
-   latest.json feed.xml robots.txt sitemap.xml _redirects "$PUBLIC_DIR/"
-cp -R "$SNAPSHOT_ROOT/functions" "$SNAPSHOT_ROOT/fonts" "$PUBLIC_DIR/"
+# intentionally unpublished. functions/ is not shipped as static assets; the
+# edge logic lives in worker.js.
+cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
+   "$SNAPSHOT_ROOT/app.js" "$SNAPSHOT_ROOT/styles.css" \
+   "$SNAPSHOT_ROOT/og-image.svg" "$SNAPSHOT_ROOT/apple-touch-icon.png" \
+   "$SNAPSHOT_ROOT/latest.json" "$SNAPSHOT_ROOT/feed.xml" \
+   "$SNAPSHOT_ROOT/robots.txt" "$SNAPSHOT_ROOT/sitemap.xml" \
+   "$SNAPSHOT_ROOT/_redirects" \
+   "$PUBLIC_DIR/"
+cp -R "$SNAPSHOT_ROOT/fonts" "$PUBLIC_DIR/"
+# Worker + wrangler config are the live edge path (Workers assets + routes).
+cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" "$DEPLOY_ROOT/"
 
 EDITION_DATE="$(jq -er '.date' "$SNAPSHOT_ROOT/latest.json")"
 STORY_COUNT="$(jq -er '.stories | length' "$SNAPSHOT_ROOT/latest.json")"
@@ -62,12 +94,11 @@ if [[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]; then
   exit 1
 fi
 
-(cd "$PUBLIC_DIR" && npx --yes wrangler pages deploy . \
-  --project-name inish-site \
-  --branch main \
-  --commit-hash "$ACCEPTED_SHA" \
-  --commit-message "Publish Nish Daily $EDITION_DATE" \
-  --commit-dirty=false)
+# Workers deploy (not Pages). The fleet token has Workers + DNS write but not
+# Pages:Edit; Pages OAuth on this host expired 2026-08-04 and is non-refreshable
+# without an interactive login.
+(cd "$DEPLOY_ROOT" && npx --yes wrangler deploy \
+  --message "Publish Nish Daily $EDITION_DATE ($ACCEPTED_SHA)")
 
 VERIFY_STAGE=""
 for _ in {1..12}; do

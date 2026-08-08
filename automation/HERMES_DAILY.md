@@ -1,6 +1,6 @@
 # Hermes daily publishing contract
 
-Run this only on `hostinger-kvm4` in `/home/nish/workspaces/products/inish-site`.
+Run this only on `hostinger-kvm4` in `/home/nish/workspaces/products/inish-site/.worktrees/vps-daily-publish` (dedicated publisher worktree on `main`). Do not use the product root checkout — fleet lanes check out PR branches there.
 
 ## Goal
 
@@ -15,7 +15,7 @@ Publish one source-backed edition to `https://inish.in/`, then send Nish the ver
 5. Run `python3 scripts/build_daily.py`, `python3 -m unittest discover -s tests -v`, and `python3 -m py_compile scripts/build_daily.py`.
 6. Review the rendered page for the candidate proof, empty copy, duplicates, unsupported claims, functional filters, and broken source URLs.
 7. Commit only the edition and generated root feed files with `daily: publish YYYY-MM-DD`, then push `main`.
-8. Run `scripts/deploy_daily.sh`. It deploys Cloudflare Pages from the VPS using a pristine snapshot of `origin/main` (fetched fresh inside the script), so the workdir may be on any branch or checkout — the deploy payload and the live verification both read from that snapshot, never from local files. The only freshness gate is a loud refusal when the accepted edition is older than the edition the live hostname serves (the site is never rolled back); a stale or mismatched live hostname otherwise fails `verify_live.py` with the observed date/story mismatch. It sends Nish the verified Telegram link only after every check passes. This also means a stale live hostname can be caught up to the last accepted edition even when the daily content owner is closed: deploying 2026-08-08 over a live 2026-08-04 is a valid recovery run, and publishing an edition older than what is live is not.
+8. Run `scripts/deploy_daily.sh`. It deploys the accepted `origin/main` edition via Cloudflare Workers (fleet token at `~/.config/fleet-console/cf.env`) from a pristine snapshot of `origin/main` (fetched fresh inside the script), so the workdir may be on any branch — the deploy payload and live verification both read from that snapshot, never from local files. The only freshness gate is a loud refusal when the accepted edition is older than the edition the live hostname serves (the site is never rolled back). It sends Nish the verified Telegram link only after every check passes.
 9. Report success only when the deploy script prints `verified_live`. Otherwise report the exact failing stage without claiming publication.
 
 ## Who this is for

@@ -1,3 +1,5 @@
+// Live edge path is worker.js (Workers + assets). Keep this file's
+// publicPaths/redirects/HSTS identical — tests enforce the shared contract.
 const publicPaths = new Set([
   "/",
   "/app.js",
