@@ -25,8 +25,10 @@ DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
 # app.js and styles.css are the legacy daily assets; og-image.svg is the static
 # social share card referenced by the generated head, so it must be copied to
-# the root alongside them on every build.
-ASSETS = ("app.js", "styles.css", "og-image.svg")
+# the root alongside them on every build. apple-touch-icon.png is pinned at the
+# root: it has no daily/ source, so the entry below is a presence check that
+# fails the build loudly if the committed icon ever goes missing.
+ASSETS = ("app.js", "styles.css", "og-image.svg", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
 STORY_FIELDS = {"title", "url", "source", "section", "summary", "fact", "take", "caveat"}
@@ -368,6 +370,7 @@ def page(edition: dict) -> str:
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://inish.in/og-image.svg">
+  <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">

@@ -1,3 +1,4 @@
+import base64
 import json
 import tempfile
 import unittest
@@ -123,6 +124,10 @@ class BuildDailyTests(unittest.TestCase):
         (self.legacy_daily / "app.js").write_text("app")
         (self.legacy_daily / "styles.css").write_text("styles")
         (self.legacy_daily / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        # A real 1x1 PNG so the icon fixture is a valid image, not just bytes.
+        (self.legacy_daily / "apple-touch-icon.png").write_bytes(
+            base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+        )
 
     def tearDown(self):
         self.temp.cleanup()
@@ -154,7 +159,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_builds_latest_feed_at_root(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
         self.assertFalse((self.public / "archive").exists())
         self.assertNotIn("archive", (self.public / "index.html").read_text())
@@ -202,6 +207,20 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(head.count("https://inish.in/og-image.svg"), 2)
         # The build copies the share card to the root alongside app.js and styles.css.
         self.assertTrue((self.public / "og-image.svg").is_file())
+
+    def test_head_carries_apple_touch_icon(self):
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn(
+            '<link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">',
+            head,
+        )
+        # The build keeps the icon at the root and the copy is a real PNG.
+        icon = self.public / "apple-touch-icon.png"
+        self.assertTrue(icon.is_file())
+        self.assertGreater(icon.stat().st_size, 8)
+        self.assertTrue(icon.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
 
     def test_quiet_day_publishes_a_short_edition(self):
         self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
