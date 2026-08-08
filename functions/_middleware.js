@@ -27,19 +27,39 @@ const redirects = new Map([
   ["/daily/sitemap.xml", "/sitemap.xml"]
 ]);
 
+// The site is HTTPS-only, so every response from the middleware can carry HSTS.
+// No subdomains exist yet; includeSubDomains keeps any future one under the
+// same policy. Preload is deliberately not claimed: it is a permanent public
+// commitment and nothing in the repository justifies it.
+const hstsHeader = "max-age=31536000; includeSubDomains";
+
+function withSecurityHeaders(response) {
+  response.headers.set("Strict-Transport-Security", hstsHeader);
+  return response;
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const target = redirects.get(url.pathname);
   if (target) {
     const destination = new URL(target, url.origin);
     destination.search = url.search;
-    return Response.redirect(destination, 301);
+    // Manual 301 instead of Response.redirect(): the runtime's redirect
+    // response has immutable headers, so HSTS could not be added to it.
+    return withSecurityHeaders(
+      new Response(null, {
+        status: 301,
+        headers: { Location: destination.href }
+      })
+    );
   }
   if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
-    return new Response("Not found", {
-      status: 404,
-      headers: { "Cache-Control": "no-store" }
-    });
+    return withSecurityHeaders(
+      new Response("Not found", {
+        status: 404,
+        headers: { "Cache-Control": "no-store" }
+      })
+    );
   }
-  return context.next();
+  return withSecurityHeaders(await context.next());
 }
