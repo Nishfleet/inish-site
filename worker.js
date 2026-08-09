@@ -48,6 +48,35 @@ function withSecurityHeaders(response) {
   });
 }
 
+// The branded 404 page ships in the assets payload as /404.html (staged by
+// deploy_daily.sh beside index.html) and is served through the ASSETS binding,
+// so the edge never embeds markup. The hostname in an internally constructed
+// asset URL is ignored; the path is what matches. Unknown paths keep their 404
+// status, the asset body is streamed rather than buffered, HEAD requests stay
+// bodyless, and a failed asset fetch falls back to the historical plain 404.
+const notFoundHeaders = {
+  "Cache-Control": "no-store",
+  "Content-Type": "text/html; charset=utf-8"
+};
+
+async function notFoundResponse(request, env) {
+  if (request.method === "HEAD") {
+    return new Response(null, { status: 404, headers: notFoundHeaders });
+  }
+  try {
+    const asset = await env.ASSETS.fetch("https://inish.in/404.html");
+    if (asset.ok) {
+      return new Response(asset.body, { status: 404, headers: notFoundHeaders });
+    }
+  } catch {
+    // The asset or binding failed; fall back rather than surfacing an error.
+  }
+  return new Response("Not found", {
+    status: 404,
+    headers: { "Cache-Control": "no-store" }
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -65,12 +94,7 @@ export default {
       );
     }
     if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
-      return withSecurityHeaders(
-        new Response("Not found", {
-          status: 404,
-          headers: { "Cache-Control": "no-store" }
-        })
-      );
+      return withSecurityHeaders(await notFoundResponse(request, env));
     }
     // Assets binding resolves "/" to index.html via html_handling defaults.
     return withSecurityHeaders(await env.ASSETS.fetch(request));

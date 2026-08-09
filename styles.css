@@ -549,3 +549,34 @@ footer > p {
     max-width: 30ch;
   }
 }
+
+/* The 404 page reuses the masthead; only the oversized status numeral, the
+   closing rule, and the way-back link belong to it. */
+.error-code {
+  margin: 24px 0 0;
+  color: var(--red);
+  font: 700 clamp(128px, 24vw, 320px)/0.82 var(--display);
+  letter-spacing: -0.05em;
+}
+
+.error-main {
+  padding: 26px 0 32px;
+  border-bottom: 3px double var(--ink);
+}
+
+.back-link {
+  display: inline-block;
+  padding: 13px 20px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  font: 700 11px/1.2 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
