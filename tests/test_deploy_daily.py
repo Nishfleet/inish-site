@@ -149,6 +149,35 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn("the accepted edition failed live verification. Failing stage:", script)
         self.assertIn("it is NOT confirmed live.", script)
 
+    def test_deploy_relocates_caches_away_from_read_only_home_dirs(self):
+        # The VPS hits recurring read-only-FS episodes where ~/.npm and
+        # ~/.wrangler/logs return EROFS; a deploy that cannot write its own
+        # caches strands the accepted edition until the next run. The wrapper
+        # must fall back to per-run temp locations before invoking wrangler.
+        script = DEPLOY_SCRIPT.read_text()
+        deploy_pos = script.index("wrangler deploy")
+        for env, fallback in (
+            ("npm_config_cache", "$WORK_DIR/npm-cache"),
+            ("WRANGLER_LOG_PATH", "$WORK_DIR/wrangler-logs"),
+        ):
+            self.assertIn(env, script)
+            self.assertIn(fallback, script)
+            self.assertLess(script.index(env), deploy_pos, f"{env} must be set before the deploy")
+            self.assertLess(script.index(fallback), deploy_pos, f"{fallback} must be staged before the deploy")
+
+    def test_deploy_retries_transient_failures(self):
+        # A failed deploy is not otherwise retried until the next daily run, so
+        # the accepted edition waits a day on a transient failure. The wrapper
+        # must retry the same payload a bounded number of times before failing
+        # loudly, and the freshness gate must still reject rollbacks.
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn("DEPLOY_ATTEMPTS=3", script)
+        self.assertIn("wrangler deploy", script)
+        self.assertIn("retrying in 20 seconds", script)
+        self.assertIn("sleep 20", script)
+        self.assertIn('[[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]', script)
+        self.assertIn("Refusing to roll the live site back", script)
+
 
 if __name__ == "__main__":
     unittest.main()
