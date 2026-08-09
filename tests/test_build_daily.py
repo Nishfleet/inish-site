@@ -1,4 +1,5 @@
 import base64
+import html
 import json
 import tempfile
 import unittest
@@ -221,6 +222,63 @@ class BuildDailyTests(unittest.TestCase):
         self.assertTrue(icon.is_file())
         self.assertGreater(icon.stat().st_size, 8)
         self.assertTrue(icon.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
+
+    def test_head_declares_a_desktop_favicon(self):
+        # Browsers ask for /favicon.ico by default; declaring the pinned
+        # apple-touch-icon as the favicon gives desktop tabs an icon without
+        # adding a new binary or touching middleware.
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<link rel="icon" type="image/png" href="/apple-touch-icon.png">', head)
+
+    def test_head_carries_truthful_structured_data_and_share_titles(self):
+        # Every share tag and every JSON-LD value is derived from the strings
+        # the page really renders — never invented copy.
+        self.write(edition())
+        self.build()
+        page = (self.public / "index.html").read_text()
+        head = page.split("</head>", 1)[0]
+
+        rendered_title = html.unescape(head.split("<title>", 1)[1].split("</title>", 1)[0])
+        rendered_description = html.unescape(
+            head.split('<meta name="description" content="', 1)[1].split('"', 1)[0]
+        )
+        for attribute, expected in (
+            ('<meta property="og:title" content="', rendered_title),
+            ('<meta property="og:description" content="', rendered_description),
+            ('<meta name="twitter:title" content="', rendered_title),
+            ('<meta name="twitter:description" content="', rendered_description),
+        ):
+            with self.subTest(attribute=attribute):
+                value = html.unescape(head.split(attribute, 1)[1].split('"', 1)[0])
+                self.assertEqual(value, expected)
+
+        self.assertEqual(head.count("application/ld+json"), 1)
+        block = head.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0]
+        data = json.loads(block)
+        self.assertEqual(data["@context"], "https://schema.org")
+        nodes = {node["@type"]: node for node in data["@graph"]}
+        self.assertEqual(set(nodes), {"WebSite", "Person", "Article"})
+
+        site = nodes["WebSite"]
+        self.assertEqual(site["name"], "Nish's Daily Reads")
+        self.assertEqual(site["url"], "https://inish.in/")
+        self.assertEqual(site["description"], rendered_description)
+
+        person = nodes["Person"]
+        self.assertEqual(person["name"], "Nish")
+        self.assertEqual(person["url"], "https://inish.in/")
+        # Only the one surface verified to belong to Nish; no job title,
+        # employer, products, or biography are claimed.
+        self.assertEqual(person["sameAs"], ["https://github.com/nish3451"])
+        self.assertNotIn("jobTitle", person)
+
+        article = nodes["Article"]
+        self.assertEqual(article["headline"], rendered_title)
+        self.assertEqual(article["datePublished"], "2026-08-02")
+        self.assertEqual(article["mainEntityOfPage"], "https://inish.in/")
+        self.assertEqual(article["author"], {"@type": "Person", "name": "Nish", "url": "https://inish.in/"})
 
     def test_head_carries_the_canonical_url(self):
         # The root feed is the site's single public surface and there are no
