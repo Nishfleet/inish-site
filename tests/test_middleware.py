@@ -195,11 +195,14 @@ class MiddlewareContractTests(unittest.TestCase):
                 self.assertEqual(self.middleware_status(path), 404)
 
         # The branded page contract: honest title, one h1, a way back to the
-        # front page, the shared stylesheet, and no scripts.
+        # front page, the shared stylesheet, the desktop icon declaration that
+        # matches the generated head (so no default /favicon.ico request is
+        # issued against the 404 surface), and no scripts.
         self.assertIn("<title>Not found", page_text)
         self.assertEqual(page_text.count("<h1>"), 1)
         self.assertIn('href="/"', page_text)
         self.assertIn('href="/styles.css"', page_text)
+        self.assertIn('<link rel="icon" type="image/png" href="/apple-touch-icon.png">', page_text)
         self.assertNotIn("<script", page_text)
 
 
