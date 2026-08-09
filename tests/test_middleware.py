@@ -131,6 +131,46 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.ttf"))
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.woff2.css"))
 
+    def test_unknown_paths_serve_branded_status_preserving_404(self):
+        # Both edge implementations must serve the deployed 404.html page for
+        # unknown paths with the 404 status preserved, fetched through the
+        # assets binding (never by widening the allowlist) and streamed, never
+        # buffered. The deployed page itself must carry the branded contract.
+        root = MIDDLEWARE.parents[1]
+        page = (root / "404.html").read_text()
+        self.assertIn("<title>", page, "the 404 page needs a title")
+        self.assertNotIn("<title></title>", page, "the 404 page title must not be empty")
+        self.assertEqual(page.count("<h1"), 1, "the 404 page must keep exactly one h1")
+        self.assertIn('href="/"', page, "the 404 page must link back to today's reads")
+        self.assertIn('href="/styles.css"', page, "the 404 page must reuse the site stylesheet")
+        for edge in (MIDDLEWARE, root / "worker.js"):
+            with self.subTest(edge=edge.name):
+                text = edge.read_text()
+                self.assertIn(
+                    'new URL("/404.html"',
+                    text,
+                    f"{edge.name} must fetch the 404 page internally by path",
+                )
+                self.assertIn(
+                    "env.ASSETS.fetch",
+                    text,
+                    f"{edge.name} must serve the page through the assets binding",
+                )
+                self.assertIn("status: 404", text, f"{edge.name} must keep the 404 status")
+                self.assertNotIn(".text()", text, f"{edge.name} must not buffer the page body")
+                self.assertNotIn(".arrayBuffer()", text, f"{edge.name} must not buffer the page body")
+                self.assertIn(DENY_BRANCH, text, f"{edge.name} must keep the fail-closed deny rule")
+                self.assertEqual(
+                    _extract_set(text, "publicPaths"),
+                    self.public_paths,
+                    f"{edge.name} allowlist must stay identical to the middleware's",
+                )
+                self.assertEqual(
+                    _extract_map(text, "redirects"),
+                    self.redirects,
+                    f"{edge.name} redirect map must stay identical to the middleware's",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

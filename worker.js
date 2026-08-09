@@ -48,6 +48,39 @@ function withSecurityHeaders(response) {
   });
 }
 
+// The branded 404: fetch the deployed /404.html through the assets binding and
+// serve it with the error status kept. The binding matches on path, not
+// hostname, so the page URL is built from the request's own origin; the body
+// is streamed, never buffered. If the page cannot be fetched, fall back to
+// the plain-text 404 rather than failing the request.
+async function brandedNotFound(request, env) {
+  const pageUrl = new URL("/404.html", request.url);
+  const pageRequest = new Request(pageUrl, {
+    method: request.method,
+    headers: request.headers
+  });
+  let asset;
+  try {
+    asset = await env.ASSETS.fetch(pageRequest);
+  } catch {
+    asset = null;
+  }
+  if (!asset || !asset.ok) {
+    return new Response("Not found", {
+      status: 404,
+      headers: { "Cache-Control": "no-store" }
+    });
+  }
+  const headers = new Headers(asset.headers);
+  headers.set("Cache-Control", "no-store");
+  headers.set("Content-Type", "text/html; charset=utf-8");
+  return new Response(asset.body, {
+    status: 404,
+    statusText: "Not Found",
+    headers
+  });
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -65,12 +98,7 @@ export default {
       );
     }
     if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
-      return withSecurityHeaders(
-        new Response("Not found", {
-          status: 404,
-          headers: { "Cache-Control": "no-store" }
-        })
-      );
+      return withSecurityHeaders(await brandedNotFound(request, env));
     }
     // Assets binding resolves "/" to index.html via html_handling defaults.
     return withSecurityHeaders(await env.ASSETS.fetch(request));
