@@ -425,10 +425,20 @@ footer > p {
 
   .masthead-top {
     grid-template-columns: 1fr 1fr;
+    gap: 10px 18px;
   }
 
+  /* The generated edition date becomes a deliberate dateline on narrow
+     screens: it spans the full masthead width on its own row, centered
+     under a hairline rule, while inish.in and the scan count keep their
+     opposing anchors. */
   .masthead-top span:nth-child(2) {
-    display: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding-top: 9px;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    letter-spacing: 0.16em;
   }
 
   .title-row {
