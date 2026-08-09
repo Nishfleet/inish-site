@@ -16,6 +16,7 @@ import ipaddress
 import json
 import re
 import shutil
+import textwrap
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -336,9 +337,59 @@ def prominence_for(index: int) -> str:
     return "brief"
 
 
+def html_safe_json(payload: dict) -> str:
+    """Serialize a payload that parses as JSON yet cannot escape its script tag.
+
+    The unicode escapes are JSON escapes: an extractor sees the original
+    characters after parsing, while the serialized text contains no "<" that
+    could open "</script>" and no "&" that a lenient HTML reader could mistake
+    for an entity. This is the JSON-safe counterpart of esc() for script text.
+    """
+    serialized = json.dumps(payload, indent=2, ensure_ascii=False)
+    for character, escape in (("<", "\\u003c"), (">", "\\u003e"), ("&", "\\u0026")):
+        serialized = serialized.replace(character, escape)
+    return serialized
+
+
+def json_ld(title: str, description: str, date: str) -> str:
+    """The head's structured data: one graph with the site, its person, and the edition.
+
+    Truth rules: only what the page itself shows. The site is the daily feed
+    and nothing else, so the Person node claims no job title, employer,
+    products, or biography — just the name and the one surface verified to
+    belong to Nish.
+    """
+    person = {
+        "@type": "Person",
+        "name": "Nish",
+        "url": "https://inish.in/",
+        "sameAs": ["https://github.com/nish3451"],
+    }
+    graph = [
+        {
+            "@type": "WebSite",
+            "name": "Nish's Daily Reads",
+            "url": "https://inish.in/",
+            "description": description,
+        },
+        person,
+        {
+            "@type": "Article",
+            "headline": title,
+            "datePublished": date,
+            "mainEntityOfPage": "https://inish.in/",
+            # The article references the person above by name and URL only.
+            "author": {"@type": "Person", "name": "Nish", "url": "https://inish.in/"},
+        },
+    ]
+    return html_safe_json({"@context": "https://schema.org", "@graph": graph})
+
+
 def page(edition: dict) -> str:
     date = dt.date.fromisoformat(edition["date"])
     title_date = date.strftime("%A, %d %B %Y")
+    title = f"Nish's Daily Reads — {edition['date']}"
+    description = "A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words."
     kept_count = len(edition["stories"])
     count_label = f"{edition['candidate_count']} scanned · {kept_count} kept"
     if edition["stories"]:
@@ -375,20 +426,28 @@ def page(edition: dict) -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nish's Daily Reads — {esc(edition['date'])}</title>
+  <title>{esc(title)}</title>
   <link rel="canonical" href="https://inish.in/">
-  <meta name="description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
+  <meta name="description" content="{esc(description)}">
+  <meta property="og:title" content="{esc(title)}">
+  <meta property="og:description" content="{esc(description)}">
   <meta property="og:image" content="https://inish.in/og-image.svg">
   <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
   <meta property="og:image:type" content="image/svg+xml">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{esc(title)}">
+  <meta name="twitter:description" content="{esc(description)}">
   <meta name="twitter:image" content="https://inish.in/og-image.svg">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
+  <script type="application/ld+json">
+{textwrap.indent(json_ld(title, description, edition["date"]), "  ")}
+  </script>
 </head>
 <body>
   <a class="skip" href="#stories">Skip to stories</a>
