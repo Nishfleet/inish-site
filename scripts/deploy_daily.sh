@@ -94,11 +94,49 @@ if [[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]; then
   exit 1
 fi
 
+# npx and Wrangler write their cache and debug logs to home-directory defaults
+# (~/.npm, ~/.wrangler/logs) unless told otherwise. This VPS has recurring
+# read-only-FS episodes where exactly those paths return EROFS; a deploy that
+# cannot write its own caches strands the accepted edition until the next run
+# (observed 2026-08-09: the edition merged but the deploy preflight tripped).
+# Keep the defaults when they are writable so the warm npx cache is reused;
+# otherwise relocate both into the per-run temp directory, which is rebuilt
+# under /tmp on every deploy and never carries state between runs.
+if [[ ! -w "${npm_config_cache:-$HOME/.npm}" ]]; then
+  export npm_config_cache="$WORK_DIR/npm-cache"
+  mkdir -p "$npm_config_cache"
+fi
+if [[ ! -w "${WRANGLER_LOG_PATH:-$HOME/.wrangler/logs}" ]]; then
+  export WRANGLER_LOG_PATH="$WORK_DIR/wrangler-logs"
+  mkdir -p "$WRANGLER_LOG_PATH"
+fi
+
 # Workers deploy (not Pages). The fleet token has Workers + DNS write but not
 # Pages:Edit; Pages OAuth on this host expired 2026-08-04 and is non-refreshable
 # without an interactive login.
-(cd "$DEPLOY_ROOT" && npx --yes wrangler deploy \
-  --message "Publish Nish Daily $EDITION_DATE ($ACCEPTED_SHA)")
+#
+# A failed deploy is otherwise not retried until the next daily run, so the
+# accepted edition would sit un-deployed for a day on a transient failure (a
+# read-only window, a network blip). Retry the same payload a bounded number of
+# times and fail loudly only after the last attempt.
+DEPLOY_ATTEMPTS=3
+DEPLOY_FAILURE=""
+for attempt in $(seq 1 "$DEPLOY_ATTEMPTS"); do
+  if (cd "$DEPLOY_ROOT" && npx --yes wrangler deploy \
+      --message "Publish Nish Daily $EDITION_DATE ($ACCEPTED_SHA)"); then
+    DEPLOY_FAILURE=""
+    break
+  fi
+  DEPLOY_FAILURE="wrangler deploy failed (attempt $attempt/$DEPLOY_ATTEMPTS)"
+  if [[ "$attempt" -lt "$DEPLOY_ATTEMPTS" ]]; then
+    echo "$DEPLOY_FAILURE; retrying in 20 seconds" >&2
+    sleep 20
+  fi
+done
+if [[ -n "$DEPLOY_FAILURE" ]]; then
+  echo "$DEPLOY_FAILURE" >&2
+  exit 1
+fi
 
 VERIFY_STAGE=""
 for _ in {1..12}; do
