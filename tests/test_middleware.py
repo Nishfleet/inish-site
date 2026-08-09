@@ -2,7 +2,10 @@ import re
 import unittest
 from pathlib import Path
 
-MIDDLEWARE = Path(__file__).resolve().parents[1] / "functions" / "_middleware.js"
+ROOT = Path(__file__).resolve().parents[1]
+MIDDLEWARE = ROOT / "functions" / "_middleware.js"
+WORKER = ROOT / "worker.js"
+NOT_FOUND_PAGE = ROOT / "404.html"
 
 # Cloudflare runs functions/_middleware.js as an ES module, so there is no local
 # Pages runtime to import it into; the documented verification for the file is
@@ -19,7 +22,7 @@ DENY_BRANCH = "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)"
 
 def _source():
     text = MIDDLEWARE.read_text()
-    assert "new Response(\"Not found\"" in text, "404 branch missing from middleware"
+    assert '"Not found"' in text, "plain-text 404 fallback missing from middleware"
     assert "status: 404" in text, "404 status missing from middleware"
     assert DENY_BRANCH in text, "deny branch changed; update this suite deliberately"
     return text
@@ -130,6 +133,47 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIsNone(self.font_path.fullmatch("/fonts/../app.js"))
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.ttf"))
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.woff2.css"))
+
+    def test_unknown_paths_serve_branded_status_preserving_404(self):
+        # The deny branch must answer with the deployed branded 404 page while
+        # staying a truthful HTTP 404: both edge sources fetch /404.html from
+        # the ASSETS binding, stream the body instead of buffering it, keep
+        # no-store and the plain-text fallback, and leave the public contract
+        # (allowlist, redirects, direct /404.html denial) untouched. The page
+        # itself must carry the editorial contract: a title, exactly one h1,
+        # a root link, and the shared stylesheet.
+        for source in (WORKER, MIDDLEWARE):
+            with self.subTest(source=source.name):
+                text = source.read_text()
+                self.assertIn("status: 404", text)
+                self.assertIn(DENY_BRANCH, text)
+                # The internal 404 asset path is served through ASSETS.fetch...
+                self.assertIn('"/404.html"', text)
+                self.assertIn("ASSETS.fetch", text)
+                # ...streamed through, never buffered into memory.
+                self.assertNotIn(".text(", text)
+                self.assertNotIn(".arrayBuffer(", text)
+                # The known plain-text fallback must survive a failed fetch,
+                # and stay bodyless for HEAD on every path.
+                self.assertIn('"Not found"', text)
+                self.assertIn("HEAD", text)
+                # Worker and middleware still share the exact route contract.
+                self.assertEqual(_extract_set(text, "publicPaths"), self.public_paths)
+                self.assertEqual(_extract_map(text, "redirects"), self.redirects)
+        # The asset is not a public route: direct hits stay denied, as do the
+        # archive paths and the other never-public surfaces.
+        self.assertNotIn("/404.html", self.public_paths)
+        for path in ("/404.html", "/admin", "/secrets.json", "/daily/2026-08-09"):
+            with self.subTest(path=path):
+                self.assertEqual(self.middleware_status(path), 404)
+        # The branded page itself.
+        html = NOT_FOUND_PAGE.read_text()
+        self.assertIn("Nish", html)
+        self.assertIn("<title>", html)
+        self.assertEqual(html.count("<h1"), 1)
+        self.assertIn('href="/"', html)
+        self.assertIn('rel="stylesheet"', html)
+        self.assertIn('href="/styles.css"', html)
 
 
 if __name__ == "__main__":

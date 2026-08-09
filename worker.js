@@ -1,8 +1,9 @@
 // Live edge worker for inish.in (Workers + static assets).
 // Mirrors the route contract in functions/_middleware.js: same publicPaths,
-// font pattern, redirects, and HSTS. Pages Functions are no longer the
-// production edge path — the VPS fleet token can deploy Workers but not
-// Cloudflare Pages, and OAuth expired 2026-08-04 left the site four days stale.
+// font pattern, redirects, HSTS, and the branded 404 for unknown paths.
+// Pages Functions are no longer the production edge path — the VPS fleet
+// token can deploy Workers but not Cloudflare Pages, and OAuth expired
+// 2026-08-04 left the site four days stale.
 const publicPaths = new Set([
   "/",
   "/app.js",
@@ -38,6 +39,48 @@ const redirects = new Map([
 // commitment and nothing in the repository justifies it.
 const hstsHeader = "max-age=31536000; includeSubDomains";
 
+// The branded 404 page ships in the deployed public dir (deploy_daily.sh
+// copies 404.html into the payload), so unknown paths answer with the real
+// page while the status stays a truthful 404 and the body stays uncached.
+// It is deliberately NOT added to publicPaths: the asset is served only
+// through this internal fetch, never as a public route.
+const notFoundAsset = "/404.html";
+
+function plainNotFound(method) {
+  // Kept as the last-resort reply: if the asset cannot be fetched, serve the
+  // original text 404 rather than exposing another asset or throwing. HEAD
+  // stays bodyless on every path, fallback included.
+  const body = method === "HEAD" ? null : "Not found";
+  return new Response(body, {
+    status: 404,
+    headers: { "Cache-Control": "no-store" }
+  });
+}
+
+async function serveNotFound(request, url, env) {
+  try {
+    // Internal fetch on the assets binding: only the path is matched, so the
+    // hostname is irrelevant and /404.html resolves inside the deployed
+    // public dir. The request method is preserved so HEAD stays bodyless,
+    // and the asset body is streamed through untouched — never buffered.
+    const asset = await env.ASSETS.fetch(
+      new Request(new URL(notFoundAsset, url.origin), { method: request.method })
+    );
+    if (!asset.ok) {
+      return plainNotFound(request.method);
+    }
+    return new Response(asset.body, {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-store",
+        "Content-Type": "text/html; charset=utf-8"
+      }
+    });
+  } catch (error) {
+    return plainNotFound(request.method);
+  }
+}
+
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
   headers.set("Strict-Transport-Security", hstsHeader);
@@ -65,12 +108,7 @@ export default {
       );
     }
     if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
-      return withSecurityHeaders(
-        new Response("Not found", {
-          status: 404,
-          headers: { "Cache-Control": "no-store" }
-        })
-      );
+      return withSecurityHeaders(await serveNotFound(request, url, env));
     }
     // Assets binding resolves "/" to index.html via html_handling defaults.
     return withSecurityHeaders(await env.ASSETS.fetch(request));

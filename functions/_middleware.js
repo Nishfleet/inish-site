@@ -1,5 +1,6 @@
 // Live edge path is worker.js (Workers + assets). Keep this file's
-// publicPaths/redirects/HSTS identical — tests enforce the shared contract.
+// publicPaths/redirects/HSTS and the branded 404 branch identical — tests
+// enforce the shared contract.
 const publicPaths = new Set([
   "/",
   "/app.js",
@@ -35,6 +36,44 @@ const redirects = new Map([
 // commitment and nothing in the repository justifies it.
 const hstsHeader = "max-age=31536000; includeSubDomains";
 
+// Mirrors worker.js: unknown paths answer with the deployed 404.html asset,
+// streamed at HTTP 404 and never buffered, falling back to the plain-text
+// line if the asset cannot be fetched. Pages Functions expose the same
+// ASSETS binding. The asset is deliberately not in publicPaths: it is only
+// reachable through this internal fetch, never as a public route.
+const notFoundAsset = "/404.html";
+
+function plainNotFound(method) {
+  // Kept as the last-resort reply: if the asset cannot be fetched, serve the
+  // original text 404 rather than exposing another asset or throwing. HEAD
+  // stays bodyless on every path, fallback included.
+  const body = method === "HEAD" ? null : "Not found";
+  return new Response(body, {
+    status: 404,
+    headers: { "Cache-Control": "no-store" }
+  });
+}
+
+async function serveNotFound(request, url, env) {
+  try {
+    const asset = await env.ASSETS.fetch(
+      new Request(new URL(notFoundAsset, url.origin), { method: request.method })
+    );
+    if (!asset.ok) {
+      return plainNotFound(request.method);
+    }
+    return new Response(asset.body, {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-store",
+        "Content-Type": "text/html; charset=utf-8"
+      }
+    });
+  } catch (error) {
+    return plainNotFound(request.method);
+  }
+}
+
 function withSecurityHeaders(response) {
   response.headers.set("Strict-Transport-Security", hstsHeader);
   return response;
@@ -56,12 +95,7 @@ export async function onRequest(context) {
     );
   }
   if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
-    return withSecurityHeaders(
-      new Response("Not found", {
-        status: 404,
-        headers: { "Cache-Control": "no-store" }
-      })
-    );
+    return withSecurityHeaders(await serveNotFound(context.request, url, context.env));
   }
   return withSecurityHeaders(await context.next());
 }
