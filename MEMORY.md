@@ -11,6 +11,7 @@ Use this file for durable project truth Codex cannot reliably infer from code al
 - Keep only the current feed plus its RSS, JSON, robots, sitemap, CSS, and JavaScript endpoints. Do not publish founder/product pages, LLM pages, or edition archives.
 - Preserve old non-archive `/daily/*` links with permanent redirects to the root equivalents; archive URLs intentionally return 404.
 - The site should stay static HTML, CSS, JavaScript, and Cloudflare Pages unless a stronger need is proven.
+- The cross-repo "link inish.in back from product sites" item (backlog cd1a458ea0) is owned by the 0509 and tinystudio-io loops, not this repo: the footer attribution edits live in nish3451/0509 (`app/components/marketing-footer.tsx`, PR #599) and nish3451/TinyStudio.io (`public/index.html` footer, PR #70), both labeled "Nish's daily reads" → https://inish.in/. This repo has no code change for it; close the item when `curl -sL https://0509.io/` and `https://tinystudio.io/` both contain an href to `https://inish.in/`. siterep.net, seofixkit.com, and aiconverter.app stay out of scope until they gain attribution chrome.
 
 ## Rejected Paths
 
