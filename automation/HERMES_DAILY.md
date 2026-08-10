@@ -1,6 +1,6 @@
 # Hermes daily publishing contract
 
-Run this only on `hostinger-kvm4` in `/home/nish/workspaces/products/inish-site/.worktrees/vps-daily-publish` (dedicated publisher worktree on `main`). Do not use the product root checkout — fleet lanes check out PR branches there.
+Run this only on `netcup-rs2000` in `/home/nish/workspaces/products/inish-site/.worktrees/vps-daily-publish` (dedicated publisher worktree on `main`). Do not use the product root checkout — fleet lanes check out PR branches there.
 
 ## Goal
 
