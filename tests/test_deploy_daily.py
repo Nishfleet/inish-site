@@ -11,9 +11,11 @@ WORKER = ROOT / "worker.js"
 MIDDLEWARE = ROOT / "functions" / "_middleware.js"
 WRANGLER = ROOT / "wrangler.jsonc"
 
-# Root static assets referenced by the generated head: the social share card
-# (og:image / twitter:image) and the iOS home-screen icon. Both are pinned at
-# the repo root and must ride in every temporary deploy payload.
+# Root static assets referenced by the generated head: the raster social share
+# card (og:image / twitter:image), its legacy SVG source kept reachable for
+# compatibility, and the iOS home-screen icon. All three are pinned at the repo
+# root and must ride in every temporary deploy payload.
+RASTER_SHARE_CARD = "og-image.png"
 SHARE_CARD = "og-image.svg"
 HOME_SCREEN_ICON = "apple-touch-icon.png"
 
@@ -62,9 +64,9 @@ class DeployDailyTests(unittest.TestCase):
             f"{missing}; deploy_daily.sh and build_daily.py must agree",
         )
 
-    def test_payload_explicitly_carries_the_share_card_and_home_screen_icon(self):
+    def test_payload_explicitly_carries_the_share_cards_and_home_screen_icon(self):
         payload = payload_root_files()
-        for name in (SHARE_CARD, HOME_SCREEN_ICON):
+        for name in (RASTER_SHARE_CARD, SHARE_CARD, HOME_SCREEN_ICON):
             self.assertIn(name, payload, f"deploy payload must include root {name}")
 
     def test_allowlist_names_only_files_that_exist_at_the_root(self):
@@ -118,6 +120,7 @@ class DeployDailyTests(unittest.TestCase):
         worker = WORKER.read_text()
         middleware = MIDDLEWARE.read_text()
         for needle in (
+            '"/og-image.png"',
             '"/og-image.svg"',
             '"/apple-touch-icon.png"',
             'max-age=31536000; includeSubDomains',

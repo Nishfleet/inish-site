@@ -1,6 +1,7 @@
 import base64
 import html
 import json
+import struct
 import tempfile
 import unittest
 from pathlib import Path
@@ -129,6 +130,11 @@ class BuildDailyTests(unittest.TestCase):
         (self.legacy_daily / "apple-touch-icon.png").write_bytes(
             base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
         )
+        # The raster share card is pinned at the root in production; the
+        # fixture supplies a valid PNG so copy_assets() copies it to the output.
+        (self.legacy_daily / "og-image.png").write_bytes(
+            base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+        )
 
     def tearDown(self):
         self.temp.cleanup()
@@ -160,7 +166,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_builds_latest_feed_at_root(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
         self.assertFalse((self.public / "archive").exists())
         self.assertNotIn("archive", (self.public / "index.html").read_text())
@@ -194,20 +200,41 @@ class BuildDailyTests(unittest.TestCase):
         self.write(edition())
         self.build()
         head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.svg">', head)
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
         self.assertIn(
             '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
             'and early signals of demand \u2014 in plain words.">',
             head,
         )
-        self.assertIn('<meta property="og:image:type" content="image/svg+xml">', head)
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
         self.assertIn('<meta property="og:image:width" content="1200">', head)
         self.assertIn('<meta property="og:image:height" content="630">', head)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
-        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.svg">', head)
-        self.assertEqual(head.count("https://inish.in/og-image.svg"), 2)
-        # The build copies the share card to the root alongside app.js and styles.css.
-        self.assertTrue((self.public / "og-image.svg").is_file())
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        # The build copies the raster share card to the root alongside app.js
+        # and styles.css.
+        self.assertTrue((self.public / "og-image.png").is_file())
+
+    def test_head_uses_raster_social_card(self):
+        # X and other raster-only unfurlers exclude SVG cards, so the generated
+        # head must point at the committed 1200x630 PNG with the raster type,
+        # and that PNG must really exist with a valid signature and the exact
+        # declared dimensions. A switch back to the SVG card fails loudly here.
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
+        self.assertIn('<meta property="og:image:width" content="1200">', head)
+        self.assertIn('<meta property="og:image:height" content="630">', head)
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        self.assertNotIn("og-image.svg", head)
+        card = (Path(__file__).resolve().parents[1] / "og-image.png").read_bytes()
+        self.assertTrue(card.startswith(b"\x89PNG\r\n\x1a\n"), "committed social card is not a PNG")
+        width, height = struct.unpack(">II", card[16:24])
+        self.assertEqual((width, height), (1200, 630), "committed social card must be 1200x630")
 
     def test_head_carries_apple_touch_icon(self):
         self.write(edition())
