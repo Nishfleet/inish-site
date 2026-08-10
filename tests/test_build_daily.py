@@ -1,6 +1,7 @@
 import base64
 import html
 import json
+import struct
 import tempfile
 import unittest
 from pathlib import Path
@@ -102,6 +103,22 @@ def story(index: int) -> dict:
     return base
 
 
+def png(width: int, height: int) -> bytes:
+    """A minimal, valid PNG of the given dimensions (stdlib-only fixture)."""
+    def chunk(tag: bytes, payload: bytes) -> bytes:
+        return struct.pack(">I", len(payload)) + tag + payload + struct.pack(
+            ">I", (__import__("zlib").crc32(tag + payload)) & 0xFFFFFFFF
+        )
+
+    def row(color: bytes) -> bytes:
+        return b"\x00" + color * width
+
+    header = chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+    raw = b"".join(row(b"\xf4\xef\xe5") for _ in range(height))
+    body = chunk(b"IDAT", __import__("zlib").compress(raw))
+    return b"\x89PNG\r\n\x1a\n" + header + body + chunk(b"IEND", b"")
+
+
 def edition(stories=3, date="2026-08-02", candidate_count=70, **overrides):
     payload = {
         "date": date,
@@ -125,6 +142,9 @@ class BuildDailyTests(unittest.TestCase):
         (self.legacy_daily / "app.js").write_text("app")
         (self.legacy_daily / "styles.css").write_text("styles")
         (self.legacy_daily / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        # A real 1200x630 PNG so the share-card fixture is a valid raster image,
+        # not just bytes; the committed card is a fixed render of og-image.svg.
+        (self.legacy_daily / "og-image.png").write_bytes(png(1200, 630))
         # A real 1x1 PNG so the icon fixture is a valid image, not just bytes.
         (self.legacy_daily / "apple-touch-icon.png").write_bytes(
             base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
@@ -160,7 +180,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_builds_latest_feed_at_root(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
         self.assertFalse((self.public / "archive").exists())
         self.assertNotIn("archive", (self.public / "index.html").read_text())
@@ -194,20 +214,41 @@ class BuildDailyTests(unittest.TestCase):
         self.write(edition())
         self.build()
         head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.svg">', head)
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
         self.assertIn(
             '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
             'and early signals of demand \u2014 in plain words.">',
             head,
         )
-        self.assertIn('<meta property="og:image:type" content="image/svg+xml">', head)
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
         self.assertIn('<meta property="og:image:width" content="1200">', head)
         self.assertIn('<meta property="og:image:height" content="630">', head)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
-        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.svg">', head)
-        self.assertEqual(head.count("https://inish.in/og-image.svg"), 2)
-        # The build copies the share card to the root alongside app.js and styles.css.
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        # The build copies the share cards to the root alongside app.js and styles.css.
+        self.assertTrue((self.public / "og-image.png").is_file())
         self.assertTrue((self.public / "og-image.svg").is_file())
+
+    def test_head_uses_raster_social_card(self):
+        # X and other raster-only unfurlers refuse SVG card images, so the head
+        # must point both og:image and twitter:image at the fixed 1200x630 PNG
+        # twin of og-image.svg and declare the raster type. The committed PNG
+        # itself is validated here with the standard library only.
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
+        self.assertNotIn("image/svg+xml", head)
+        self.assertNotIn("og-image.svg", head)
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+
+        card = (self.public / "og-image.png").read_bytes()
+        self.assertTrue(card.startswith(b"\x89PNG\r\n\x1a\n"), "share card must be a PNG")
+        width, height = struct.unpack(">II", card[16:24])
+        self.assertEqual((width, height), (1200, 630))
+        self.assertGreater(len(card), 8)
 
     def test_head_carries_apple_touch_icon(self):
         self.write(edition())

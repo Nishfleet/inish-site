@@ -166,6 +166,7 @@ def make_live_server(root: Path, overrides=None):
         routes[f"/{name}"] = (root / name).read_bytes()
     routes["/"] = routes["/index.html"]
     routes["/og-image.svg"] = (root / "og-image.svg").read_bytes()
+    routes["/og-image.png"] = (root / "og-image.png").read_bytes()
     routes["/apple-touch-icon.png"] = (root / "apple-touch-icon.png").read_bytes()
     for font in (root / "fonts").glob("*.woff2"):
         routes[f"/fonts/{font.name}"] = font.read_bytes()
@@ -206,6 +207,7 @@ class LiveVerifierTests(unittest.TestCase):
         (self.root / "robots.txt").write_text("User-agent: *\nAllow: /\n")
         (self.root / "sitemap.xml").write_text(SITEMAP)
         (self.root / "og-image.svg").write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
+        (self.root / "og-image.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-card")
         (self.root / "apple-touch-icon.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-icon")
         (self.root / "data" / "editions" / f"{date}.json").write_text(json.dumps(edition))
 
@@ -268,12 +270,20 @@ class LiveVerifierTests(unittest.TestCase):
         self.assertNotIn("live_feed_parity", output)
 
     def test_missing_share_asset_fails_verification(self):
-        # The social share card is staged and middleware-allowed, but a deploy
-        # that drops it again must fail loudly instead of passing as verified.
+        # The social share cards are staged and middleware-allowed, but a deploy
+        # that drops one again must fail loudly instead of passing as verified.
         code, output = self.run_verifier({"/og-image.svg": None})
         self.assertNotEqual(code, 0)
         self.assertIn("/og-image.svg: expected exact 200 body", output)
         self.assertIn("HEAD /og-image.svg: expected empty 200", output)
+
+    def test_missing_raster_share_card_fails_verification(self):
+        # The raster twin is what og:image and twitter:image point at, so a
+        # deploy that drops it must fail loudly like any other share asset.
+        code, output = self.run_verifier({"/og-image.png": None})
+        self.assertNotEqual(code, 0)
+        self.assertIn("/og-image.png: expected exact 200 body", output)
+        self.assertIn("HEAD /og-image.png: expected empty 200", output)
 
     def test_mismatched_share_asset_fails_verification(self):
         # Byte drift on the identity asset (e.g. a stale or truncated icon) is

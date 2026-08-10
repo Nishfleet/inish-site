@@ -63,7 +63,7 @@ class MiddlewareContractTests(unittest.TestCase):
         return 404
 
     def test_root_metadata_assets_are_allowlisted(self):
-        for asset in ("/og-image.svg", "/apple-touch-icon.png"):
+        for asset in ("/og-image.svg", "/og-image.png", "/apple-touch-icon.png"):
             self.assertIn(asset, self.public_paths)
 
     def test_allowlist_is_exactly_the_known_surface(self):
@@ -77,6 +77,7 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/styles.css",
                 "/apple-touch-icon.png",
                 "/og-image.svg",
+                "/og-image.png",
                 "/latest.json",
                 "/feed.xml",
                 "/robots.txt",
@@ -105,11 +106,13 @@ class MiddlewareContractTests(unittest.TestCase):
     def test_metadata_assets_reach_static_layer_and_arbitrary_paths_stay_404(self):
         cases = {
             "/og-image.svg": "static",
+            "/og-image.png": "static",
             "/apple-touch-icon.png": "static",
             "/fonts/archivo-700.woff2": "static",
             "/archive": 404,
             "/admin": 404,
             "/secrets.json": 404,
+            "/og-image.svg.png": 404,
             "/og-image.jpg": 404,
             "/apple-touch-icon.ico": 404,
             "/fonts/nope.ttf": 404,

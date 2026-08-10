@@ -147,7 +147,7 @@ def main() -> int:
         failures.append("fonts: no woff2 files found to verify")
 
     # The identity/share assets referenced by the generated head (the social
-    # share card and the iOS touch icon) are staged by deploy_daily.sh and
+    # share cards and the iOS touch icon) are staged by deploy_daily.sh and
     # allowed through the worker allowlist, but nothing verified they actually
     # reached the live hostname; a deploy that dropped them again would have
     # passed verification. Byte-check them like the other payload files.
@@ -158,6 +158,7 @@ def main() -> int:
         "/latest.json": "latest.json",
         "/feed.xml": "feed.xml",
         "/og-image.svg": "og-image.svg",
+        "/og-image.png": "og-image.png",
         "/apple-touch-icon.png": "apple-touch-icon.png",
         **fonts,
     }.items():
@@ -168,7 +169,7 @@ def main() -> int:
         if status != 200 or body != expected:
             failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
-    for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/og-image.svg", "/apple-touch-icon.png", "/robots.txt", "/sitemap.xml", *fonts):
+    for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/og-image.svg", "/og-image.png", "/apple-touch-icon.png", "/robots.txt", "/sitemap.xml", *fonts):
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method="HEAD")
         if status != 200 or body:
             failures.append(f"HEAD {path}: expected empty 200, got {status} and {len(body)} bytes")
