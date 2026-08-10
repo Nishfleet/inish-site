@@ -21,7 +21,7 @@ concurrency:
 jobs:
   test:
     name: test
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, linux, x64, vps-verify]
     timeout-minutes: 10
     steps:
       - name: Check out source
