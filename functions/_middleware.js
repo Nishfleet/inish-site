@@ -6,6 +6,7 @@ const publicPaths = new Set([
   "/styles.css",
   "/apple-touch-icon.png", // iOS home-screen icon, referenced by the generated head
   "/og-image.svg", // social share card, referenced by the generated head
+  "/fonts/OFL.txt", // the SIL OFL license text the shipped stylesheet points at
   "/latest.json",
   "/feed.xml",
   "/robots.txt",

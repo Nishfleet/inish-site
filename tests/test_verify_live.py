@@ -169,6 +169,7 @@ def make_live_server(root: Path, overrides=None):
     routes["/apple-touch-icon.png"] = (root / "apple-touch-icon.png").read_bytes()
     for font in (root / "fonts").glob("*.woff2"):
         routes[f"/fonts/{font.name}"] = font.read_bytes()
+    routes["/fonts/OFL.txt"] = (root / "fonts" / "OFL.txt").read_bytes()
     if overrides:
         routes.update(overrides)
 
@@ -190,6 +191,7 @@ class LiveVerifierTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "fonts").mkdir(parents=True)
         (self.root / "fonts" / "archivo-700.woff2").write_bytes(b"\x00\x01" * 8)
+        (self.root / "fonts" / "OFL.txt").write_text("SIL Open Font License fixture text\n")
         (self.root / "data" / "editions").mkdir(parents=True)
         self.write_fixtures()
 
@@ -282,6 +284,14 @@ class LiveVerifierTests(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertIn("/apple-touch-icon.png: expected exact 200 body", output)
         self.assertNotIn("verified_feed_only", output)
+
+    def test_missing_license_file_fails_verification(self):
+        # The shipped stylesheet points readers at /fonts/OFL.txt, so a deploy
+        # that drops the license must fail loudly instead of passing as verified.
+        code, output = self.run_verifier({"/fonts/OFL.txt": None})
+        self.assertNotEqual(code, 0)
+        self.assertIn("/fonts/OFL.txt: expected exact 200 body", output)
+        self.assertIn("HEAD /fonts/OFL.txt: expected empty 200", output)
 
 
 class MiddlewareContractTests(unittest.TestCase):

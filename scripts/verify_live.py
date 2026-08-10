@@ -143,6 +143,10 @@ def main() -> int:
         f"/fonts/{path.name}": f"fonts/{path.name}"
         for path in sorted((args.root / "fonts").glob("*.woff2"))
     }
+    # The license file is part of the same public promise: the shipped
+    # stylesheet tells readers to "see /fonts/OFL.txt", so a deploy that drops
+    # it must fail verification like any other dropped payload file.
+    fonts["/fonts/OFL.txt"] = "fonts/OFL.txt"
     if not fonts:
         failures.append("fonts: no woff2 files found to verify")
 
