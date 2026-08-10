@@ -40,6 +40,32 @@ function withSecurityHeaders(response) {
   return response;
 }
 
+// Mirrors the worker's notFoundResponse exactly: serve the branded /404.html
+// asset through the ASSETS binding with status 404, stream the body, keep HEAD
+// bodyless, and fall back to the historical plain 404 if the asset is missing.
+const notFoundHeaders = {
+  "Cache-Control": "no-store",
+  "Content-Type": "text/html; charset=utf-8"
+};
+
+async function notFoundResponse(request, env) {
+  if (request.method === "HEAD") {
+    return new Response(null, { status: 404, headers: notFoundHeaders });
+  }
+  try {
+    const asset = await env.ASSETS.fetch("https://inish.in/404.html");
+    if (asset.ok) {
+      return new Response(asset.body, { status: 404, headers: notFoundHeaders });
+    }
+  } catch {
+    // The asset or binding failed; fall back rather than surfacing an error.
+  }
+  return new Response("Not found", {
+    status: 404,
+    headers: { "Cache-Control": "no-store" }
+  });
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const target = redirects.get(url.pathname);
@@ -56,12 +82,7 @@ export async function onRequest(context) {
     );
   }
   if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
-    return withSecurityHeaders(
-      new Response("Not found", {
-        status: 404,
-        headers: { "Cache-Control": "no-store" }
-      })
-    );
+    return withSecurityHeaders(await notFoundResponse(context.request, context.env));
   }
   return withSecurityHeaders(await context.next());
 }
