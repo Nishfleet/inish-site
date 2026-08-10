@@ -11,6 +11,7 @@ Use this file for durable project truth Codex cannot reliably infer from code al
 - Keep only the current feed plus its RSS, JSON, robots, sitemap, CSS, and JavaScript endpoints. Do not publish founder/product pages, LLM pages, or edition archives.
 - Preserve old non-archive `/daily/*` links with permanent redirects to the root equivalents; archive URLs intentionally return 404.
 - The site should stay static HTML, CSS, JavaScript, and Cloudflare Pages unless a stronger need is proven.
+- The public GitHub profile website field (github.com/nish3451 → profile → website) is a manual account write, not a fleet action: the machine's gh token (scopes `gist`, `read:org`, `repo`, `workflow`) lacks the `user` scope, so `PATCH /user` fails with "This API operation needs the 'user' scope". The intended value is `https://inish.in/`; verify with `gh api users/nish3451 --jq .blog`. Do not re-file or re-dispatch this item until the field is set (github.com/settings/profile) or a `user`-scoped token exists — its closed twin was fleet-worked 2026-08-09 and re-filed 2026-08-10 (backlog item aeeb906eb7, triaged blocked-on-credential).
 
 ## Rejected Paths
 
