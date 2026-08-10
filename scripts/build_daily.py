@@ -321,7 +321,7 @@ def story_card(story: dict, index: int, prominence: str) -> str:
           <div class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></div>
           <h2><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></h2>
           <p>{esc(story['summary'])}</p>
-          <p class="fact"><strong>Checked</strong> {esc(story['fact'])}</p>
+          <p class="fact"><strong>Checked</strong> <a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
           <p class="take"><strong>Nish</strong> {esc(story['take'])}</p>
           <p class="caveat"><strong>But</strong> {esc(story['caveat'])}</p>
           <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} ↗</a>
