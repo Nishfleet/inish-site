@@ -124,7 +124,12 @@ class BuildDailyTests(unittest.TestCase):
         self.legacy_daily.mkdir()
         (self.legacy_daily / "app.js").write_text("app")
         (self.legacy_daily / "styles.css").write_text("styles")
+        # The card's editable SVG design source stays in daily/, but only the
+        # raster og-image.png is staged as the served share card.
         (self.legacy_daily / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        (self.legacy_daily / "og-image.png").write_bytes(
+            base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+        )
         # A real 1x1 PNG so the icon fixture is a valid image, not just bytes.
         (self.legacy_daily / "apple-touch-icon.png").write_bytes(
             base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
@@ -160,8 +165,11 @@ class BuildDailyTests(unittest.TestCase):
     def test_builds_latest_feed_at_root(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "app.js", "styles.css", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
+        # The SVG card design source is not staged: only the raster card is
+        # part of the built public surface.
+        self.assertFalse((self.public / "og-image.svg").exists())
         self.assertFalse((self.public / "archive").exists())
         self.assertNotIn("archive", (self.public / "index.html").read_text())
         self.assertEqual(json.loads((self.public / "latest.json").read_text())["date"], "2026-08-02")
@@ -194,20 +202,26 @@ class BuildDailyTests(unittest.TestCase):
         self.write(edition())
         self.build()
         head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.svg">', head)
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
         self.assertIn(
             '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
             'and early signals of demand \u2014 in plain words.">',
             head,
         )
-        self.assertIn('<meta property="og:image:type" content="image/svg+xml">', head)
+        # The card is raster on purpose: X refuses SVG link cards, so the head
+        # must never point at the SVG design source.
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
         self.assertIn('<meta property="og:image:width" content="1200">', head)
         self.assertIn('<meta property="og:image:height" content="630">', head)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
-        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.svg">', head)
-        self.assertEqual(head.count("https://inish.in/og-image.svg"), 2)
-        # The build copies the share card to the root alongside app.js and styles.css.
-        self.assertTrue((self.public / "og-image.svg").is_file())
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        self.assertNotIn("og-image.svg", head)
+        # The build copies the raster share card to the root alongside app.js
+        # and styles.css, and the copy is a real PNG.
+        card = self.public / "og-image.png"
+        self.assertTrue(card.is_file())
+        self.assertTrue(card.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
 
     def test_head_carries_apple_touch_icon(self):
         self.write(edition())
