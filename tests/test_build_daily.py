@@ -190,6 +190,23 @@ class BuildDailyTests(unittest.TestCase):
         self.assertNotIn("Nish's angle", page)
         self.assertIn("70 scanned · 6 kept", page)
 
+    def test_every_checked_fact_links_to_its_evidence(self):
+        # A "Checked" claim must be clickable through to the exact source it
+        # was verified against, not a bare assertion the reader has to hunt
+        # for. The label stays outside the link so the accessible name is the
+        # fact sentence itself.
+        self.write(edition(stories=4))
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertEqual(page.count('<p class="fact"><strong>Checked</strong> <a href='), 4)
+        for index in range(4):
+            story = SAMPLE_STORIES[index]
+            self.assertIn(
+                f'<a href="{html.escape(story["url"], quote=True)}" '
+                f'rel="noopener noreferrer">{html.escape(story["fact"], quote=True)}</a>',
+                page,
+            )
+
     def test_head_carries_social_share_metadata(self):
         self.write(edition())
         self.build()

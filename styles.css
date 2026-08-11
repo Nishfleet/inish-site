@@ -317,6 +317,19 @@ a:focus-visible {
   line-height: 1.5;
 }
 
+/* The fact is the claim; the claim links to the source it was verified
+   against, so "Checked" is never a bare assertion a reader cannot follow. */
+.story .fact a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.story .fact a:hover {
+  color: var(--red);
+}
+
 .story .take {
   border-left-color: var(--red);
   color: var(--ink);
