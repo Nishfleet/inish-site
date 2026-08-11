@@ -3,6 +3,7 @@ import html
 import json
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
 
@@ -175,6 +176,34 @@ class BuildDailyTests(unittest.TestCase):
         sitemap = (self.public / "sitemap.xml").read_text()
         self.assertEqual(sitemap.count("<loc>"), 1)
         self.assertIn("<loc>https://inish.in/</loc>", sitemap)
+
+    def test_rss_item_carries_every_story_of_the_edition(self):
+        # feed.xml is the only durable copy of an edition: the root page rolls
+        # over and archive URLs are unpublished by design, so the item's
+        # description must carry each story's title, source, and link to read
+        # standalone in a subscriber's reader after rollover.
+        self.write(edition(stories=6))
+        self.build()
+        clean = self.load()
+        feed = ET.fromstring((self.public / "feed.xml").read_text())
+        item = feed.find("./channel/item")
+        self.assertIsNotNone(item)
+        self.assertEqual(item.find("link").text, "https://inish.in/")
+        self.assertEqual(item.find("guid").text, "inish-daily-2026-08-02")
+        description_element = item.find("description")
+        self.assertIsNotNone(description_element)
+        # The description is a small HTML fragment, so its text lives in child
+        # elements; join it for the text assertions and keep the markup for
+        # the anchor-count contract.
+        description = html.unescape("".join(description_element.itertext()))
+        description_xml = ET.tostring(description_element, encoding="unicode")
+        self.assertIn(clean["editor_note"], description)
+        self.assertEqual(description_xml.count("<a href="), len(clean["stories"]))
+        for story in clean["stories"]:
+            with self.subTest(title=story["title"]):
+                self.assertIn(story["title"], description)
+                self.assertIn(story["source"], description)
+                self.assertIn(f'href="{story["url"]}"', description_xml)
 
     def test_renders_prominence_and_the_three_labels(self):
         self.write(edition(stories=6))

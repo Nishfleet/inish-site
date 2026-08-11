@@ -473,9 +473,18 @@ def page(edition: dict) -> str:
 def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
     link = "https://inish.in/"
-    description = html.escape(edition["editor_note"])
     published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"inish-daily-{day.isoformat()}"
+    # The item description is an edition's only durable surface: the root page
+    # rolls to the next edition and archive URLs are unpublished by design, so
+    # the description must carry every story's title, source, and link for the
+    # item to read standalone in a subscriber's reader after rollover. The
+    # editor's note stays as the lead-in; a quiet day keeps the note alone.
+    stories = "".join(
+        f"<li><a href=\"{esc(story['url'])}\">{esc(story['title'])}</a> — {esc(story['source'])}</li>"
+        for story in edition["stories"]
+    )
+    description = f"<p>{esc(edition['editor_note'])}</p><ol>{stories}</ol>" if stories else esc(edition["editor_note"])
     item = f"<item><title>Nish's Daily Reads — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish's Daily Reads</title><link>https://inish.in/</link><description>A daily read for a founder: AI, product ideas, and demand signals.</description>" + item + "</channel></rss>\n"
 
