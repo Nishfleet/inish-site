@@ -345,6 +345,30 @@ class BuildDailyTests(unittest.TestCase):
                 noun = "story" if count == 1 else "stories"
                 self.assertIn(f">Showing all {count} {noun}<", page)
 
+    def test_filter_status_is_hidden_by_a_real_css_class_not_an_inline_style(self):
+        # The live region is hidden by .visually-hidden in the stylesheet, never
+        # by an inline style the builder repeats on every page. A class that the
+        # CSS does not define would hide nothing if the inline style were ever
+        # dropped, so the renderer and the stylesheet are checked together.
+        self.write(edition(stories=3))
+        self.build()
+        page = (self.public / "index.html").read_text()
+        status = page.split('id="filter-status"', 1)[1].split(">", 1)[0]
+        self.assertIn('class="visually-hidden"', page.split('id="filter-status"', 1)[0])
+        self.assertNotIn('style="', status)
+        styles = (Path(__file__).resolve().parents[1] / "styles.css").read_text()
+        rule = styles.split(".visually-hidden {", 1)
+        self.assertEqual(len(rule), 2, "styles.css must define a .visually-hidden rule")
+        declarations = rule[1].split("}", 1)[0]
+        for required in (
+            "position: absolute",
+            "width: 1px",
+            "height: 1px",
+            "clip: rect(0 0 0 0)",
+            "white-space: nowrap",
+        ):
+            self.assertIn(required, declarations)
+
     def test_footer_links_the_owned_studio(self):
         # The merged outbound identity link is part of the renderer, so the
         # next daily publish cannot silently drop it from the footer.
