@@ -70,8 +70,8 @@ class MiddlewareContractTests(unittest.TestCase):
             self.assertIn(asset, self.public_paths)
 
     def test_allowlist_is_exactly_the_known_surface(self):
-        # Exact equality is the narrowness guard: both metadata assets are
-        # present and nothing else was slipped in.
+        # Exact equality is the narrowness guard: both metadata assets and the
+        # font license text are present and nothing else was slipped in.
         self.assertEqual(
             self.public_paths,
             {
@@ -84,6 +84,7 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/feed.xml",
                 "/robots.txt",
                 "/sitemap.xml",
+                "/fonts/OFL.txt",
             },
         )
 
@@ -110,6 +111,7 @@ class MiddlewareContractTests(unittest.TestCase):
             "/og-image.svg": "static",
             "/apple-touch-icon.png": "static",
             "/fonts/archivo-700.woff2": "static",
+            "/fonts/OFL.txt": "static",
             "/archive": 404,
             "/admin": 404,
             "/secrets.json": 404,
@@ -117,6 +119,7 @@ class MiddlewareContractTests(unittest.TestCase):
             "/apple-touch-icon.ico": 404,
             "/fonts/nope.ttf": 404,
             "/fonts/nope.woff2/": 404,
+            "/fonts/OFL.md": 404,
             "/daily/2026-08-08": 404,
             "/index.html": 301,
             "/daily": 301,
@@ -160,8 +163,9 @@ class MiddlewareContractTests(unittest.TestCase):
                 self.assertIn("new Response(null", source)
                 self.assertIn('new Response("Not found"', source)
 
-        # Allowlist and redirects are unchanged: no new public path for the
-        # 404 asset, no new redirect, the deny surface still 404s.
+        # Allowlist keeps only the known surface plus the OFL license text the
+        # shipped stylesheet references; no new redirect, the deny surface still
+        # 404s, and the 404 asset itself stays internal.
         self.assertEqual(
             self.public_paths,
             {
@@ -174,6 +178,7 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/feed.xml",
                 "/robots.txt",
                 "/sitemap.xml",
+                "/fonts/OFL.txt",
             },
         )
         self.assertEqual(

@@ -12,7 +12,8 @@ const publicPaths = new Set([
   "/latest.json",
   "/feed.xml",
   "/robots.txt",
-  "/sitemap.xml"
+  "/sitemap.xml",
+  "/fonts/OFL.txt" // SIL OFL 1.1 license text, referenced by styles.css
 ]);
 
 // Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a

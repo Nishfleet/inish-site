@@ -139,11 +139,14 @@ def main() -> int:
 
     # A missing font file fails silently in the browser: the page still renders,
     # just in whatever face the visitor's OS happens to own. Verify the bytes.
+    # The OFL license text the shipped stylesheets reference is just as silent
+    # when dropped, so it is byte-checked alongside the faces.
     fonts = {
         f"/fonts/{path.name}": f"fonts/{path.name}"
         for path in sorted((args.root / "fonts").glob("*.woff2"))
     }
-    if not fonts:
+    fonts["/fonts/OFL.txt"] = "fonts/OFL.txt"
+    if len(fonts) == 1:
         failures.append("fonts: no woff2 files found to verify")
 
     # The identity/share assets referenced by the generated head (the social
