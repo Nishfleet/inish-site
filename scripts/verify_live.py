@@ -97,9 +97,18 @@ def rss_item(body: bytes) -> tuple[str, str, str, str, str]:
     identity = []
     for tag in ("title", "guid", "link", "pubDate", "description"):
         element = item.find(tag)
-        if element is None or element.text is None:
+        if element is None:
             raise ValueError(f"missing <{tag}>")
-        identity.append(element.text)
+        if tag == "description" and len(element):
+            # The item description is an HTML fragment carrying the edition's
+            # stories, so its text lives in child elements. Serialize the
+            # fragment so parity compares the stories it carries, not just
+            # the editor note; both sides round-trip through the same parser.
+            identity.append(ET.tostring(element, encoding="unicode"))
+        else:
+            if element.text is None:
+                raise ValueError(f"missing <{tag}>")
+            identity.append(element.text)
     return tuple(identity)  # type: ignore[return-value]
 
 

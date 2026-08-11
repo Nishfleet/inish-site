@@ -142,6 +142,24 @@ class FeedParityTests(unittest.TestCase):
         local = rss_payload().encode()
         self.assertIn("not a valid single-item RSS", rss_feed_mismatch(local, b"<rss><channel>"))
 
+    def test_rss_parity_accepts_a_story_carrying_item_description(self):
+        # The item description now carries the edition's stories as an HTML
+        # fragment (title, source, and link per story), so its text lives in
+        # child elements. Parity must compare the fragment, not just the note.
+        description = (
+            "<p>Three things survived the check today; the rest were launch posts.</p>"
+            '<ol><li><a href="https://ratchet.example/launch">Ratchet ships deterministic replays</a>'
+            " — Ratchet</li></ol>"
+        )
+        local = rss_payload().replace(
+            "A fixture edition with enough words to stand in for the accepted one.", description
+        ).encode()
+        self.assertIsNone(rss_feed_mismatch(local, local))
+        changed = local.replace(b"https://ratchet.example/launch", b"https://other.example/launch")
+        mismatch = rss_feed_mismatch(local, changed)
+        self.assertIsNotNone(mismatch)
+        self.assertIn("differs in content", mismatch)
+
 
 # Mirrors scripts/verify_live.py's redirect contract, so the mock hostname
 # behaves like the real one for the route checks that must keep working.
