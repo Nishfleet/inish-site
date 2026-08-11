@@ -9,6 +9,7 @@ DEPLOY_SCRIPT = ROOT / "scripts" / "deploy_daily.sh"
 BUILD_SCRIPT = ROOT / "scripts" / "build_daily.py"
 WORKER = ROOT / "worker.js"
 MIDDLEWARE = ROOT / "functions" / "_middleware.js"
+CONTRACT = ROOT / "route-contract.js"
 WRANGLER = ROOT / "wrangler.jsonc"
 
 # Root static assets referenced by the generated head: the social share card
@@ -39,6 +40,19 @@ def payload_root_files() -> list[str]:
             f"expected exactly one root-file cp line in {DEPLOY_SCRIPT}, found {len(matches)}"
         )
     return re.findall(r'\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"', matches[0].group(0))
+
+
+def contract_public_paths() -> set[str]:
+    """The public-path allowlist from route-contract.js, the one source of truth."""
+    text = CONTRACT.read_text()
+    match = re.search(r"publicPaths\s*=\s*new Set\(\[(.*?)\]\);", text, re.S)
+    assert match, f"could not find the publicPaths Set in {CONTRACT.name}"
+    return set(re.findall(r'"([^"]+)"', match.group(1)))
+
+
+def contract_root_files() -> set[str]:
+    """Allowlisted paths mapped to the root files they serve ("/" -> index.html)."""
+    return {"index.html" if path == "/" else path.lstrip("/") for path in contract_public_paths()}
 
 
 def head_root_assets() -> set[str]:
@@ -113,19 +127,61 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn('"inish.in/*"', wrangler)
         self.assertIn('"ASSETS"', wrangler)
 
-    def test_worker_and_pages_middleware_share_the_route_contract(self):
-        # Keep the two edge sources honest: allowlist, redirects, HSTS string.
+    def test_payload_contains_every_allowlisted_root_file(self):
+        # One source of truth: whatever route-contract.js allows must actually
+        # ship in the deploy payload, or the live hostname 404s an allowlisted
+        # path. A path added to the contract but not to the payload fails here.
+        missing = sorted(contract_root_files() - set(payload_root_files()))
+        self.assertEqual(
+            missing,
+            [],
+            "deploy payload omits allowlisted root files: "
+            f"{missing}; deploy_daily.sh and route-contract.js must agree",
+        )
+
+    def test_payload_extra_files_are_exactly_the_internal_ones(self):
+        # The payload may carry nothing public beyond the allowlist: the only
+        # extra root files are the branded 404 asset and the Pages _redirects,
+        # both deliberately internal. This is the exact-surface guard that
+        # replaces the old hard-coded test list.
+        extra = sorted(set(payload_root_files()) - contract_root_files())
+        self.assertEqual(
+            extra,
+            ["404.html", "_redirects"],
+            "payload carries non-public root files beyond 404.html and _redirects",
+        )
+
+    def test_deploy_ships_the_route_contract_beside_the_worker(self):
+        # worker.js imports ./route-contract.js, so the deploy root must carry
+        # the contract or the deployed worker cannot resolve its module graph.
+        # It must NOT ride in the public assets payload.
+        script = DEPLOY_SCRIPT.read_text().replace("\\\n", " ")
+        self.assertRegex(
+            script,
+            r'cp "\$SNAPSHOT_ROOT/worker\.js"\s+"\$SNAPSHOT_ROOT/wrangler\.jsonc"'
+            r'\s+"\$SNAPSHOT_ROOT/route-contract\.js"\s+"\$DEPLOY_ROOT/"',
+        )
+        self.assertNotIn("route-contract.js", " ".join(payload_root_files()))
+
+    def test_worker_and_pages_middleware_share_one_route_contract(self):
+        # Both edges import route-contract.js and define no literals of their
+        # own; the values themselves live only in the contract file.
         worker = WORKER.read_text()
         middleware = MIDDLEWARE.read_text()
+        contract = CONTRACT.read_text()
+        self.assertIn('from "./route-contract.js"', worker)
+        self.assertIn('from "../route-contract.js"', middleware)
         for needle in (
             '"/og-image.svg"',
             '"/apple-touch-icon.png"',
             'max-age=31536000; includeSubDomains',
-            "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)",
             '["/daily", "/"]',
         ):
-            self.assertIn(needle, worker)
-            self.assertIn(needle, middleware)
+            self.assertIn(needle, contract)
+        for source in (worker, middleware):
+            self.assertIn("!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)", source)
+            self.assertNotIn("const publicPaths = new Set", source)
+            self.assertNotIn("const redirects = new Map", source)
 
     def test_deploy_loads_fleet_token_when_env_is_empty(self):
         script = DEPLOY_SCRIPT.read_text()
