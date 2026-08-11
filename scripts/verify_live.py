@@ -213,6 +213,10 @@ def main() -> int:
                 )
 
     removed = [
+        # The 404 asset itself is internal to the edge (worker.js and the Pages
+        # middleware serve it through the ASSETS binding); a public request for
+        # it must get the same denied branded 404 as any other unknown path.
+        "/404.html",
         "/llms.txt",
         "/archive",
         "/archive/",
@@ -242,11 +246,28 @@ def main() -> int:
             f"/daily/archive/{edition_date}/index.html",
             f"/data/editions/{edition_date}.json",
         ])
+    # The branded 404 page is a public promise a status code alone cannot see:
+    # if the edge's ASSETS fallback ever takes over (the plain "Not found"
+    # response in worker.js / functions/_middleware.js), every removed route
+    # still answers 404 and verification would stay green while visitors lose
+    # the error desk. Byte-check the GET body against the snapshot's 404.html
+    # (beacon-stripped like the root page); HEAD stays bodyless by contract.
+    try:
+        branded_404 = (args.root / "404.html").read_bytes()
+    except FileNotFoundError:
+        failures.append("404.html: snapshot lacks the branded 404 page; cannot verify the error desk")
+        branded_404 = None
     for path in removed:
         for method in ("GET", "HEAD"):
             status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method=method)
-            if status != 404 or (method == "HEAD" and body):
-                failures.append(f"{method} {path}: expected empty 404, got {status} and {len(body)} bytes")
+            if method == "GET":
+                if branded_404 is not None and status == 404 and without_cloudflare_beacon(body) == branded_404:
+                    continue
+                failures.append(
+                    f"GET {path}: expected the branded 404 page, got {status} and {len(body)} bytes"
+                )
+            elif status != 404 or body:
+                failures.append(f"HEAD {path}: expected empty 404, got {status} and {len(body)} bytes")
 
     metadata = {
         "/robots.txt": (args.root / "robots.txt").read_bytes(),

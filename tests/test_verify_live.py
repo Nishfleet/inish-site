@@ -160,7 +160,10 @@ REDIRECTS = {
 
 def make_live_server(root: Path, overrides=None):
     """A fake verifier fetch() that serves the fixture root like the live
-    hostname would, with optional per-route overrides (e.g. a stale edition)."""
+    hostname would, with optional per-route overrides. An override is either
+    the exact body bytes (served with 200, like a stale asset) or a
+    ``(status, body)`` tuple (e.g. a plain-fallback 404). Unknown routes serve
+    the branded 404 page with status 404, exactly like the edge worker."""
     routes = {}
     for name in ("index.html", "app.js", "styles.css", "latest.json", "feed.xml", "robots.txt", "sitemap.xml"):
         routes[f"/{name}"] = (root / name).read_bytes()
@@ -172,6 +175,7 @@ def make_live_server(root: Path, overrides=None):
     routes["/fonts/OFL.txt"] = (root / "fonts" / "OFL.txt").read_bytes()
     if overrides:
         routes.update(overrides)
+    branded_404 = (root / "404.html").read_bytes()
 
     def fetch(base, path, *, method="GET"):
         route, _, query = path.partition("?")
@@ -179,7 +183,10 @@ def make_live_server(root: Path, overrides=None):
             return 301, b"", f"{REDIRECTS[route]}?{query}"
         body = routes.get(route)
         if body is None:
-            return 404, b"", None
+            return 404, (b"" if method == "HEAD" else branded_404), None
+        if isinstance(body, tuple):
+            status, body = body
+            return status, (b"" if method == "HEAD" else body), None
         return 200, (b"" if method == "HEAD" else body), None
 
     return fetch
@@ -209,6 +216,9 @@ class LiveVerifierTests(unittest.TestCase):
         (self.root / "sitemap.xml").write_text(SITEMAP)
         (self.root / "og-image.svg").write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
         (self.root / "apple-touch-icon.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-icon")
+        (self.root / "404.html").write_text(
+            "<!doctype html><title>Not found</title><p>fixture error desk</p>\n"
+        )
         (self.root / "data" / "editions" / f"{date}.json").write_text(json.dumps(edition))
 
     def run_verifier(self, overrides=None):
@@ -266,8 +276,17 @@ class LiveVerifierTests(unittest.TestCase):
         # proving the parity guard did not narrow verification to feeds alone.
         code, output = self.run_verifier({"/archive": b"should not exist"})
         self.assertNotEqual(code, 0)
-        self.assertIn("GET /archive: expected empty 404", output)
+        self.assertIn("GET /archive: expected the branded 404 page", output)
         self.assertNotIn("live_feed_parity", output)
+
+    def test_plain_fallback_404_body_fails_verification(self):
+        # The status-only 404 contract cannot see the edge's worst degradation:
+        # a broken ASSETS fetch falls back to a plain "Not found" body with the
+        # same 404 status, so verification must byte-check the error desk.
+        code, output = self.run_verifier({"/archive": (404, b"Not found")})
+        self.assertNotEqual(code, 0)
+        self.assertIn("GET /archive: expected the branded 404 page, got 404 and 9 bytes", output)
+        self.assertNotIn("verified_feed_only", output)
 
     def test_missing_share_asset_fails_verification(self):
         # The social share card is staged and middleware-allowed, but a deploy
