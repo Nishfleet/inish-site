@@ -143,19 +143,18 @@ class FeedParityTests(unittest.TestCase):
         self.assertIn("not a valid single-item RSS", rss_feed_mismatch(local, b"<rss><channel>"))
 
 
-# Mirrors scripts/verify_live.py's redirect contract, so the mock hostname
-# behaves like the real one for the route checks that must keep working.
-REDIRECTS = {
-    "/index.html": "/",
-    "/daily": "/",
-    "/daily/": "/",
-    "/daily/index.html": "/",
-    "/daily/app.js": "/app.js",
-    "/daily/styles.css": "/styles.css",
-    "/daily/latest.json": "/latest.json",
-    "/daily/feed.xml": "/feed.xml",
-    "/daily/sitemap.xml": "/sitemap.xml",
-}
+# The redirect contract comes from route-contract.js — the same single source
+# of truth the verifier itself reads — so the mock hostname behaves like the
+# real one for the route checks that must keep working.
+def _extract_map(text, name):
+    match = re.search(rf"{name}\s*=\s*new Map\(\[(.*?)\]\);", text, re.S)
+    assert match, f"could not find the {name} Map in route-contract.js"
+    pairs = re.findall(r'\["([^"]+)",\s*"([^"]+)"\]', match.group(1))
+    return dict(pairs)
+
+
+CONTRACT_SOURCE = (Path(__file__).resolve().parents[1] / "route-contract.js").read_text()
+REDIRECTS = _extract_map(CONTRACT_SOURCE, "redirects")
 
 
 def make_live_server(root: Path, overrides=None):
@@ -198,6 +197,7 @@ class LiveVerifierTests(unittest.TestCase):
 
     def write_fixtures(self, date="2026-08-08", stories=7):
         edition = edition_payload(date, stories)
+        (self.root / "route-contract.js").write_text(CONTRACT_SOURCE)
         (self.root / "index.html").write_text(index_payload(date))
         (self.root / "app.js").write_text("app fixture")
         (self.root / "styles.css").write_text("styles fixture")
@@ -283,6 +283,32 @@ class LiveVerifierTests(unittest.TestCase):
         self.assertIn("/apple-touch-icon.png: expected exact 200 body", output)
         self.assertNotIn("verified_feed_only", output)
 
+    def test_verifier_checks_paths_derived_from_route_contract(self):
+        # The checked surface comes from the snapshot's route-contract.js: a
+        # path allowlisted there (and present in the snapshot) but missing from
+        # the live hostname must fail verification exactly like the
+        # hand-listed assets did. Adding a public path to the contract is
+        # enough for it to be live-verified — no second list to maintain.
+        contract = (self.root / "route-contract.js").read_text()
+        (self.root / "route-contract.js").write_text(
+            contract.replace('  "/sitemap.xml"', '  "/sitemap.xml",\n  "/brand-new.svg"')
+        )
+        (self.root / "brand-new.svg").write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
+        code, output = self.run_verifier({"/brand-new.svg": None})
+        self.assertNotEqual(code, 0)
+        self.assertIn("/brand-new.svg: expected exact 200 body", output)
+
+    def test_verifier_fails_loudly_when_a_contract_path_has_no_snapshot_file(self):
+        # A public path that names no root file in the snapshot is a broken
+        # contract: fail with a named line instead of crashing on the read.
+        contract = (self.root / "route-contract.js").read_text()
+        (self.root / "route-contract.js").write_text(
+            contract.replace('  "/sitemap.xml"', '  "/sitemap.xml",\n  "/phantom.svg"')
+        )
+        code, output = self.run_verifier()
+        self.assertNotEqual(code, 0)
+        self.assertIn("/phantom.svg: no snapshot file phantom.svg", output)
+
 
 class MiddlewareContractTests(unittest.TestCase):
     """The HSTS regression gate: the Pages middleware must keep serving a
@@ -291,6 +317,7 @@ class MiddlewareContractTests(unittest.TestCase):
     tests below, because the suite is stdlib-only and CI has no Node runtime."""
 
     MIDDLEWARE = Path(__file__).resolve().parents[1] / "functions" / "_middleware.js"
+    CONTRACT = Path(__file__).resolve().parents[1] / "route-contract.js"
 
     def test_hsts_set_on_redirect_404_and_passthrough_responses(self):
         source = self.MIDDLEWARE.read_text()
@@ -308,19 +335,24 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("new Response(null, {", source)
 
     def test_hsts_value_is_explicit_without_preload(self):
-        source = self.MIDDLEWARE.read_text()
-        self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', source)
-        header = re.search(r'hstsHeader = "([^"]+)"', source)
-        self.assertIsNotNone(header, "HSTS value must be explicit")
+        # The value now lives in route-contract.js, the single source of truth
+        # both edges import; the middleware applies it via the header setter.
+        middleware = self.MIDDLEWARE.read_text()
+        self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', middleware)
+        contract = self.CONTRACT.read_text()
+        header = re.search(r'hstsHeader = "([^"]+)"', contract)
+        self.assertIsNotNone(header, "HSTS value must be explicit in route-contract.js")
         self.assertIn("max-age=31536000", header.group(1))
         self.assertIn("includeSubDomains", header.group(1))
         self.assertNotIn("preload", header.group(1))
 
     def test_public_allowlist_and_redirect_semantics_kept(self):
-        source = self.MIDDLEWARE.read_text()
-        self.assertIn("publicPaths", source)
-        self.assertIn('["/daily", "/"]', source)
-        self.assertIn("status: 404", source)
+        middleware = self.MIDDLEWARE.read_text()
+        contract = self.CONTRACT.read_text()
+        self.assertIn("publicPaths", middleware)
+        self.assertIn('from "../route-contract.js"', middleware)
+        self.assertIn('["/daily", "/"]', contract)
+        self.assertIn("status: 404", middleware)
 
 
 class DeployScriptContractTests(unittest.TestCase):

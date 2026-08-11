@@ -50,6 +50,32 @@ def fetch(base: str, path: str, *, method: str = "GET") -> tuple[int, bytes, str
         return error.code, error.read(), error.headers.get("Location")
 
 
+def _route_contract(root: Path) -> tuple[set[str], dict[str, str]]:
+    """Read the edge route contract from the snapshot's route-contract.js —
+    the single source of truth for the public-path allowlist and the redirect
+    map. A shape drift fails loudly here rather than silently verifying a
+    stale surface; the unit suite pins the extractable shape.
+    """
+    source = (root / "route-contract.js").read_text()
+
+    def extract_set(name: str) -> set[str]:
+        match = re.search(rf"{name}\s*=\s*new Set\(\[(.*?)\]\);", source, re.S)
+        if match is None:
+            raise AssertionError(f"route-contract.js: could not find the {name} Set")
+        return set(re.findall(r'"([^"]+)"', match.group(1)))
+
+    def extract_map(name: str) -> dict[str, str]:
+        match = re.search(rf"{name}\s*=\s*new Map\(\[(.*?)\]\);", source, re.S)
+        if match is None:
+            raise AssertionError(f"route-contract.js: could not find the {name} Map")
+        pairs = re.findall(r'\["([^"]+)",\s*"([^"]+)"\]', match.group(1))
+        if len(pairs) != len(set(pair[0] for pair in pairs)):
+            raise AssertionError(f"route-contract.js: duplicate keys in the {name} Map")
+        return dict(pairs)
+
+    return extract_set("publicPaths"), extract_map("redirects")
+
+
 def json_feed_mismatch(local: bytes, live: bytes) -> str | None:
     """Compare the complete canonical JSON feed against the accepted edition.
 
@@ -150,25 +176,33 @@ def main() -> int:
     # share card and the iOS touch icon) are staged by deploy_daily.sh and
     # allowed through the worker allowlist, but nothing verified they actually
     # reached the live hostname; a deploy that dropped them again would have
-    # passed verification. Byte-check them like the other payload files.
-    for path, relative in {
-        "/": "index.html",
-        "/app.js": "app.js",
-        "/styles.css": "styles.css",
-        "/latest.json": "latest.json",
-        "/feed.xml": "feed.xml",
-        "/og-image.svg": "og-image.svg",
-        "/apple-touch-icon.png": "apple-touch-icon.png",
-        **fonts,
-    }.items():
+    # passed verification. Byte-check every allowlisted public path like the
+    # other payload files. The surface comes from route-contract.js — the one
+    # source of truth — so a path added there is verified here automatically
+    # instead of being silently skipped.
+    contract_path = args.root / "route-contract.js"
+    if not contract_path.is_file():
+        failures.append("route-contract.js: the snapshot is missing the route contract")
+        public_paths, redirects = set(), {}
+    else:
+        public_paths, redirects = _route_contract(args.root)
+    payload_files = {
+        path: "index.html" if path == "/" else path.lstrip("/")
+        for path in public_paths
+    }
+    for path, relative in {**payload_files, **fonts}.items():
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
-        expected = (args.root / relative).read_bytes()
+        expected_path = args.root / relative
+        if not expected_path.is_file():
+            failures.append(f"{path}: no snapshot file {relative} for the allowlisted path")
+            continue
+        expected = expected_path.read_bytes()
         if path == "/":
             body = without_cloudflare_beacon(body)
         if status != 200 or body != expected:
             failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
-    for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/og-image.svg", "/apple-touch-icon.png", "/robots.txt", "/sitemap.xml", *fonts):
+    for path in (*payload_files, *fonts):
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method="HEAD")
         if status != 200 or body:
             failures.append(f"HEAD {path}: expected empty 200, got {status} and {len(body)} bytes")
@@ -186,17 +220,6 @@ def main() -> int:
         if mismatch is not None:
             failures.append(mismatch)
 
-    redirects = {
-        "/index.html": "/",
-        "/daily": "/",
-        "/daily/": "/",
-        "/daily/index.html": "/",
-        "/daily/app.js": "/app.js",
-        "/daily/styles.css": "/styles.css",
-        "/daily/latest.json": "/latest.json",
-        "/daily/feed.xml": "/feed.xml",
-        "/daily/sitemap.xml": "/sitemap.xml",
-    }
     for path, target in redirects.items():
         request_path = f"{path}?deploy={cache_token}"
         expected_location = urljoin(args.base, f"{target}?deploy={cache_token}")
@@ -244,15 +267,6 @@ def main() -> int:
             status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method=method)
             if status != 404 or (method == "HEAD" and body):
                 failures.append(f"{method} {path}: expected empty 404, got {status} and {len(body)} bytes")
-
-    metadata = {
-        "/robots.txt": (args.root / "robots.txt").read_bytes(),
-        "/sitemap.xml": (args.root / "sitemap.xml").read_bytes(),
-    }
-    for path, expected in metadata.items():
-        status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
-        if status != 200 or body != expected:
-            failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
     if failures:
         print("\n".join(failures))
