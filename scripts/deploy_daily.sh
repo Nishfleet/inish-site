@@ -69,7 +69,10 @@ cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
    "$PUBLIC_DIR/"
 cp -R "$SNAPSHOT_ROOT/fonts" "$PUBLIC_DIR/"
 # Worker + wrangler config are the live edge path (Workers assets + routes).
-cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" "$DEPLOY_ROOT/"
+# route-contract.js is the module the worker imports, so it must ride beside
+# worker.js in the deploy root or the deployed worker cannot resolve it.
+cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" \
+   "$SNAPSHOT_ROOT/route-contract.js" "$DEPLOY_ROOT/"
 
 EDITION_DATE="$(jq -er '.date' "$SNAPSHOT_ROOT/latest.json")"
 STORY_COUNT="$(jq -er '.stories | length' "$SNAPSHOT_ROOT/latest.json")"

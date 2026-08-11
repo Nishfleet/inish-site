@@ -1,39 +1,8 @@
-// Live edge path is worker.js (Workers + assets). Keep this file's
-// publicPaths/redirects/HSTS identical — tests enforce the shared contract.
-const publicPaths = new Set([
-  "/",
-  "/app.js",
-  "/styles.css",
-  "/apple-touch-icon.png", // iOS home-screen icon, referenced by the generated head
-  "/og-image.svg", // social share card, referenced by the generated head
-  "/latest.json",
-  "/feed.xml",
-  "/robots.txt",
-  "/sitemap.xml"
-]);
-
-// Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
-// future face does not need a middleware edit, and tight enough that it cannot
-// serve anything but a woff2 from this one directory.
-const fontPath = /^\/fonts\/[a-z0-9-]+\.woff2$/;
-
-const redirects = new Map([
-  ["/index.html", "/"],
-  ["/daily", "/"],
-  ["/daily/", "/"],
-  ["/daily/index.html", "/"],
-  ["/daily/app.js", "/app.js"],
-  ["/daily/styles.css", "/styles.css"],
-  ["/daily/latest.json", "/latest.json"],
-  ["/daily/feed.xml", "/feed.xml"],
-  ["/daily/sitemap.xml", "/sitemap.xml"]
-]);
-
-// The site is HTTPS-only, so every response from the middleware can carry HSTS.
-// No subdomains exist yet; includeSubDomains keeps any future one under the
-// same policy. Preload is deliberately not claimed: it is a permanent public
-// commitment and nothing in the repository justifies it.
-const hstsHeader = "max-age=31536000; includeSubDomains";
+// Pages middleware mirror of the live edge path (worker.js). The route
+// contract (publicPaths, font pattern, redirects, HSTS) lives in the shared
+// route-contract.js — the single source of truth both edges import, which the
+// tests enforce.
+import { publicPaths, fontPath, redirects, hstsHeader } from "../route-contract.js";
 
 function withSecurityHeaders(response) {
   response.headers.set("Strict-Transport-Security", hstsHeader);
