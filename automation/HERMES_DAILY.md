@@ -31,6 +31,12 @@ deploying or touching any token. It prints `verified_live_current` when live
 matches origin/main, or `LIVE_IS_STALE` with the named failing files and routes
 otherwise. Run it before trusting that a merged change reached the site.
 
+The repo also schedules it: the `Live current check` workflow
+(`.github/workflows/live-current-check.yml`) runs it hourly on the VPS
+self-hosted runner with no secrets, and can be triggered by hand from the
+Actions tab (`workflow_dispatch`). A stale check reds that run with
+`LIVE_IS_STALE`; the fix is still a deploy, not a code edit.
+
 ## Who this is for
 
 One reader: Nish, a **non-technical founder**. He is building and selling products, not reading code. Write for him and nobody else.
