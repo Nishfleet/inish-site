@@ -1,0 +1,49 @@
+# Scheduled caller for scripts/check_live_current.sh.
+#
+# deploy_daily.sh verifies live parity only at deploy time, so a daily
+# publisher run that never fires (a missed schedule, a stalled agent job)
+# leaves inish.in silently stale until the next deploy happens to run — a
+# real stall lasted 32 hours on 2026-08-10 while merged head metadata and a
+# mobile fix sat undelivered. check_live_current.sh closes that blind spot
+# with a deploy-free, token-free parity check; this workflow is its
+# scheduled caller.
+#
+# The job deliberately carries no secrets: the script fetches origin/main
+# fresh and byte-compares the live hostname against that snapshot. A stale
+# live site fails the run loudly — the run goes red with LIVE_IS_STALE and
+# the named failing files and routes, visible in the Actions tab without
+# anyone polling the hostname.
+#
+# `schedule` fires only for workflows on the default branch. The workflow is
+# also manually dispatchable (Actions tab or `gh workflow run`) — the daily
+# runbook asks for exactly that before trusting that a merged change reached
+# the site.
+name: Live current check
+
+on:
+  schedule:
+    # Hourly, UTC. The daily publisher targets Asia/Kolkata; an hourly sweep
+    # bounds staleness detection to about an hour regardless of when the
+    # publisher run was supposed to fire.
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-current-check
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: [self-hosted, linux, x64, vps-verify]
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Compare the live hostname with origin/main
+        # Exit 0 prints verified_live_current; exit 1 prints LIVE_IS_STALE
+        # with the failing stage, and fails the run.
+        run: bash scripts/check_live_current.sh
