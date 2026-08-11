@@ -169,6 +169,7 @@ def make_live_server(root: Path, overrides=None):
     routes["/apple-touch-icon.png"] = (root / "apple-touch-icon.png").read_bytes()
     for font in (root / "fonts").glob("*.woff2"):
         routes[f"/fonts/{font.name}"] = font.read_bytes()
+    routes["/fonts/OFL.txt"] = (root / "fonts" / "OFL.txt").read_bytes()
     if overrides:
         routes.update(overrides)
 
@@ -190,6 +191,7 @@ class LiveVerifierTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         (self.root / "fonts").mkdir(parents=True)
         (self.root / "fonts" / "archivo-700.woff2").write_bytes(b"\x00\x01" * 8)
+        (self.root / "fonts" / "OFL.txt").write_text("SIL OFL 1.1 fixture\n")
         (self.root / "data" / "editions").mkdir(parents=True)
         self.write_fixtures()
 
