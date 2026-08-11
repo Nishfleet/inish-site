@@ -23,12 +23,11 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT
-LEGACY_DAILY = ROOT / "daily"
-# app.js and styles.css are the legacy daily assets; og-image.svg is the static
-# social share card referenced by the generated head, so it must be copied to
-# the root alongside them on every build. apple-touch-icon.png is pinned at the
-# root: it has no daily/ source, so the entry below is a presence check that
-# fails the build loudly if the committed icon ever goes missing.
+# These committed root assets are canonical: the generated head references
+# every one of them, and nothing here may overwrite them. The old build copied
+# them from a stale daily/ mirror, which silently reverted merged root fixes
+# on every publish (drift classes #27 and #33); the mirror is gone and the
+# build now only fails loudly if a referenced root asset goes missing.
 ASSETS = ("app.js", "styles.css", "og-image.svg", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
@@ -485,28 +484,26 @@ def sitemap() -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
 
 
-def copy_assets() -> None:
+def check_root_assets() -> None:
+    """The generated page references these committed root assets; the build
+    fails loudly if any of them is missing. The root is canonical — nothing is
+    ever copied over it from a mirror, because a stale mirror is exactly what
+    kept reverting merged root fixes (see the #27 and #33 drift classes)."""
     for name in ASSETS:
-        source = LEGACY_DAILY / name
-        destination = DAILY / name
-        if source.is_file() and source.resolve() != destination.resolve():
-            shutil.copyfile(source, destination)
-        elif not destination.is_file():
-            raise FileNotFoundError(f"Missing Daily Reads asset: {source}")
+        asset = DAILY / name
+        if not asset.is_file():
+            raise FileNotFoundError(f"Missing root asset referenced by the daily page: {asset}")
 
 
 def main() -> None:
     latest = load_latest()
     DAILY.mkdir(parents=True, exist_ok=True)
-    copy_assets()
-    archive_roots = [DAILY / "archive"]
-    if DAILY == ROOT:
-        archive_roots.append(LEGACY_DAILY / "archive")
-    for archive_root in set(archive_roots):
-        if archive_root.is_symlink() or archive_root.is_file():
-            archive_root.unlink()
-        elif archive_root.is_dir():
-            shutil.rmtree(archive_root)
+    check_root_assets()
+    archive_root = DAILY / "archive"
+    if archive_root.is_symlink() or archive_root.is_file():
+        archive_root.unlink()
+    elif archive_root.is_dir():
+        shutil.rmtree(archive_root)
     (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (DAILY / "feed.xml").write_text(rss(latest), encoding="utf-8")
