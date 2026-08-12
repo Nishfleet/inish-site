@@ -119,14 +119,15 @@ class BuildDailyTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.editions = self.root / "data" / "editions"
         self.public = self.root / "public"
-        self.legacy_daily = self.root / "legacy-daily"
         self.editions.mkdir(parents=True)
-        self.legacy_daily.mkdir()
-        (self.legacy_daily / "app.js").write_text("app")
-        (self.legacy_daily / "styles.css").write_text("styles")
-        (self.legacy_daily / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        self.public.mkdir()
+        # The committed root assets the generated head references. They are
+        # canonical: the build must never overwrite them, only check they exist.
+        (self.public / "app.js").write_text("app")
+        (self.public / "styles.css").write_text("styles")
+        (self.public / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
         # A real 1x1 PNG so the icon fixture is a valid image, not just bytes.
-        (self.legacy_daily / "apple-touch-icon.png").write_bytes(
+        (self.public / "apple-touch-icon.png").write_bytes(
             base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
         )
 
@@ -141,7 +142,6 @@ class BuildDailyTests(unittest.TestCase):
         with (
             patch.object(builder, "EDITIONS", self.editions),
             patch.object(builder, "DAILY", self.public),
-            patch.object(builder, "LEGACY_DAILY", self.legacy_daily),
         ):
             builder.main()
 
@@ -494,23 +494,38 @@ class BuildDailyTests(unittest.TestCase):
             with self.subTest(candidate_count=candidate_count):
                 self.assertRejects(edition(candidate_count=candidate_count), "candidate_count")
 
+    def test_keeps_committed_root_assets_untouched(self):
+        """A stale daily-style mirror must never overwrite canonical root assets.
+
+        This is the regression test for the drift class that #27, #33/#45, and
+        #41 each fixed by hand-syncing the builder's daily/ mirror with merged
+        root assets: the old build silently reverted the merged fix on the next
+        publish until the mirror was re-synced by hand.
+        """
+        self.write(edition())
+        canonical = (self.public / "styles.css").read_text()
+        self.build()
+        self.assertEqual((self.public / "styles.css").read_text(), canonical)
+        self.assertEqual((self.public / "app.js").read_text(), "app")
+        self.assertEqual((self.public / "og-image.svg").read_text(), '<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+
+    def test_build_fails_loudly_when_a_root_asset_is_missing(self):
+        self.write(edition())
+        (self.public / "styles.css").unlink()
+        with self.assertRaisesRegex(FileNotFoundError, "styles.css"):
+            self.build()
+
     def test_removes_stale_archive_output(self):
         self.write(edition())
         stale = self.public / "archive" / "2026-07-31"
         stale.mkdir(parents=True)
         (stale / "index.html").write_text("stale")
-        legacy_stale = self.legacy_daily / "archive" / "2026-07-31"
-        legacy_stale.mkdir(parents=True)
-        (legacy_stale / "index.html").write_text("stale")
         with (
             patch.object(builder, "EDITIONS", self.editions),
-            patch.object(builder, "ROOT", self.public),
             patch.object(builder, "DAILY", self.public),
-            patch.object(builder, "LEGACY_DAILY", self.legacy_daily),
         ):
             builder.main()
         self.assertFalse(stale.exists())
-        self.assertFalse(legacy_stale.exists())
         self.assertFalse((self.public / "archive").exists())
 
 
