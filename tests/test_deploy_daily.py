@@ -178,6 +178,81 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn('[[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]', script)
         self.assertIn("Refusing to roll the live site back", script)
 
+    # The deploy loop line is "npx --yes wrangler deploy \" + newline; the
+    # plain substring "wrangler deploy" also prefixes "wrangler deployments
+    # list", so the loop position must use the backslash-newline form.
+    DEPLOY_LOOP_LINE = 'wrangler deploy \\\n'
+
+    def test_verification_failure_rolls_back_to_the_captured_predeploy_version(self):
+        # A successful-but-bad publish (wrong bytes, wrong identity, broken
+        # routing) is not protected by the deploy retry loop: the wrapper must
+        # capture the version serving 100% of traffic BEFORE deploying, then on
+        # exhausted live verification restore exactly that version with
+        # `wrangler rollback <VERSION_ID> --name inish-site`.
+        script = DEPLOY_SCRIPT.read_text()
+        self.assertIn("wrangler deployments list --name inish-site --json", script)
+        self.assertIn('PRE_DEPLOY_VERSION="$(', script)
+        capture_pos = script.index("wrangler deployments list")
+        deploy_pos = script.index(self.DEPLOY_LOOP_LINE)
+        self.assertLess(
+            capture_pos, deploy_pos,
+            "the pre-deploy version must be captured before wrangler deploy runs",
+        )
+        # The rollback must target the exact captured version id, never a
+        # literal or a different variable.
+        self.assertIn(
+            'npx --yes wrangler rollback "$PRE_DEPLOY_VERSION" --name inish-site',
+            script,
+        )
+        rollback_pos = script.index("npx --yes wrangler rollback")
+        self.assertLess(
+            deploy_pos, rollback_pos,
+            "rollback must come after the deploy",
+        )
+        self.assertLess(
+            script.index("failed live verification"), rollback_pos,
+            "rollback must be the response to the twelve-attempt verification loop exhausting",
+        )
+
+    def test_restored_live_identity_is_reverified_after_rollback(self):
+        # The rollback must prove the restoration with the same verification
+        # path the deploy uses (verify_live.py), pointed at the pre-deploy
+        # identity — never a lighter second probe — and report the restored
+        # outcome in the output.
+        script = DEPLOY_SCRIPT.read_text()
+        verify_count = script.count("python3 scripts/verify_live.py")
+        self.assertGreaterEqual(
+            verify_count, 2,
+            "the restored identity must be re-verified with the same verification path",
+        )
+        rollback_pos = script.index('npx --yes wrangler rollback "$PRE_DEPLOY_VERSION"')
+        self.assertLess(
+            rollback_pos, script.rfind("python3 scripts/verify_live.py"),
+            "the restored live identity must be re-verified after the rollback",
+        )
+        # The re-verification targets the pre-deploy edition (the date that was
+        # live before publishing and the commit that published it), not the
+        # accepted edition.
+        self.assertIn('--edition-date "$LIVE_EDITION_DATE"', script)
+        self.assertIn('--commit "$PRE_DEPLOY_COMMIT"', script)
+        self.assertIn("rollback_restored", script)
+
+    def test_deploy_is_not_attempted_when_the_predeploy_version_cannot_be_captured(self):
+        # An unreversible deploy must not start: if the version currently
+        # serving inish-site cannot be determined, the script fails loudly
+        # BEFORE wrangler deploy runs, never publishing without a rollback
+        # target.
+        script = DEPLOY_SCRIPT.read_text()
+        guard = "cannot determine the pre-deploy version of worker inish-site"
+        self.assertIn(guard, script)
+        self.assertIn('if [[ -z "$PRE_DEPLOY_VERSION" ]]', script)
+        guard_pos = script.index(guard)
+        deploy_pos = script.index(self.DEPLOY_LOOP_LINE)
+        self.assertLess(
+            guard_pos, deploy_pos,
+            "the capture guard must fail before wrangler deploy runs",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
