@@ -33,7 +33,11 @@ LEGACY_DAILY = ROOT / "daily"
 ASSETS = ("app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
-STORY_FIELDS = {"title", "url", "source", "section", "summary", "fact", "take", "caveat"}
+# evidence_url is the exact source the fact was verified against. It may equal
+# url (the primary source carries the claim) or be a separate HTTPS URL — a
+# discussion thread, a data page, a primary document — when the fact's evidence
+# lives elsewhere. Without it a "Checked" fact is a bare assertion.
+STORY_FIELDS = {"title", "url", "evidence_url", "source", "section", "summary", "fact", "take", "caveat"}
 
 MAX_STORIES = 8
 MAX_PER_SECTION = 4
@@ -124,23 +128,23 @@ def canonical_url(url: str) -> str:
     return f"{host}{path}"
 
 
-def validate_url(value: object) -> str:
+def validate_url(value: object, label: str = "Story") -> str:
     if not isinstance(value, str):
-        raise ValueError("Story URL must be a string")
+        raise ValueError(f"{label} URL must be a string")
     url = str(value)
     parsed = urlparse(url)
     hostname = parsed.hostname
     if parsed.scheme != "https" or not parsed.netloc or not hostname or parsed.username or parsed.password:
-        raise ValueError(f"Only public HTTPS story URLs are allowed: {url}")
+        raise ValueError(f"Only public HTTPS {label} URLs are allowed: {url}")
     try:
         address = ipaddress.ip_address(hostname)
     except ValueError:
         lowered = hostname.lower().rstrip(".")
         if "." not in lowered or lowered == "localhost" or lowered.endswith((".localhost", ".local", ".internal")):
-            raise ValueError(f"Only public HTTPS story URLs are allowed: {url}") from None
+            raise ValueError(f"Only public HTTPS {label} URLs are allowed: {url}") from None
     else:
         if not address.is_global:
-            raise ValueError(f"Only public HTTPS story URLs are allowed: {url}")
+            raise ValueError(f"Only public HTTPS {label} URLs are allowed: {url}")
     return url
 
 
@@ -250,6 +254,10 @@ def validate_story(story: object, path: Path, published: dict[str, str], seen: s
     if not isinstance(story, dict) or set(story) != STORY_FIELDS:
         raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
     url = validate_url(story["url"])
+    # The fact's evidence may be the story itself or a separate source (a
+    # discussion thread, a data page). It must exist and be a public HTTPS URL
+    # either way: a "Checked" claim with no reachable evidence is rejected.
+    evidence_url = validate_url(story["evidence_url"], label="evidence")
     key = canonical_url(url)
     if key in seen:
         raise ValueError(f"{path}: duplicate URL {url}")
@@ -264,6 +272,7 @@ def validate_story(story: object, path: Path, published: dict[str, str], seen: s
     return {
         "title": title,
         "url": url,
+        "evidence_url": evidence_url,
         "source": validate_text(story["source"], "source", 2, 100),
         "section": section,
         "summary": validate_text(story["summary"], "summary", 25, 700),
@@ -322,7 +331,7 @@ def story_card(story: dict, index: int, prominence: str) -> str:
           <div class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></div>
           <h2><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></h2>
           <p>{esc(story['summary'])}</p>
-          <p class="fact"><strong>Checked</strong> <a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
+          <p class="fact"><strong>Checked</strong> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
           <p class="take"><strong>Nish</strong> {esc(story['take'])}</p>
           <p class="caveat"><strong>But</strong> {esc(story['caveat'])}</p>
           <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} ↗</a>
