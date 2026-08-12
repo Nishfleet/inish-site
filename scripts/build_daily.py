@@ -24,12 +24,13 @@ ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
-# app.js and styles.css are the legacy daily assets; og-image.svg is the static
-# social share card referenced by the generated head, so it must be copied to
-# the root alongside them on every build. apple-touch-icon.png is pinned at the
-# root: it has no daily/ source, so the entry below is a presence check that
-# fails the build loudly if the committed icon ever goes missing.
-ASSETS = ("app.js", "styles.css", "og-image.svg", "apple-touch-icon.png")
+# app.js and styles.css are the legacy daily assets; og-image.svg is the
+# compatibility share-card source (kept reachable for older references), copied
+# to the root alongside them on every build. og-image.png is the raster card the
+# generated head actually references; like apple-touch-icon.png it is pinned at
+# the root with no daily/ source, so its entry is a presence check that fails
+# the build loudly if the committed card ever goes missing.
+ASSETS = ("app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
 # evidence_url is the exact source the fact was verified against. It may equal
@@ -440,15 +441,15 @@ def page(edition: dict) -> str:
   <meta name="description" content="{esc(description)}">
   <meta property="og:title" content="{esc(title)}">
   <meta property="og:description" content="{esc(description)}">
-  <meta property="og:image" content="https://inish.in/og-image.svg">
+  <meta property="og:image" content="https://inish.in/og-image.png">
   <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
-  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{esc(title)}">
   <meta name="twitter:description" content="{esc(description)}">
-  <meta name="twitter:image" content="https://inish.in/og-image.svg">
+  <meta name="twitter:image" content="https://inish.in/og-image.png">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
