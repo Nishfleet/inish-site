@@ -1,3 +1,4 @@
+import json
 import re
 import unittest
 from pathlib import Path
@@ -5,15 +6,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MIDDLEWARE = ROOT / "functions" / "_middleware.js"
 WORKER = ROOT / "worker.js"
+DEPLOY_SCRIPT = ROOT / "scripts" / "deploy_daily.sh"
+CONTRACT = ROOT / "public-paths.json"
+REDIRECTS_FILE = ROOT / "_redirects"
 PAGE_404 = ROOT / "404.html"
 
 # Cloudflare runs functions/_middleware.js as an ES module, so there is no local
 # Pages runtime to import it into; the documented verification for the file is
-# static (see docs/plans/2026-06-18-001-feat-agent-surface-plan.md). These tests
-# follow the DeployScriptContractTests pattern: they extract the allowlist, font
-# pattern, and redirect map straight from the source and evaluate the
-# middleware's exact deny rule against them. If the file's shape drifts from the
-# extractors, the tests fail loudly instead of silently checking something else.
+# static (see docs/plans/2026-06-18-001-feat-agent-surface-plan.md). The public
+# route contract has ONE source of truth — public-paths.json — and both edge
+# implementations read it. These tests load that file directly and evaluate the
+# middleware's exact deny rule against it, so adding a public path is a single
+# data edit plus the file on the deploy copy line; it must not require editing
+# this suite.
 
 # The deny branch must stay anchored to these two checks; a catch-all or a
 # widened allowlist is exactly the regression this suite exists to catch.
@@ -28,37 +33,59 @@ def _source():
     return text
 
 
-def _extract_set(text, name):
-    match = re.search(rf"{name}\s*=\s*new Set\(\[(.*?)\]\);", text, re.S)
-    assert match, f"could not find the {name} Set in {MIDDLEWARE.name}"
-    return set(re.findall(r'"([^"]+)"', match.group(1)))
+def _load_contract():
+    return json.loads(CONTRACT.read_text())
 
 
-def _extract_map(text, name):
-    match = re.search(rf"{name}\s*=\s*new Map\(\[(.*?)\]\);", text, re.S)
-    assert match, f"could not find the {name} Map in {MIDDLEWARE.name}"
-    pairs = re.findall(r'\["([^"]+)",\s*"([^"]+)"\]', match.group(1))
-    return dict(pairs)
+def _payload_root_files():
+    """The root files on deploy_daily.sh's payload copy line (minus the
+    edge-internal 404.html/_redirects), each mapped to its public path."""
+    script = DEPLOY_SCRIPT.read_text().replace("\\\n", " ")
+    matches = list(re.finditer(r'cp (\"\$SNAPSHOT_ROOT/[A-Za-z0-9._-]+\"\s+)+\"\$PUBLIC_DIR/\"', script))
+    if len(matches) != 1:
+        raise AssertionError(
+            f"expected exactly one root-file cp line in {DEPLOY_SCRIPT.name}, found {len(matches)}"
+        )
+    return re.findall(r'\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"', matches[0].group(0))
 
 
-def _extract_font_pattern(text):
-    match = re.search(r"fontPath\s*=\s*/(.*?)/;", text, re.S)
-    assert match, f"could not find the fontPath pattern in {MIDDLEWARE.name}"
-    # The JS regex is already anchored (^...$) and uses only constructs that
-    # mean the same thing in Python re.
-    return re.compile(match.group(1))
+def _deployed_public_surface():
+    """The public surface the deploy payload ships: "/" for index.html, every
+    other root file on the copy line except the edge-internal 404.html and
+    _redirects, plus the OFL license text that rides inside the fonts/
+    directory copy."""
+    paths = {"/"}
+    for name in _payload_root_files():
+        if name in ("404.html", "_redirects"):
+            continue
+        paths.add("/" if name == "index.html" else f"/{name}")
+    paths.add("/fonts/OFL.txt")
+    return paths
+
+
+def _redirects_file_map():
+    """The redirect map carried by the static _redirects artifact, which must
+    mirror the edge contract (the Pages path is no longer deployed, so this is
+    the only independent copy of the redirect list)."""
+    result = {}
+    for line in REDIRECTS_FILE.read_text().splitlines():
+        source, target, code = line.split()
+        assert code == "301", f"unexpected redirect code in {REDIRECTS_FILE.name}: {line}"
+        result[source] = target
+    return result
 
 
 class MiddlewareContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         text = _source()
-        cls.public_paths = _extract_set(text, "publicPaths")
-        cls.redirects = _extract_map(text, "redirects")
-        cls.font_path = _extract_font_pattern(text)
+        cls.contract = _load_contract()
+        cls.public_paths = set(cls.contract["publicPaths"])
+        cls.redirects = dict(cls.contract["redirects"])
+        cls.font_path = re.compile(cls.contract["fontPath"])
 
     def middleware_status(self, path):
-        """The middleware's decision for a pathname, using the values it ships."""
+        """The middleware's decision for a pathname, using the contract it ships."""
         if path in self.redirects:
             return 301
         if path in self.public_paths or self.font_path.fullmatch(path):
@@ -69,42 +96,30 @@ class MiddlewareContractTests(unittest.TestCase):
         for asset in ("/og-image.svg", "/apple-touch-icon.png"):
             self.assertIn(asset, self.public_paths)
 
-    def test_allowlist_is_exactly_the_known_surface(self):
-        # Exact equality is the narrowness guard: both metadata assets and the
-        # font license text are present and nothing else was slipped in.
-        self.assertEqual(
-            self.public_paths,
-            {
-                "/",
-                "/app.js",
-                "/styles.css",
-                "/apple-touch-icon.png",
-                "/og-image.svg",
-                "/latest.json",
-                "/feed.xml",
-                "/robots.txt",
-                "/sitemap.xml",
-                "/fonts/OFL.txt",
-            },
-        )
+    def test_allowlist_is_exactly_the_deployed_surface(self):
+        # Exact equality is the narrowness guard, anchored on real artifacts
+        # instead of a literal: the allowlist must be exactly the public files
+        # the deploy payload ships — the root files on deploy_daily.sh's copy
+        # line (minus the edge-internal 404.html/_redirects) plus the license
+        # text that ships inside fonts/. A path addition needs the data edit
+        # and the file on the copy line, never a test edit.
+        self.assertEqual(self.public_paths, _deployed_public_surface())
 
-    def test_feed_paths_and_redirects_are_unchanged(self):
-        self.assertEqual(
-            self.redirects,
-            {
-                "/index.html": "/",
-                "/daily": "/",
-                "/daily/": "/",
-                "/daily/index.html": "/",
-                "/daily/app.js": "/app.js",
-                "/daily/styles.css": "/styles.css",
-                "/daily/latest.json": "/latest.json",
-                "/daily/feed.xml": "/feed.xml",
-                "/daily/sitemap.xml": "/sitemap.xml",
-            },
-        )
+    def test_every_public_path_names_a_real_file(self):
+        for path in self.public_paths:
+            if path == "/":
+                continue
+            self.assertTrue(
+                (ROOT / path.lstrip("/")).is_file(),
+                f"public path names a missing file: {path}",
+            )
+
+    def test_feed_paths_are_static_and_redirects_match_the_pages_file(self):
         for feed in ("/", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml", "/app.js", "/styles.css"):
             self.assertEqual(self.middleware_status(feed), "static")
+        # The edge contract and the static _redirects artifact must agree
+        # exactly; either one drifting alone is a contract break.
+        self.assertEqual(self.redirects, _redirects_file_map())
 
     def test_metadata_assets_reach_static_layer_and_arbitrary_paths_stay_404(self):
         cases = {
@@ -162,39 +177,16 @@ class MiddlewareContractTests(unittest.TestCase):
                 self.assertIn('request.method === "HEAD"', source)
                 self.assertIn("new Response(null", source)
                 self.assertIn('new Response("Not found"', source)
+                # The route data comes from the one source of truth, never from
+                # inline literals in the edge files.
+                self.assertIn("public-paths.json", source)
+                self.assertNotIn("new Set([", source)
+                self.assertNotIn("new Map([", source)
 
-        # Allowlist keeps only the known surface plus the OFL license text the
-        # shipped stylesheet references; no new redirect, the deny surface still
-        # 404s, and the 404 asset itself stays internal.
-        self.assertEqual(
-            self.public_paths,
-            {
-                "/",
-                "/app.js",
-                "/styles.css",
-                "/apple-touch-icon.png",
-                "/og-image.svg",
-                "/latest.json",
-                "/feed.xml",
-                "/robots.txt",
-                "/sitemap.xml",
-                "/fonts/OFL.txt",
-            },
-        )
-        self.assertEqual(
-            self.redirects,
-            {
-                "/index.html": "/",
-                "/daily": "/",
-                "/daily/": "/",
-                "/daily/index.html": "/",
-                "/daily/app.js": "/app.js",
-                "/daily/styles.css": "/styles.css",
-                "/daily/latest.json": "/latest.json",
-                "/daily/feed.xml": "/feed.xml",
-                "/daily/sitemap.xml": "/sitemap.xml",
-            },
-        )
+        # The allowlist is exactly the deployed public surface and the deny
+        # surface still 404s; the 404 asset itself stays internal.
+        self.assertEqual(self.public_paths, _deployed_public_surface())
+        self.assertEqual(self.redirects, _redirects_file_map())
         for path in ("/404.html", "/admin", "/secrets.json", "/daily/2026-08-09"):
             with self.subTest(denied=path):
                 self.assertEqual(self.middleware_status(path), 404)

@@ -1,3 +1,4 @@
+import json
 import re
 import shutil
 import tempfile
@@ -114,18 +115,43 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn('"ASSETS"', wrangler)
 
     def test_worker_and_pages_middleware_share_the_route_contract(self):
-        # Keep the two edge sources honest: allowlist, redirects, HSTS string.
-        worker = WORKER.read_text()
-        middleware = MIDDLEWARE.read_text()
-        for needle in (
-            '"/og-image.svg"',
-            '"/apple-touch-icon.png"',
-            'max-age=31536000; includeSubDomains',
-            "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)",
-            '["/daily", "/"]',
-        ):
-            self.assertIn(needle, worker)
-            self.assertIn(needle, middleware)
+        # The public route contract has one source of truth (public-paths.json);
+        # both edge sources must read it — never inline their own literals —
+        # and the deploy must ship the file beside worker.js so the edge can
+        # resolve the import at deploy time.
+        contract = json.loads((ROOT / "public-paths.json").read_text())
+        self.assertEqual(contract["hstsHeader"], "max-age=31536000; includeSubDomains")
+        self.assertIn("/og-image.svg", contract["publicPaths"])
+        self.assertIn("/apple-touch-icon.png", contract["publicPaths"])
+        self.assertIn("/fonts/OFL.txt", contract["publicPaths"])
+        self.assertIn("/daily/", contract["redirects"])
+        for source in (WORKER.read_text(), MIDDLEWARE.read_text()):
+            self.assertIn("public-paths.json", source)
+            self.assertIn("!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)", source)
+            self.assertNotIn("new Set([", source, "route data must not be inlined in the edge source")
+            self.assertNotIn("new Map([", source, "route data must not be inlined in the edge source")
+        deploy = DEPLOY_SCRIPT.read_text()
+        self.assertIn('"$SNAPSHOT_ROOT/public-paths.json"', deploy)
+        self.assertLess(deploy.index("public-paths.json"), deploy.index("wrangler deploy"))
+
+    def test_deploy_payload_matches_the_public_path_allowlist(self):
+        # The copy line and public-paths.json are the two artifacts that must
+        # agree: every allowlisted root file ships in the payload, and every
+        # payload root file (except the edge-internal 404.html/_redirects) is
+        # allowlisted. The middleware suite asserts the full bidirectional
+        # equality; here we pin the deploy side.
+        contract = json.loads((ROOT / "public-paths.json").read_text())
+        allowlisted = {name for name in payload_root_files() if name not in ("404.html", "_redirects")}
+        for path in contract["publicPaths"]:
+            if path == "/":
+                continue
+            name = path.lstrip("/")
+            if "/" in name:
+                continue  # fonts/OFL.txt ships inside the fonts/ directory copy
+            self.assertIn(name, allowlisted, f"allowlisted {path} is missing from the deploy copy line")
+        for name in allowlisted:
+            expected = "/" if name == "index.html" else f"/{name}"
+            self.assertIn(expected, contract["publicPaths"], f"deploy ships {name} but it is not allowlisted")
 
     def test_deploy_loads_fleet_token_when_env_is_empty(self):
         script = DEPLOY_SCRIPT.read_text()
