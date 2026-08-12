@@ -587,6 +587,28 @@ class BuildDailyTests(unittest.TestCase):
             with self.subTest(candidate_count=candidate_count):
                 self.assertRejects(edition(candidate_count=candidate_count), "candidate_count")
 
+    def test_committed_surface_matches_the_newest_accepted_edition(self):
+        # Deliberately NOT patched to temp dirs: the committed generated
+        # surface must equal exactly what the builder renders from the newest
+        # accepted edition. Observed 2026-08-12: the published note claimed
+        # "Four stories survived the check" while the accepted edition (and the
+        # rendered page's own "2 kept" label) said two, so the live page, RSS,
+        # and JSON promised something the edition never said. Any drift between
+        # the accepted edition and the committed surface must fail here.
+        latest = builder.load_latest()
+        self.assertEqual(
+            (builder.ROOT / "latest.json").read_text(encoding="utf-8"),
+            json.dumps(latest, indent=2, ensure_ascii=False) + "\n",
+        )
+        self.assertEqual(
+            (builder.ROOT / "feed.xml").read_text(encoding="utf-8"),
+            builder.rss(latest),
+        )
+        self.assertEqual(
+            (builder.ROOT / "index.html").read_text(encoding="utf-8"),
+            builder.page(latest),
+        )
+
     def test_removes_stale_archive_output(self):
         self.write(edition())
         stale = self.public / "archive" / "2026-07-31"
