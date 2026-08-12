@@ -63,7 +63,7 @@ git archive --format=tar FETCH_HEAD | tar -x -C "$SNAPSHOT_ROOT"
 # edge logic lives in worker.js.
 cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
    "$SNAPSHOT_ROOT/app.js" "$SNAPSHOT_ROOT/styles.css" \
-   "$SNAPSHOT_ROOT/og-image.svg" "$SNAPSHOT_ROOT/apple-touch-icon.png" \
+   "$SNAPSHOT_ROOT/og-image.svg" "$SNAPSHOT_ROOT/og-image.png" "$SNAPSHOT_ROOT/apple-touch-icon.png" \
    "$SNAPSHOT_ROOT/latest.json" "$SNAPSHOT_ROOT/feed.xml" \
    "$SNAPSHOT_ROOT/robots.txt" "$SNAPSHOT_ROOT/sitemap.xml" \
    "$SNAPSHOT_ROOT/_redirects" \
