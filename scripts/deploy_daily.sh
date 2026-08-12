@@ -39,6 +39,7 @@ ACCEPTED_SHA="$(git rev-parse FETCH_HEAD)"
 
 WORK_DIR="$(mktemp -d /tmp/inish-daily-deploy.XXXXXX)"
 SNAPSHOT_ROOT="$WORK_DIR/snapshot"
+PRE_SNAPSHOT_ROOT="$WORK_DIR/pre-snapshot"
 DEPLOY_ROOT="$WORK_DIR/deploy"
 PUBLIC_DIR="$DEPLOY_ROOT/public"
 # shellcheck disable=SC2329  # Invoked by trap.
@@ -119,6 +120,24 @@ fi
 # accepted edition would sit un-deployed for a day on a transient failure (a
 # read-only window, a network blip). Retry the same payload a bounded number of
 # times and fail loudly only after the last attempt.
+#
+# A post-deploy verification failure must be able to restore the state that
+# served inish.in before this publish, so the version currently serving 100% of
+# traffic is captured BEFORE deploying, and bound to the SHA about to be
+# published. Without a rollback target an unreversible deploy must not start.
+PRE_DEPLOY_VERSION="$(
+  (
+    cd "$DEPLOY_ROOT" && npx --yes wrangler deployments list --name inish-site --json \
+    | jq -r '.[0]?.versions[]? | select(.percentage == 100) | .version_id' \
+    | head -n 1
+  ) || true
+)"
+if [[ -z "$PRE_DEPLOY_VERSION" ]]; then
+  echo "rollback_target: cannot determine the pre-deploy version of worker inish-site; refusing to deploy $ACCEPTED_SHA without a rollback target" >&2
+  exit 1
+fi
+echo "rollback_target: version $PRE_DEPLOY_VERSION currently serves worker inish-site; about to publish $ACCEPTED_SHA" >&2
+
 DEPLOY_ATTEMPTS=3
 DEPLOY_FAILURE=""
 for attempt in $(seq 1 "$DEPLOY_ATTEMPTS"); do
@@ -151,5 +170,40 @@ done
 
 echo "Cloudflare deployed, but the accepted edition failed live verification. Failing stage:" >&2
 printf '%s\n' "$VERIFY_STAGE" >&2
+
+# The retry loop above protects a failed deploy command, not a successful bad
+# publish: when the new Worker serves wrong bytes, wrong identity, or broken
+# routing for all twelve attempts, restore the version that served 100% of
+# traffic before this deploy, then prove the restoration with the same
+# verifier the deploy itself uses.
+if ! (cd "$DEPLOY_ROOT" && npx --yes wrangler rollback "$PRE_DEPLOY_VERSION" --name inish-site); then
+  echo "rollback_failed: worker inish-site is left serving an unverified deployment; deploy of $ACCEPTED_SHA failed live verification and wrangler rollback to version $PRE_DEPLOY_VERSION also failed — a human must roll worker inish-site back to version $PRE_DEPLOY_VERSION" >&2
+  echo "The accepted edition in the repository was left untouched; it is NOT confirmed live." >&2
+  exit 1
+fi
+echo "rolled_back: worker inish-site restored to version $PRE_DEPLOY_VERSION; re-verifying the restored identity" >&2
+
+# Re-verify the restored live identity with the same verification path the
+# deploy uses (verify_live.py against a pristine snapshot), pointed at the
+# pre-deploy edition: the daily publish commit for the edition date that was
+# live before this deploy.
+mkdir -p "$PRE_SNAPSHOT_ROOT"
+PRE_DEPLOY_COMMIT="$(git log --format=%H --max-count=1 FETCH_HEAD --grep="^daily: publish $LIVE_EDITION_DATE$" || true)"
+if [[ -z "$PRE_DEPLOY_COMMIT" ]]; then
+  echo "rollback_verify_failed: worker inish-site rolled back to version $PRE_DEPLOY_VERSION but the pre-deploy commit for edition $LIVE_EDITION_DATE cannot be resolved, so the restored identity cannot be re-verified — a human must verify worker inish-site at version $PRE_DEPLOY_VERSION" >&2
+  echo "The accepted edition in the repository was left untouched; it is NOT confirmed live." >&2
+  exit 1
+fi
+if ! git archive --format=tar "$PRE_DEPLOY_COMMIT" | tar -x -C "$PRE_SNAPSHOT_ROOT"; then
+  echo "rollback_verify_failed: worker inish-site rolled back to version $PRE_DEPLOY_VERSION but its pre-deploy snapshot could not be materialized, so the restored identity cannot be re-verified — a human must verify worker inish-site at version $PRE_DEPLOY_VERSION" >&2
+  echo "The accepted edition in the repository was left untouched; it is NOT confirmed live." >&2
+  exit 1
+fi
+if ROLLBACK_VERIFY_STAGE="$(python3 scripts/verify_live.py --root "$PRE_SNAPSHOT_ROOT" --edition-date "$LIVE_EDITION_DATE" --commit "$PRE_DEPLOY_COMMIT" 2>&1)"; then
+  echo "rollback_restored: worker inish-site is verified live on version $PRE_DEPLOY_VERSION (edition $LIVE_EDITION_DATE, commit $PRE_DEPLOY_COMMIT); the accepted edition $EDITION_DATE was NOT published" >&2
+else
+  echo "rollback_verify_failed: worker inish-site rolled back to version $PRE_DEPLOY_VERSION but the restored identity failed re-verification — a human must act on worker inish-site version $PRE_DEPLOY_VERSION. Failing stage:" >&2
+  printf '%s\n' "$ROLLBACK_VERIFY_STAGE" >&2
+fi
 echo "The accepted edition in the repository was left untouched; it is NOT confirmed live." >&2
 exit 1
