@@ -66,12 +66,13 @@ class MiddlewareContractTests(unittest.TestCase):
         return 404
 
     def test_root_metadata_assets_are_allowlisted(self):
-        for asset in ("/og-image.svg", "/apple-touch-icon.png"):
+        for asset in ("/og-image.svg", "/og-image.png", "/apple-touch-icon.png"):
             self.assertIn(asset, self.public_paths)
 
     def test_allowlist_is_exactly_the_known_surface(self):
-        # Exact equality is the narrowness guard: both metadata assets and the
-        # font license text are present and nothing else was slipped in.
+        # Exact equality is the narrowness guard: the raster share card, its
+        # legacy SVG source, the touch icon, and the font license text are all
+        # present and nothing else was slipped in.
         self.assertEqual(
             self.public_paths,
             {
@@ -80,6 +81,7 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/styles.css",
                 "/apple-touch-icon.png",
                 "/og-image.svg",
+                "/og-image.png",
                 "/latest.json",
                 "/feed.xml",
                 "/robots.txt",
@@ -109,6 +111,7 @@ class MiddlewareContractTests(unittest.TestCase):
     def test_metadata_assets_reach_static_layer_and_arbitrary_paths_stay_404(self):
         cases = {
             "/og-image.svg": "static",
+            "/og-image.png": "static",
             "/apple-touch-icon.png": "static",
             "/fonts/archivo-700.woff2": "static",
             "/fonts/OFL.txt": "static",
@@ -174,6 +177,7 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/styles.css",
                 "/apple-touch-icon.png",
                 "/og-image.svg",
+                "/og-image.png",
                 "/latest.json",
                 "/feed.xml",
                 "/robots.txt",
