@@ -1,40 +1,25 @@
-// Live edge path is worker.js (Workers + assets). Keep this file's
-// publicPaths/redirects/HSTS identical — tests enforce the shared contract.
-const publicPaths = new Set([
-  "/",
-  "/app.js",
-  "/styles.css",
-  "/apple-touch-icon.png", // iOS home-screen icon, referenced by the generated head
-  "/og-image.svg", // social share card, referenced by the generated head
-  "/latest.json",
-  "/feed.xml",
-  "/robots.txt",
-  "/sitemap.xml",
-  "/fonts/OFL.txt" // SIL OFL 1.1 license text, referenced by styles.css
-]);
+// Pages parity mirror of the live edge worker (worker.js + Workers assets).
+// The public route contract — the publicPaths allowlist, the font pattern, the
+// redirects, and HSTS — has ONE source of truth: public-paths.json. worker.js
+// and this file both read it, and scripts/verify_live.py plus the test suite
+// derive their expectations from it, so a path addition is a single data edit
+// instead of a multi-file contract change.
+import routeContract from "../public-paths.json";
+
+const publicPaths = new Set(routeContract.publicPaths);
 
 // Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
 // future face does not need a middleware edit, and tight enough that it cannot
 // serve anything but a woff2 from this one directory.
-const fontPath = /^\/fonts\/[a-z0-9-]+\.woff2$/;
+const fontPath = new RegExp(routeContract.fontPath);
 
-const redirects = new Map([
-  ["/index.html", "/"],
-  ["/daily", "/"],
-  ["/daily/", "/"],
-  ["/daily/index.html", "/"],
-  ["/daily/app.js", "/app.js"],
-  ["/daily/styles.css", "/styles.css"],
-  ["/daily/latest.json", "/latest.json"],
-  ["/daily/feed.xml", "/feed.xml"],
-  ["/daily/sitemap.xml", "/sitemap.xml"]
-]);
+const redirects = new Map(Object.entries(routeContract.redirects));
 
 // The site is HTTPS-only, so every response from the middleware can carry HSTS.
 // No subdomains exist yet; includeSubDomains keeps any future one under the
 // same policy. Preload is deliberately not claimed: it is a permanent public
 // commitment and nothing in the repository justifies it.
-const hstsHeader = "max-age=31536000; includeSubDomains";
+const hstsHeader = routeContract.hstsHeader;
 
 function withSecurityHeaders(response) {
   response.headers.set("Strict-Transport-Security", hstsHeader);

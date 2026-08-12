@@ -59,7 +59,9 @@ git archive --format=tar FETCH_HEAD | tar -x -C "$SNAPSHOT_ROOT"
 # surface. Copied ONLY from the snapshot — never from the workdir CWD.
 # data/editions and the rest of the tree stay out of the payload: archives are
 # intentionally unpublished. functions/ is not shipped as static assets; the
-# edge logic lives in worker.js.
+# edge logic lives in worker.js. This copy line must stay in exact sync with
+# the publicPaths allowlist in public-paths.json (the single source of truth);
+# tests enforce the agreement in both directions.
 cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
    "$SNAPSHOT_ROOT/app.js" "$SNAPSHOT_ROOT/styles.css" \
    "$SNAPSHOT_ROOT/og-image.svg" "$SNAPSHOT_ROOT/apple-touch-icon.png" \
@@ -68,8 +70,10 @@ cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
    "$SNAPSHOT_ROOT/_redirects" \
    "$PUBLIC_DIR/"
 cp -R "$SNAPSHOT_ROOT/fonts" "$PUBLIC_DIR/"
-# Worker + wrangler config are the live edge path (Workers assets + routes).
-cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" "$DEPLOY_ROOT/"
+# Worker + wrangler config + the route contract are the live edge path
+# (Workers assets + routes); worker.js imports the contract at deploy time.
+cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" \
+   "$SNAPSHOT_ROOT/public-paths.json" "$DEPLOY_ROOT/"
 
 EDITION_DATE="$(jq -er '.date' "$SNAPSHOT_ROOT/latest.json")"
 STORY_COUNT="$(jq -er '.stories | length' "$SNAPSHOT_ROOT/latest.json")"

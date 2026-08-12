@@ -1,0 +1,27 @@
+{
+  "publicPaths": [
+    "/",
+    "/app.js",
+    "/styles.css",
+    "/apple-touch-icon.png",
+    "/og-image.svg",
+    "/latest.json",
+    "/feed.xml",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/fonts/OFL.txt"
+  ],
+  "fontPath": "^/fonts/[a-z0-9-]+\\.woff2$",
+  "redirects": {
+    "/index.html": "/",
+    "/daily": "/",
+    "/daily/": "/",
+    "/daily/index.html": "/",
+    "/daily/app.js": "/app.js",
+    "/daily/styles.css": "/styles.css",
+    "/daily/latest.json": "/latest.json",
+    "/daily/feed.xml": "/feed.xml",
+    "/daily/sitemap.xml": "/sitemap.xml"
+  },
+  "hstsHeader": "max-age=31536000; includeSubDomains"
+}
