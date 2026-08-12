@@ -14,6 +14,7 @@ SAMPLE_STORIES = [
     {
         "title": "Ratchet ships deterministic replays",
         "url": "https://ratchet.example/launch",
+        "evidence_url": "https://ratchet.example/launch",
         "source": "Ratchet",
         "section": "AI",
         "summary": "Ratchet records tool calls and replays them against a pinned snapshot of the environment.",
@@ -24,6 +25,7 @@ SAMPLE_STORIES = [
     {
         "title": "Postmark publishes five years of bounce data",
         "url": "https://postmark.example/bounces",
+        "evidence_url": "https://postmark.example/bounces",
         "source": "Postmark",
         "section": "Demand signals",
         "summary": "An email provider released aggregate delivery outcomes covering a large sender population.",
@@ -34,6 +36,7 @@ SAMPLE_STORIES = [
     {
         "title": "Grid layout gets a subgrid escape hatch",
         "url": "https://layout.example/subgrid",
+        "evidence_url": "https://layout.example/subgrid",
         "source": "Layout Weekly",
         "section": "Product ideas",
         "summary": "A walkthrough of aligning nested cards to an outer track without redefining columns.",
@@ -44,6 +47,7 @@ SAMPLE_STORIES = [
     {
         "title": "SQLite adds a page-level checksum mode",
         "url": "https://dbnotes.example/checksums",
+        "evidence_url": "https://dbnotes.example/checksums",
         "source": "DB Notes",
         "section": "Tools",
         "summary": "An opt-in pragma stores a checksum per page and refuses reads when one fails to match.",
@@ -54,6 +58,7 @@ SAMPLE_STORIES = [
     {
         "title": "A registry outage traced to one expired token",
         "url": "https://status.example/incident-4412",
+        "evidence_url": "https://status.example/incident-4412",
         "source": "Status Example",
         "section": "Tools",
         "summary": "A package registry postmortem walks through a credential expiry that stalled publishes.",
@@ -64,6 +69,7 @@ SAMPLE_STORIES = [
     {
         "title": "Pricing page test moves annual conversion",
         "url": "https://growthlog.example/annual-toggle",
+        "evidence_url": "https://growthlog.example/annual-toggle",
         "source": "Growth Log",
         "section": "Demand signals",
         "summary": "A team defaulted its pricing toggle to annual billing and published the resulting split.",
@@ -74,6 +80,7 @@ SAMPLE_STORIES = [
     {
         "title": "Screen reader survey shows heading reliance",
         "url": "https://a11ynotes.example/survey",
+        "evidence_url": "https://a11ynotes.example/survey",
         "source": "A11y Notes",
         "section": "Product ideas",
         "summary": "A long-running accessibility survey published how respondents navigate unfamiliar pages.",
@@ -84,6 +91,7 @@ SAMPLE_STORIES = [
     {
         "title": "Local model runner adds speculative decoding",
         "url": "https://runner.example/speculative",
+        "evidence_url": "https://runner.example/speculative",
         "source": "Runner",
         "section": "AI",
         "summary": "A desktop inference tool added draft-model speculation behind a configuration flag.",
@@ -202,10 +210,68 @@ class BuildDailyTests(unittest.TestCase):
         for index in range(4):
             story = SAMPLE_STORIES[index]
             self.assertIn(
-                f'<a href="{html.escape(story["url"], quote=True)}" '
+                f'<a href="{html.escape(story["evidence_url"], quote=True)}" '
                 f'rel="noopener noreferrer">{html.escape(story["fact"], quote=True)}</a>',
                 page,
             )
+
+    def cross_source_story(self):
+        """A story whose Checked fact is only supported by a separate source.
+
+        The fact (Hacker News engagement) is not on the story page at all; the
+        HN item is the exact evidence, so the renderer must link the fact to
+        the HN item while the story keeps its own primary-source links.
+        """
+        return {
+            "title": "Claude Code messages cross sessions now",
+            "url": "https://code.claude.com/docs/en/cross-session-messaging",
+            "evidence_url": "https://news.ycombinator.com/item?id=49222824",
+            "source": "Anthropic",
+            "section": "AI",
+            "summary": "A new Claude Code page explains how messages persist across sessions on the same machine.",
+            "fact": "Hacker News logged 168 points and 70 comments on the discussion of the launch.",
+            "take": "I read the HN thread before trusting the feature, because points measure attention, not correctness.",
+            "caveat": "Points and comment counts are engagement, not an endorsement of the feature.",
+        }
+
+    def test_checked_fact_renders_its_evidence_link(self):
+        # The exact-evidence contract: a fact verified against a discussion
+        # thread must link to that thread, while the story still links to the
+        # primary source. Both links render; neither is dropped or collapsed
+        # into the other.
+        payload = edition(stories=1, date="2026-08-02")
+        payload["stories"][0] = self.cross_source_story()
+        self.write(payload)
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertIn(
+            '<p class="fact"><strong>Checked</strong> '
+            '<a href="https://news.ycombinator.com/item?id=49222824" rel="noopener noreferrer">'
+            "Hacker News logged 168 points and 70 comments on the discussion of the launch.</a></p>",
+            page,
+        )
+        self.assertIn(
+            '<h2><a href="https://code.claude.com/docs/en/cross-session-messaging" rel="noopener noreferrer">'
+            "Claude Code messages cross sessions now</a></h2>",
+            page,
+        )
+        # The fact must not masquerade as a story link: wrapping it in the
+        # primary-source URL would send the reader to a page that does not
+        # contain the claim.
+        self.assertNotIn(
+            '<a href="https://code.claude.com/docs/en/cross-session-messaging" rel="noopener noreferrer">'
+            "Hacker News logged 168 points",
+            page,
+        )
+
+    def test_rejects_cross_source_fact_without_evidence_url(self):
+        # A story whose fact is only supported by a separate source must carry
+        # that evidence URL, or the whole edition is rejected. "Checked" with
+        # no reachable evidence is a bare assertion.
+        payload = edition(stories=1, date="2026-08-02")
+        payload["stories"][0] = self.cross_source_story()
+        del payload["stories"][0]["evidence_url"]
+        self.assertRejects(payload, "story fields must be exactly")
 
     def test_head_carries_social_share_metadata(self):
         self.write(edition())
