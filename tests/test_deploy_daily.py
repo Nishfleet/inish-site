@@ -1,5 +1,8 @@
+import json
+import os
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -52,6 +55,129 @@ def head_root_assets() -> set[str]:
         for match in HEAD_ASSET.finditer(head)
         if match.group(1).count("/") == 1
     }
+
+
+# ---- Behavioral rollback fixture --------------------------------------------
+# The exhausted-live-verification rollback test runs the real deploy_daily.sh
+# against a hermetic git fixture with every external command stubbed on PATH,
+# then asserts on the ordered command log the script actually executes.
+ACCEPTED_EDITION = "2026-08-13"  # the edition this deploy publishes
+LIVE_EDITION = "2026-08-12"  # the edition live before the deploy
+PRE_DEPLOY_VERSION_ID = "v-9f8e7d6c5b4a3210"  # the version serving 100% pre-deploy
+
+# Every payload file deploy_daily.sh copies from the snapshot (plus the fonts
+# directory, worker.js and wrangler.jsonc), minimal but real enough for the
+# script's own preflight to run.
+FIXTURE_PAYLOAD_FILES = (
+    "index.html", "404.html", "app.js", "styles.css",
+    "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml",
+    "robots.txt", "sitemap.xml", "_redirects",
+)
+
+NPX_STUB = """#!/usr/bin/env bash
+# Stub npx: the script always invokes "npx --yes <cmd> ..."; drop the flag and
+# exec the wrapped command straight from PATH so the wrangler stub executes.
+if [[ "${1:-}" == "--yes" ]]; then
+  shift
+fi
+exec "$@"
+"""
+
+WRANGLER_STUB = """#!/usr/bin/env bash
+# Stub wrangler: record every invocation, then answer deterministically:
+# deployments list reports the pre-deploy version at 100%; deploy and rollback
+# succeed. Any other subcommand fails loudly so drift surfaces in the log.
+printf 'cmd:wrangler %s\\n' "$*" >>"$COMMAND_LOG"
+case "${1:-}" in
+  deployments)
+    printf '%s\\n' '[{"id":"deploy-1","versions":[{"percentage":100,"version_id":"__PRE_DEPLOY_VERSION_ID__"}]}]'
+    exit 0
+    ;;
+  deploy)
+    exit 0
+    ;;
+  rollback)
+    exit 0
+    ;;
+  *)
+    printf 'unexpected wrangler invocation: %s\\n' "$*" >>"$COMMAND_LOG"
+    exit 1
+    ;;
+esac
+"""
+
+CURL_STUB = """#!/usr/bin/env bash
+# Stub curl: the freshness gate reads the live edition from a fixture file.
+cat "$LIVE_LATEST_JSON"
+exit 0
+"""
+
+SLEEP_STUB = """#!/usr/bin/env bash
+# Stub sleep: the verification loop keeps its real twelve-attempt exhaustion
+# and the deploy retry keeps its real bounds, but no test wall-clock time is
+# spent on the 5s/20s pacing sleeps.
+exit 0
+"""
+
+HERMES_STUB = """#!/usr/bin/env bash
+# Stub hermes: record any success notification. The rollback path must never
+# send one, so the test asserts the log has no hermes line.
+printf 'cmd:hermes %s\\n' "$*" >>"$COMMAND_LOG"
+exit 0
+"""
+
+VERIFY_STUB = '''#!/usr/bin/env python3
+"""Stub scripts/verify_live.py for the behavioral rollback test.
+
+The deployed (accepted) edition never becomes live, so every verification
+attempt for it fails and the loop exhausts; the pre-deploy identity alone
+verifies, so the post-rollback re-verification of the restored version
+succeeds. Every call is recorded in the shared command log.
+"""
+import argparse
+import os
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--root")
+parser.add_argument("--edition-date")
+parser.add_argument("--commit")
+args = parser.parse_args()
+
+with open(os.environ["COMMAND_LOG"], "a") as log:
+    log.write("cmd:verify_live edition=%s commit=%s\\n" % (args.edition_date, args.commit))
+
+if args.edition_date == os.environ["LIVE_EDITION_DATE"]:
+    print("verified live edition %s (commit %s)" % (args.edition_date, args.commit))
+    sys.exit(0)
+print("verify_live stage: edition %s (commit %s) is not live" % (args.edition_date, args.commit))
+sys.exit(1)
+'''
+
+
+def _git(cwd: Path, *args: str) -> str:
+    """Run git in a fixture repo with a fixed identity; return stdout."""
+    result = subprocess.run(
+        ["git", "-C", str(cwd), "-c", "user.name=Fixture", "-c", "user.email=fixture@inish.in", *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout
+
+
+def fixture_payload(tree: Path, edition: str, story_count: int) -> None:
+    """Write the minimal origin/main tree deploy_daily.sh needs to publish."""
+    for name in FIXTURE_PAYLOAD_FILES:
+        (tree / name).write_text(f"{name} fixture for edition {edition}\n")
+    fonts = tree / "fonts"
+    fonts.mkdir(exist_ok=True)
+    (fonts / "fixture.woff2").write_text("fixture font\n")
+    (tree / "worker.js").write_text('export default { async fetch() { return new Response("fixture"); } };\n')
+    (tree / "wrangler.jsonc").write_text('{ "name": "inish-site" }\n')
+    (tree / "latest.json").write_text(
+        json.dumps({"date": edition, "stories": [{"title": f"story {i}"} for i in range(story_count)]}, indent=2) + "\n"
+    )
 
 
 class DeployDailyTests(unittest.TestCase):
@@ -186,59 +312,118 @@ class DeployDailyTests(unittest.TestCase):
     # list", so the loop position must use the backslash-newline form.
     DEPLOY_LOOP_LINE = 'wrangler deploy \\\n'
 
-    def test_verification_failure_rolls_back_to_the_captured_predeploy_version(self):
-        # A successful-but-bad publish (wrong bytes, wrong identity, broken
-        # routing) is not protected by the deploy retry loop: the wrapper must
-        # capture the version serving 100% of traffic BEFORE deploying, then on
-        # exhausted live verification restore exactly that version with
-        # `wrangler rollback <VERSION_ID> --name inish-site`.
-        script = DEPLOY_SCRIPT.read_text()
-        self.assertIn("wrangler deployments list --name inish-site --json", script)
-        self.assertIn('PRE_DEPLOY_VERSION="$(', script)
-        capture_pos = script.index("wrangler deployments list")
-        deploy_pos = script.index(self.DEPLOY_LOOP_LINE)
-        self.assertLess(
-            capture_pos, deploy_pos,
-            "the pre-deploy version must be captured before wrangler deploy runs",
-        )
-        # The rollback must target the exact captured version id, never a
-        # literal or a different variable.
-        self.assertIn(
-            'npx --yes wrangler rollback "$PRE_DEPLOY_VERSION" --name inish-site',
-            script,
-        )
-        rollback_pos = script.index("npx --yes wrangler rollback")
-        self.assertLess(
-            deploy_pos, rollback_pos,
-            "rollback must come after the deploy",
-        )
-        self.assertLess(
-            script.index("failed live verification"), rollback_pos,
-            "rollback must be the response to the twelve-attempt verification loop exhausting",
-        )
+    def test_exhausted_verification_rolls_back_exactly_once_and_reverifies(self):
+        # Behavioral replacement for the former source-string rollback tests:
+        # run the real deploy_daily.sh against a hermetic fixture where the
+        # provider is fully stubbed, and assert on the ordered command log the
+        # exhausted-live-verification path actually executes. Short-circuiting
+        # or deleting the rollback (or the twelve-attempt exhaustion) makes
+        # this test red.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            stubbin = tmp / "stubbin"
+            origin = tmp / "origin.git"
+            work = tmp / "work"
+            run = tmp / "run"
+            command_log = tmp / "commands.log"
+            live_feed = tmp / "live-latest.json"
 
-    def test_restored_live_identity_is_reverified_after_rollback(self):
-        # The rollback must prove the restoration with the same verification
-        # path the deploy uses (verify_live.py), pointed at the pre-deploy
-        # identity — never a lighter second probe — and report the restored
-        # outcome in the output.
-        script = DEPLOY_SCRIPT.read_text()
-        verify_count = script.count("python3 scripts/verify_live.py")
-        self.assertGreaterEqual(
-            verify_count, 2,
-            "the restored identity must be re-verified with the same verification path",
-        )
-        rollback_pos = script.index('npx --yes wrangler rollback "$PRE_DEPLOY_VERSION"')
-        self.assertLess(
-            rollback_pos, script.rfind("python3 scripts/verify_live.py"),
-            "the restored live identity must be re-verified after the rollback",
-        )
-        # The re-verification targets the pre-deploy edition (the date that was
-        # live before publishing and the commit that published it), not the
-        # accepted edition.
-        self.assertIn('--edition-date "$LIVE_EDITION_DATE"', script)
-        self.assertIn('--commit "$PRE_DEPLOY_COMMIT"', script)
-        self.assertIn("rollback_restored", script)
+            # A hermetic origin/main: the accepted edition on top of the live
+            # edition, published with the exact commit message the script's
+            # pre-deploy commit lookup greps for.
+            _git(tmp, "init", "--bare", "-b", "main", str(origin))
+            _git(tmp, "clone", str(origin), str(work))
+            fixture_payload(work, LIVE_EDITION, 2)
+            _git(work, "add", "-A")
+            _git(work, "commit", "-m", f"daily: publish {LIVE_EDITION}")
+            pre_deploy_commit = _git(work, "rev-parse", "HEAD").strip()
+            fixture_payload(work, ACCEPTED_EDITION, 3)
+            _git(work, "add", "-A")
+            _git(work, "commit", "-m", f"daily: publish {ACCEPTED_EDITION}")
+            accepted_commit = _git(work, "rev-parse", "HEAD").strip()
+            _git(work, "push", "-u", "origin", "main")
+
+            # The run checkout carries the real deploy script plus the verify
+            # stub that only the pre-deploy identity can satisfy.
+            _git(tmp, "clone", str(origin), str(run))
+            (run / "scripts").mkdir()
+            shutil.copyfile(DEPLOY_SCRIPT, run / "scripts" / "deploy_daily.sh")
+            (run / "scripts" / "deploy_daily.sh").chmod(0o755)
+            (run / "scripts" / "verify_live.py").write_text(VERIFY_STUB)
+
+            # Stub every external command the script can reach.
+            stubbin.mkdir()
+            for name, body in {
+                "npx": NPX_STUB,
+                "wrangler": WRANGLER_STUB.replace("__PRE_DEPLOY_VERSION_ID__", PRE_DEPLOY_VERSION_ID),
+                "curl": CURL_STUB,
+                "sleep": SLEEP_STUB,
+                "hermes": HERMES_STUB,
+            }.items():
+                stub = stubbin / name
+                stub.write_text(body)
+                stub.chmod(0o755)
+
+            # The live hostname serves the pre-deploy edition: a newer live
+            # edition would trip the freshness gate before the deploy starts.
+            live_feed.write_text(
+                json.dumps({"date": LIVE_EDITION, "stories": [{"title": "live"}]}) + "\n"
+            )
+
+            env = os.environ.copy()
+            env["PATH"] = f"{stubbin}:{env['PATH']}"
+            env["CLOUDFLARE_API_TOKEN"] = "fixture-token; provider is stubbed"
+            env["COMMAND_LOG"] = str(command_log)
+            env["LIVE_LATEST_JSON"] = str(live_feed)
+            env["LIVE_EDITION_DATE"] = LIVE_EDITION
+            result = subprocess.run(
+                [str(run / "scripts" / "deploy_daily.sh")],
+                cwd=str(run),
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+
+            output = result.stdout + result.stderr
+            self.assertEqual(result.returncode, 1, output)
+            commands = command_log.read_text().splitlines()
+
+            captures = [c for c in commands if c.startswith("cmd:wrangler deployments ")]
+            deploys = [c for c in commands if c.startswith("cmd:wrangler deploy ")]
+            exhausted = [
+                c for c in commands
+                if c == f"cmd:verify_live edition={ACCEPTED_EDITION} commit={accepted_commit}"
+            ]
+            rollbacks = [
+                c for c in commands
+                if c == f"cmd:wrangler rollback {PRE_DEPLOY_VERSION_ID} --name inish-site"
+            ]
+            restored = [
+                c for c in commands
+                if c == f"cmd:verify_live edition={LIVE_EDITION} commit={pre_deploy_commit}"
+            ]
+
+            self.assertEqual(len(captures), 1, commands)
+            self.assertEqual(len(deploys), 1, commands)
+            self.assertEqual(len(exhausted), 12, commands)
+            self.assertEqual(len(rollbacks), 1, commands)
+            self.assertEqual(len(restored), 1, commands)
+            # Order: pre-deploy capture -> deploy -> all twelve exhausted
+            # verifications -> exactly one rollback -> restored-identity
+            # re-verification. No success notification may be sent.
+            self.assertLess(commands.index(captures[0]), commands.index(deploys[0]))
+            self.assertLess(commands.index(deploys[0]), commands.index(exhausted[0]))
+            self.assertLess(commands.index(exhausted[-1]), commands.index(rollbacks[0]))
+            self.assertLess(commands.index(rollbacks[0]), commands.index(restored[0]))
+            self.assertEqual([c for c in commands if c.startswith("cmd:hermes")], [])
+            for needle in (
+                f"rollback_target: version {PRE_DEPLOY_VERSION_ID} currently serves worker inish-site",
+                "rolled_back: worker inish-site restored to version",
+                "rollback_restored: worker inish-site is verified live on version",
+                "it is NOT confirmed live.",
+            ):
+                self.assertIn(needle, output)
 
     def test_deploy_is_not_attempted_when_the_predeploy_version_cannot_be_captured(self):
         # An unreversible deploy must not start: if the version currently
