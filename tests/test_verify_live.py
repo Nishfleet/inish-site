@@ -343,10 +343,15 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertNotIn("preload", header.group(1))
 
     def test_public_allowlist_and_redirect_semantics_kept(self):
-        source = self.MIDDLEWARE.read_text()
-        self.assertIn("publicPaths", source)
-        self.assertIn('["/daily", "/"]', source)
-        self.assertIn("status: 404", source)
+        # The route contract moved to functions/policy.js; the middleware is a
+        # thin entrypoint that imports it. Keep the canonical checks rooted at
+        # the policy module, and the middleware 404 plumbing where it lives.
+        policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
+        policy_source = policy.read_text()
+        middleware_source = self.MIDDLEWARE.read_text()
+        self.assertIn("publicPaths", policy_source)
+        self.assertIn('["/daily", "/"]', policy_source)
+        self.assertIn("status: 404", middleware_source)
 
 
 class DeployScriptContractTests(unittest.TestCase):

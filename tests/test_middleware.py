@@ -3,47 +3,66 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# The route contract moved to functions/policy.js so the deny branch can be
+# imported and exercised by real tests; the middleware is now a thin entrypoint
+# that imports from it. POINT-OF-UPDATE: when the policy shape changes, this
+# file and tests/test_middleware_deny.test.mjs change together.
+POLICY = ROOT / "functions" / "policy.js"
 MIDDLEWARE = ROOT / "functions" / "_middleware.js"
 WORKER = ROOT / "worker.js"
 PAGE_404 = ROOT / "404.html"
 
 # Cloudflare runs functions/_middleware.js as an ES module, so there is no local
-# Pages runtime to import it into; the documented verification for the file is
-# static (see docs/plans/2026-06-18-001-feat-agent-surface-plan.md). These tests
-# follow the DeployScriptContractTests pattern: they extract the allowlist, font
-# pattern, and redirect map straight from the source and evaluate the
-# middleware's exact deny rule against them. If the file's shape drifts from the
-# extractors, the tests fail loudly instead of silently checking something else.
+# Pages runtime to import it into. tests/test_middleware_deny.test.mjs is the
+# executable proof of the deny property against the imported policy; this file
+# stays the cross-source contract guard, now reading the policy module as the
+# canonical source and the middleware as the thin entrypoint that consumes it.
 
 # The deny branch must stay anchored to these two checks; a catch-all or a
-# widened allowlist is exactly the regression this suite exists to catch.
-DENY_BRANCH = "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)"
+# widened allowlist is exactly the regression this suite exists to catch. The
+# focused JS run also pins this property against the imported function, so
+# mutating the source (e.g. with `false &&`) makes both suites red.
+#
+# The policy module's decide(pathname) takes the path as a parameter, so its
+# deny form is `pathname`. The Cloudflare Worker inlines the deny check
+# against `url.pathname`. Both forms check the same property.
+DENY_BRANCH_POLICY = "!publicPaths.has(pathname) && !fontPath.test(pathname)"
+DENY_BRANCH_EDGE = "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)"
 
 
-def _source():
+def _policy_source():
+    text = POLICY.read_text()
+    assert DENY_BRANCH_POLICY in text, "deny branch changed in policy.js; update this suite deliberately"
+    return text
+
+
+def _middleware_source():
     text = MIDDLEWARE.read_text()
     assert "new Response(\"Not found\"" in text, "404 branch missing from middleware"
     assert "status: 404" in text, "404 status missing from middleware"
-    assert DENY_BRANCH in text, "deny branch changed; update this suite deliberately"
+    # The middleware must import its decision from the policy module rather than
+    # re-implementing it; drift here is the same kind of regression.
+    assert "from \"./policy.js\"" in text, "middleware must import its decision from policy.js"
+    assert "decide(" in text, "middleware must call decide() rather than re-implement the rule"
     return text
 
 
 def _extract_set(text, name):
     match = re.search(rf"{name}\s*=\s*new Set\(\[(.*?)\]\);", text, re.S)
-    assert match, f"could not find the {name} Set in {MIDDLEWARE.name}"
+    assert match, f"could not find the {name} Set in {POLICY.name}"
     return set(re.findall(r'"([^"]+)"', match.group(1)))
 
 
 def _extract_map(text, name):
     match = re.search(rf"{name}\s*=\s*new Map\(\[(.*?)\]\);", text, re.S)
-    assert match, f"could not find the {name} Map in {MIDDLEWARE.name}"
+    assert match, f"could not find the {name} Map in {POLICY.name}"
     pairs = re.findall(r'\["([^"]+)",\s*"([^"]+)"\]', match.group(1))
     return dict(pairs)
 
 
 def _extract_font_pattern(text):
     match = re.search(r"fontPath\s*=\s*/(.*?)/;", text, re.S)
-    assert match, f"could not find the fontPath pattern in {MIDDLEWARE.name}"
+    assert match, f"could not find the fontPath pattern in {POLICY.name}"
     # The JS regex is already anchored (^...$) and uses only constructs that
     # mean the same thing in Python re.
     return re.compile(match.group(1))
@@ -52,10 +71,11 @@ def _extract_font_pattern(text):
 class MiddlewareContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        text = _source()
-        cls.public_paths = _extract_set(text, "publicPaths")
-        cls.redirects = _extract_map(text, "redirects")
-        cls.font_path = _extract_font_pattern(text)
+        cls.policy_text = _policy_source()
+        cls.middleware_text = _middleware_source()
+        cls.public_paths = _extract_set(cls.policy_text, "publicPaths")
+        cls.redirects = _extract_map(cls.policy_text, "redirects")
+        cls.font_path = _extract_font_pattern(cls.policy_text)
 
     def middleware_status(self, path):
         """The middleware's decision for a pathname, using the values it ships."""
@@ -70,9 +90,8 @@ class MiddlewareContractTests(unittest.TestCase):
             self.assertIn(asset, self.public_paths)
 
     def test_allowlist_is_exactly_the_known_surface(self):
-        # Exact equality is the narrowness guard: the raster share card, its
-        # legacy SVG source, the touch icon, and the font license text are all
-        # present and nothing else was slipped in.
+        # Exact equality is the narrowness guard: both metadata assets and the
+        # font license text are present and nothing else was slipped in.
         self.assertEqual(
             self.public_paths,
             {
@@ -147,12 +166,16 @@ class MiddlewareContractTests(unittest.TestCase):
         # deny branch exactly as they were. The 404 asset stays internal: it
         # is not a new public path and direct /404.html access stays denied.
         worker_text = WORKER.read_text()
-        middleware_text = _source()
+        middleware_text = self.middleware_text
         page_text = PAGE_404.read_text()
 
+        # The route contract now lives in the policy module; the middleware
+        # entrypoint and the worker must keep mirroring it. The policy module
+        # is the canonical source of the deny branch — no 404 plumbing or
+        # HSTS header lives there, so the cross-source check is split.
         for name, source in (("worker.js", worker_text), ("_middleware.js", middleware_text)):
             with self.subTest(edge=name):
-                self.assertIn(DENY_BRANCH, source, "deny branch changed")
+                self.assertIn("max-age=31536000; includeSubDomains", source)
                 self.assertIn('env.ASSETS.fetch("https://inish.in/404.html")', source)
                 self.assertIn("status: 404", source)
                 self.assertIn('"Cache-Control": "no-store"', source)
@@ -165,6 +188,22 @@ class MiddlewareContractTests(unittest.TestCase):
                 self.assertIn('request.method === "HEAD"', source)
                 self.assertIn("new Response(null", source)
                 self.assertIn('new Response("Not found"', source)
+
+        # The Pages middleware must delegate the decision to the policy module
+        # rather than re-implementing it; drift here is the same kind of
+        # regression as a widened allowlist.
+        self.assertIn("from \"./policy.js\"", middleware_text)
+        self.assertIn("decide(", middleware_text)
+
+        # The policy module is the canonical source of the deny branch, and
+        # both edges must keep the same deny branch inline so the mutation
+        # would be visible at the same place the test reads.
+        self.assertIn(DENY_BRANCH_POLICY, self.policy_text)
+        self.assertIn(DENY_BRANCH_EDGE, worker_text)
+        # The Pages middleware now imports the decision; its deny branch is
+        # the imported call, not the raw expression — assert the import.
+        self.assertNotIn(DENY_BRANCH_POLICY, middleware_text)
+        self.assertNotIn(DENY_BRANCH_EDGE, middleware_text)
 
         # Allowlist keeps only the known surface plus the OFL license text the
         # shipped stylesheet references; no new redirect, the deny surface still
