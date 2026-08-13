@@ -1,0 +1,10 @@
+{
+  "name": "inish-site",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "inish.in edge policy. The Node entrypoint is the behavioral test runner; the live edge is the Cloudflare Worker in worker.js.",
+  "scripts": {
+    "test": "node --test tests/test_middleware_deny.test.mjs"
+  }
+}

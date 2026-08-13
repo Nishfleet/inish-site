@@ -243,15 +243,29 @@ class DeployDailyTests(unittest.TestCase):
 
     def test_worker_and_pages_middleware_share_the_route_contract(self):
         # Keep the two edge sources honest: allowlist, redirects, HSTS string.
+        # The Pages middleware imports the route contract from policy.js; the
+        # Worker still inlines it. The route-contract items must match across
+        # policy.js and worker.js, and the response plumbing (HSTS, 404, ASSETS)
+        # must match across both edge sources.
         worker = WORKER.read_text()
         middleware = MIDDLEWARE.read_text()
+        policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
+        policy_source = policy.read_text()
         for needle in (
             '"/og-image.svg"',
             '"/og-image.png"',
             '"/apple-touch-icon.png"',
-            'max-age=31536000; includeSubDomains',
-            "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)",
             '["/daily", "/"]',
+        ):
+            self.assertIn(needle, policy_source)
+            self.assertIn(needle, worker)
+        # The route contract deny branch: the policy uses pathname (function
+        # arg), the Worker uses url.pathname. Both must carry the same check.
+        self.assertIn("!publicPaths.has(pathname) && !fontPath.test(pathname)", policy_source)
+        self.assertIn("!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)", worker)
+        # Response plumbing lives in both edge sources.
+        for needle in (
+            "max-age=31536000; includeSubDomains",
         ):
             self.assertIn(needle, worker)
             self.assertIn(needle, middleware)
