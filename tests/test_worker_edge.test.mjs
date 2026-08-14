@@ -1,11 +1,12 @@
 // Behavioral tests for the deployed Worker route decision (worker.js).
 //
-// worker.js is the live edge for inish.in and carries its own inline copy of
-// the deny policy (publicPaths / fontPath / redirects / HSTS). The Python
-// suites prove that copy by substring-matching the source; a runtime mutation
-// like prefixing the deny check with `false &&`, or widening the worker-only
-// allowlist, keeps every current test green while unlisted paths reach the
-// ASSETS binding and can be served as static content.
+// worker.js is the live edge for inish.in. It imports the deny policy
+// (publicPaths / fontPath / redirects) from functions/policy.js — the single
+// source of truth — and keeps only the response plumbing inline. The Python
+// suites prove that import by substring-matching the source; a runtime
+// mutation like prefixing the deny check with `false &&`, or widening the
+// policy allowlist, keeps every current test green while unlisted paths reach
+// the ASSETS binding and can be served as static content.
 //
 // This suite drives the worker's default export directly with a recording
 // ASSETS stub: denied paths must return 404 with the branded-404 read only
@@ -16,7 +17,7 @@
 //
 // Mutation experiments (run locally, reverted before commit; the suite goes
 // red for each): a `false &&` prefix on the deny check, adding a deny sample
-// to the worker's publicPaths allowlist, dropping `destination.search =` from
+// to the policy's publicPaths allowlist, dropping `destination.search =` from
 // the redirect, and dropping the HSTS set in withSecurityHeaders.
 //
 // node --test runs this file directly; no transpiler, no third-party deps.
@@ -35,9 +36,9 @@ const ORIGIN = "https://inish.in";
 const HSTS = "max-age=31536000; includeSubDomains";
 
 // Negative space mirrors the middleware suite's samples and adds paths that
-// specifically probe the worker's inline copy. /private/notes.txt is the path
+// specifically probe the shared policy. /private/notes.txt is the path
 // used by the allowlist-widening mutation experiment: adding it to the
-// worker's publicPaths must turn this suite red.
+// policy's publicPaths must turn this suite red.
 const DENY_SAMPLES = [
   "/admin",
   "/admin/",
@@ -59,7 +60,7 @@ const DENY_SAMPLES = [
   "/index.html.bak" // suffix injection on a redirect target
 ];
 
-// The worker's own allowlist: every entry must reach the ASSETS binding.
+// The policy allowlist: every entry must reach the ASSETS binding.
 const ALLOW_SAMPLES = [
   "/",
   "/app.js",

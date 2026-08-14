@@ -66,8 +66,8 @@ LIVE_EDITION = "2026-08-12"  # the edition live before the deploy
 PRE_DEPLOY_VERSION_ID = "v-9f8e7d6c5b4a3210"  # the version serving 100% pre-deploy
 
 # Every payload file deploy_daily.sh copies from the snapshot (plus the fonts
-# directory, worker.js and wrangler.jsonc), minimal but real enough for the
-# script's own preflight to run.
+# directory, worker.js, wrangler.jsonc and functions/policy.js), minimal but
+# real enough for the script's own preflight to run.
 FIXTURE_PAYLOAD_FILES = (
     "index.html", "404.html", "app.js", "styles.css",
     "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml",
@@ -175,6 +175,9 @@ def fixture_payload(tree: Path, edition: str, story_count: int) -> None:
     (fonts / "fixture.woff2").write_text("fixture font\n")
     (tree / "worker.js").write_text('export default { async fetch() { return new Response("fixture"); } };\n')
     (tree / "wrangler.jsonc").write_text('{ "name": "inish-site" }\n')
+    functions = tree / "functions"
+    functions.mkdir(exist_ok=True)
+    (functions / "policy.js").write_text('export const publicPaths = new Set();\n')
     (tree / "latest.json").write_text(
         json.dumps({"date": edition, "stories": [{"title": f"story {i}"} for i in range(story_count)]}, indent=2) + "\n"
     )
@@ -242,11 +245,10 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn('"ASSETS"', wrangler)
 
     def test_worker_and_pages_middleware_share_the_route_contract(self):
-        # Keep the two edge sources honest: allowlist, redirects, HSTS string.
-        # The Pages middleware imports the route contract from policy.js; the
-        # Worker still inlines it. The route-contract items must match across
-        # policy.js and worker.js, and the response plumbing (HSTS, 404, ASSETS)
-        # must match across both edge sources.
+        # Keep the two edge sources honest: both must import the route contract
+        # from functions/policy.js rather than inlining their own literals, and
+        # the response plumbing (HSTS, 404, ASSETS) must match across both edge
+        # sources. A path addition is a single edit in the policy module.
         worker = WORKER.read_text()
         middleware = MIDDLEWARE.read_text()
         policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
@@ -258,11 +260,15 @@ class DeployDailyTests(unittest.TestCase):
             '["/daily", "/"]',
         ):
             self.assertIn(needle, policy_source)
-            self.assertIn(needle, worker)
-        # The route contract deny branch: the policy uses pathname (function
-        # arg), the Worker uses url.pathname. Both must carry the same check.
+        # The route contract deny branch lives only in the policy module; both
+        # edges must import the decision from it and define no literals of
+        # their own.
         self.assertIn("!publicPaths.has(pathname) && !fontPath.test(pathname)", policy_source)
-        self.assertIn("!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)", worker)
+        self.assertIn("from \"./functions/policy.js\"", worker)
+        self.assertIn("decide(", worker)
+        self.assertNotIn("const publicPaths = new Set", worker)
+        self.assertNotIn("const redirects = new Map", worker)
+        self.assertNotIn("const fontPath =", worker)
         # Response plumbing lives in both edge sources.
         for needle in (
             "max-age=31536000; includeSubDomains",

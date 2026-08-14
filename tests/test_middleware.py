@@ -24,10 +24,9 @@ PAGE_404 = ROOT / "404.html"
 # mutating the source (e.g. with `false &&`) makes both suites red.
 #
 # The policy module's decide(pathname) takes the path as a parameter, so its
-# deny form is `pathname`. The Cloudflare Worker inlines the deny check
-# against `url.pathname`. Both forms check the same property.
+# deny form is `pathname`. Both edge implementations now import that decision
+# rather than inlining their own deny check.
 DENY_BRANCH_POLICY = "!publicPaths.has(pathname) && !fontPath.test(pathname)"
-DENY_BRANCH_EDGE = "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)"
 
 
 def _policy_source():
@@ -191,19 +190,24 @@ class MiddlewareContractTests(unittest.TestCase):
 
         # The Pages middleware must delegate the decision to the policy module
         # rather than re-implementing it; drift here is the same kind of
-        # regression as a widened allowlist.
+        # regression as a widened allowlist. The Worker must do the same: it
+        # imports the decision and never re-declares its own allowlist, so a
+        # path addition is a single edit in the policy module.
         self.assertIn("from \"./policy.js\"", middleware_text)
         self.assertIn("decide(", middleware_text)
+        self.assertIn("from \"./functions/policy.js\"", worker_text)
+        self.assertIn("decide(", worker_text)
+        self.assertNotIn("const publicPaths = new Set", worker_text)
+        self.assertNotIn("const redirects = new Map", worker_text)
+        self.assertNotIn("const fontPath =", worker_text)
 
         # The policy module is the canonical source of the deny branch, and
-        # both edges must keep the same deny branch inline so the mutation
-        # would be visible at the same place the test reads.
+        # both edges must import the decision from it so a mutation is visible
+        # at the same place the test reads.
         self.assertIn(DENY_BRANCH_POLICY, self.policy_text)
-        self.assertIn(DENY_BRANCH_EDGE, worker_text)
         # The Pages middleware now imports the decision; its deny branch is
         # the imported call, not the raw expression — assert the import.
         self.assertNotIn(DENY_BRANCH_POLICY, middleware_text)
-        self.assertNotIn(DENY_BRANCH_EDGE, middleware_text)
 
         # Allowlist keeps only the known surface plus the OFL license text the
         # shipped stylesheet references; no new redirect, the deny surface still
