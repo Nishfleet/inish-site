@@ -41,8 +41,11 @@ The hourly sweep itself does not depend on GitHub scheduling: GitHub's
 `schedule` events are delivered late or not at all for hours at a time
 (recurring since 2026-08-10, with 7+ hour silent gaps), so the hourly cadence
 runs as a systemd timer on the VPS (`install/live-current-check.timer`,
-payload `scripts/run_live_current_check.sh`). The workflow is kept as the
-manual dispatch path; it no longer carries a `schedule` trigger.
+payload `scripts/run_live_current_check.sh`, installed as
+`/etc/systemd/system/live-current-check.{service,timer}`). The workflow is
+kept as the manual dispatch path; it no longer carries a `schedule` trigger.
+A failing sweep leaves the timer's unit failed; recover by deploying the
+accepted edition, then `sudo systemctl start live-current-check.service`.
 
 ## Who this is for
 
