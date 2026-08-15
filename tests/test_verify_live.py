@@ -1,4 +1,5 @@
 import io
+import html
 import json
 import re
 import sys
@@ -37,6 +38,15 @@ def edition_payload(date="2026-08-08", stories=7):
 
 def rss_payload(date="2026-08-08"):
     note = "A fixture edition with enough words to stand in for the accepted one."
+    item_html = (
+        f"<p>{note}</p>"
+        '<h3><a href="https://example.com/story-1">Fixture story 1</a></h3>'
+        "<p>Fixture summaries carry a checkable number and nothing else.</p>"
+        '<p><strong>Checked</strong> <a href="https://example.com/story-1">'
+        "Fixture fact: 1.1 seconds on the reference run.</a></p>"
+        "<p><strong>Nish</strong> I would measure fixture story 1 myself before trusting it.</p>"
+        "<p><strong>But</strong> This is fixture copy; nothing here actually ran anywhere.</p>"
+    )
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<rss version="2.0"><channel><title>Nish\'s Daily Reads</title>'
@@ -45,7 +55,7 @@ def rss_payload(date="2026-08-08"):
         f"<item><title>Nish's Daily Reads — {date}</title><link>https://inish.in/</link>"
         f'<guid isPermaLink="false">inish-daily-{date}</guid>'
         "<pubDate>Sat, 08 Aug 2026 00:00:00 +0000</pubDate>"
-        f"<description>{note}</description></item>"
+        f"<description>{html.escape(item_html)}</description></item>"
         "</channel></rss>\n"
     )
 
@@ -135,6 +145,26 @@ class FeedParityTests(unittest.TestCase):
             "A different editor note that was never accepted.",
         ).encode()
         mismatch = rss_feed_mismatch(local, live)
+        self.assertIsNotNone(mismatch)
+        self.assertIn("differs in content", mismatch)
+
+    def test_rss_parity_rejects_an_item_that_omits_its_stories(self):
+        # The feed contract after the root page rolls over: the item must carry
+        # the edition's stories, not just an editor note. A live feed whose item
+        # description lacks them must fail parity even with the right guid.
+        note = "A fixture edition with enough words to stand in for the accepted one."
+        stripped = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<rss version="2.0"><channel><title>Nish\'s Daily Reads</title>'
+            "<link>https://inish.in/</link>"
+            "<description>A daily read for a founder: AI, product ideas, and demand signals.</description>"
+            "<item><title>Nish's Daily Reads — 2026-08-08</title><link>https://inish.in/</link>"
+            '<guid isPermaLink="false">inish-daily-2026-08-08</guid>'
+            "<pubDate>Sat, 08 Aug 2026 00:00:00 +0000</pubDate>"
+            f"<description>{note}</description></item>"
+            "</channel></rss>\n"
+        )
+        mismatch = rss_feed_mismatch(rss_payload("2026-08-08").encode(), stripped.encode())
         self.assertIsNotNone(mismatch)
         self.assertIn("differs in content", mismatch)
 

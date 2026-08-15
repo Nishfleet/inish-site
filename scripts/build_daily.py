@@ -479,10 +479,27 @@ def page(edition: dict) -> str:
 """
 
 
+def rss_item_description(edition: dict) -> str:
+    """The item body: the editor's note plus every story, so a subscriber who
+    reads the feed in a reader still sees the edition after the root page has
+    rolled over to a newer day. The assembled HTML is escaped once as a whole,
+    so the description is character data (per RSS practice) and one story's
+    ampersand or angle bracket cannot corrupt another's markup.
+    """
+    parts = [f"<p>{edition['editor_note']}</p>"]
+    for story in edition["stories"]:
+        parts.append(f"<h3><a href=\"{story['url']}\">{story['title']}</a></h3>")
+        parts.append(f"<p>{story['summary']}</p>")
+        parts.append(f"<p><strong>Checked</strong> <a href=\"{story['evidence_url']}\">{story['fact']}</a></p>")
+        parts.append(f"<p><strong>Nish</strong> {story['take']}</p>")
+        parts.append(f"<p><strong>But</strong> {story['caveat']}</p>")
+    return html.escape("".join(parts))
+
+
 def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
     link = "https://inish.in/"
-    description = html.escape(edition["editor_note"])
+    description = rss_item_description(edition)
     published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"inish-daily-{day.isoformat()}"
     item = f"<item><title>Nish's Daily Reads — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
