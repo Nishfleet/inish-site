@@ -190,6 +190,68 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(sitemap.count("<loc>"), 1)
         self.assertIn("<loc>https://inish.in/</loc>", sitemap)
 
+    def test_rss_item_carries_every_story_of_its_edition(self):
+        # The root page rolls over every day, so the RSS item must keep the
+        # whole edition readable after the link target has changed. The
+        # description renders the editor's note and every story — title with
+        # its source link, summary, Checked fact linked to its evidence, take,
+        # and caveat — as one HTML string escaped into the XML character data.
+        self.write(edition(stories=3))
+        self.build()
+        feed = (self.public / "feed.xml").read_text()
+        description = feed.split("<item>", 1)[1].split("<description>", 1)[1].rsplit("</description>", 1)[0]
+        self.assertEqual(
+            description,
+            builder.rss_item_description(self.load()),
+        )
+        self.assertIn(
+            f"<p>{edition()['editor_note']}</p>",
+            html.unescape(description),
+        )
+        for index in range(3):
+            story = SAMPLE_STORIES[index]
+            self.assertIn(
+                f'<h3><a href="{story["url"]}">{story["title"]}</a></h3>',
+                html.unescape(description),
+            )
+            self.assertIn(f"<p>{story['summary']}</p>", html.unescape(description))
+            self.assertIn(
+                f'<p><strong>Checked</strong> <a href="{story["evidence_url"]}">'
+                f"{story['fact']}</a></p>",
+                html.unescape(description),
+            )
+            self.assertIn(f"<p><strong>Nish</strong> {story['take']}</p>", html.unescape(description))
+            self.assertIn(f"<p><strong>But</strong> {story['caveat']}</p>", html.unescape(description))
+
+    def test_rss_item_description_is_well_formed_when_copy_has_special_characters(self):
+        # A story whose copy contains an ampersand, a quote, or angle brackets
+        # must not corrupt the XML or another story's markup: the whole
+        # description is escaped into character data, so the feed still parses
+        # and the round-tripped HTML is exactly the intended markup.
+        payload = edition(stories=1)
+        story = payload["stories"][0]
+        story["title"] = 'R&D <launch> & "results"'
+        story["fact"] = 'The README says "&lt;3 &amp; more" and quotes an "angle: <tag>"'
+        story["take"] = 'I would measure the <launch> & "results" spec myself before trusting its numbers.'
+        story["caveat"] = 'Single "quotes", double "quotes", & ampersands, <angle> brackets.'
+        self.write(payload)
+        self.build()
+        feed = (self.public / "feed.xml").read_text()
+        description = feed.split("<item>", 1)[1].split("<description>", 1)[1].rsplit("</description>", 1)[0]
+        self.assertNotIn("<launch>", description)
+        self.assertNotIn("<tag>", description)
+        import xml.etree.ElementTree as ET
+        ET.fromstring(feed)
+        self.assertEqual(
+            html.unescape(description),
+            f"<p>{payload['editor_note']}</p>"
+            f'<h3><a href="{story["url"]}">{story["title"]}</a></h3>'
+            f"<p>{story['summary']}</p>"
+            f'<p><strong>Checked</strong> <a href="{story["evidence_url"]}">{story["fact"]}</a></p>'
+            f"<p><strong>Nish</strong> {story['take']}</p>"
+            f"<p><strong>But</strong> {story['caveat']}</p>",
+        )
+
     def test_renders_prominence_and_the_three_labels(self):
         self.write(edition(stories=6))
         self.build()
