@@ -32,10 +32,17 @@ matches origin/main, or `LIVE_IS_STALE` with the named failing files and routes
 otherwise. Run it before trusting that a merged change reached the site.
 
 The repo also schedules it: the `Live current check` workflow
-(`.github/workflows/live-current-check.yml`) runs it hourly on the VPS
-self-hosted runner with no secrets, and can be triggered by hand from the
-Actions tab (`workflow_dispatch`). A stale check reds that run with
-`LIVE_IS_STALE`; the fix is still a deploy, not a code edit.
+(`.github/workflows/live-current-check.yml`) runs it on the VPS self-hosted
+runner with no secrets, and can be triggered by hand from the Actions tab
+(`workflow_dispatch`). A stale check reds that run with `LIVE_IS_STALE`; the
+fix is still a deploy, not a code edit.
+
+The hourly sweep itself does not depend on GitHub scheduling: GitHub's
+`schedule` events are delivered late or not at all for hours at a time
+(recurring since 2026-08-10, with 7+ hour silent gaps), so the hourly cadence
+runs as a systemd timer on the VPS (`install/live-current-check.timer`,
+payload `scripts/run_live_current_check.sh`). The workflow is kept as the
+manual dispatch path; it no longer carries a `schedule` trigger.
 
 ## Who this is for
 
