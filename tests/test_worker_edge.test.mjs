@@ -125,9 +125,9 @@ function makeAssets() {
   };
 }
 
-async function call(path, { method = "GET", search = "" } = {}) {
+async function call(path, { method = "GET", search = "", origin = ORIGIN } = {}) {
   const assets = makeAssets();
-  const request = new Request(`${ORIGIN}${path}${search}`, { method });
+  const request = new Request(`${origin}${path}${search}`, { method });
   const response = await worker.fetch(request, { ASSETS: assets });
   return { response, assets };
 }
@@ -214,5 +214,116 @@ test("redirect: a path without search 301s to the bare target with HSTS", async 
     );
     assert.equal(response.headers.get("Strict-Transport-Security"), HSTS);
     assert.deepEqual(assets.reads, []);
+  }
+});
+
+// Canonical host/scheme redirect — http:// and www. both 301 to the
+// bare-apex HTTPS origin. The path is preserved as-is, search is preserved,
+// and the redirect short-circuits ASSETS (the assets binding is only for
+// canonical-origin reads). A regression that drops the canonical check
+// serves the site from three extra origins; this suite pins it to behavior.
+
+const CANONICAL_TARGET = "https://inish.in";
+
+test("canonical: http://inish.in/* 301s to https://inish.in/* preserving search", async () => {
+  for (const [path, search, expected] of [
+    ["/", "", `${CANONICAL_TARGET}/`],
+    ["/", "?q=1", `${CANONICAL_TARGET}/?q=1`],
+    ["/feed.xml", "?utm=feed", `${CANONICAL_TARGET}/feed.xml?utm=feed`],
+    ["/daily", "?from=old", `${CANONICAL_TARGET}/daily?from=old`]
+  ]) {
+    const { response, assets } = await call(path, {
+      search,
+      origin: "http://inish.in"
+    });
+    assert.equal(response.status, 301, `expected 301 for http://inish.in${path}`);
+    assert.equal(
+      response.headers.get("Location"),
+      expected,
+      `Location must point to canonical origin for http://inish.in${path}${search}`
+    );
+    assert.equal(
+      response.headers.get("Strict-Transport-Security"),
+      HSTS,
+      `301 for http://inish.in${path} must carry HSTS`
+    );
+    assert.deepEqual(assets.reads, [], `canonical redirect must not touch ASSETS`);
+  }
+});
+
+test("canonical: https://www.inish.in/* 301s to https://inish.in/* preserving search", async () => {
+  for (const [path, search, expected] of [
+    ["/", "", `${CANONICAL_TARGET}/`],
+    ["/", "?q=hello", `${CANONICAL_TARGET}/?q=hello`],
+    ["/feed.xml", "?utm=feed", `${CANONICAL_TARGET}/feed.xml?utm=feed`],
+    ["/fonts/archivo-700.woff2", "", `${CANONICAL_TARGET}/fonts/archivo-700.woff2`]
+  ]) {
+    const { response, assets } = await call(path, {
+      search,
+      origin: "https://www.inish.in"
+    });
+    assert.equal(response.status, 301, `expected 301 for https://www.inish.in${path}`);
+    assert.equal(
+      response.headers.get("Location"),
+      expected,
+      `Location must drop the www. host for https://www.inish.in${path}${search}`
+    );
+    assert.equal(
+      response.headers.get("Strict-Transport-Security"),
+      HSTS,
+      `301 for https://www.inish.in${path} must carry HSTS`
+    );
+    assert.deepEqual(assets.reads, [], `www. redirect must not touch ASSETS`);
+  }
+});
+
+test("canonical: http://www.inish.in/* collapses to a single 301", async () => {
+  // Combined case: one 301 to the canonical origin handles both http→https
+  // and www→bare. A regression that only checks one dimension would either
+  // redirect to http://inish.in (still wrong scheme) or to https://www.inish.in
+  // (still wrong host) and this test fails.
+  for (const [path, search, expected] of [
+    ["/", "", `${CANONICAL_TARGET}/`],
+    ["/", "?q=1", `${CANONICAL_TARGET}/?q=1`],
+    ["/feed.xml", "", `${CANONICAL_TARGET}/feed.xml`]
+  ]) {
+    const { response, assets } = await call(path, {
+      search,
+      origin: "http://www.inish.in"
+    });
+    assert.equal(response.status, 301, `expected 301 for http://www.inish.in${path}`);
+    assert.equal(
+      response.headers.get("Location"),
+      expected,
+      `Location must collapse both http and www in one hop`
+    );
+    assert.equal(response.headers.get("Strict-Transport-Security"), HSTS);
+    assert.deepEqual(assets.reads, []);
+  }
+});
+
+test("canonical: the canonical origin is not self-redirected (loop guard)", async () => {
+  // The bare-apex HTTPS origin must NOT produce a 301 to itself: that would
+  // be a redirect loop on the first visit. The canonical check must return
+  // null for it and let the path-based decision run normally.
+  for (const path of ["/", "/feed.xml", "/styles.css", "/admin", "/daily/2026-08-09"]) {
+    const { response } = await call(path, { origin: CANONICAL_TARGET });
+    assert.notEqual(response.status, 301, `canonical origin must not 301 ${path}`);
+  }
+});
+
+test("canonical: HEAD on a non-canonical URL still 301s without reading ASSETS", async () => {
+  // Same canonical behavior for HEAD as for GET: 301 with HSTS, zero asset
+  // reads (the redirect short-circuits the asset lookup).
+  for (const origin of ["http://inish.in", "https://www.inish.in", "http://www.inish.in"]) {
+    const { response, assets } = await call("/", { method: "HEAD", origin });
+    assert.equal(response.status, 301, `HEAD on ${origin}/ must 301`);
+    assert.equal(
+      response.headers.get("Location"),
+      `${CANONICAL_TARGET}/`,
+      `HEAD on ${origin}/ must redirect to the canonical origin`
+    );
+    assert.equal(response.headers.get("Strict-Transport-Security"), HSTS);
+    assert.deepEqual(assets.reads, [], `HEAD canonical redirect must not touch ASSETS`);
   }
 });

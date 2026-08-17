@@ -43,6 +43,10 @@ def _middleware_source():
     # re-implementing it; drift here is the same kind of regression.
     assert "from \"./policy.js\"" in text, "middleware must import its decision from policy.js"
     assert "decide(" in text, "middleware must call decide() rather than re-implement the rule"
+    # The canonical host/scheme redirect lives in policy.js too; both edges
+    # must import it so a regression that drops the canonical check is
+    # visible from this single file rather than per-edge.
+    assert "canonicalize(" in text, "middleware must call canonicalize() before decide()"
     return text
 
 
@@ -67,6 +71,15 @@ def _extract_font_pattern(text):
     return re.compile(match.group(1))
 
 
+def _extract_canonical_origin(text):
+    # The export is a single string literal; the narrowness of this regex
+    # keeps any future policy edit from silently widening the surface the
+    # site serves from.
+    match = re.search(r'canonicalOrigin\s*=\s*"([^"]+)"', text)
+    assert match, f"could not find the canonicalOrigin string in {POLICY.name}"
+    return match.group(1)
+
+
 class MiddlewareContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -75,6 +88,7 @@ class MiddlewareContractTests(unittest.TestCase):
         cls.public_paths = _extract_set(cls.policy_text, "publicPaths")
         cls.redirects = _extract_map(cls.policy_text, "redirects")
         cls.font_path = _extract_font_pattern(cls.policy_text)
+        cls.canonical_origin = _extract_canonical_origin(cls.policy_text)
 
     def middleware_status(self, path):
         """The middleware's decision for a pathname, using the values it ships."""
@@ -158,6 +172,15 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.ttf"))
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.woff2.css"))
 
+    def test_canonical_origin_is_bare_apex_https(self):
+        # The single source of truth for the canonical host/scheme is the
+        # canonicalOrigin export in policy.js. Pinning it here means a drift
+        # (adding www., dropping the scheme, switching to http) makes this
+        # suite red and the worker redirect goes to the wrong place. The
+        # exact-string form (https:// + bare host + trailing slash) is
+        # checked by the behavioral suite in test_middleware_deny.test.mjs.
+        self.assertEqual(self.canonical_origin, "https://inish.in/")
+
     def test_unknown_paths_serve_branded_status_preserving_404(self):
         # Unknown paths keep HTTP 404 but must serve the deployed branded page
         # (404.html) through the ASSETS binding — streamed, never buffered —
@@ -195,11 +218,21 @@ class MiddlewareContractTests(unittest.TestCase):
         # path addition is a single edit in the policy module.
         self.assertIn("from \"./policy.js\"", middleware_text)
         self.assertIn("decide(", middleware_text)
+        self.assertIn("canonicalize(", middleware_text)
         self.assertIn("from \"./functions/policy.js\"", worker_text)
         self.assertIn("decide(", worker_text)
+        self.assertIn("canonicalize(", worker_text)
         self.assertNotIn("const publicPaths = new Set", worker_text)
         self.assertNotIn("const redirects = new Map", worker_text)
         self.assertNotIn("const fontPath =", worker_text)
+        # The canonical host/scheme rewrite lives in policy.js too; the worker
+        # and the Pages middleware must import it rather than inlining their
+        # own host checks. Drift here is the same kind of regression as a
+        # re-implemented deny branch.
+        self.assertNotIn('hostname === "inish.in"', worker_text)
+        self.assertNotIn('hostname === "inish.in"', middleware_text)
+        self.assertNotIn('protocol === "https:"', worker_text)
+        self.assertNotIn('protocol === "https:"', middleware_text)
 
         # The policy module is the canonical source of the deny branch, and
         # both edges must import the decision from it so a mutation is visible

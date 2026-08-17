@@ -350,8 +350,11 @@ class MiddlewareContractTests(unittest.TestCase):
 
     def test_hsts_set_on_redirect_404_and_passthrough_responses(self):
         source = self.MIDDLEWARE.read_text()
-        # Definition plus the three call sites: redirect, 404, and passthrough.
-        self.assertEqual(source.count("withSecurityHeaders("), 4)
+        # Definition plus the four call sites: canonical host/scheme redirect,
+        # path redirect, 404, and passthrough. The canonical redirect runs
+        # first so http:// and www. requests upgrade to HTTPS before any
+        # path-based decision runs.
+        self.assertEqual(source.count("withSecurityHeaders("), 5)
 
     def test_redirect_stays_301_with_location_query_and_hsts(self):
         source = self.MIDDLEWARE.read_text()
