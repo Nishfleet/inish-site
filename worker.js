@@ -6,7 +6,7 @@
 // literals. Pages Functions are no longer the production edge path — the VPS
 // fleet token can deploy Workers but not Cloudflare Pages, and OAuth expired
 // 2026-08-04 left the site four days stale.
-import { decide, redirects } from "./functions/policy.js";
+import { canonicalize, decide, redirects } from "./functions/policy.js";
 
 // The site is HTTPS-only, so every response from the middleware can carry HSTS.
 // No subdomains exist yet; includeSubDomains keeps any future one under the
@@ -56,6 +56,18 @@ async function notFoundResponse(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // Canonicalize to https://inish.in{path}{search} before any path-based
+    // decision runs: http://, www., and the combined cases all collapse to a
+    // single 301 instead of serving three extra copies of the site.
+    const canonical = canonicalize(url);
+    if (canonical !== null) {
+      return withSecurityHeaders(
+        new Response(null, {
+          status: 301,
+          headers: { Location: canonical }
+        })
+      );
+    }
     const decision = decide(url.pathname);
     const target = redirects.get(url.pathname);
     if (target) {

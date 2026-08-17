@@ -4,7 +4,7 @@
 // The decision lives in ./policy.js so the deny/allow/redirect branch can be
 // exercised by real tests against the imported function rather than by
 // substring matching on this file.
-import { decide, redirects } from "./policy.js";
+import { canonicalize, decide, redirects } from "./policy.js";
 
 // The site is HTTPS-only, so every response from the middleware can carry HSTS.
 // No subdomains exist yet; includeSubDomains keeps any future one under the
@@ -45,6 +45,18 @@ async function notFoundResponse(request, env) {
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
+  // Canonicalize to https://inish.in{path}{search} before any path-based
+  // decision runs: http://, www., and the combined cases all collapse to a
+  // single 301 instead of serving three extra copies of the site.
+  const canonical = canonicalize(url);
+  if (canonical !== null) {
+    return withSecurityHeaders(
+      new Response(null, {
+        status: 301,
+        headers: { Location: canonical }
+      })
+    );
+  }
   const decision = decide(url.pathname);
   if (decision === "redirect") {
     const target = redirects.get(url.pathname);

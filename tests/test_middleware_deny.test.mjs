@@ -6,12 +6,24 @@
 // functions/policy.js and checks its verdict against the real surface,
 // which a `false &&` prefix or any other denial short-circuit would fail.
 //
+// The canonicalize() suite at the bottom pins the host/scheme side of the
+// same contract — http://, www., and the combined cases all collapse to
+// https://inish.in/{path}{search}, while the bare-apex HTTPS URL stays
+// canonical (no self-redirect).
+//
 // node --test runs this file directly; no transpiler, no third-party deps.
 
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { decide, publicPaths, redirects, fontPath } from "../functions/policy.js";
+import {
+  canonicalOrigin,
+  canonicalize,
+  decide,
+  publicPaths,
+  redirects,
+  fontPath
+} from "../functions/policy.js";
 
 const DENY_SAMPLES = [
   // None of these are in the allowlist, none of these match the font pattern.
@@ -183,4 +195,117 @@ test("deny: a short-circuit of the deny condition flips the verdict", () => {
     assert.equal(decide(path), "deny", `real decide must deny ${path}`);
     assert.equal(short(path), "static", `mutated decide must allow ${path}`);
   }
+});
+
+test("canonical: canonicalOrigin is the bare-apex HTTPS URL with a trailing slash", () => {
+  // The constant is the redirect target for every non-canonical URL. Any
+  // drift here (adding www., dropping the slash, switching to http) would
+  // silently widen the surface the site serves from; the constant is the
+  // pin that makes the drift visible at import time.
+  assert.equal(canonicalOrigin, "https://inish.in/");
+});
+
+test("canonical: the bare-apex HTTPS URL is canonical (returns null)", () => {
+  // A self-redirect would be a redirect loop on the first visit; the helper
+  // must return null so the worker treats the URL as already on the
+  // canonical origin and continues with the path-based decision.
+  for (const u of [
+    new URL("https://inish.in/"),
+    new URL("https://inish.in/?q=1"),
+    new URL("https://inish.in/feed.xml"),
+    new URL("https://inish.in/daily/2026-08-09"),
+    new URL("https://inish.in/fonts/archivo-700.woff2")
+  ]) {
+    assert.equal(canonicalize(u), null, `expected canonical for ${u.href}`);
+  }
+});
+
+test("canonical: http://inish.in/* 301s to https://inish.in/* preserving search", () => {
+  for (const [from, search, to] of [
+    ["https-equivalent", "", "https://inish.in/"],
+    ["with search", "?q=1&r=2", "https://inish.in/?q=1&r=2"],
+    ["feed path", "?utm=feed", "https://inish.in/feed.xml?utm=feed"],
+    ["legacy /daily", "?from=old", "https://inish.in/daily?from=old"]
+  ]) {
+    const url = new URL(`http://inish.in/${from === "legacy /daily" ? "daily" : ""}${search}`);
+    if (from === "feed path") url.pathname = "/feed.xml";
+    const result = canonicalize(url);
+    assert.equal(result, to, `expected ${to} for ${url.href}, got ${result}`);
+  }
+});
+
+test("canonical: https://www.inish.in/* 301s to https://inish.in/* preserving search", () => {
+  for (const [path, search, to] of [
+    ["/", "", "https://inish.in/"],
+    ["/", "?q=hello", "https://inish.in/?q=hello"],
+    ["/feed.xml", "?utm=feed", "https://inish.in/feed.xml?utm=feed"],
+    ["/daily", "?from=old", "https://inish.in/daily?from=old"],
+    ["/fonts/archivo-700.woff2", "", "https://inish.in/fonts/archivo-700.woff2"]
+  ]) {
+    const url = new URL(`https://www.inish.in${path}${search}`);
+    assert.equal(canonicalize(url), to, `expected ${to} for ${url.href}`);
+  }
+});
+
+test("canonical: http://www.inish.in/* collapses in a single hop", () => {
+  // The combined case: one 301 to the canonical origin handles both
+  // http→https and www→bare in a single hop, not two. A mutation that
+  // handles only one of the two dimensions would either redirect to
+  // http://inish.in (still wrong scheme) or to https://www.inish.in
+  // (still wrong host).
+  for (const [path, search, to] of [
+    ["/", "", "https://inish.in/"],
+    ["/", "?q=1", "https://inish.in/?q=1"],
+    ["/feed.xml", "", "https://inish.in/feed.xml"]
+  ]) {
+    const url = new URL(`http://www.inish.in${path}${search}`);
+    assert.equal(canonicalize(url), to, `expected ${to} for ${url.href}`);
+  }
+});
+
+test("canonical: a non-canonical mutation that drops the protocol check leaks http://", () => {
+  // Negative-space test mirroring the deny short-circuit above: rebuild
+  // canonicalize with the http→https branch dropped, and assert the real
+  // helper still rejects http://inish.in/ while the mutated helper treats
+  // it as canonical. A regression that drops the protocol check would
+  // serve the http URL directly (no HSTS upgrade) and this test fails —
+  // pinning the protocol check to the behavior, not the source.
+  function shortCanonicalize(url) {
+    const isBare = url.hostname === "inish.in";
+    // protocol branch intentionally neutralised, mirroring the mutation under test
+    if (false && url.protocol === "https:" && isBare) return null;
+    if (isBare) return null;
+    return new URL(url.pathname + url.search, canonicalOrigin).href;
+  }
+  // http://inish.in/ is NOT canonical — the protocol upgrade is required.
+  const realHttp = canonicalize(new URL("http://inish.in/"));
+  const mutedHttp = shortCanonicalize(new URL("http://inish.in/"));
+  assert.equal(realHttp, "https://inish.in/");
+  assert.equal(mutedHttp, null, "mutated helper treats http://inish.in/ as canonical");
+});
+
+test("canonical: a non-canonical mutation that drops the host check leaks www.", () => {
+  // Mirror of the previous test for the host branch: rebuild canonicalize
+  // with the www→bare check dropped, and assert the real helper still
+  // rejects https://www.inish.in/ while the mutated helper treats it as
+  // canonical. A regression that drops the host check would leave the
+  // www. host serving the site directly and this test fails.
+  function shortCanonicalize(url) {
+    const isHttps = url.protocol === "https:";
+    // host branch intentionally neutralised: any https URL passes through
+    if (false && isHttps && url.hostname === "inish.in") return null;
+    if (isHttps) return null;
+    return new URL(url.pathname + url.search, canonicalOrigin).href;
+  }
+  // https://www.inish.in/ is NOT canonical — the host rewrite is required.
+  const realWww = canonicalize(new URL("https://www.inish.in/"));
+  const mutedWww = shortCanonicalize(new URL("https://www.inish.in/"));
+  assert.equal(realWww, "https://inish.in/");
+  assert.equal(mutedWww, null, "mutated helper treats https://www.inish.in/ as canonical");
+
+  // https://inish.in/ IS canonical — both helpers agree.
+  const realHttps = canonicalize(new URL("https://inish.in/"));
+  const mutedHttps = shortCanonicalize(new URL("https://inish.in/"));
+  assert.equal(realHttps, null);
+  assert.equal(mutedHttps, null);
 });
