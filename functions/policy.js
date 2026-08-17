@@ -12,6 +12,16 @@
 // middleware (and any future caller) can read the same constants the
 // decision was made against. The render of `decide()` is the contract; the
 // constants are the data.
+//
+// `canonicalOrigin` and `canonicalize()` cover the host/scheme side of the
+// same contract: the bare-apex HTTPS origin is the only URL the site serves
+// from, and any request that arrives on http://, on the www subdomain, or on
+// any other combination gets 301'd to that origin before the path-based
+// decision runs. Both edge entrypoints (the live Worker and the kept-in-sync
+// Pages middleware) call `canonicalize()` first so the bare-apex visitor
+// never reaches the policy module twice.
+export const canonicalOrigin = "https://inish.in/";
+
 export const publicPaths = new Set([
   "/",
   "/app.js",
@@ -53,4 +63,19 @@ export function decide(pathname) {
   if (redirects.has(pathname)) return "redirect";
   if (!publicPaths.has(pathname) && !fontPath.test(pathname)) return "deny";
   return "static";
+}
+
+// Returns the canonical URL string for `url` (scheme + bare apex + path +
+// search), or null when the URL is already on the canonical origin. Called
+// before `decide()` in both edge entrypoints so a single 301 handles
+// http→https, www→bare, and any combined case in one hop — without it the
+// worker would serve three extra copies of the site on http://inish.in/,
+// https://www.inish.in/, and http://www.inish.in/. The search string is
+// preserved because analytics and link previews care about it; the fragment
+// is never part of the request URL anyway.
+export function canonicalize(url) {
+  const isHttps = url.protocol === "https:";
+  const isBare = url.hostname === "inish.in";
+  if (isHttps && isBare) return null;
+  return new URL(url.pathname + url.search, canonicalOrigin).href;
 }
