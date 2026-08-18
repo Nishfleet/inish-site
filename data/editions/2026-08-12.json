@@ -1,0 +1,29 @@
+{
+  "date": "2026-08-12",
+  "candidate_count": 247,
+  "editor_note": "I opened the strongest candidates across AI, founder businesses, and product ideas. Two stories survived the check: each had a primary source with a concrete number, date, or measured result. I dropped the rest rather than padding the feed with announcements I could not verify well enough.",
+  "stories": [
+    {
+      "title": "OpenAI finally ships ChatGPT and Codex for Linux",
+      "url": "https://techcrunch.com/2026/08/11/openai-launches-chatgpt-desktop-app-for-linux/",
+      "evidence_url": "https://techcrunch.com/2026/08/11/openai-launches-chatgpt-desktop-app-for-linux/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "OpenAI has released a worldwide preview of its desktop app for Linux. The app includes ChatGPT, ChatGPT Work, and Codex, giving Linux users a native desktop route instead of relying on the browser.",
+      "fact": "The preview supports Ubuntu 24.04 and 26.04 LTS, Debian 13, and Fedora 43 and 44.",
+      "take": "I read this as ecosystem catch-up rather than a novelty launch. A native Linux app removes one more reason for technical teams to standardize on a competitor's desktop experience.",
+      "caveat": "It is still a preview and the supported distribution list is narrower than the full Linux universe."
+    },
+    {
+      "title": "River AI raises $1.1B to make models personally trainable",
+      "url": "https://techcrunch.com/2026/08/11/general-catalyst-leads-1-1b-round-into-2-month-old-river-ai/",
+      "evidence_url": "https://techcrunch.com/2026/08/11/general-catalyst-leads-1-1b-round-into-2-month-old-river-ai/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "River AI, founded by former xAI researcher Igor Babuschkin, has raised a huge round only two months after coming out of stealth. Its pitch is that people and companies should train open models into assistants they can actually own and improve.",
+      "fact": "River says its API supports reinforcement learning and LoRA fine-tuning, and that a complex training run can take 15 to 20 minutes without an infrastructure team.",
+      "take": "I do not see River's funding headline as the main signal. I see a shift from asking people to write better prompts toward giving them a model they can teach. That is a much larger product surface for Tiny Studio to watch.",
+      "caveat": "The speed and cost claims are company claims, and the product is too young to show whether the promised training workflow works outside demos."
+    }
+  ]
+}

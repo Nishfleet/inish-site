@@ -24,15 +24,20 @@ ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT
 LEGACY_DAILY = ROOT / "daily"
-# app.js and styles.css are the legacy daily assets; og-image.svg is the static
-# social share card referenced by the generated head, so it must be copied to
-# the root alongside them on every build. apple-touch-icon.png is pinned at the
-# root: it has no daily/ source, so the entry below is a presence check that
-# fails the build loudly if the committed icon ever goes missing.
-ASSETS = ("app.js", "styles.css", "og-image.svg", "apple-touch-icon.png")
+# app.js and styles.css are the legacy daily assets; og-image.svg is the
+# compatibility share-card source (kept reachable for older references), copied
+# to the root alongside them on every build. og-image.png is the raster card the
+# generated head actually references; like apple-touch-icon.png it is pinned at
+# the root with no daily/ source, so its entry is a presence check that fails
+# the build loudly if the committed card ever goes missing.
+ASSETS = ("app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
-STORY_FIELDS = {"title", "url", "source", "section", "summary", "fact", "take", "caveat"}
+# evidence_url is the exact source the fact was verified against. It may equal
+# url (the primary source carries the claim) or be a separate HTTPS URL — a
+# discussion thread, a data page, a primary document — when the fact's evidence
+# lives elsewhere. Without it a "Checked" fact is a bare assertion.
+STORY_FIELDS = {"title", "url", "evidence_url", "source", "section", "summary", "fact", "take", "caveat"}
 
 MAX_STORIES = 8
 MAX_PER_SECTION = 4
@@ -123,23 +128,23 @@ def canonical_url(url: str) -> str:
     return f"{host}{path}"
 
 
-def validate_url(value: object) -> str:
+def validate_url(value: object, label: str = "Story") -> str:
     if not isinstance(value, str):
-        raise ValueError("Story URL must be a string")
+        raise ValueError(f"{label} URL must be a string")
     url = str(value)
     parsed = urlparse(url)
     hostname = parsed.hostname
     if parsed.scheme != "https" or not parsed.netloc or not hostname or parsed.username or parsed.password:
-        raise ValueError(f"Only public HTTPS story URLs are allowed: {url}")
+        raise ValueError(f"Only public HTTPS {label} URLs are allowed: {url}")
     try:
         address = ipaddress.ip_address(hostname)
     except ValueError:
         lowered = hostname.lower().rstrip(".")
         if "." not in lowered or lowered == "localhost" or lowered.endswith((".localhost", ".local", ".internal")):
-            raise ValueError(f"Only public HTTPS story URLs are allowed: {url}") from None
+            raise ValueError(f"Only public HTTPS {label} URLs are allowed: {url}") from None
     else:
         if not address.is_global:
-            raise ValueError(f"Only public HTTPS story URLs are allowed: {url}")
+            raise ValueError(f"Only public HTTPS {label} URLs are allowed: {url}")
     return url
 
 
@@ -249,6 +254,10 @@ def validate_story(story: object, path: Path, published: dict[str, str], seen: s
     if not isinstance(story, dict) or set(story) != STORY_FIELDS:
         raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
     url = validate_url(story["url"])
+    # The fact's evidence may be the story itself or a separate source (a
+    # discussion thread, a data page). It must exist and be a public HTTPS URL
+    # either way: a "Checked" claim with no reachable evidence is rejected.
+    evidence_url = validate_url(story["evidence_url"], label="evidence")
     key = canonical_url(url)
     if key in seen:
         raise ValueError(f"{path}: duplicate URL {url}")
@@ -263,6 +272,7 @@ def validate_story(story: object, path: Path, published: dict[str, str], seen: s
     return {
         "title": title,
         "url": url,
+        "evidence_url": evidence_url,
         "source": validate_text(story["source"], "source", 2, 100),
         "section": section,
         "summary": validate_text(story["summary"], "summary", 25, 700),
@@ -321,7 +331,7 @@ def story_card(story: dict, index: int, prominence: str) -> str:
           <div class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></div>
           <h2><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></h2>
           <p>{esc(story['summary'])}</p>
-          <p class="fact"><strong>Checked</strong> <a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
+          <p class="fact"><strong>Checked</strong> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
           <p class="take"><strong>Nish</strong> {esc(story['take'])}</p>
           <p class="caveat"><strong>But</strong> {esc(story['caveat'])}</p>
           <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} ↗</a>
@@ -431,15 +441,15 @@ def page(edition: dict) -> str:
   <meta name="description" content="{esc(description)}">
   <meta property="og:title" content="{esc(title)}">
   <meta property="og:description" content="{esc(description)}">
-  <meta property="og:image" content="https://inish.in/og-image.svg">
+  <meta property="og:image" content="https://inish.in/og-image.png">
   <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
-  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{esc(title)}">
   <meta name="twitter:description" content="{esc(description)}">
-  <meta name="twitter:image" content="https://inish.in/og-image.svg">
+  <meta name="twitter:image" content="https://inish.in/og-image.png">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
@@ -470,10 +480,27 @@ def page(edition: dict) -> str:
 """
 
 
+def rss_item_description(edition: dict) -> str:
+    """The item body: the editor's note plus every story, so a subscriber who
+    reads the feed in a reader still sees the edition after the root page has
+    rolled over to a newer day. The assembled HTML is escaped once as a whole,
+    so the description is character data (per RSS practice) and one story's
+    ampersand or angle bracket cannot corrupt another's markup.
+    """
+    parts = [f"<p>{edition['editor_note']}</p>"]
+    for story in edition["stories"]:
+        parts.append(f"<h3><a href=\"{story['url']}\">{story['title']}</a></h3>")
+        parts.append(f"<p>{story['summary']}</p>")
+        parts.append(f"<p><strong>Checked</strong> <a href=\"{story['evidence_url']}\">{story['fact']}</a></p>")
+        parts.append(f"<p><strong>Nish</strong> {story['take']}</p>")
+        parts.append(f"<p><strong>But</strong> {story['caveat']}</p>")
+    return html.escape("".join(parts))
+
+
 def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
     link = "https://inish.in/"
-    description = html.escape(edition["editor_note"])
+    description = rss_item_description(edition)
     published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"inish-daily-{day.isoformat()}"
     item = f"<item><title>Nish's Daily Reads — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"

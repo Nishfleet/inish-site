@@ -1,34 +1,10 @@
 // Live edge path is worker.js (Workers + assets). Keep this file's
 // publicPaths/redirects/HSTS identical — tests enforce the shared contract.
-const publicPaths = new Set([
-  "/",
-  "/app.js",
-  "/styles.css",
-  "/apple-touch-icon.png", // iOS home-screen icon, referenced by the generated head
-  "/og-image.svg", // social share card, referenced by the generated head
-  "/latest.json",
-  "/feed.xml",
-  "/robots.txt",
-  "/sitemap.xml",
-  "/fonts/OFL.txt" // SIL OFL 1.1 license text, referenced by styles.css
-]);
-
-// Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
-// future face does not need a middleware edit, and tight enough that it cannot
-// serve anything but a woff2 from this one directory.
-const fontPath = /^\/fonts\/[a-z0-9-]+\.woff2$/;
-
-const redirects = new Map([
-  ["/index.html", "/"],
-  ["/daily", "/"],
-  ["/daily/", "/"],
-  ["/daily/index.html", "/"],
-  ["/daily/app.js", "/app.js"],
-  ["/daily/styles.css", "/styles.css"],
-  ["/daily/latest.json", "/latest.json"],
-  ["/daily/feed.xml", "/feed.xml"],
-  ["/daily/sitemap.xml", "/sitemap.xml"]
-]);
+//
+// The decision lives in ./policy.js so the deny/allow/redirect branch can be
+// exercised by real tests against the imported function rather than by
+// substring matching on this file.
+import { canonicalize, decide, redirects } from "./policy.js";
 
 // The site is HTTPS-only, so every response from the middleware can carry HSTS.
 // No subdomains exist yet; includeSubDomains keeps any future one under the
@@ -69,8 +45,21 @@ async function notFoundResponse(request, env) {
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
-  const target = redirects.get(url.pathname);
-  if (target) {
+  // Canonicalize to https://inish.in{path}{search} before any path-based
+  // decision runs: http://, www., and the combined cases all collapse to a
+  // single 301 instead of serving three extra copies of the site.
+  const canonical = canonicalize(url);
+  if (canonical !== null) {
+    return withSecurityHeaders(
+      new Response(null, {
+        status: 301,
+        headers: { Location: canonical }
+      })
+    );
+  }
+  const decision = decide(url.pathname);
+  if (decision === "redirect") {
+    const target = redirects.get(url.pathname);
     const destination = new URL(target, url.origin);
     destination.search = url.search;
     // Manual 301 instead of Response.redirect(): the runtime's redirect
@@ -82,7 +71,7 @@ export async function onRequest(context) {
       })
     );
   }
-  if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
+  if (decision === "deny") {
     return withSecurityHeaders(await notFoundResponse(context.request, context.env));
   }
   return withSecurityHeaders(await context.next());

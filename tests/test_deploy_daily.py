@@ -1,5 +1,8 @@
+import json
+import os
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -11,10 +14,12 @@ WORKER = ROOT / "worker.js"
 MIDDLEWARE = ROOT / "functions" / "_middleware.js"
 WRANGLER = ROOT / "wrangler.jsonc"
 
-# Root static assets referenced by the generated head: the social share card
-# (og:image / twitter:image) and the iOS home-screen icon. Both are pinned at
-# the repo root and must ride in every temporary deploy payload.
+# Root static assets referenced by the generated head: the raster social share
+# card (og:image / twitter:image), its legacy SVG source, and the iOS
+# home-screen icon. All are pinned at the repo root and must ride in every
+# temporary deploy payload.
 SHARE_CARD = "og-image.svg"
+RASTER_SHARE_CARD = "og-image.png"
 HOME_SCREEN_ICON = "apple-touch-icon.png"
 
 # The deploy script copies the root files into the payload from SNAPSHOT_ROOT
@@ -52,6 +57,132 @@ def head_root_assets() -> set[str]:
     }
 
 
+# ---- Behavioral rollback fixture --------------------------------------------
+# The exhausted-live-verification rollback test runs the real deploy_daily.sh
+# against a hermetic git fixture with every external command stubbed on PATH,
+# then asserts on the ordered command log the script actually executes.
+ACCEPTED_EDITION = "2026-08-13"  # the edition this deploy publishes
+LIVE_EDITION = "2026-08-12"  # the edition live before the deploy
+PRE_DEPLOY_VERSION_ID = "v-9f8e7d6c5b4a3210"  # the version serving 100% pre-deploy
+
+# Every payload file deploy_daily.sh copies from the snapshot (plus the fonts
+# directory, worker.js, wrangler.jsonc and functions/policy.js), minimal but
+# real enough for the script's own preflight to run.
+FIXTURE_PAYLOAD_FILES = (
+    "index.html", "404.html", "app.js", "styles.css",
+    "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml",
+    "robots.txt", "sitemap.xml", "_redirects",
+)
+
+NPX_STUB = """#!/usr/bin/env bash
+# Stub npx: the script always invokes "npx --yes <cmd> ..."; drop the flag and
+# exec the wrapped command straight from PATH so the wrangler stub executes.
+if [[ "${1:-}" == "--yes" ]]; then
+  shift
+fi
+exec "$@"
+"""
+
+WRANGLER_STUB = """#!/usr/bin/env bash
+# Stub wrangler: record every invocation, then answer deterministically:
+# deployments list reports the pre-deploy version at 100%; deploy and rollback
+# succeed. Any other subcommand fails loudly so drift surfaces in the log.
+printf 'cmd:wrangler %s\\n' "$*" >>"$COMMAND_LOG"
+case "${1:-}" in
+  deployments)
+    printf '%s\\n' '[{"id":"deploy-1","versions":[{"percentage":100,"version_id":"__PRE_DEPLOY_VERSION_ID__"}]}]'
+    exit 0
+    ;;
+  deploy)
+    exit 0
+    ;;
+  rollback)
+    exit 0
+    ;;
+  *)
+    printf 'unexpected wrangler invocation: %s\\n' "$*" >>"$COMMAND_LOG"
+    exit 1
+    ;;
+esac
+"""
+
+CURL_STUB = """#!/usr/bin/env bash
+# Stub curl: the freshness gate reads the live edition from a fixture file.
+cat "$LIVE_LATEST_JSON"
+exit 0
+"""
+
+SLEEP_STUB = """#!/usr/bin/env bash
+# Stub sleep: the verification loop keeps its real twelve-attempt exhaustion
+# and the deploy retry keeps its real bounds, but no test wall-clock time is
+# spent on the 5s/20s pacing sleeps.
+exit 0
+"""
+
+HERMES_STUB = """#!/usr/bin/env bash
+# Stub hermes: record any success notification. The rollback path must never
+# send one, so the test asserts the log has no hermes line.
+printf 'cmd:hermes %s\\n' "$*" >>"$COMMAND_LOG"
+exit 0
+"""
+
+VERIFY_STUB = '''#!/usr/bin/env python3
+"""Stub scripts/verify_live.py for the behavioral rollback test.
+
+The deployed (accepted) edition never becomes live, so every verification
+attempt for it fails and the loop exhausts; the pre-deploy identity alone
+verifies, so the post-rollback re-verification of the restored version
+succeeds. Every call is recorded in the shared command log.
+"""
+import argparse
+import os
+import sys
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--root")
+parser.add_argument("--edition-date")
+parser.add_argument("--commit")
+args = parser.parse_args()
+
+with open(os.environ["COMMAND_LOG"], "a") as log:
+    log.write("cmd:verify_live edition=%s commit=%s\\n" % (args.edition_date, args.commit))
+
+if args.edition_date == os.environ["LIVE_EDITION_DATE"]:
+    print("verified live edition %s (commit %s)" % (args.edition_date, args.commit))
+    sys.exit(0)
+print("verify_live stage: edition %s (commit %s) is not live" % (args.edition_date, args.commit))
+sys.exit(1)
+'''
+
+
+def _git(cwd: Path, *args: str) -> str:
+    """Run git in a fixture repo with a fixed identity; return stdout."""
+    result = subprocess.run(
+        ["git", "-C", str(cwd), "-c", "user.name=Fixture", "-c", "user.email=fixture@inish.in", *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout
+
+
+def fixture_payload(tree: Path, edition: str, story_count: int) -> None:
+    """Write the minimal origin/main tree deploy_daily.sh needs to publish."""
+    for name in FIXTURE_PAYLOAD_FILES:
+        (tree / name).write_text(f"{name} fixture for edition {edition}\n")
+    fonts = tree / "fonts"
+    fonts.mkdir(exist_ok=True)
+    (fonts / "fixture.woff2").write_text("fixture font\n")
+    (tree / "worker.js").write_text('export default { async fetch() { return new Response("fixture"); } };\n')
+    (tree / "wrangler.jsonc").write_text('{ "name": "inish-site" }\n')
+    functions = tree / "functions"
+    functions.mkdir(exist_ok=True)
+    (functions / "policy.js").write_text('export const publicPaths = new Set();\n')
+    (tree / "latest.json").write_text(
+        json.dumps({"date": edition, "stories": [{"title": f"story {i}"} for i in range(story_count)]}, indent=2) + "\n"
+    )
+
+
 class DeployDailyTests(unittest.TestCase):
     def test_payload_covers_every_root_asset_the_head_references(self):
         missing = sorted(head_root_assets() - set(payload_root_files()))
@@ -62,9 +193,9 @@ class DeployDailyTests(unittest.TestCase):
             f"{missing}; deploy_daily.sh and build_daily.py must agree",
         )
 
-    def test_payload_explicitly_carries_the_share_card_and_home_screen_icon(self):
+    def test_payload_explicitly_carries_the_share_cards_and_home_screen_icon(self):
         payload = payload_root_files()
-        for name in (SHARE_CARD, HOME_SCREEN_ICON):
+        for name in (SHARE_CARD, RASTER_SHARE_CARD, HOME_SCREEN_ICON):
             self.assertIn(name, payload, f"deploy payload must include root {name}")
 
     def test_allowlist_names_only_files_that_exist_at_the_root(self):
@@ -114,15 +245,33 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn('"ASSETS"', wrangler)
 
     def test_worker_and_pages_middleware_share_the_route_contract(self):
-        # Keep the two edge sources honest: allowlist, redirects, HSTS string.
+        # Keep the two edge sources honest: both must import the route contract
+        # from functions/policy.js rather than inlining their own literals, and
+        # the response plumbing (HSTS, 404, ASSETS) must match across both edge
+        # sources. A path addition is a single edit in the policy module.
         worker = WORKER.read_text()
         middleware = MIDDLEWARE.read_text()
+        policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
+        policy_source = policy.read_text()
         for needle in (
             '"/og-image.svg"',
+            '"/og-image.png"',
             '"/apple-touch-icon.png"',
-            'max-age=31536000; includeSubDomains',
-            "!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)",
             '["/daily", "/"]',
+        ):
+            self.assertIn(needle, policy_source)
+        # The route contract deny branch lives only in the policy module; both
+        # edges must import the decision from it and define no literals of
+        # their own.
+        self.assertIn("!publicPaths.has(pathname) && !fontPath.test(pathname)", policy_source)
+        self.assertIn("from \"./functions/policy.js\"", worker)
+        self.assertIn("decide(", worker)
+        self.assertNotIn("const publicPaths = new Set", worker)
+        self.assertNotIn("const redirects = new Map", worker)
+        self.assertNotIn("const fontPath =", worker)
+        # Response plumbing lives in both edge sources.
+        for needle in (
+            "max-age=31536000; includeSubDomains",
         ):
             self.assertIn(needle, worker)
             self.assertIn(needle, middleware)
@@ -177,6 +326,140 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn("sleep 20", script)
         self.assertIn('[[ "$EDITION_DATE" < "$LIVE_EDITION_DATE" ]]', script)
         self.assertIn("Refusing to roll the live site back", script)
+
+    # The deploy loop line is "npx --yes wrangler deploy \" + newline; the
+    # plain substring "wrangler deploy" also prefixes "wrangler deployments
+    # list", so the loop position must use the backslash-newline form.
+    DEPLOY_LOOP_LINE = 'wrangler deploy \\\n'
+
+    def test_exhausted_verification_rolls_back_exactly_once_and_reverifies(self):
+        # Behavioral replacement for the former source-string rollback tests:
+        # run the real deploy_daily.sh against a hermetic fixture where the
+        # provider is fully stubbed, and assert on the ordered command log the
+        # exhausted-live-verification path actually executes. Short-circuiting
+        # or deleting the rollback (or the twelve-attempt exhaustion) makes
+        # this test red.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            stubbin = tmp / "stubbin"
+            origin = tmp / "origin.git"
+            work = tmp / "work"
+            run = tmp / "run"
+            command_log = tmp / "commands.log"
+            live_feed = tmp / "live-latest.json"
+
+            # A hermetic origin/main: the accepted edition on top of the live
+            # edition, published with the exact commit message the script's
+            # pre-deploy commit lookup greps for.
+            _git(tmp, "init", "--bare", "-b", "main", str(origin))
+            _git(tmp, "clone", str(origin), str(work))
+            fixture_payload(work, LIVE_EDITION, 2)
+            _git(work, "add", "-A")
+            _git(work, "commit", "-m", f"daily: publish {LIVE_EDITION}")
+            pre_deploy_commit = _git(work, "rev-parse", "HEAD").strip()
+            fixture_payload(work, ACCEPTED_EDITION, 3)
+            _git(work, "add", "-A")
+            _git(work, "commit", "-m", f"daily: publish {ACCEPTED_EDITION}")
+            accepted_commit = _git(work, "rev-parse", "HEAD").strip()
+            _git(work, "push", "-u", "origin", "main")
+
+            # The run checkout carries the real deploy script plus the verify
+            # stub that only the pre-deploy identity can satisfy.
+            _git(tmp, "clone", str(origin), str(run))
+            (run / "scripts").mkdir()
+            shutil.copyfile(DEPLOY_SCRIPT, run / "scripts" / "deploy_daily.sh")
+            (run / "scripts" / "deploy_daily.sh").chmod(0o755)
+            (run / "scripts" / "verify_live.py").write_text(VERIFY_STUB)
+
+            # Stub every external command the script can reach.
+            stubbin.mkdir()
+            for name, body in {
+                "npx": NPX_STUB,
+                "wrangler": WRANGLER_STUB.replace("__PRE_DEPLOY_VERSION_ID__", PRE_DEPLOY_VERSION_ID),
+                "curl": CURL_STUB,
+                "sleep": SLEEP_STUB,
+                "hermes": HERMES_STUB,
+            }.items():
+                stub = stubbin / name
+                stub.write_text(body)
+                stub.chmod(0o755)
+
+            # The live hostname serves the pre-deploy edition: a newer live
+            # edition would trip the freshness gate before the deploy starts.
+            live_feed.write_text(
+                json.dumps({"date": LIVE_EDITION, "stories": [{"title": "live"}]}) + "\n"
+            )
+
+            env = os.environ.copy()
+            env["PATH"] = f"{stubbin}:{env['PATH']}"
+            env["CLOUDFLARE_API_TOKEN"] = "fixture-token; provider is stubbed"
+            env["COMMAND_LOG"] = str(command_log)
+            env["LIVE_LATEST_JSON"] = str(live_feed)
+            env["LIVE_EDITION_DATE"] = LIVE_EDITION
+            result = subprocess.run(
+                [str(run / "scripts" / "deploy_daily.sh")],
+                cwd=str(run),
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=120,
+            )
+
+            output = result.stdout + result.stderr
+            self.assertEqual(result.returncode, 1, output)
+            commands = command_log.read_text().splitlines()
+
+            captures = [c for c in commands if c.startswith("cmd:wrangler deployments ")]
+            deploys = [c for c in commands if c.startswith("cmd:wrangler deploy ")]
+            exhausted = [
+                c for c in commands
+                if c == f"cmd:verify_live edition={ACCEPTED_EDITION} commit={accepted_commit}"
+            ]
+            rollbacks = [
+                c for c in commands
+                if c == f"cmd:wrangler rollback {PRE_DEPLOY_VERSION_ID} --name inish-site"
+            ]
+            restored = [
+                c for c in commands
+                if c == f"cmd:verify_live edition={LIVE_EDITION} commit={pre_deploy_commit}"
+            ]
+
+            self.assertEqual(len(captures), 1, commands)
+            self.assertEqual(len(deploys), 1, commands)
+            self.assertEqual(len(exhausted), 12, commands)
+            self.assertEqual(len(rollbacks), 1, commands)
+            self.assertEqual(len(restored), 1, commands)
+            # Order: pre-deploy capture -> deploy -> all twelve exhausted
+            # verifications -> exactly one rollback -> restored-identity
+            # re-verification. No success notification may be sent.
+            self.assertLess(commands.index(captures[0]), commands.index(deploys[0]))
+            self.assertLess(commands.index(deploys[0]), commands.index(exhausted[0]))
+            self.assertLess(commands.index(exhausted[-1]), commands.index(rollbacks[0]))
+            self.assertLess(commands.index(rollbacks[0]), commands.index(restored[0]))
+            self.assertEqual([c for c in commands if c.startswith("cmd:hermes")], [])
+            for needle in (
+                f"rollback_target: version {PRE_DEPLOY_VERSION_ID} currently serves worker inish-site",
+                "rolled_back: worker inish-site restored to version",
+                "rollback_restored: worker inish-site is verified live on version",
+                "it is NOT confirmed live.",
+            ):
+                self.assertIn(needle, output)
+
+    def test_deploy_is_not_attempted_when_the_predeploy_version_cannot_be_captured(self):
+        # An unreversible deploy must not start: if the version currently
+        # serving inish-site cannot be determined, the script fails loudly
+        # BEFORE wrangler deploy runs, never publishing without a rollback
+        # target.
+        script = DEPLOY_SCRIPT.read_text()
+        guard = "cannot determine the pre-deploy version of worker inish-site"
+        self.assertIn(guard, script)
+        self.assertIn('if [[ -z "$PRE_DEPLOY_VERSION" ]]', script)
+        guard_pos = script.index(guard)
+        deploy_pos = script.index(self.DEPLOY_LOOP_LINE)
+        self.assertLess(
+            guard_pos, deploy_pos,
+            "the capture guard must fail before wrangler deploy runs",
+        )
 
 
 if __name__ == "__main__":
