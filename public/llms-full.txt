@@ -1,0 +1,133 @@
+# AI Converter full context
+
+AI Converter is a web app for automated AI conversion and common file-format conversion. Bank statement PDF to CSV is the first production AI module.
+
+## Current product wedge
+
+The production AI module is bank statement PDF to CSV. Receipt, invoice, screenshot-table, audio transcript, document-to-Markdown, screenshot-to-HTML, and common file-format conversion use the same preview-first path when configured. Pixel-perfect image-to-code is not claimed.
+
+Accounting SEO pages explain truthful CSV preparation use cases for QuickBooks, Xero, Wave, Excel, credit card statements, and bookkeepers. These pages must not claim official accounting-platform support, direct bank feeds, guaranteed imports, reconciliation, categorization, SOC 2, GDPR, accounting advice, or tax advice.
+
+Live behavior:
+- Direct browser upload for bank statement PDFs.
+- PDF bank statement to QuickBooks CSV preparation, with explicit limits: not official QuickBooks Web Connect, no QuickBooks connection, and no guaranteed import.
+- PDF bank statement to Xero CSV preparation, with explicit limits: no Xero connection, no direct bank feed, and no guaranteed import.
+- PDF bank statement to Wave CSV preparation, with explicit limits: no Wave connection, no direct bank feed, and no guaranteed import.
+- Scanned bank statement to Excel-readable CSV when OCR confidence is high enough. This is CSV that opens in Excel, not a guaranteed native Excel workbook.
+- Credit card statement PDF to CSV when transaction rows can be safely extracted.
+- Bank statement converter for bookkeepers who need reviewable CSV rows for cleanup, client workpapers, and accounting-system prep.
+- PDF upload limit: 50 MB.
+- Page-pack pricing up to 500 pages.
+- Built-in parser first for digital PDFs.
+- OCR fallback for scanned or messy PDFs when configured.
+- Free preview and downloadable sample CSV before payment.
+- Paid full extraction and CSV download.
+- One automatic stronger redo for paid jobs.
+- Low-confidence conversions fail closed.
+- No human file review queue.
+- No emailed bank statements in the live bank-statement workflow.
+- Receipt image or PDF to expense CSV is beta. It can export vendor, date, category, total, tax, payment method, and notes when safely detected.
+- Invoice or bill image/PDF to CSV or JSON is beta. It can export vendor, invoice number, invoice date, due date, subtotal, tax, total, payment terms, notes, and JSON line items when safely detected.
+- Screenshot PNG, JPG, WEBP, or image PDF to spreadsheet CSV is beta. It can infer table rows and headers when safely detected.
+- Image format conversion from PNG, JPG, JPEG, or WEBP to PNG, JPG, or WEBP is live.
+- Raster-to-SVG conversion from PNG, JPG, JPEG, or WEBP to SVG is live.
+- Audio transcript from MP3, WAV, M4A, AAC, OGG, or WEBM to TXT or JSON is beta.
+- Document Markdown conversion for supported rich document formats is beta.
+- Screenshot to HTML is beta. It creates a clean starter preview and uses image understanding for paid image exports when configured. It does not claim pixel-perfect screenshot cloning.
+- Common file conversion supports documents, images, audio, video, and archives when the selected input and output are available. Long media jobs run in the background and update automatically.
+- Beta modules use OCR and can fail closed when structure confidence is too low.
+
+Homepage ticker examples:
+- Core examples: bank statement PDF to CSV, receipt image to expense CSV, invoice PDF to JSON, screenshot table to CSV, JPG to PNG, PNG to JPG, WEBP to PNG, audio to transcript, document to Markdown.
+- Provider-backed conversion options are available across the current accepted input formats and output choices, with more coming soon. Examples include PDF to Word, Word to PDF, PDF to JPG, HEIC to JPG, SVG to PNG, MP4 to MP3, MOV to MP4, GIF to MP4, WAV to MP3, XLSX to CSV, CSV to XLSX, and docs/images/audio/video/archive categories.
+
+## Pricing
+
+- Free preview and sample CSV download.
+- Starter: ₹399 for 25 pages or images.
+- Standard: ₹799 for 100 pages or images.
+- Bulk: ₹1,399 for 500 pages or images.
+
+## Data handling
+
+- Source files are private.
+- Source files are kept for preview, paid unlock, and the redo window.
+- Source files are deleted after failed extraction, completed redo, or the 24-hour source lifecycle.
+- Generated files expire after 7 days.
+- API responses for sensitive routes are marked no-store.
+- Job access uses a job ID and random token.
+
+## Output shape
+
+Typical CSV columns:
+- date
+- description
+- money_in
+- money_out
+- balance
+
+Beta receipt CSV columns:
+- date
+- vendor
+- category
+- total
+- currency
+- subtotal
+- tax
+- payment_method
+- notes
+
+Beta screenshot/table CSV columns are inferred from the visible table when safe. Markdown tables, OCR table blocks, HTML table output, and obvious date-description-amount rows are handled.
+
+Beta invoice CSV columns:
+- vendor
+- invoice_number
+- invoice_date
+- due_date
+- total
+- currency
+- subtotal
+- tax
+- payment_terms
+- notes
+
+Beta invoice JSON includes the invoice summary, line_items when safely detected, warnings, and confidence.
+
+Beta audio TXT contains the transcript. Beta audio JSON contains transcript, word count, optional VTT, and word-level detail when available.
+
+Beta document Markdown exports `.md`. Screenshot-to-HTML exports `.html` based on detected readable content and structure.
+
+Fake sample CSV:
+- https://aiconverter.app/sample-bank-statement.csv
+
+## Pages
+
+- Home: https://aiconverter.app
+- Formats: https://aiconverter.app/formats/
+- About: https://aiconverter.app/about/
+- Bank statement PDF to CSV: https://aiconverter.app/bank-statement-pdf-to-csv/
+- Convert bank statement to CSV: https://aiconverter.app/convert-bank-statement-to-csv/
+- PDF bank statement to QuickBooks CSV: https://aiconverter.app/pdf-bank-statement-to-quickbooks-csv/
+- PDF bank statement to Xero CSV: https://aiconverter.app/pdf-bank-statement-to-xero-csv/
+- PDF bank statement to Wave CSV: https://aiconverter.app/pdf-bank-statement-to-wave-csv/
+- Scanned bank statement to Excel: https://aiconverter.app/scanned-bank-statement-to-excel/
+- Credit card statement PDF to CSV: https://aiconverter.app/credit-card-statement-pdf-to-csv/
+- Bank statement converter for bookkeepers: https://aiconverter.app/bank-statement-converter-for-bookkeepers/
+- Sample CSV: https://aiconverter.app/sample-csv/
+- Security: https://aiconverter.app/security/
+- Trust center: https://aiconverter.app/trust/
+- Privacy: https://aiconverter.app/privacy/
+- Terms: https://aiconverter.app/terms/
+- Refunds: https://aiconverter.app/refund/
+- Data retention: https://aiconverter.app/data-retention/
+- Support: https://aiconverter.app/support/
+
+## Upcoming, not live as primary bank-statement intake
+
+- AI-monitored email intake after the secure direct upload workflow is stable.
+
+## Claims to avoid
+
+Do not claim AI Converter supports every bank, every statement format, every receipt format, every invoice format, every screenshot layout, every audio file, every document, every image format, every file type, certified compliance, human review, guaranteed accuracy, accounting or tax advice, instant AI processing, pixel-perfect screenshot-to-code, or customer-volume proof. Format conversion depends on the live app accepting that exact input/output pair. Exports should be reviewed before important use.
+
+Do not claim official QuickBooks Web Connect, direct QuickBooks/Xero/Wave integration, direct bank feeds, guaranteed imports, reconciliation, categorization, SOC 2, or GDPR. Mention OFX or QBO only through the optional "Need OFX/QBO? Add bank details" path, not as guaranteed import files.

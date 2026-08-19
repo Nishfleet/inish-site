@@ -1,0 +1,399 @@
+{
+  "converters": [
+    {
+      "id": "bank",
+      "title": "Bank statement",
+      "input": "PDF",
+      "output": "CSV",
+      "state": "Live",
+      "accept": "application/pdf,.pdf",
+      "description": "Preview and extract bank statement rows, then export clean CSV presets for accounting imports.",
+      "outputFormats": [
+        { "id": "quickbooks-csv", "label": "QuickBooks CSV" },
+        { "id": "xero-csv", "label": "Xero CSV" },
+        { "id": "wave-csv", "label": "Wave CSV" },
+        { "id": "gnucash-csv", "label": "GnuCash CSV" },
+        { "id": "csv", "label": "Clean CSV" },
+        { "id": "ofx", "label": "OFX" },
+        { "id": "qbo", "label": "QBO" },
+        { "id": "qif", "label": "QIF" }
+      ],
+      "columns": [
+        { "key": "date", "label": "Date" },
+        { "key": "description", "label": "Description" },
+        { "key": "money_in", "label": "In" },
+        { "key": "money_out", "label": "Out" },
+        { "key": "balance", "label": "Balance" }
+      ],
+      "checks": ["Row extraction", "Accounting CSV presets", "Balance checks"]
+    },
+    {
+      "id": "receipt",
+      "title": "Receipt",
+      "input": "Image / PDF",
+      "output": "Expense CSV",
+      "state": "Beta",
+      "accept": "application/pdf,image/png,image/jpeg,image/webp,.pdf,.png,.jpg,.jpeg,.webp",
+      "description": "Extract vendor, date, category, total, tax, payment method, and notes from receipt images or PDFs.",
+      "columns": [
+        { "key": "date", "label": "Date" },
+        { "key": "vendor", "label": "Vendor" },
+        { "key": "category", "label": "Category" },
+        { "key": "total", "label": "Total" },
+        { "key": "currency", "label": "Currency" },
+        { "key": "subtotal", "label": "Subtotal" },
+        { "key": "tax", "label": "Tax" },
+        { "key": "payment_method", "label": "Payment method" },
+        { "key": "notes", "label": "Notes" }
+      ],
+      "checks": ["Vendor detection", "Tax and total checks", "Category inference"]
+    },
+    {
+      "id": "screenshot",
+      "title": "Screenshot",
+      "input": "PNG / JPG",
+      "output": "Spreadsheet",
+      "state": "Beta",
+      "accept": "application/pdf,image/png,image/jpeg,image/webp,.pdf,.png,.jpg,.jpeg,.webp",
+      "description": "Pull table-like data from screenshots and image PDFs into spreadsheet-ready CSV.",
+      "columns": [
+        { "key": "column_1", "label": "Column 1" },
+        { "key": "column_2", "label": "Column 2" },
+        { "key": "column_3", "label": "Column 3" },
+        { "key": "column_4", "label": "Column 4" },
+        { "key": "column_5", "label": "Column 5" }
+      ],
+      "checks": ["Table OCR", "Header inference", "Spreadsheet CSV"]
+    },
+    {
+      "id": "invoice",
+      "title": "Invoice / bill",
+      "input": "Image / PDF",
+      "output": "Structured file",
+      "state": "Beta",
+      "accept": "application/pdf,image/png,image/jpeg,image/webp,.pdf,.png,.jpg,.jpeg,.webp",
+      "description": "Extract vendor, invoice number, dates, totals, tax, payment terms, notes, and line items from invoices or bills.",
+      "outputFormats": [
+        { "id": "csv", "label": "CSV" },
+        { "id": "json", "label": "JSON" }
+      ],
+      "columns": [
+        { "key": "vendor", "label": "Vendor" },
+        { "key": "invoice_number", "label": "Invoice #" },
+        { "key": "invoice_date", "label": "Invoice date" },
+        { "key": "due_date", "label": "Due date" },
+        { "key": "total", "label": "Total" },
+        { "key": "currency", "label": "Currency" },
+        { "key": "tax", "label": "Tax" },
+        { "key": "payment_terms", "label": "Payment terms" },
+        { "key": "notes", "label": "Notes" }
+      ],
+      "checks": ["Invoice fields", "Total checks", "Line-item capture"]
+    },
+    {
+      "id": "image-format",
+      "title": "Image format",
+      "input": "PNG / JPG / WEBP",
+      "output": "PNG / JPG / WEBP",
+      "state": "Local",
+      "mode": "local-image",
+      "accept": "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp",
+      "description": "Convert common image formats.",
+      "outputFormats": [
+        { "id": "png", "label": "PNG" },
+        { "id": "jpeg", "label": "JPG" },
+        { "id": "webp", "label": "WEBP" }
+      ],
+      "checks": ["Private conversion", "No server upload", "Instant download"]
+    },
+    {
+      "id": "raster-vector",
+      "title": "Raster to SVG",
+      "input": "PNG / JPG / WEBP",
+      "output": "SVG",
+      "state": "Local",
+      "mode": "local-svg",
+      "accept": "image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp",
+      "description": "Create a lightweight posterized SVG from a common image.",
+      "outputFormats": [
+        { "id": "svg", "label": "SVG" }
+      ],
+      "checks": ["Private conversion", "No server upload", "SVG download"]
+    },
+    {
+      "id": "audio-transcript",
+      "title": "Audio transcript",
+      "input": "MP3 / WAV / M4A",
+      "output": "Transcript",
+      "state": "Beta",
+      "accept": "audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/mp4,audio/x-m4a,audio/aac,audio/ogg,audio/webm,.mp3,.wav,.m4a,.aac,.ogg,.webm",
+      "description": "Transcribe common audio files into a TXT transcript or structured JSON.",
+      "outputFormats": [
+        { "id": "txt", "label": "TXT" },
+        { "id": "json", "label": "JSON" }
+      ],
+      "columns": [
+        { "key": "transcript", "label": "Transcript" },
+        { "key": "word_count", "label": "Words" },
+        { "key": "format", "label": "Format" }
+      ],
+      "checks": ["Speech-to-text", "TXT or JSON", "25 MB audio limit"]
+    },
+    {
+      "id": "document-markdown",
+      "title": "Document Markdown",
+      "input": "PDF / DOCX / XLSX / HTML",
+      "output": "Markdown",
+      "state": "Beta",
+      "accept": "application/pdf,image/png,image/jpeg,image/webp,image/svg+xml,text/html,application/xml,text/xml,text/csv,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroenabled.12,application/vnd.ms-excel.sheet.binary.macroenabled.12,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.text,application/vnd.apple.numbers,.pdf,.png,.jpg,.jpeg,.webp,.svg,.html,.htm,.xml,.csv,.docx,.xlsx,.xlsm,.xlsb,.xls,.et,.ods,.odt,.numbers",
+      "description": "Convert rich documents and images into clean Markdown.",
+      "outputFormats": [
+        { "id": "md", "label": "MD" }
+      ],
+      "columns": [
+        { "key": "name", "label": "File" },
+        { "key": "type", "label": "Type" },
+        { "key": "tokens", "label": "Tokens" },
+        { "key": "preview", "label": "Preview" }
+      ],
+      "checks": ["Document to Markdown", "Rich-format parser", "Private download"]
+    },
+    {
+      "id": "screenshot-code",
+      "title": "Screenshot to HTML",
+      "input": "PNG / JPG / WEBP / PDF",
+      "output": "HTML",
+      "state": "Beta",
+      "accept": "application/pdf,image/png,image/jpeg,image/webp,.pdf,.png,.jpg,.jpeg,.webp",
+      "description": "Turn readable screenshot content into HTML. Preview uses a starter; paid image exports use image understanding when configured. This is not a pixel-perfect clone.",
+      "outputFormats": [
+        { "id": "html", "label": "HTML" }
+      ],
+      "columns": [
+        { "key": "component", "label": "Component" },
+        { "key": "source", "label": "Source" },
+        { "key": "preview", "label": "Preview" }
+      ],
+      "checks": ["Vision HTML on paid image export", "HTML preview starter", "Truthful non-pixel-perfect output"]
+    },
+    {
+      "id": "universal-file",
+      "title": "Universal file",
+      "input": "Docs / media / archives",
+      "output": "Popular formats",
+      "state": "Live",
+      "mode": "provider-cloudconvert",
+      "accept": "application/pdf,application/msword,application/rtf,text/plain,text/markdown,text/html,text/csv,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.ms-powerpoint,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,image/png,image/jpeg,image/webp,image/gif,image/bmp,image/tiff,image/heic,image/heif,image/svg+xml,audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/mp4,audio/x-m4a,audio/aac,audio/ogg,audio/flac,audio/webm,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/x-ms-wmv,video/webm,application/zip,application/x-7z-compressed,application/x-tar,application/gzip,application/vnd.rar,application/x-rar-compressed,.pdf,.doc,.docx,.rtf,.txt,.md,.html,.htm,.csv,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.png,.jpg,.jpeg,.webp,.gif,.bmp,.tif,.tiff,.heic,.heif,.svg,.mp3,.wav,.m4a,.aac,.ogg,.flac,.webm,.mp4,.mov,.avi,.mkv,.wmv,.zip,.7z,.tar,.gz,.rar",
+      "description": "Convert documents, images, audio, video, and archives into popular output formats. Long media jobs run in the background and update automatically.",
+      "outputFormats": [
+        { "id": "pdf", "label": "PDF" },
+        { "id": "docx", "label": "DOCX" },
+        { "id": "txt", "label": "TXT" },
+        { "id": "html", "label": "HTML" },
+        { "id": "md", "label": "MD" },
+        { "id": "csv", "label": "CSV" },
+        { "id": "xlsx", "label": "XLSX" },
+        { "id": "pptx", "label": "PPTX" },
+        { "id": "png", "label": "PNG" },
+        { "id": "jpg", "label": "JPG" },
+        { "id": "webp", "label": "WEBP" },
+        { "id": "gif", "label": "GIF" },
+        { "id": "svg", "label": "SVG" },
+        { "id": "mp3", "label": "MP3" },
+        { "id": "wav", "label": "WAV" },
+        { "id": "m4a", "label": "M4A" },
+        { "id": "ogg", "label": "OGG" },
+        { "id": "flac", "label": "FLAC" },
+        { "id": "mp4", "label": "MP4" },
+        { "id": "webm", "label": "WEBM" },
+        { "id": "mov", "label": "MOV" },
+        { "id": "zip", "label": "ZIP" },
+        { "id": "7z", "label": "7Z" },
+        { "id": "tar", "label": "TAR" }
+      ],
+      "columns": [
+        { "key": "file", "label": "File" },
+        { "key": "input", "label": "Input" },
+        { "key": "output", "label": "Output" },
+        { "key": "route", "label": "Step" },
+        { "key": "status", "label": "Status" }
+      ],
+      "checks": ["Format conversion", "Background processing", "Private download"]
+    },
+    {
+      "id": "email",
+      "title": "Email monitor",
+      "input": "Inbox",
+      "output": "Converted files",
+      "state": "Upcoming",
+      "description": "Let AI watch a connected inbox for converter requests once the direct upload workflow is proven."
+    }
+  ],
+  "sampleRows": [
+    {
+      "date": "2026-04-02",
+      "description": "Stripe payout",
+      "moneyIn": "$8,420.12",
+      "moneyOut": "",
+      "balance": "$62,104.09"
+    },
+    {
+      "date": "2026-04-07",
+      "description": "Amazon Web Services",
+      "moneyIn": "",
+      "moneyOut": "$1,284.33",
+      "balance": "$60,819.76"
+    },
+    {
+      "date": "2026-04-14",
+      "description": "Payroll transfer",
+      "moneyIn": "",
+      "moneyOut": "$14,300.00",
+      "balance": "$46,519.76"
+    },
+    {
+      "date": "2026-04-22",
+      "description": "Client ACH",
+      "moneyIn": "$22,000.00",
+      "moneyOut": "",
+      "balance": "$68,519.76"
+    }
+  ],
+  "sampleRowsByConverter": {
+    "receipt": [
+      {
+        "date": "2026-05-12",
+        "vendor": "Central Coffee",
+        "category": "Meals",
+        "total": 8.37,
+        "currency": "USD",
+        "subtotal": 7.75,
+        "tax": 0.62,
+        "payment_method": "card",
+        "notes": "Latte $4.50; Bagel $3.25"
+      },
+      {
+        "date": "2026-05-13",
+        "vendor": "Cloud Hosting Inc",
+        "category": "Software",
+        "total": 22,
+        "currency": "USD",
+        "subtotal": 20,
+        "tax": 2,
+        "payment_method": "card",
+        "notes": "Hosting plan $20.00"
+      }
+    ],
+    "screenshot": [
+      {
+        "column_1": "2026-05-01",
+        "column_2": "Hosting",
+        "column_3": "$12.30"
+      },
+      {
+        "column_1": "2026-05-02",
+        "column_2": "Domain",
+        "column_3": "$10.46"
+      },
+      {
+        "column_1": "2026-05-03",
+        "column_2": "OCR API",
+        "column_3": "$1.92"
+      }
+    ],
+    "invoice": [
+      {
+        "vendor": "Cloud Hosting Inc",
+        "invoice_number": "INV-2026-042",
+        "invoice_date": "2026-05-10",
+        "due_date": "2026-05-24",
+        "total": 242,
+        "currency": "USD",
+        "tax": 22,
+        "payment_terms": "Net 14",
+        "notes": "Hosting plan; usage overage"
+      }
+    ],
+    "audio-transcript": [
+      {
+        "transcript": "The weekly close is ready. Please review the bank statement rows and attach the missing receipt before Friday.",
+        "word_count": 18,
+        "format": "TXT"
+      }
+    ],
+    "document-markdown": [
+      {
+        "name": "operating-plan.docx",
+        "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "tokens": 1240,
+        "preview": "# Operating plan\n\n## Priorities\n- Close books\n- Export clean records"
+      }
+    ],
+    "screenshot-code": [
+      {
+        "component": "HTML starter",
+        "source": "image/png",
+        "preview": "Readable text and sections from the screenshot are converted into an HTML starting point."
+      }
+    ],
+    "universal-file": [
+      {
+        "file": "deck.pptx",
+        "input": "PPTX",
+        "output": "PDF",
+        "route": "Preview ready",
+        "status": "Ready to unlock"
+      }
+    ]
+  },
+  "pricing": [
+    {
+      "id": "starter",
+      "name": "Starter",
+      "price": "₹399",
+      "amount": 39900,
+      "currency": "INR",
+      "detail": "25 pages/images",
+      "pages": 25,
+      "note": "Free preview first"
+    },
+    {
+      "id": "batch",
+      "name": "Standard",
+      "price": "₹799",
+      "amount": 79900,
+      "currency": "INR",
+      "detail": "100 pages/images",
+      "pages": 100,
+      "note": "Most one-off jobs"
+    },
+    {
+      "id": "pro",
+      "name": "Bulk",
+      "price": "₹1,399",
+      "amount": 139900,
+      "currency": "INR",
+      "detail": "500 pages/images",
+      "pages": 500,
+      "note": "Best value"
+    }
+  ],
+  "trustProof": [
+    {
+      "title": "Download the sample first",
+      "detail": "Review and download preview rows before you pay for the full export."
+    },
+    {
+      "title": "Private, short-lived uploads",
+      "detail": "Source files stay in private storage only for preview, unlock, and the redo window."
+    },
+    {
+      "title": "Uncertain files stop early",
+      "detail": "If we cannot produce a reliable preview, the job fails closed and you are not charged."
+    },
+    {
+      "title": "No human file review",
+      "detail": "The live path is direct upload, automated processing, payment, and download."
+    }
+  ]
+}

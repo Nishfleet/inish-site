@@ -1,0 +1,41 @@
+{
+  "rules": [
+    {
+      "id": "Delete source PDFs after 1 day",
+      "enabled": true,
+      "conditions": {
+        "prefix": "sources/"
+      },
+      "deleteObjectsTransition": {
+        "condition": {
+          "type": "Age",
+          "maxAge": 86400
+        }
+      }
+    },
+    {
+      "id": "Delete conversion artifacts after 7 days",
+      "enabled": true,
+      "conditions": {
+        "prefix": "jobs/"
+      },
+      "deleteObjectsTransition": {
+        "condition": {
+          "type": "Age",
+          "maxAge": 604800
+        }
+      }
+    },
+    {
+      "id": "Abort incomplete uploads after 1 day",
+      "enabled": true,
+      "conditions": {},
+      "abortMultipartUploadsTransition": {
+        "condition": {
+          "type": "Age",
+          "maxAge": 86400
+        }
+      }
+    }
+  ]
+}

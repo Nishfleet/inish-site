@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    <meta
+      name="description"
+      content="This AI Converter page was not found. Search real conversion routes, recover the closest live page, or report the broken link."
+    />
+    <title>Page not found - AI Converter</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <style>
+      @font-face {
+        font-family: "HK Grotesk";
+        src: url("/fonts/hkgrotesk-regular.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "HK Grotesk";
+        src: url("/fonts/hkgrotesk-medium.woff2") format("woff2");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "HK Grotesk";
+        src: url("/fonts/hkgrotesk-semibold.woff2") format("woff2");
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "HK Grotesk";
+        src: url("/fonts/hkgrotesk-bold.woff2") format("woff2");
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: "HK Grotesk";
+        src: url("/fonts/hkgrotesk-extrabold.woff2") format("woff2");
+        font-weight: 800;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      :root {
+        color-scheme: light;
+        --bg: #f7f7f1;
+        --surface: #fffef8;
+        --surface-2: #ededdf;
+        --ink: #12120f;
+        --muted: #6e716a;
+        --line: #deded2;
+        --line-strong: #bdbfaf;
+        --green: #bbff2c;
+        --green-dark: #314d05;
+        --green-mid: #6ba000;
+        --green-hot: #9cff00;
+        --blue: #2563eb;
+        --blue-soft: #edf1ff;
+        --danger: #d73525;
+        --shadow: 0 24px 70px rgba(43, 43, 30, 0.1);
+        --radius: 8px;
+        --font-sans: "HK Grotesk", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", monospace;
+        font-family: var(--font-sans);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-width: 0;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-width: 0;
+        overflow-x: hidden;
+        color: var(--ink);
+        font-family: var(--font-sans);
+        font-synthesis: none;
+        text-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background:
+          radial-gradient(circle at 50% 18%, rgba(187, 255, 44, 0.22), transparent 23rem),
+          linear-gradient(90deg, rgba(18, 18, 15, 0.045) 1px, transparent 1px),
+          linear-gradient(180deg, rgba(18, 18, 15, 0.04) 1px, transparent 1px),
+          var(--bg);
+        background-size: auto, 96px 96px, 96px 96px, auto;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button,
+      a,
+      input {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible {
+        outline: 3px solid rgba(37, 99, 235, 0.45);
+        outline-offset: 3px;
+      }
+
+      .page-shell {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding-bottom: 32px;
+      }
+
+      .site-header {
+        min-height: 72px;
+        display: grid;
+        gap: 12px;
+        padding: 14px 0 12px;
+      }
+
+      .brand-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .brand {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .brand img {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        filter: drop-shadow(0 10px 18px rgba(107, 160, 0, 0.2));
+      }
+
+      .header-code {
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid rgba(215, 53, 37, 0.18);
+        border-radius: 999px;
+        padding: 0 12px;
+        color: var(--danger);
+        background: rgba(255, 254, 248, 0.84);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .route-nav {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 2px 1px 10px;
+        scrollbar-width: thin;
+        scroll-snap-type: x proximity;
+      }
+
+      .route-nav a {
+        min-height: 40px;
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        scroll-snap-align: start;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 8px;
+        padding: 0 12px;
+        background: rgba(255, 254, 248, 0.84);
+        color: rgba(18, 18, 15, 0.75);
+        font-size: 13px;
+        font-weight: 600;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+      }
+
+      .route-nav a:hover {
+        transform: translateY(-1px);
+        border-color: rgba(18, 18, 15, 0.18);
+        background: #ffffff;
+        color: var(--ink);
+      }
+
+      .not-found-hero {
+        display: grid;
+        gap: 18px;
+        padding-top: 12px;
+      }
+
+      .message-panel {
+        min-width: 0;
+        animation: rise-in 520ms ease both;
+      }
+
+      .status-pill {
+        width: fit-content;
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 999px;
+        padding: 4px 12px;
+        background: rgba(255, 254, 248, 0.82);
+        color: var(--danger);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--danger);
+        box-shadow: 0 0 0 5px rgba(215, 53, 37, 0.08);
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 760px;
+        font-size: clamp(42px, 13vw, 92px);
+        line-height: 0.92;
+        letter-spacing: 0;
+        font-weight: 500;
+        text-wrap: balance;
+      }
+
+      h1 strong {
+        display: block;
+        color: var(--green-dark);
+        font-weight: 500;
+      }
+
+      .lede {
+        max-width: 680px;
+        margin: 18px 0 0;
+        color: rgba(18, 18, 15, 0.74);
+        font-size: clamp(17px, 4.7vw, 20px);
+        line-height: 1.48;
+      }
+
+      .attempt-box {
+        display: grid;
+        gap: 6px;
+        margin-top: 18px;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 8px;
+        padding: 12px;
+        background: rgba(255, 254, 248, 0.78);
+      }
+
+      .attempt-box span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .attempt-box code {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        color: var(--ink);
+        font-family: var(--font-mono);
+        font-size: 13px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .primary-button,
+      .secondary-button {
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 8px;
+        padding: 0 16px;
+        font-size: 14px;
+        font-weight: 800;
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+      }
+
+      .primary-button {
+        border: 1px solid rgba(18, 18, 15, 0.92);
+        background: var(--ink);
+        color: #ffffff;
+        box-shadow: 0 14px 28px rgba(18, 18, 15, 0.18);
+      }
+
+      .secondary-button {
+        border: 1px solid rgba(18, 18, 15, 0.1);
+        background: rgba(255, 254, 248, 0.84);
+        color: var(--ink);
+      }
+
+      .primary-button:hover,
+      .secondary-button:hover {
+        transform: translateY(-1px);
+      }
+
+      .rescue-panel {
+        min-width: 0;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 18px;
+        background:
+          linear-gradient(90deg, rgba(18, 18, 15, 0.035) 1px, transparent 1px),
+          linear-gradient(180deg, rgba(18, 18, 15, 0.03) 1px, transparent 1px),
+          rgba(255, 254, 248, 0.94);
+        background-size: 26px 26px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        animation: rise-in 560ms 80ms ease both;
+      }
+
+      .rescue-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid rgba(18, 18, 15, 0.08);
+        padding: 12px;
+        background: rgba(255, 254, 248, 0.88);
+      }
+
+      .rescue-title {
+        display: grid;
+        gap: 2px;
+      }
+
+      .rescue-title span {
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .rescue-title strong {
+        font-size: 16px;
+        line-height: 1.1;
+      }
+
+      .rescue-score {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0 10px;
+        background: var(--green);
+        color: #172404;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .rescue-body {
+        display: grid;
+        gap: 14px;
+        padding: 14px;
+      }
+
+      .intent-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        border: 1px solid rgba(18, 18, 15, 0.07);
+        border-radius: 12px;
+        padding: 5px;
+        background: rgba(18, 18, 15, 0.035);
+      }
+
+      .intent-tabs button {
+        min-height: 42px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: rgba(18, 18, 15, 0.62);
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .intent-tabs button.is-active {
+        border-color: rgba(18, 18, 15, 0.08);
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: 0 8px 22px rgba(18, 18, 15, 0.05);
+      }
+
+      .rescue-stage {
+        display: grid;
+        gap: 8px;
+      }
+
+      .stage-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        background: rgba(255, 254, 248, 0.72);
+      }
+
+      .stage-buttons button {
+        min-width: 0;
+        min-height: 42px;
+        border: 0;
+        border-right: 1px solid rgba(18, 18, 15, 0.08);
+        background: transparent;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .stage-buttons button:last-child {
+        border-right: 0;
+      }
+
+      .stage-buttons button.is-active {
+        background: var(--green);
+        color: #172404;
+      }
+
+      .rescue-range-wrap {
+        position: relative;
+        display: grid;
+        gap: 8px;
+        padding: 12px 4px 2px;
+      }
+
+      .rescue-range {
+        width: 100%;
+        min-height: 44px;
+        margin: 0;
+        accent-color: var(--green-dark);
+        cursor: grab;
+        touch-action: none;
+      }
+
+      .rescue-range:active {
+        cursor: grabbing;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .range-labels {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .range-labels span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .statement-row {
+        display: grid;
+        gap: 8px;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 12px;
+        padding: 10px;
+        background: rgba(255, 254, 248, 0.82);
+      }
+
+      .row-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .row-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .cell {
+        min-width: 0;
+        border: 1px solid rgba(18, 18, 15, 0.07);
+        border-radius: 8px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.58);
+      }
+
+      .cell span {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .cell strong {
+        display: block;
+        min-height: 34px;
+        overflow-wrap: anywhere;
+        font-size: 14px;
+        line-height: 1.25;
+      }
+
+      .cell.is-hot {
+        border-color: rgba(107, 160, 0, 0.28);
+        background: rgba(187, 255, 44, 0.18);
+      }
+
+      .rescue-note {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 12px;
+        padding: 12px;
+        background: #0f1712;
+        color: #f8fbf7;
+        font-size: 15px;
+        line-height: 1.35;
+      }
+
+      .rescue-note strong {
+        color: var(--green);
+      }
+
+      .match-card {
+        display: grid;
+        gap: 12px;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 12px;
+        padding: 12px;
+        background: rgba(255, 254, 248, 0.86);
+      }
+
+      .match-card span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .match-link {
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-radius: 8px;
+        padding: 0 12px;
+        background: var(--ink);
+        color: #ffffff;
+        font-weight: 800;
+      }
+
+      .match-link small {
+        color: rgba(255, 255, 255, 0.68);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .recovery-grid {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .search-panel,
+      .escape-panel,
+      .report-panel {
+        min-width: 0;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 12px;
+        background: rgba(255, 254, 248, 0.82);
+        box-shadow: 0 18px 48px rgba(43, 43, 30, 0.035);
+      }
+
+      .panel-inner {
+        display: grid;
+        gap: 14px;
+        padding: 16px;
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: clamp(24px, 7vw, 38px);
+        line-height: 1;
+        font-weight: 500;
+      }
+
+      .section-heading p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.4;
+      }
+
+      .search-field {
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: 1px solid rgba(18, 18, 15, 0.1);
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #ffffff;
+      }
+
+      .search-field span {
+        color: var(--green-dark);
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .search-field input {
+        min-width: 0;
+        width: 100%;
+        height: 46px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+      }
+
+      .route-results,
+      .escape-routes {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .route-card {
+        min-height: 84px;
+        display: grid;
+        align-content: center;
+        gap: 8px;
+        border: 1px solid rgba(18, 18, 15, 0.08);
+        border-radius: 8px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.64);
+        transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+      }
+
+      .route-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(18, 18, 15, 0.18);
+        background: #ffffff;
+      }
+
+      .route-card strong {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 16px;
+        line-height: 1.2;
+      }
+
+      .route-card span {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .empty-state {
+        min-height: 72px;
+        display: grid;
+        place-items: center;
+        border: 1px dashed rgba(18, 18, 15, 0.16);
+        border-radius: 8px;
+        padding: 12px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .report-panel {
+        background: #0f1712;
+        color: #f8fbf7;
+      }
+
+      .report-panel p {
+        color: #b9c6bb;
+      }
+
+      .report-panel .secondary-button {
+        width: 100%;
+        border-color: rgba(255, 255, 255, 0.16);
+        background: var(--green);
+        color: #172404;
+      }
+
+      .footer {
+        display: grid;
+        gap: 18px;
+        margin-top: 28px;
+        border-top: 1px solid var(--line);
+        padding: 24px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .footer-brand {
+        display: grid;
+        gap: 5px;
+      }
+
+      .footer-brand strong {
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 16px;
+        font-weight: 700;
+      }
+
+      .footer-links a {
+        min-height: 28px;
+        display: inline-flex;
+        align-items: center;
+        color: var(--muted);
+      }
+
+      .footer-links a:hover {
+        color: var(--ink);
+      }
+
+      @keyframes rise-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (min-width: 680px) {
+        .site-header {
+          border: 1px solid rgba(18, 18, 15, 0.06);
+          border-top: 0;
+          border-radius: 0 0 18px 18px;
+          padding: 14px 22px 10px;
+          background: rgba(255, 254, 248, 0.84);
+          backdrop-filter: blur(18px);
+          box-shadow: 0 18px 44px rgba(18, 18, 15, 0.045);
+        }
+
+        .row-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .route-results,
+        .escape-routes {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .footer {
+          grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1fr);
+          align-items: start;
+        }
+
+        .footer-links {
+          justify-content: flex-end;
+        }
+      }
+
+      @media (min-width: 960px) {
+        .route-nav {
+          flex-wrap: wrap;
+          overflow-x: visible;
+          padding-bottom: 0;
+          scroll-snap-type: none;
+        }
+
+        .not-found-hero {
+          grid-template-columns: minmax(0, 0.82fr) minmax(430px, 0.62fr);
+          align-items: center;
+          gap: 34px;
+          padding-top: 34px;
+        }
+
+        .recovery-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.55fr);
+          align-items: start;
+        }
+
+        .search-panel {
+          grid-row: span 2;
+        }
+
+        .row-grid {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .rescue-body {
+          padding: 16px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .page-shell {
+          width: min(100% - 20px, 1180px);
+        }
+
+        .brand-row {
+          align-items: flex-start;
+        }
+
+        .header-code {
+          margin-top: 5px;
+        }
+
+        .hero-actions > *,
+        .report-panel .secondary-button {
+          width: 100%;
+        }
+
+        .intent-tabs button,
+        .stage-buttons button {
+          font-size: 10px;
+        }
+
+        .section-heading {
+          display: grid;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 1ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="site-header" aria-label="Site header">
+        <div class="brand-row">
+          <a class="brand" href="/" aria-label="AI Converter home">
+            <img src="/favicon.svg" alt="" width="34" height="34" />
+            <span>AI Converter</span>
+          </a>
+          <span class="header-code">404</span>
+        </div>
+        <nav class="route-nav" id="route-source" aria-label="Primary navigation">
+          <a data-primary-route data-route-id="bank-statement-pdf-to-csv" data-intent="statement" data-reason="Best starting point for a statement PDF that needs spreadsheet-ready CSV." data-keywords="bank statement pdf csv spreadsheet transactions rows clean export" href="/bank-statement-pdf-to-csv/">bank statement PDF to CSV</a>
+          <a data-primary-route data-route-id="pdf-bank-statement-to-quickbooks-csv" data-intent="accounting" data-reason="Use this when the missing page looked like a QuickBooks CSV route." data-keywords="quickbooks csv bank statement accounting import qbo intuit" href="/pdf-bank-statement-to-quickbooks-csv/">PDF bank statement to QuickBooks CSV</a>
+          <a data-primary-route data-route-id="pdf-bank-statement-to-xero-csv" data-intent="accounting" data-reason="Use this when you are preparing bank rows for a Xero import workflow." data-keywords="xero csv bank statement accounting import bookkeeping" href="/pdf-bank-statement-to-xero-csv/">PDF bank statement to Xero CSV</a>
+          <a data-primary-route data-route-id="pdf-bank-statement-to-wave-csv" data-intent="accounting" data-reason="Use this when you need a Wave-shaped statement CSV." data-keywords="wave csv bank statement accounting import" href="/pdf-bank-statement-to-wave-csv/">PDF bank statement to Wave CSV</a>
+          <a data-primary-route data-route-id="scanned-bank-statement-to-excel" data-intent="statement" data-reason="Use this when the source is a scan or image-heavy statement that should land in Excel." data-keywords="scanned bank statement excel xlsx ocr image pdf" href="/scanned-bank-statement-to-excel/">scanned bank statement to Excel</a>
+          <a data-primary-route data-route-id="credit-card-statement-pdf-to-csv" data-intent="statement" data-reason="Use this when the file is a credit card statement, not a bank account statement." data-keywords="credit card statement pdf csv transactions card" href="/credit-card-statement-pdf-to-csv/">credit card statement PDF to CSV</a>
+          <a data-primary-route data-route-id="formats" data-intent="statement accounting policy" data-reason="Use this to see every route the live app is allowed to offer." data-keywords="formats conversion options all routes files outputs" href="/formats/">formats page</a>
+          <a data-primary-route data-route-id="privacy" data-intent="policy" data-reason="Use this for how files, payment data, and job metadata are handled." data-keywords="privacy files payment metadata data policy" href="/privacy/">privacy policy</a>
+          <a data-primary-route data-route-id="security" data-intent="policy" data-reason="Use this for private storage, retention, upload, and access-control notes." data-keywords="security private storage retention upload access" href="/security/">security notes</a>
+          <a data-primary-route data-route-id="data-retention" data-intent="policy" data-reason="Use this for source-file and generated-file retention windows." data-keywords="data retention delete files generated source lifecycle" href="/data-retention/">data retention policy</a>
+          <a data-primary-route data-route-id="refund" data-intent="policy" data-reason="Use this for refund, credit, failed job, and redo details." data-keywords="refund credit failed job redo payment" href="/refund/">refund policy</a>
+        </nav>
+      </header>
+
+      <section class="not-found-hero" aria-labelledby="page-title">
+        <div class="message-panel">
+          <div class="status-pill" aria-label="Error 404">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>404 / Page not found</span>
+          </div>
+          <h1 id="page-title">
+            This page did not export.
+            <strong>We can recover the route.</strong>
+          </h1>
+          <p class="lede">
+            The address you opened does not match a live AI Converter page. No blame here:
+            links get stale, slashes wander, and bank statements already cause enough friction.
+          </p>
+          <div class="attempt-box" aria-live="polite">
+            <span>Attempted URL</span>
+            <code id="attempted-url">Loading attempted URL...</code>
+          </div>
+          <div class="hero-actions">
+            <a class="primary-button" id="hero-match-link" href="/bank-statement-pdf-to-csv/">
+              Open closest route
+            </a>
+            <a class="secondary-button" href="#route-search">Search real pages</a>
+          </div>
+        </div>
+
+        <section class="rescue-panel" aria-labelledby="rescue-title">
+          <div class="rescue-topbar">
+            <div class="rescue-title">
+              <span>Interactive recovery</span>
+              <strong id="rescue-title">Statement Row Rescuer</strong>
+            </div>
+            <span class="rescue-score" id="rescue-score">0% mapped</span>
+          </div>
+          <div class="rescue-body">
+            <div class="intent-tabs" aria-label="Route intent">
+              <button type="button" data-intent-button="statement" class="is-active">Statement</button>
+              <button type="button" data-intent-button="accounting">Accounting</button>
+              <button type="button" data-intent-button="policy">Policy</button>
+            </div>
+
+            <div class="rescue-stage">
+              <div class="stage-buttons" aria-label="Recovery stages">
+                <button type="button" data-stage-button="0" class="is-active">Parse</button>
+                <button type="button" data-stage-button="1">Validate</button>
+                <button type="button" data-stage-button="2">Map</button>
+                <button type="button" data-stage-button="3">Export</button>
+              </div>
+              <div class="rescue-range-wrap">
+                <label class="sr-only" for="rescue-slider">Drag to scrub the missing route through the recovery stages</label>
+                <input
+                  class="rescue-range"
+                  id="rescue-slider"
+                  type="range"
+                  min="0"
+                  max="3"
+                  step="1"
+                  value="0"
+                  aria-valuetext="Parse stage"
+                />
+                <div class="range-labels" aria-hidden="true">
+                  <span>Parse</span>
+                  <span>Validate</span>
+                  <span>Map</span>
+                  <span>Export</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="statement-row" aria-live="polite">
+              <div class="row-header">
+                <span>Recovered statement row</span>
+                <span id="row-status">Missing route</span>
+              </div>
+              <div class="row-grid">
+                <div class="cell is-hot">
+                  <span>Input</span>
+                  <strong id="cell-input">404 path</strong>
+                </div>
+                <div class="cell">
+                  <span>Validation</span>
+                  <strong id="cell-validation">Waiting for route check</strong>
+                </div>
+                <div class="cell">
+                  <span>Mapped to</span>
+                  <strong id="cell-mapped">Closest live page pending</strong>
+                </div>
+                <div class="cell">
+                  <span>Output</span>
+                  <strong id="cell-output">No dead-end export</strong>
+                </div>
+              </div>
+            </div>
+
+            <p class="rescue-note" id="rescue-note">
+              Drag the row through the workflow. The lost path gets parsed, checked against real pages, then mapped to a live route.
+            </p>
+
+            <div class="match-card">
+              <span>Did you mean?</span>
+              <a class="match-link" id="match-link" href="/bank-statement-pdf-to-csv/">
+                <strong id="match-label">bank statement PDF to CSV</strong>
+                <small id="match-path">/bank-statement-pdf-to-csv/</small>
+              </a>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="recovery-grid" id="route-search" aria-label="Recovery options">
+        <section class="search-panel" aria-labelledby="search-title">
+          <div class="panel-inner">
+            <div class="section-heading">
+              <div>
+                <h2 id="search-title">Search real pages</h2>
+                <p>Only live AI Converter routes are searchable here.</p>
+              </div>
+            </div>
+            <label class="search-field">
+              <span>FIND</span>
+              <input id="route-search-input" type="search" placeholder="Try QuickBooks, Xero, refund, privacy..." autocomplete="off" />
+            </label>
+            <div class="route-results" id="route-results" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="escape-panel" aria-labelledby="escape-title">
+          <div class="panel-inner">
+            <div class="section-heading">
+              <div>
+                <h2 id="escape-title">Useful ways out</h2>
+                <p>High-signal routes for the most common 404 landings.</p>
+              </div>
+            </div>
+            <div class="escape-routes" id="escape-routes"></div>
+          </div>
+        </section>
+
+        <section class="report-panel" aria-labelledby="report-title">
+          <div class="panel-inner">
+            <div class="section-heading">
+              <div>
+                <h2 id="report-title">Report this link</h2>
+                <p>If this came from a link on the site, send the broken URL with one click. Do not include sensitive file contents.</p>
+              </div>
+            </div>
+            <a class="secondary-button" id="report-link" href="/support/?category=other">Open prefilled support report</a>
+          </div>
+        </section>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-brand">
+          <strong>AI Converter</strong>
+          <span>Turn bank statement PDFs into validated CSV exports for Wave, QuickBooks, Xero, and spreadsheet accounting import prep.</span>
+        </div>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="/bank-statement-pdf-to-csv/">bank statement PDF to CSV</a>
+          <a href="/pdf-bank-statement-to-quickbooks-csv/">PDF bank statement to QuickBooks CSV</a>
+          <a href="/pdf-bank-statement-to-xero-csv/">PDF bank statement to Xero CSV</a>
+          <a href="/pdf-bank-statement-to-wave-csv/">PDF bank statement to Wave CSV</a>
+          <a href="/scanned-bank-statement-to-excel/">scanned bank statement to Excel</a>
+          <a href="/credit-card-statement-pdf-to-csv/">credit card statement PDF to CSV</a>
+          <a href="/formats/">formats page</a>
+          <a href="/privacy/">privacy policy</a>
+          <a href="/security/">security notes</a>
+          <a href="/data-retention/">data retention policy</a>
+          <a href="/refund/">refund policy</a>
+        </nav>
+      </footer>
+    </main>
+
+    <script src="/404.js" defer></script>
+  </body>
+</html>

@@ -1,5 +1,10 @@
-.DS_Store
+node_modules/
+dist/
+.drill-artifacts/
 .wrangler/
-data/candidates/
-__pycache__/
-*.pyc
+.dev.vars
+.env
+.monitor.env
+.private-corpus/
+.playwright-mcp/
+.DS_Store

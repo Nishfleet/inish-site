@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="AI Converter preview-first private file conversion">
+  <rect width="1200" height="630" fill="#f7f7f1"/>
+  <path d="M0 0h1200v630H0z" fill="#f7f7f1"/>
+  <g opacity=".18" stroke="#12120f" stroke-width="1">
+    <path d="M0 90h1200M0 180h1200M0 270h1200M0 360h1200M0 450h1200M0 540h1200"/>
+    <path d="M120 0v630M240 0v630M360 0v630M480 0v630M600 0v630M720 0v630M840 0v630M960 0v630M1080 0v630"/>
+  </g>
+  <circle cx="960" cy="126" r="102" fill="#bbff2c" opacity=".46"/>
+  <rect x="86" y="82" width="88" height="88" rx="22" fill="#49d17d"/>
+  <path d="M112 136.5 141.5 107l7.5 7.5L119.5 144H112v-7.5Z" fill="#06170d"/>
+  <path d="M146 100l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" fill="#06170d"/>
+  <text x="198" y="138" fill="#12120f" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">AI Converter</text>
+  <text x="86" y="304" fill="#12120f" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="800">Messy files in.</text>
+  <text x="86" y="402" fill="#314d05" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="800">Clean exports out.</text>
+  <text x="90" y="482" fill="#4f5649" font-family="Arial, Helvetica, sans-serif" font-size="34">Preview bank statements, receipts, invoices, documents, audio, images, and archives before checkout.</text>
+  <rect x="88" y="536" width="300" height="54" rx="27" fill="#12120f"/>
+  <text x="120" y="572" fill="#f6ffdb" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700">Preview first</text>
+  <text x="430" y="572" fill="#314d05" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700">Private upload. Useful exports.</text>
+</svg>

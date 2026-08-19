@@ -1,0 +1,155 @@
+[
+  {
+    "id": "b932b44e-8c30-4cb6-965e-4b1630eefa2e",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Recovery publish Nish Daily 2026-08-08",
+      "workers/triggered_by": "upload"
+    },
+    "versions": [
+      {
+        "version_id": "de1fb974-0f8d-44f0-af3c-c2d02cdb53af",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-08T21:33:55.595068Z"
+  },
+  {
+    "id": "9c290c6e-50de-45c6-be2f-cc9b5256860b",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Fix apex routes + asset root for Nish Daily 2026-08-08",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "34e8a813-bc75-438e-b329-6392c4912260",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-08T21:34:52.916767Z"
+  },
+  {
+    "id": "6f0da74a-6f09-42e4-9bd9-a100b138f52f",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-08 (5f84c6e19bb40e1ebd08e23622d4a2e825af4fb2)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "1a530297-d2f1-4798-8e16-6880549a6681",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-08T21:41:15.534465Z"
+  },
+  {
+    "id": "70c2506a-682e-454c-9b84-de346b3d3d7c",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-08 (d5a2e1e3000352c62238e606841b6f3dbebf8430)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "2b3cb6e7-cff9-40ae-af34-08b1197aeda8",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-08T22:50:13.221509Z"
+  },
+  {
+    "id": "a2138c3a-50a7-4e69-8d7c-4ea34167f4e0",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-09 (252089a93c60888084a8389c5208bded77fa9966)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "d9d1b052-5c5d-4edb-a876-eae284761cb8",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-09T02:33:52.124687Z"
+  },
+  {
+    "id": "21dcf056-647b-4b10-97bf-54e0f80c2715",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-09 (810b076c4fe282a7483f991ffef454a12303b105)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "13814122-aa53-41d7-8e2e-ef609ebf3468",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-10T12:04:41.604063Z"
+  },
+  {
+    "id": "cd08a7f9-fda9-44ec-bd41-c7ab4f6b7430",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-11 (5bb9abc111087426b053d610a04cc6a7ec79059c)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "6f93277a-b44e-4142-a68f-1d9874f671a0",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-11T06:45:35.531384Z"
+  },
+  {
+    "id": "4d8bd1b2-124d-46cb-8113-2639f57516d8",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-11 (4078e2d0f571f53ccc494a51501e9ae2f672e51b)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "08c2ca57-2c32-4cf6-960e-a6de18445741",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-11T15:26:06.705518Z"
+  },
+  {
+    "id": "0154450c-fb70-49bb-b4ef-489651fb689f",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "nishant345@gmail.com",
+    "annotations": {
+      "workers/message": "Publish Nish Daily 2026-08-12 (f52a81012ef583b0f8b4be3599fc05c64186a3ce)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "5f2b76cb-5378-446c-8fbd-cde0a1618ba9",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-08-12T02:26:45.255594Z"
+  }
+]

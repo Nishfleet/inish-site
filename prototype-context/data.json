@@ -1,0 +1,42 @@
+{
+  "sourceOfTruth": [
+    "src/data/converters.json",
+    "src/conversion-catalog.js",
+    "functions/lib/universal.js",
+    "functions/api/admin/overview.js"
+  ],
+  "popularRequests": [
+    "Bank statement PDF to CSV",
+    "Receipt image to expense CSV",
+    "Invoice PDF to JSON",
+    "Screenshot table to CSV",
+    "JPG to PNG",
+    "PNG to JPG",
+    "WEBP to PNG",
+    "Audio to transcript",
+    "Document to Markdown",
+    "PDF to Word",
+    "Word to PDF",
+    "HEIC to JPG",
+    "MP4 to MP3",
+    "MOV to MP4",
+    "GIF to MP4",
+    "WAV to MP3",
+    "XLSX to CSV"
+  ],
+  "confidenceFields": [
+    "Output",
+    "Preview",
+    "Privacy",
+    "Limit"
+  ],
+  "opsQueues": [
+    "Failed jobs",
+    "Stuck provider jobs",
+    "Dodo payment handoffs",
+    "Unmatched payments",
+    "Refund or credit due",
+    "Open support",
+    "Webhook failures"
+  ]
+}

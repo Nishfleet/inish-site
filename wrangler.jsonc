@@ -1,19 +1,34 @@
 {
-  "name": "inish-site",
-  "main": "worker.js",
-  "compatibility_date": "2026-08-01",
-  "workers_dev": true,
-  "preview_urls": false,
-  // Apex host patterns are required: "inish.in/*" alone does not match "/".
-  "routes": [
-    { "pattern": "inish.in", "zone_name": "inish.in" },
-    { "pattern": "inish.in/*", "zone_name": "inish.in" },
-    { "pattern": "www.inish.in", "zone_name": "inish.in" },
-    { "pattern": "www.inish.in/*", "zone_name": "inish.in" }
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "aiconverter",
+  "compatibility_date": "2026-05-12",
+  "pages_build_output_dir": "dist",
+  "ai": {
+    "binding": "AI"
+  },
+  "r2_buckets": [
+    {
+      "binding": "AICONVERTER_BUCKET",
+      "bucket_name": "aiconverter-private"
+    }
   ],
-  "assets": {
-    "directory": "./public",
-    "binding": "ASSETS",
-    "run_worker_first": ["/*"]
+  "d1_databases": [
+    {
+      "binding": "AICONVERTER_DB",
+      "database_name": "aiconverter",
+      "database_id": "376080eb-60f1-4bb8-aabb-06622acabb63"
+    }
+  ],
+  "vars": {
+    "AUTO_REFUNDS_ENABLED": "true",
+    "CLOUDCONVERT_DAILY_JOB_LIMIT": "10",
+    "CLOUDCONVERT_MIN_CREDITS": "1",
+    "CLOUDCONVERT_REQUIRE_CREDIT_CHECK": "true",
+    "ENABLE_AZURE_FALLBACK": "false",
+    "FREE_DOWNLOADS_ENABLED": "false",
+    "CONVERTIO_DAILY_JOB_LIMIT": "10",
+    // Set RATE_LIMIT_SALT as a secret, not a committed var:
+    // wrangler pages secret put RATE_LIMIT_SALT
+    "RATE_LIMIT_MAX_PER_HOUR": "8"
   }
 }

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, noarchive, nosnippet" />
+    <title>Admin Overview - AI Converter</title>
+    <link rel="stylesheet" href="/legal.css" />
+  </head>
+  <body>
+    <main class="legal-shell">
+      <header class="legal-header">
+        <a class="brand" href="/"><span class="brand-mark">AI</span><span><strong class="brand-name">AI Converter</strong></span></a>
+        <a class="top-link" href="/">Back to app</a>
+      </header>
+
+      <section class="legal-hero">
+        <p class="eyebrow">Private admin</p>
+        <h1>Operations overview</h1>
+        <p class="lede">
+          Protected alerts for runtime health, CloudConvert spend caps, provider failures,
+          Dodo webhooks, refunds, support, and conversion usage.
+        </p>
+      </section>
+
+      <section class="legal-card">
+        <form id="admin-form" class="support-form">
+          <label>
+            Admin token
+            <input id="admin-token" type="password" autocomplete="off" required />
+          </label>
+          <button class="button-link" type="submit">Load overview</button>
+        </form>
+      </section>
+
+      <section class="admin-output-shell">
+        <div id="admin-output" class="admin-output">Enter the admin token to load live status.</div>
+      </section>
+    </main>
+    <script src="/admin/admin.js" defer></script>
+  </body>
+</html>
