@@ -419,7 +419,7 @@ def page(edition: dict) -> str:
       <button class="active" data-filter="all" aria-pressed="true">All</button>
       {''.join(f'<button data-filter="{esc(section)}" aria-pressed="false">{esc(section)}</button>' for section in present)}
     </nav>
-    <p class="visually-hidden" id="filter-status" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;">Showing all {kept_count} {status_noun}</p>"""
+    <p class="visually-hidden" id="filter-status" role="status" aria-live="polite">Showing all {kept_count} {status_noun}</p>"""
     else:
         cards = """
       <article class="story story-lead quiet-day">
