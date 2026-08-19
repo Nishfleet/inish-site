@@ -1,7 +1,6 @@
 import io
 import html
 import json
-import re
 import sys
 import tempfile
 import unittest
@@ -11,6 +10,8 @@ from unittest.mock import patch
 
 import scripts.verify_live as verifier
 from scripts.verify_live import json_feed_mismatch, rss_feed_mismatch, without_cloudflare_beacon
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def edition_payload(date="2026-08-08", stories=7):
@@ -173,19 +174,12 @@ class FeedParityTests(unittest.TestCase):
         self.assertIn("not a valid single-item RSS", rss_feed_mismatch(local, b"<rss><channel>"))
 
 
-# Mirrors scripts/verify_live.py's redirect contract, so the mock hostname
-# behaves like the real one for the route checks that must keep working.
-REDIRECTS = {
-    "/index.html": "/",
-    "/daily": "/",
-    "/daily/": "/",
-    "/daily/index.html": "/",
-    "/daily/app.js": "/app.js",
-    "/daily/styles.css": "/styles.css",
-    "/daily/latest.json": "/latest.json",
-    "/daily/feed.xml": "/feed.xml",
-    "/daily/sitemap.xml": "/sitemap.xml",
-}
+# The route contract mirrors scripts/verify_live.py's single source of truth
+# (public-paths.json), so the mock hostname behaves like the real one for the
+# route checks that must keep working.
+ROUTE_CONTRACT = json.loads((ROOT / "public-paths.json").read_text())
+REDIRECTS = dict(ROUTE_CONTRACT["redirects"])
+PUBLIC_PATHS = list(ROUTE_CONTRACT["publicPaths"])
 
 
 def make_live_server(root: Path, overrides=None):
@@ -193,17 +187,18 @@ def make_live_server(root: Path, overrides=None):
     hostname would, with optional per-route overrides. An override is either
     the exact body bytes (served with 200, like a stale asset) or a
     ``(status, body)`` tuple (e.g. a plain-fallback 404). Unknown routes serve
-    the branded 404 page with status 404, exactly like the edge worker."""
+    the branded 404 page with status 404, exactly like the edge worker. A
+    public path with no fixture file serves the branded 404 too, so a route
+    addition fails verification loudly until the fixture carries the file."""
     routes = {}
-    for name in ("index.html", "app.js", "styles.css", "latest.json", "feed.xml", "robots.txt", "sitemap.xml"):
-        routes[f"/{name}"] = (root / name).read_bytes()
-    routes["/"] = routes["/index.html"]
-    routes["/og-image.svg"] = (root / "og-image.svg").read_bytes()
-    routes["/og-image.png"] = (root / "og-image.png").read_bytes()
-    routes["/apple-touch-icon.png"] = (root / "apple-touch-icon.png").read_bytes()
+    for path in PUBLIC_PATHS:
+        if path == "/":
+            routes["/"] = (root / "index.html").read_bytes()
+            continue
+        relative = root / path.lstrip("/")
+        routes[path] = relative.read_bytes() if relative.is_file() else None
     for font in (root / "fonts").glob("*.woff2"):
         routes[f"/fonts/{font.name}"] = font.read_bytes()
-    routes["/fonts/OFL.txt"] = (root / "fonts" / "OFL.txt").read_bytes()
     if overrides:
         routes.update(overrides)
     branded_404 = (root / "404.html").read_bytes()
@@ -252,6 +247,9 @@ class LiveVerifierTests(unittest.TestCase):
             "<!doctype html><title>Not found</title><p>fixture error desk</p>\n"
         )
         (self.root / "data" / "editions" / f"{date}.json").write_text(json.dumps(edition))
+        # The route contract is part of the deployed snapshot; the verifier
+        # reads the public surface from it.
+        (self.root / "public-paths.json").write_text((ROOT / "public-paths.json").read_text())
 
     def run_verifier(self, overrides=None):
         output = io.StringIO()
@@ -343,10 +341,12 @@ class LiveVerifierTests(unittest.TestCase):
 class MiddlewareContractTests(unittest.TestCase):
     """The HSTS regression gate: the Pages middleware must keep serving a
     Strict-Transport-Security header on every response path so the HTTPS-only
-    policy cannot silently regress. Source-text contract, like the deploy-script
-    tests below, because the suite is stdlib-only and CI has no Node runtime."""
+    policy cannot silently regress. The header value is route-contract data —
+    one source of truth in public-paths.json — and the middleware must keep
+    applying it. Source-text contract, like the deploy-script tests below,
+    because the suite is stdlib-only and CI has no Node runtime."""
 
-    MIDDLEWARE = Path(__file__).resolve().parents[1] / "functions" / "_middleware.js"
+    MIDDLEWARE = ROOT / "functions" / "_middleware.js"
 
     def test_hsts_set_on_redirect_404_and_passthrough_responses(self):
         source = self.MIDDLEWARE.read_text()
@@ -367,24 +367,30 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("new Response(null, {", source)
 
     def test_hsts_value_is_explicit_without_preload(self):
+        header = ROUTE_CONTRACT["hstsHeader"]
+        self.assertIn("max-age=31536000", header)
+        self.assertIn("includeSubDomains", header)
+        self.assertNotIn("preload", header)
+        # The middleware must keep applying the contract value; the value
+        # itself is route data read from public-paths.json by policy.js.
         source = self.MIDDLEWARE.read_text()
         self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', source)
-        header = re.search(r'hstsHeader = "([^"]+)"', source)
-        self.assertIsNotNone(header, "HSTS value must be explicit")
-        self.assertIn("max-age=31536000", header.group(1))
-        self.assertIn("includeSubDomains", header.group(1))
-        self.assertNotIn("preload", header.group(1))
+        self.assertIn("from \"./policy.js\"", source)
 
     def test_public_allowlist_and_redirect_semantics_kept(self):
-        # The route contract moved to functions/policy.js; the middleware is a
-        # thin entrypoint that imports it. Keep the canonical checks rooted at
-        # the policy module, and the middleware 404 plumbing where it lives.
+        # The route contract has one source of truth (public-paths.json);
+        # functions/policy.js reads it and the middleware is a thin entrypoint
+        # that imports the decision from it. Keep the canonical checks rooted
+        # at the policy module, and the middleware 404 plumbing where it lives.
         policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
         policy_source = policy.read_text()
         middleware_source = self.MIDDLEWARE.read_text()
-        self.assertIn("publicPaths", policy_source)
-        self.assertIn('["/daily", "/"]', policy_source)
+        self.assertIn("public-paths.json", policy_source)
+        self.assertIn("new Set(routeContract.publicPaths)", policy_source)
+        self.assertIn("new Map(Object.entries(routeContract.redirects))", policy_source)
+        self.assertIn("from \"./policy.js\"", middleware_source)
         self.assertIn("status: 404", middleware_source)
+        self.assertIn("/daily/", ROUTE_CONTRACT["redirects"])
 
 
 class DeployScriptContractTests(unittest.TestCase):

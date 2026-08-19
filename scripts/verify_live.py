@@ -137,43 +137,52 @@ def main() -> int:
     cache_token = f"{args.commit}-{time.time_ns()}"
     failures: list[str] = []
 
+    # The public route contract has one source of truth: public-paths.json,
+    # which the deploy payload ships beside worker.js. The edge allowlist and
+    # this verifier both read it, so adding a public path is a single data
+    # edit instead of a multi-file contract change. A snapshot without the
+    # file is a loud failure, never a silent narrower check.
+    try:
+        route_contract = json.loads((args.root / "public-paths.json").read_text())
+    except (OSError, json.JSONDecodeError) as error:
+        failures.append(f"public-paths.json: cannot load the route contract from the snapshot ({error})")
+        route_contract = {}
+    public_paths = set(route_contract.get("publicPaths", []))
+
     # A missing font file fails silently in the browser: the page still renders,
     # just in whatever face the visitor's OS happens to own. Verify the bytes.
     # The OFL license text the shipped stylesheets reference is just as silent
-    # when dropped, so it is byte-checked alongside the faces.
+    # when dropped, so it is byte-checked alongside the faces (it is allowlisted
+    # in public-paths.json, so it reaches the checks below as a public path).
     fonts = {
         f"/fonts/{path.name}": f"fonts/{path.name}"
         for path in sorted((args.root / "fonts").glob("*.woff2"))
     }
-    fonts["/fonts/OFL.txt"] = "fonts/OFL.txt"
-    if len(fonts) == 1:
+    if not fonts:
         failures.append("fonts: no woff2 files found to verify")
 
-    # The identity/share assets referenced by the generated head (the raster
-    # social share card, its legacy SVG source, and the iOS touch icon) are
-    # staged by deploy_daily.sh and allowed through the worker allowlist, but
-    # nothing verified they actually reached the live hostname; a deploy that
-    # dropped them again would have passed verification. Byte-check them like
-    # the other payload files.
-    for path, relative in {
-        "/": "index.html",
-        "/app.js": "app.js",
-        "/styles.css": "styles.css",
-        "/latest.json": "latest.json",
-        "/feed.xml": "feed.xml",
-        "/og-image.svg": "og-image.svg",
-        "/og-image.png": "og-image.png",
-        "/apple-touch-icon.png": "apple-touch-icon.png",
-        **fonts,
-    }.items():
+    # Every public path must answer with the exact snapshot bytes: the identity
+    # assets referenced by the generated head (the social share card and the
+    # iOS touch icon) are staged by deploy_daily.sh and allowed through the
+    # worker allowlist, but nothing verified they actually reached the live
+    # hostname; a deploy that dropped them again would have passed verification.
+    byte_checks = {"/": "index.html"}
+    for path in sorted(public_paths - {"/"}):
+        byte_checks[path] = path.lstrip("/")
+    byte_checks.update(fonts)
+    for path, relative in byte_checks.items():
+        expected_path = args.root / relative
+        if not expected_path.is_file():
+            failures.append(f"{path}: snapshot lacks {relative} named by the route contract")
+            continue
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
-        expected = (args.root / relative).read_bytes()
+        expected = expected_path.read_bytes()
         if path == "/":
             body = without_cloudflare_beacon(body)
         if status != 200 or body != expected:
             failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
 
-    for path in ("/", "/app.js", "/styles.css", "/latest.json", "/feed.xml", "/og-image.svg", "/og-image.png", "/apple-touch-icon.png", "/robots.txt", "/sitemap.xml", *fonts):
+    for path in sorted(public_paths | set(fonts)):
         status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}", method="HEAD")
         if status != 200 or body:
             failures.append(f"HEAD {path}: expected empty 200, got {status} and {len(body)} bytes")
@@ -191,17 +200,7 @@ def main() -> int:
         if mismatch is not None:
             failures.append(mismatch)
 
-    redirects = {
-        "/index.html": "/",
-        "/daily": "/",
-        "/daily/": "/",
-        "/daily/index.html": "/",
-        "/daily/app.js": "/app.js",
-        "/daily/styles.css": "/styles.css",
-        "/daily/latest.json": "/latest.json",
-        "/daily/feed.xml": "/feed.xml",
-        "/daily/sitemap.xml": "/sitemap.xml",
-    }
+    redirects = dict(route_contract.get("redirects", {}))
     for path, target in redirects.items():
         request_path = f"{path}?deploy={cache_token}"
         expected_location = urljoin(args.base, f"{target}?deploy={cache_token}")
@@ -271,14 +270,9 @@ def main() -> int:
             elif status != 404 or body:
                 failures.append(f"HEAD {path}: expected empty 404, got {status} and {len(body)} bytes")
 
-    metadata = {
-        "/robots.txt": (args.root / "robots.txt").read_bytes(),
-        "/sitemap.xml": (args.root / "sitemap.xml").read_bytes(),
-    }
-    for path, expected in metadata.items():
-        status, body, _ = fetch(args.base, f"{path}?deploy={cache_token}")
-        if status != 200 or body != expected:
-            failures.append(f"{path}: expected exact 200 body, got {status} and {len(body)} bytes")
+    # The public metadata files are byte-checked above as ordinary public
+    # paths (they are allowlisted in public-paths.json), so no separate check
+    # is needed here.
 
     if failures:
         print("\n".join(failures))

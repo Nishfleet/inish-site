@@ -8,10 +8,14 @@
 // function returning one of "redirect", "deny", or "static", so the focused
 // test can import it and exercise the deny property against real inputs.
 //
-// `publicPaths`, `fontPath`, and `redirects` are also exported so the
-// middleware (and any future caller) can read the same constants the
-// decision was made against. The render of `decide()` is the contract; the
-// constants are the data.
+// The route DATA — the publicPaths allowlist, the font pattern, the redirects,
+// the HSTS value, and the canonical origin — has ONE source of truth:
+// public-paths.json. worker.js and this file both read it, and
+// scripts/verify_live.py plus the test suite derive their expectations from
+// it, so adding a public path is a single data edit instead of a multi-file
+// contract change. This module derives the constants from that file and
+// exposes the decision as a pure function; the render of `decide()` is the
+// contract, the constants are the data.
 //
 // `canonicalOrigin` and `canonicalize()` cover the host/scheme side of the
 // same contract: the bare-apex HTTPS origin is the only URL the site serves
@@ -20,38 +24,24 @@
 // decision runs. Both edge entrypoints (the live Worker and the kept-in-sync
 // Pages middleware) call `canonicalize()` first so the bare-apex visitor
 // never reaches the policy module twice.
-export const canonicalOrigin = "https://inish.in/";
+import routeContract from "../public-paths.json" with { type: "json" };
 
-export const publicPaths = new Set([
-  "/",
-  "/app.js",
-  "/styles.css",
-  "/apple-touch-icon.png", // iOS home-screen icon, referenced by the generated head
-  "/og-image.svg", // legacy share-card source, kept reachable for compatibility
-  "/og-image.png", // raster social share card, referenced by the generated head
-  "/latest.json",
-  "/feed.xml",
-  "/robots.txt",
-  "/sitemap.xml",
-  "/fonts/OFL.txt" // SIL OFL 1.1 license text, referenced by styles.css
-]);
+export const canonicalOrigin = routeContract.canonicalOrigin;
+
+export const publicPaths = new Set(routeContract.publicPaths);
 
 // Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
 // future face does not need a middleware edit, and tight enough that it cannot
 // serve anything but a woff2 from this one directory.
-export const fontPath = /^\/fonts\/[a-z0-9-]+\.woff2$/;
+export const fontPath = new RegExp(routeContract.fontPath);
 
-export const redirects = new Map([
-  ["/index.html", "/"],
-  ["/daily", "/"],
-  ["/daily/", "/"],
-  ["/daily/index.html", "/"],
-  ["/daily/app.js", "/app.js"],
-  ["/daily/styles.css", "/styles.css"],
-  ["/daily/latest.json", "/latest.json"],
-  ["/daily/feed.xml", "/feed.xml"],
-  ["/daily/sitemap.xml", "/sitemap.xml"]
-]);
+export const redirects = new Map(Object.entries(routeContract.redirects));
+
+// The site is HTTPS-only, so every response from the middleware can carry HSTS.
+// No subdomains exist yet; includeSubDomains keeps any future one under the
+// same policy. Preload is deliberately not claimed: it is a permanent public
+// commitment and nothing in the repository justifies it.
+export const hstsHeader = routeContract.hstsHeader;
 
 // Decide what the middleware should do for `pathname`.
 //
