@@ -1,10 +1,12 @@
 {
+  "canonicalOrigin": "https://inish.in/",
   "publicPaths": [
     "/",
     "/app.js",
     "/styles.css",
     "/apple-touch-icon.png",
     "/og-image.svg",
+    "/og-image.png",
     "/latest.json",
     "/feed.xml",
     "/robots.txt",

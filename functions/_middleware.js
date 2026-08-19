@@ -1,25 +1,16 @@
-// Pages parity mirror of the live edge worker (worker.js + Workers assets).
-// The public route contract — the publicPaths allowlist, the font pattern, the
-// redirects, and HSTS — has ONE source of truth: public-paths.json. worker.js
-// and this file both read it, and scripts/verify_live.py plus the test suite
-// derive their expectations from it, so a path addition is a single data edit
-// instead of a multi-file contract change.
-import routeContract from "../public-paths.json";
-
-const publicPaths = new Set(routeContract.publicPaths);
-
-// Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
-// future face does not need a middleware edit, and tight enough that it cannot
-// serve anything but a woff2 from this one directory.
-const fontPath = new RegExp(routeContract.fontPath);
-
-const redirects = new Map(Object.entries(routeContract.redirects));
+// Live edge path is worker.js (Workers + assets). Keep this file's
+// publicPaths/redirects/HSTS identical — tests enforce the shared contract.
+//
+// The decision lives in ./policy.js so the deny/allow/redirect branch can be
+// exercised by real tests against the imported function rather than by
+// substring matching on this file.
+import { canonicalize, decide, redirects } from "./policy.js";
 
 // The site is HTTPS-only, so every response from the middleware can carry HSTS.
 // No subdomains exist yet; includeSubDomains keeps any future one under the
 // same policy. Preload is deliberately not claimed: it is a permanent public
 // commitment and nothing in the repository justifies it.
-const hstsHeader = routeContract.hstsHeader;
+const hstsHeader = "max-age=31536000; includeSubDomains";
 
 function withSecurityHeaders(response) {
   response.headers.set("Strict-Transport-Security", hstsHeader);
@@ -54,8 +45,21 @@ async function notFoundResponse(request, env) {
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
-  const target = redirects.get(url.pathname);
-  if (target) {
+  // Canonicalize to https://inish.in{path}{search} before any path-based
+  // decision runs: http://, www., and the combined cases all collapse to a
+  // single 301 instead of serving three extra copies of the site.
+  const canonical = canonicalize(url);
+  if (canonical !== null) {
+    return withSecurityHeaders(
+      new Response(null, {
+        status: 301,
+        headers: { Location: canonical }
+      })
+    );
+  }
+  const decision = decide(url.pathname);
+  if (decision === "redirect") {
+    const target = redirects.get(url.pathname);
     const destination = new URL(target, url.origin);
     destination.search = url.search;
     // Manual 301 instead of Response.redirect(): the runtime's redirect
@@ -67,7 +71,7 @@ export async function onRequest(context) {
       })
     );
   }
-  if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
+  if (decision === "deny") {
     return withSecurityHeaders(await notFoundResponse(context.request, context.env));
   }
   return withSecurityHeaders(await context.next());

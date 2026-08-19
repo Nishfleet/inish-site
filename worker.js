@@ -1,28 +1,18 @@
 // Live edge worker for inish.in (Workers + static assets).
 // The public route contract — the publicPaths allowlist, the font pattern, the
-// redirects, and HSTS — has ONE source of truth: public-paths.json. worker.js
-// and the Pages parity mirror functions/_middleware.js both read it, and
-// scripts/verify_live.py plus the test suite derive their expectations from
-// it, so adding a public path is a single data edit instead of a multi-file
-// contract change. Pages Functions are no longer the production edge path —
-// the VPS fleet token can deploy Workers but not Cloudflare Pages, and OAuth
-// expired 2026-08-04 left the site four days stale.
-import routeContract from "./public-paths.json";
-
-const publicPaths = new Set(routeContract.publicPaths);
-
-// Self-hosted webfonts. Kept as a narrow pattern rather than an exact list so a
-// future face does not need a middleware edit, and tight enough that it cannot
-// serve anything but a woff2 from this one directory.
-const fontPath = new RegExp(routeContract.fontPath);
-
-const redirects = new Map(Object.entries(routeContract.redirects));
+// redirects — has ONE source of truth: functions/policy.js. worker.js and the
+// Pages mirror functions/_middleware.js both import it, so adding a public
+// path is a single edit in the policy module, never a hunt through mirrored
+// literals. Pages Functions are no longer the production edge path — the VPS
+// fleet token can deploy Workers but not Cloudflare Pages, and OAuth expired
+// 2026-08-04 left the site four days stale.
+import { canonicalize, decide, redirects } from "./functions/policy.js";
 
 // The site is HTTPS-only, so every response from the middleware can carry HSTS.
 // No subdomains exist yet; includeSubDomains keeps any future one under the
 // same policy. Preload is deliberately not claimed: it is a permanent public
 // commitment and nothing in the repository justifies it.
-const hstsHeader = routeContract.hstsHeader;
+const hstsHeader = "max-age=31536000; includeSubDomains";
 
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
@@ -66,6 +56,19 @@ async function notFoundResponse(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    // Canonicalize to https://inish.in{path}{search} before any path-based
+    // decision runs: http://, www., and the combined cases all collapse to a
+    // single 301 instead of serving three extra copies of the site.
+    const canonical = canonicalize(url);
+    if (canonical !== null) {
+      return withSecurityHeaders(
+        new Response(null, {
+          status: 301,
+          headers: { Location: canonical }
+        })
+      );
+    }
+    const decision = decide(url.pathname);
     const target = redirects.get(url.pathname);
     if (target) {
       const destination = new URL(target, url.origin);
@@ -79,7 +82,7 @@ export default {
         })
       );
     }
-    if (!publicPaths.has(url.pathname) && !fontPath.test(url.pathname)) {
+    if (decision === "deny") {
       return withSecurityHeaders(await notFoundResponse(request, env));
     }
     // Assets binding resolves "/" to index.html via html_handling defaults.

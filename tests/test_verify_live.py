@@ -1,4 +1,5 @@
 import io
+import html
 import json
 import sys
 import tempfile
@@ -38,6 +39,15 @@ def edition_payload(date="2026-08-08", stories=7):
 
 def rss_payload(date="2026-08-08"):
     note = "A fixture edition with enough words to stand in for the accepted one."
+    item_html = (
+        f"<p>{note}</p>"
+        '<h3><a href="https://example.com/story-1">Fixture story 1</a></h3>'
+        "<p>Fixture summaries carry a checkable number and nothing else.</p>"
+        '<p><strong>Checked</strong> <a href="https://example.com/story-1">'
+        "Fixture fact: 1.1 seconds on the reference run.</a></p>"
+        "<p><strong>Nish</strong> I would measure fixture story 1 myself before trusting it.</p>"
+        "<p><strong>But</strong> This is fixture copy; nothing here actually ran anywhere.</p>"
+    )
     return (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<rss version="2.0"><channel><title>Nish\'s Daily Reads</title>'
@@ -46,7 +56,7 @@ def rss_payload(date="2026-08-08"):
         f"<item><title>Nish's Daily Reads — {date}</title><link>https://inish.in/</link>"
         f'<guid isPermaLink="false">inish-daily-{date}</guid>'
         "<pubDate>Sat, 08 Aug 2026 00:00:00 +0000</pubDate>"
-        f"<description>{note}</description></item>"
+        f"<description>{html.escape(item_html)}</description></item>"
         "</channel></rss>\n"
     )
 
@@ -139,6 +149,26 @@ class FeedParityTests(unittest.TestCase):
         self.assertIsNotNone(mismatch)
         self.assertIn("differs in content", mismatch)
 
+    def test_rss_parity_rejects_an_item_that_omits_its_stories(self):
+        # The feed contract after the root page rolls over: the item must carry
+        # the edition's stories, not just an editor note. A live feed whose item
+        # description lacks them must fail parity even with the right guid.
+        note = "A fixture edition with enough words to stand in for the accepted one."
+        stripped = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<rss version="2.0"><channel><title>Nish\'s Daily Reads</title>'
+            "<link>https://inish.in/</link>"
+            "<description>A daily read for a founder: AI, product ideas, and demand signals.</description>"
+            "<item><title>Nish's Daily Reads — 2026-08-08</title><link>https://inish.in/</link>"
+            '<guid isPermaLink="false">inish-daily-2026-08-08</guid>'
+            "<pubDate>Sat, 08 Aug 2026 00:00:00 +0000</pubDate>"
+            f"<description>{note}</description></item>"
+            "</channel></rss>\n"
+        )
+        mismatch = rss_feed_mismatch(rss_payload("2026-08-08").encode(), stripped.encode())
+        self.assertIsNotNone(mismatch)
+        self.assertIn("differs in content", mismatch)
+
     def test_rss_parity_rejects_a_malformed_live_feed(self):
         local = rss_payload().encode()
         self.assertIn("not a valid single-item RSS", rss_feed_mismatch(local, b"<rss><channel>"))
@@ -211,6 +241,7 @@ class LiveVerifierTests(unittest.TestCase):
         (self.root / "robots.txt").write_text("User-agent: *\nAllow: /\n")
         (self.root / "sitemap.xml").write_text(SITEMAP)
         (self.root / "og-image.svg").write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
+        (self.root / "og-image.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-card")
         (self.root / "apple-touch-icon.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-icon")
         (self.root / "404.html").write_text(
             "<!doctype html><title>Not found</title><p>fixture error desk</p>\n"
@@ -287,13 +318,16 @@ class LiveVerifierTests(unittest.TestCase):
         self.assertIn("GET /archive: expected the branded 404 page, got 404 and 9 bytes", output)
         self.assertNotIn("verified_feed_only", output)
 
-    def test_missing_share_asset_fails_verification(self):
-        # The social share card is staged and middleware-allowed, but a deploy
-        # that drops it again must fail loudly instead of passing as verified.
-        code, output = self.run_verifier({"/og-image.svg": None})
+    def test_missing_share_assets_fail_verification(self):
+        # The share cards (raster PNG and legacy SVG) are staged and
+        # middleware-allowed, but a deploy that drops either again must fail
+        # loudly instead of passing as verified.
+        code, output = self.run_verifier({"/og-image.svg": None, "/og-image.png": None})
         self.assertNotEqual(code, 0)
         self.assertIn("/og-image.svg: expected exact 200 body", output)
         self.assertIn("HEAD /og-image.svg: expected empty 200", output)
+        self.assertIn("/og-image.png: expected exact 200 body", output)
+        self.assertIn("HEAD /og-image.png: expected empty 200", output)
 
     def test_mismatched_share_asset_fails_verification(self):
         # Byte drift on the identity asset (e.g. a stale or truncated icon) is
@@ -316,8 +350,11 @@ class MiddlewareContractTests(unittest.TestCase):
 
     def test_hsts_set_on_redirect_404_and_passthrough_responses(self):
         source = self.MIDDLEWARE.read_text()
-        # Definition plus the three call sites: redirect, 404, and passthrough.
-        self.assertEqual(source.count("withSecurityHeaders("), 4)
+        # Definition plus the four call sites: canonical host/scheme redirect,
+        # path redirect, 404, and passthrough. The canonical redirect runs
+        # first so http:// and www. requests upgrade to HTTPS before any
+        # path-based decision runs.
+        self.assertEqual(source.count("withSecurityHeaders("), 5)
 
     def test_redirect_stays_301_with_location_query_and_hsts(self):
         source = self.MIDDLEWARE.read_text()
@@ -334,16 +371,25 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("max-age=31536000", header)
         self.assertIn("includeSubDomains", header)
         self.assertNotIn("preload", header)
-        # The middleware must keep applying the contract value.
+        # The middleware must keep applying the contract value; the value
+        # itself is route data read from public-paths.json by policy.js.
         source = self.MIDDLEWARE.read_text()
         self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', source)
-        self.assertIn("public-paths.json", source)
+        self.assertIn("from \"./policy.js\"", source)
 
     def test_public_allowlist_and_redirect_semantics_kept(self):
-        source = self.MIDDLEWARE.read_text()
-        self.assertIn("publicPaths", source)
-        self.assertIn("public-paths.json", source)
-        self.assertIn("status: 404", source)
+        # The route contract has one source of truth (public-paths.json);
+        # functions/policy.js reads it and the middleware is a thin entrypoint
+        # that imports the decision from it. Keep the canonical checks rooted
+        # at the policy module, and the middleware 404 plumbing where it lives.
+        policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
+        policy_source = policy.read_text()
+        middleware_source = self.MIDDLEWARE.read_text()
+        self.assertIn("public-paths.json", policy_source)
+        self.assertIn("new Set(routeContract.publicPaths)", policy_source)
+        self.assertIn("new Map(Object.entries(routeContract.redirects))", policy_source)
+        self.assertIn("from \"./policy.js\"", middleware_source)
+        self.assertIn("status: 404", middleware_source)
         self.assertIn("/daily/", ROUTE_CONTRACT["redirects"])
 
 

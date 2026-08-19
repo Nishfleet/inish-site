@@ -1,0 +1,41 @@
+# VPS hourly Live current check (systemd timer payload).
+#
+# GitHub's `schedule` events are delivered late or not at all for hours at a
+# time (recurring on this repo since 2026-08-10), which is what this unit
+# replaces: it runs the same parity check as the Live current check
+# workflow, but on the VPS's own scheduler, so an Actions schedule stall
+# cannot leave inish.in silently stale.
+#
+# Install: copy scripts/run_live_current_check.sh to /usr/local/sbin and
+# point ExecStart at it, then `systemctl daemon-reload`. The wrapper creates
+# and keeps its own private origin/main clone under the running user's cache
+# dir, so nothing else needs to be prepared on the host. This repo's default
+# ExecStart path is the one the fleet installer uses for this product.
+
+[Unit]
+Description=inish.in hourly live-current parity check (deploy-free)
+# Deliberately independent of any GitHub Actions runner or scheduler: the
+# check must keep firing while every runner is busy, offline, or stalled.
+# It never deploys and only needs outbound HTTPS plus a read of origin/main.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Runs as the host's operator user because the repo is private: the clone
+# needs the same git credential every fleet checkout uses (the gh CLI
+# helper), which lives in this user's home. No new secret is created for
+# this sweep, and the unit never deploys or touches Cloudflare credentials.
+User=nish
+Group=nish
+# The check writes only under the user's cache dir and /tmp; the script
+# itself is at the read-only path below.
+ExecStart=/usr/local/sbin/run_live_current_check.sh
+# A stale live site must leave the unit failed for operators and watchdogs;
+# do not restart into a tight failure loop.
+Restart=no
+# One hourly sweep must finish well inside one hour.
+TimeoutStartSec=1800
+
+[Install]
+WantedBy=multi-user.target

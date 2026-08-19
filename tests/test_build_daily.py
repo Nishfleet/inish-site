@@ -14,6 +14,7 @@ SAMPLE_STORIES = [
     {
         "title": "Ratchet ships deterministic replays",
         "url": "https://ratchet.example/launch",
+        "evidence_url": "https://ratchet.example/launch",
         "source": "Ratchet",
         "section": "AI",
         "summary": "Ratchet records tool calls and replays them against a pinned snapshot of the environment.",
@@ -24,6 +25,7 @@ SAMPLE_STORIES = [
     {
         "title": "Postmark publishes five years of bounce data",
         "url": "https://postmark.example/bounces",
+        "evidence_url": "https://postmark.example/bounces",
         "source": "Postmark",
         "section": "Demand signals",
         "summary": "An email provider released aggregate delivery outcomes covering a large sender population.",
@@ -34,6 +36,7 @@ SAMPLE_STORIES = [
     {
         "title": "Grid layout gets a subgrid escape hatch",
         "url": "https://layout.example/subgrid",
+        "evidence_url": "https://layout.example/subgrid",
         "source": "Layout Weekly",
         "section": "Product ideas",
         "summary": "A walkthrough of aligning nested cards to an outer track without redefining columns.",
@@ -44,6 +47,7 @@ SAMPLE_STORIES = [
     {
         "title": "SQLite adds a page-level checksum mode",
         "url": "https://dbnotes.example/checksums",
+        "evidence_url": "https://dbnotes.example/checksums",
         "source": "DB Notes",
         "section": "Tools",
         "summary": "An opt-in pragma stores a checksum per page and refuses reads when one fails to match.",
@@ -54,6 +58,7 @@ SAMPLE_STORIES = [
     {
         "title": "A registry outage traced to one expired token",
         "url": "https://status.example/incident-4412",
+        "evidence_url": "https://status.example/incident-4412",
         "source": "Status Example",
         "section": "Tools",
         "summary": "A package registry postmortem walks through a credential expiry that stalled publishes.",
@@ -64,6 +69,7 @@ SAMPLE_STORIES = [
     {
         "title": "Pricing page test moves annual conversion",
         "url": "https://growthlog.example/annual-toggle",
+        "evidence_url": "https://growthlog.example/annual-toggle",
         "source": "Growth Log",
         "section": "Demand signals",
         "summary": "A team defaulted its pricing toggle to annual billing and published the resulting split.",
@@ -74,6 +80,7 @@ SAMPLE_STORIES = [
     {
         "title": "Screen reader survey shows heading reliance",
         "url": "https://a11ynotes.example/survey",
+        "evidence_url": "https://a11ynotes.example/survey",
         "source": "A11y Notes",
         "section": "Product ideas",
         "summary": "A long-running accessibility survey published how respondents navigate unfamiliar pages.",
@@ -84,6 +91,7 @@ SAMPLE_STORIES = [
     {
         "title": "Local model runner adds speculative decoding",
         "url": "https://runner.example/speculative",
+        "evidence_url": "https://runner.example/speculative",
         "source": "Runner",
         "section": "AI",
         "summary": "A desktop inference tool added draft-model speculation behind a configuration flag.",
@@ -129,6 +137,12 @@ class BuildDailyTests(unittest.TestCase):
         (self.legacy_daily / "apple-touch-icon.png").write_bytes(
             base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
         )
+        # The raster share card is pinned at the build root (no daily/ source,
+        # like the touch icon), so the fixture lives at the public destination.
+        self.public.mkdir()
+        (self.public / "og-image.png").write_bytes(
+            base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+        )
 
     def tearDown(self):
         self.temp.cleanup()
@@ -160,7 +174,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_builds_latest_feed_at_root(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
         self.assertFalse((self.public / "archive").exists())
         self.assertNotIn("archive", (self.public / "index.html").read_text())
@@ -175,6 +189,68 @@ class BuildDailyTests(unittest.TestCase):
         sitemap = (self.public / "sitemap.xml").read_text()
         self.assertEqual(sitemap.count("<loc>"), 1)
         self.assertIn("<loc>https://inish.in/</loc>", sitemap)
+
+    def test_rss_item_carries_every_story_of_its_edition(self):
+        # The root page rolls over every day, so the RSS item must keep the
+        # whole edition readable after the link target has changed. The
+        # description renders the editor's note and every story — title with
+        # its source link, summary, Checked fact linked to its evidence, take,
+        # and caveat — as one HTML string escaped into the XML character data.
+        self.write(edition(stories=3))
+        self.build()
+        feed = (self.public / "feed.xml").read_text()
+        description = feed.split("<item>", 1)[1].split("<description>", 1)[1].rsplit("</description>", 1)[0]
+        self.assertEqual(
+            description,
+            builder.rss_item_description(self.load()),
+        )
+        self.assertIn(
+            f"<p>{edition()['editor_note']}</p>",
+            html.unescape(description),
+        )
+        for index in range(3):
+            story = SAMPLE_STORIES[index]
+            self.assertIn(
+                f'<h3><a href="{story["url"]}">{story["title"]}</a></h3>',
+                html.unescape(description),
+            )
+            self.assertIn(f"<p>{story['summary']}</p>", html.unescape(description))
+            self.assertIn(
+                f'<p><strong>Checked</strong> <a href="{story["evidence_url"]}">'
+                f"{story['fact']}</a></p>",
+                html.unescape(description),
+            )
+            self.assertIn(f"<p><strong>Nish</strong> {story['take']}</p>", html.unescape(description))
+            self.assertIn(f"<p><strong>But</strong> {story['caveat']}</p>", html.unescape(description))
+
+    def test_rss_item_description_is_well_formed_when_copy_has_special_characters(self):
+        # A story whose copy contains an ampersand, a quote, or angle brackets
+        # must not corrupt the XML or another story's markup: the whole
+        # description is escaped into character data, so the feed still parses
+        # and the round-tripped HTML is exactly the intended markup.
+        payload = edition(stories=1)
+        story = payload["stories"][0]
+        story["title"] = 'R&D <launch> & "results"'
+        story["fact"] = 'The README says "&lt;3 &amp; more" and quotes an "angle: <tag>"'
+        story["take"] = 'I would measure the <launch> & "results" spec myself before trusting its numbers.'
+        story["caveat"] = 'Single "quotes", double "quotes", & ampersands, <angle> brackets.'
+        self.write(payload)
+        self.build()
+        feed = (self.public / "feed.xml").read_text()
+        description = feed.split("<item>", 1)[1].split("<description>", 1)[1].rsplit("</description>", 1)[0]
+        self.assertNotIn("<launch>", description)
+        self.assertNotIn("<tag>", description)
+        import xml.etree.ElementTree as ET
+        ET.fromstring(feed)
+        self.assertEqual(
+            html.unescape(description),
+            f"<p>{payload['editor_note']}</p>"
+            f'<h3><a href="{story["url"]}">{story["title"]}</a></h3>'
+            f"<p>{story['summary']}</p>"
+            f'<p><strong>Checked</strong> <a href="{story["evidence_url"]}">{story["fact"]}</a></p>'
+            f"<p><strong>Nish</strong> {story['take']}</p>"
+            f"<p><strong>But</strong> {story['caveat']}</p>",
+        )
 
     def test_renders_prominence_and_the_three_labels(self):
         self.write(edition(stories=6))
@@ -202,29 +278,108 @@ class BuildDailyTests(unittest.TestCase):
         for index in range(4):
             story = SAMPLE_STORIES[index]
             self.assertIn(
-                f'<a href="{html.escape(story["url"], quote=True)}" '
+                f'<a href="{html.escape(story["evidence_url"], quote=True)}" '
                 f'rel="noopener noreferrer">{html.escape(story["fact"], quote=True)}</a>',
                 page,
             )
+
+    def cross_source_story(self):
+        """A story whose Checked fact is only supported by a separate source.
+
+        The fact (Hacker News engagement) is not on the story page at all; the
+        HN item is the exact evidence, so the renderer must link the fact to
+        the HN item while the story keeps its own primary-source links.
+        """
+        return {
+            "title": "Claude Code messages cross sessions now",
+            "url": "https://code.claude.com/docs/en/cross-session-messaging",
+            "evidence_url": "https://news.ycombinator.com/item?id=49222824",
+            "source": "Anthropic",
+            "section": "AI",
+            "summary": "A new Claude Code page explains how messages persist across sessions on the same machine.",
+            "fact": "Hacker News logged 168 points and 70 comments on the discussion of the launch.",
+            "take": "I read the HN thread before trusting the feature, because points measure attention, not correctness.",
+            "caveat": "Points and comment counts are engagement, not an endorsement of the feature.",
+        }
+
+    def test_checked_fact_renders_its_evidence_link(self):
+        # The exact-evidence contract: a fact verified against a discussion
+        # thread must link to that thread, while the story still links to the
+        # primary source. Both links render; neither is dropped or collapsed
+        # into the other.
+        payload = edition(stories=1, date="2026-08-02")
+        payload["stories"][0] = self.cross_source_story()
+        self.write(payload)
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertIn(
+            '<p class="fact"><strong>Checked</strong> '
+            '<a href="https://news.ycombinator.com/item?id=49222824" rel="noopener noreferrer">'
+            "Hacker News logged 168 points and 70 comments on the discussion of the launch.</a></p>",
+            page,
+        )
+        self.assertIn(
+            '<h2><a href="https://code.claude.com/docs/en/cross-session-messaging" rel="noopener noreferrer">'
+            "Claude Code messages cross sessions now</a></h2>",
+            page,
+        )
+        # The fact must not masquerade as a story link: wrapping it in the
+        # primary-source URL would send the reader to a page that does not
+        # contain the claim.
+        self.assertNotIn(
+            '<a href="https://code.claude.com/docs/en/cross-session-messaging" rel="noopener noreferrer">'
+            "Hacker News logged 168 points",
+            page,
+        )
+
+    def test_rejects_cross_source_fact_without_evidence_url(self):
+        # A story whose fact is only supported by a separate source must carry
+        # that evidence URL, or the whole edition is rejected. "Checked" with
+        # no reachable evidence is a bare assertion.
+        payload = edition(stories=1, date="2026-08-02")
+        payload["stories"][0] = self.cross_source_story()
+        del payload["stories"][0]["evidence_url"]
+        self.assertRejects(payload, "story fields must be exactly")
 
     def test_head_carries_social_share_metadata(self):
         self.write(edition())
         self.build()
         head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.svg">', head)
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
         self.assertIn(
             '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
             'and early signals of demand \u2014 in plain words.">',
             head,
         )
-        self.assertIn('<meta property="og:image:type" content="image/svg+xml">', head)
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
         self.assertIn('<meta property="og:image:width" content="1200">', head)
         self.assertIn('<meta property="og:image:height" content="630">', head)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
-        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.svg">', head)
-        self.assertEqual(head.count("https://inish.in/og-image.svg"), 2)
-        # The build copies the share card to the root alongside app.js and styles.css.
-        self.assertTrue((self.public / "og-image.svg").is_file())
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        # The build keeps the raster share card at the root alongside app.js and styles.css.
+        self.assertTrue((self.public / "og-image.png").is_file())
+
+    def test_head_uses_raster_social_card(self):
+        # X and other raster-only unfurlers exclude SVG card images, so the
+        # generated head must point both og:image and twitter:image at the
+        # committed 1200x630 PNG and declare it as image/png.
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
+        self.assertIn('<meta property="og:image:type" content="image/png">', head)
+        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
+        self.assertNotIn("og-image.svg", head)
+        # The committed card is a real PNG with the promised dimensions,
+        # validated with the standard library only (signature + IHDR fields).
+        card = (Path(__file__).resolve().parents[1] / "og-image.png").read_bytes()
+        self.assertTrue(card.startswith(b"\x89PNG\r\n\x1a\n"), "og-image.png is not a PNG")
+        self.assertEqual(
+            (int.from_bytes(card[16:20], "big"), int.from_bytes(card[20:24], "big")),
+            (1200, 630),
+            "og-image.png must be exactly 1200x630",
+        )
 
     def test_head_carries_apple_touch_icon(self):
         self.write(edition())
@@ -493,6 +648,28 @@ class BuildDailyTests(unittest.TestCase):
         for candidate_count in (True, False, 0, -1, 8.0, "8", 2):
             with self.subTest(candidate_count=candidate_count):
                 self.assertRejects(edition(candidate_count=candidate_count), "candidate_count")
+
+    def test_committed_surface_matches_the_newest_accepted_edition(self):
+        # Deliberately NOT patched to temp dirs: the committed generated
+        # surface must equal exactly what the builder renders from the newest
+        # accepted edition. Observed 2026-08-12: the published note claimed
+        # "Four stories survived the check" while the accepted edition (and the
+        # rendered page's own "2 kept" label) said two, so the live page, RSS,
+        # and JSON promised something the edition never said. Any drift between
+        # the accepted edition and the committed surface must fail here.
+        latest = builder.load_latest()
+        self.assertEqual(
+            (builder.ROOT / "latest.json").read_text(encoding="utf-8"),
+            json.dumps(latest, indent=2, ensure_ascii=False) + "\n",
+        )
+        self.assertEqual(
+            (builder.ROOT / "feed.xml").read_text(encoding="utf-8"),
+            builder.rss(latest),
+        )
+        self.assertEqual(
+            (builder.ROOT / "index.html").read_text(encoding="utf-8"),
+            builder.page(latest),
+        )
 
     def test_removes_stale_archive_output(self):
         self.write(edition())
