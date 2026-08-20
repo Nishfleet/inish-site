@@ -367,6 +367,13 @@ def json_ld(title: str, description: str, date: str) -> str:
     and nothing else, so the Person node claims no job title, employer,
     products, or biography — just the name and the one surface verified to
     belong to Nish.
+
+    The Article node mirrors the Open Graph meta the head already publishes
+    (og:image, og:description) and the edition's own publication date, so AI
+    answer engines and search crawlers that read JSON-LD without parsing the
+    OG meta still see the same facts the human-visible page declares. The
+    raster card and the description are the single hard-coded values
+    rendered in page(); the date stamp is the edition's own ISO date.
     """
     person = {
         "@type": "Person",
@@ -385,7 +392,10 @@ def json_ld(title: str, description: str, date: str) -> str:
         {
             "@type": "Article",
             "headline": title,
+            "image": "https://inish.in/og-image.png",
             "datePublished": date,
+            "dateModified": date,
+            "description": description,
             "mainEntityOfPage": "https://inish.in/",
             # The article references the person above by name and URL only.
             "author": {"@type": "Person", "name": "Nish", "url": "https://inish.in/"},

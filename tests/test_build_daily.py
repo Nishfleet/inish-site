@@ -355,7 +355,12 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn('<meta property="og:image:height" content="630">', head)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
         self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
-        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        # The raster card URL appears in three places: og:image, twitter:image,
+        # and the Article JSON-LD image field. They must agree — a JSON-LD
+        # pointing at a different image than the OG meta would break
+        # truth-rule parity between the human-visible page and the
+        # machine-readable surface.
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 3)
         # The build keeps the raster share card at the root alongside app.js and styles.css.
         self.assertTrue((self.public / "og-image.png").is_file())
 
@@ -447,7 +452,17 @@ class BuildDailyTests(unittest.TestCase):
 
         article = nodes["Article"]
         self.assertEqual(article["headline"], rendered_title)
+        # Article carries the same raster card URL the OG meta points at, so
+        # AI answer engines and search crawlers that read JSON-LD alone still
+        # see the same image the human-visible page declares. The value is
+        # the committed 1200x630 PNG, not the legacy SVG.
+        self.assertEqual(article["image"], "https://inish.in/og-image.png")
         self.assertEqual(article["datePublished"], "2026-08-02")
+        # The edition is published once; dateModified equals datePublished so
+        # crawlers reading JSON-LD get the same freshness stamp the sitemap
+        # lastmod advertises.
+        self.assertEqual(article["dateModified"], "2026-08-02")
+        self.assertEqual(article["description"], rendered_description)
         self.assertEqual(article["mainEntityOfPage"], "https://inish.in/")
         self.assertEqual(article["author"], {"@type": "Person", "name": "Nish", "url": "https://inish.in/"})
 
