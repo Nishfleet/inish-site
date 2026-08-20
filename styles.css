@@ -76,6 +76,22 @@ body {
   top: 16px;
 }
 
+/* The filter-status live region announces story-count changes to assistive
+   tech. It must stay out of the visual layout, and it is hidden by this class
+   — not by an inline style — so the rendered page cannot drift from the
+   stylesheet and any future sr-only element can reuse the pattern. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .masthead {
   padding: 18px 0 0;
   border-bottom: 3px double var(--ink);

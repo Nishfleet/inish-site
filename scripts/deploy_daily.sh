@@ -61,7 +61,9 @@ git archive --format=tar FETCH_HEAD | tar -x -C "$SNAPSHOT_ROOT"
 # data/editions and the rest of the tree stay out of the payload: archives are
 # intentionally unpublished. functions/ is not shipped as static assets; the
 # edge logic lives in worker.js, which imports the route contract from
-# functions/policy.js.
+# functions/policy.js (which in turn reads public-paths.json). This copy line
+# must stay in exact sync with the publicPaths allowlist in public-paths.json
+# (the single source of truth); tests enforce the agreement in both directions.
 cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
    "$SNAPSHOT_ROOT/app.js" "$SNAPSHOT_ROOT/styles.css" \
    "$SNAPSHOT_ROOT/og-image.svg" "$SNAPSHOT_ROOT/og-image.png" "$SNAPSHOT_ROOT/apple-touch-icon.png" \
@@ -70,10 +72,12 @@ cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
    "$SNAPSHOT_ROOT/_redirects" \
    "$PUBLIC_DIR/"
 cp -R "$SNAPSHOT_ROOT/fonts" "$PUBLIC_DIR/"
-# Worker + wrangler config are the live edge path (Workers assets + routes);
-# the worker imports the route contract from functions/policy.js, so that
-# module must ride beside it in the deploy root.
-cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" "$DEPLOY_ROOT/"
+# Worker + wrangler config + the route contract are the live edge path
+# (Workers assets + routes); worker.js imports the contract from
+# functions/policy.js, which reads public-paths.json, so both must ride
+# beside it in the deploy root.
+cp "$SNAPSHOT_ROOT/worker.js" "$SNAPSHOT_ROOT/wrangler.jsonc" \
+   "$SNAPSHOT_ROOT/public-paths.json" "$DEPLOY_ROOT/"
 mkdir -p "$DEPLOY_ROOT/functions"
 cp "$SNAPSHOT_ROOT/functions/policy.js" "$DEPLOY_ROOT/functions/"
 

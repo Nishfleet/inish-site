@@ -4,6 +4,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CHECK_SCRIPT = ROOT / "scripts" / "check_live_current.sh"
 DEPLOY_SCRIPT = ROOT / "scripts" / "deploy_daily.sh"
+RUNNER_SCRIPT = ROOT / "scripts" / "run_live_current_check.sh"
+UNIT = ROOT / "install" / "live-current-check.service"
+TIMER = ROOT / "install" / "live-current-check.timer"
 
 
 class CheckLiveCurrentTests(unittest.TestCase):
@@ -101,6 +104,40 @@ class CheckLiveCurrentTests(unittest.TestCase):
         ):
             self.assertIn(needle, check)
             self.assertIn(needle, deploy)
+
+    def test_hourly_caller_is_committed_and_referenced_by_the_unit(self):
+        # The resilience fix must be reproducible from this repo alone: the
+        # timer payload script exists and the unit points at it.
+        self.assertTrue(RUNNER_SCRIPT.exists())
+        unit = UNIT.read_text()
+        self.assertIn("ExecStart=/usr/local/sbin/run_live_current_check.sh", unit)
+
+    def test_hourly_caller_runs_the_pinned_check_from_the_fetched_head(self):
+        # The accepted main is the truth, never a hardcoded hash or an
+        # installed copy: the wrapper fetches origin/main, derives the
+        # accepted SHA from FETCH_HEAD, and runs that commit's check script.
+        runner = RUNNER_SCRIPT.read_text()
+        self.assertIn('git -C "$CLONE_DIR" fetch --quiet origin main', runner)
+        self.assertIn('ACCEPTED_SHA="$(git -C "$CLONE_DIR" rev-parse FETCH_HEAD)"', runner)
+        self.assertIn('git -C "$CLONE_DIR" show "$ACCEPTED_SHA:scripts/check_live_current.sh"', runner)
+        self.assertIn("exec bash \"$CHECK_PATH\"", runner)
+
+    def test_hourly_caller_never_deploys_and_needs_no_cloudflare_token(self):
+        runner = RUNNER_SCRIPT.read_text()
+        for needle in ("wrangler", "npx", "CLOUDFLARE_API_TOKEN", "cf.env", "deploy_daily.sh"):
+            self.assertNotIn(needle, runner)
+
+    def test_hourly_schedule_lives_on_the_vps_timer_not_the_workflow(self):
+        # GitHub's `schedule` events stall for hours (the recurring failure
+        # this fix exists to close), so the workflow must not carry a cron
+        # and the hourly cadence must live in the committed VPS timer.
+        workflow = (ROOT / ".github" / "workflows" / "live-current-check.yml").read_text()
+        self.assertNotIn("schedule:", workflow)
+        self.assertNotIn("cron:", workflow)
+        timer = TIMER.read_text()
+        self.assertIn("[Timer]", timer)
+        self.assertIn("OnCalendar=", timer)
+        self.assertIn("Persistent=true", timer)
 
 
 if __name__ == "__main__":

@@ -23,13 +23,12 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
 DAILY = ROOT
-LEGACY_DAILY = ROOT / "daily"
-# app.js and styles.css are the legacy daily assets; og-image.svg is the
-# compatibility share-card source (kept reachable for older references), copied
-# to the root alongside them on every build. og-image.png is the raster card the
-# generated head actually references; like apple-touch-icon.png it is pinned at
-# the root with no daily/ source, so its entry is a presence check that fails
-# the build loudly if the committed card ever goes missing.
+# These committed root assets are canonical: the generated head references
+# every one of them, and nothing in the build may overwrite them. The old build
+# copied them from a stale daily/ mirror, which silently reverted merged root
+# fixes on every publish (drift classes #27, #33/#45, and #41 each needed a
+# hand re-sync of the mirror); the mirror is deleted and the build now only
+# fails loudly if a referenced root asset goes missing.
 ASSETS = ("app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
@@ -420,7 +419,7 @@ def page(edition: dict) -> str:
       <button class="active" data-filter="all" aria-pressed="true">All</button>
       {''.join(f'<button data-filter="{esc(section)}" aria-pressed="false">{esc(section)}</button>' for section in present)}
     </nav>
-    <p class="visually-hidden" id="filter-status" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;">Showing all {kept_count} {status_noun}</p>"""
+    <p class="visually-hidden" id="filter-status" role="status" aria-live="polite">Showing all {kept_count} {status_noun}</p>"""
     else:
         cards = """
       <article class="story story-lead quiet-day">
@@ -512,28 +511,26 @@ def sitemap() -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
 
 
-def copy_assets() -> None:
+def check_root_assets() -> None:
+    """The generated page references these committed root assets; the build
+    fails loudly if any of them is missing. The root is canonical: nothing is
+    ever copied over it from a mirror, because a stale mirror is exactly what
+    kept reverting merged root fixes (drift classes #27, #33/#45, #41)."""
     for name in ASSETS:
-        source = LEGACY_DAILY / name
-        destination = DAILY / name
-        if source.is_file() and source.resolve() != destination.resolve():
-            shutil.copyfile(source, destination)
-        elif not destination.is_file():
-            raise FileNotFoundError(f"Missing Daily Reads asset: {source}")
+        asset = DAILY / name
+        if not asset.is_file():
+            raise FileNotFoundError(f"Missing root asset referenced by the daily page: {asset}")
 
 
 def main() -> None:
     latest = load_latest()
     DAILY.mkdir(parents=True, exist_ok=True)
-    copy_assets()
-    archive_roots = [DAILY / "archive"]
-    if DAILY == ROOT:
-        archive_roots.append(LEGACY_DAILY / "archive")
-    for archive_root in set(archive_roots):
-        if archive_root.is_symlink() or archive_root.is_file():
-            archive_root.unlink()
-        elif archive_root.is_dir():
-            shutil.rmtree(archive_root)
+    check_root_assets()
+    archive_root = DAILY / "archive"
+    if archive_root.is_symlink() or archive_root.is_file():
+        archive_root.unlink()
+    elif archive_root.is_dir():
+        shutil.rmtree(archive_root)
     (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (DAILY / "feed.xml").write_text(rss(latest), encoding="utf-8")
