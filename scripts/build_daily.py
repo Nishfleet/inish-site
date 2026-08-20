@@ -367,20 +367,19 @@ def json_ld(title: str, description: str, date: str) -> str:
     and nothing else, so the Person node claims no job title, employer,
     products, or biography — just the name and the one surface verified to
     belong to Nish. `knowsAbout` lists the topics the feed itself surfaces
-    (the same section labels that appear in the filter nav), so AI answer
-    engines can match Nish to topic queries, not just resolve the entity.
+    (the exact section labels from the page's filter nav, minus the
+    catch-all Wildcard bucket), so AI answer engines can match Nish to topic
+    queries, not just resolve the entity.
     """
     person = {
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
         "sameAs": ["https://github.com/nish3451"],
-        "knowsAbout": [
-            "Artificial Intelligence",
-            "Product Development",
-            "Demand Signals",
-            "Software Tools",
-        ],
+        # Derived from SECTIONS (the filter nav) so the schema can never
+        # claim a topic the page does not show; the Wildcard bucket is a
+        # catch-all, not a topic, so it stays out.
+        "knowsAbout": sorted(SECTIONS - {"Wildcard"}),
     }
     graph = [
         {

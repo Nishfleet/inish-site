@@ -445,17 +445,13 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(person["sameAs"], ["https://github.com/nish3451"])
         self.assertNotIn("jobTitle", person)
         # `knowsAbout` mirrors the filter nav topics the page itself shows
-        # so AI answer engines can match Nish to topic queries, not just
-        # resolve the entity. Adding a value that is not visible on the
-        # page would be a truth-rule violation.
+        # (derived from SECTIONS, minus the catch-all Wildcard bucket) so AI
+        # answer engines can match Nish to topic queries, not just resolve the
+        # entity. A value that is not visible on the page would be a
+        # truth-rule violation.
         self.assertEqual(
             person["knowsAbout"],
-            [
-                "Artificial Intelligence",
-                "Product Development",
-                "Demand Signals",
-                "Software Tools",
-            ],
+            sorted(builder.SECTIONS - {"Wildcard"}),
         )
 
         article = nodes["Article"]
