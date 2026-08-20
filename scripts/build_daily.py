@@ -438,6 +438,7 @@ def page(edition: dict) -> str:
   <title>{esc(title)}</title>
   <link rel="canonical" href="https://inish.in/">
   <meta name="description" content="{esc(description)}">
+  <meta property="og:url" content="https://inish.in/">
   <meta property="og:title" content="{esc(title)}">
   <meta property="og:description" content="{esc(description)}">
   <meta property="og:image" content="https://inish.in/og-image.png">
