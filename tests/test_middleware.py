@@ -66,22 +66,43 @@ def _load_contract():
 
 
 def _payload_root_files():
-    """The root files on deploy_daily.sh's payload copy line (minus the
-    edge-internal 404.html/_redirects), each mapped to its public path."""
-    script = DEPLOY_SCRIPT.read_text().replace("\\\n", " ")
-    matches = list(re.finditer(r'cp (\"\$SNAPSHOT_ROOT/[A-Za-z0-9._-]+\"\s+)+\"\$PUBLIC_DIR/\"', script))
-    if len(matches) != 1:
+    """The root files on deploy_daily.sh's payload copy line.
+
+    The deploy derives this list from public-paths.json (the route contract
+    is the single source of truth for the public surface) plus the edge-
+    internal 404.html and _redirects. The static regex used to scan a hand-
+    written cp line no longer matches: the list is built at runtime via a
+    jq loop over publicPaths, so this function reads the same derivation
+    directly. A regression that puts a manual root-file cp line back in the
+    deploy script is caught by the assertion at the top of the function."""
+    script = DEPLOY_SCRIPT.read_text()
+    if ".publicPaths" not in script:
         raise AssertionError(
-            f"expected exactly one root-file cp line in {DEPLOY_SCRIPT.name}, found {len(matches)}"
+            f"{DEPLOY_SCRIPT.name} must derive the root payload from public-paths.json"
         )
-    return re.findall(r'\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"', matches[0].group(0))
+    if "$SNAPSHOT_ROOT/index.html" in script:
+        raise AssertionError(
+            f"{DEPLOY_SCRIPT.name} has a manual root-file cp line; "
+            f"the public surface must be derived from public-paths.json"
+        )
+    contract = json.loads(CONTRACT.read_text())
+    files = []
+    for path in contract["publicPaths"]:
+        if path == "/":
+            files.append("index.html")
+            continue
+        bare = path.lstrip("/")
+        if "/" not in bare:
+            files.append(bare)
+    files += ["404.html", "_redirects"]
+    return sorted(set(files))
 
 
 def _deployed_public_surface():
     """The public surface the deploy payload ships: "/" for index.html, every
-    other root file on the copy line except the edge-internal 404.html and
-    _redirects, plus the OFL license text that rides inside the fonts/
-    directory copy."""
+    other root file derived from public-paths.json's publicPaths (the route
+    contract), except the edge-internal 404.html and _redirects, plus the OFL
+    license text that rides inside the fonts/ directory copy."""
     paths = {"/"}
     for name in _payload_root_files():
         if name in ("404.html", "_redirects"):
