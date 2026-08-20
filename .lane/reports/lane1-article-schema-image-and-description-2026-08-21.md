@@ -127,3 +127,7 @@ Person node, but for the Article node.
   would either duplicate Person or claim a non-existent entity. The
   Schema.org recommendation is conditional on a separate publisher
   existing; it does not here.
+
+## Completion marker
+
+COMPLETE
