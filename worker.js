@@ -6,13 +6,17 @@
 // literals. Pages Functions are no longer the production edge path — the VPS
 // fleet token can deploy Workers but not Cloudflare Pages, and OAuth expired
 // 2026-08-04 left the site four days stale.
-import { canonicalize, decide, redirects } from "./functions/policy.js";
+import {
+  canonicalize,
+  decide,
+  hstsHeader,
+  notFoundAssetUrl,
+  redirects
+} from "./functions/policy.js";
 
-// The site is HTTPS-only, so every response from the middleware can carry HSTS.
-// No subdomains exist yet; includeSubDomains keeps any future one under the
-// same policy. Preload is deliberately not claimed: it is a permanent public
-// commitment and nothing in the repository justifies it.
-const hstsHeader = "max-age=31536000; includeSubDomains";
+// HSTS lives in public-paths.json as the single source of truth for the route
+// contract; policy.js re-exports it and the worker applies it to every
+// response. The value itself is route data, not plumbing.
 
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
@@ -30,6 +34,9 @@ function withSecurityHeaders(response) {
 // asset URL is ignored; the path is what matches. Unknown paths keep their 404
 // status, the asset body is streamed rather than buffered, HEAD requests stay
 // bodyless, and a failed asset fetch falls back to the historical plain 404.
+// The asset URL itself is route data: policy.js derives it from canonicalOrigin,
+// so a canonical-host change is a single edit and so is a rename of the 404
+// asset to a path other than /404.html.
 const notFoundHeaders = {
   "Cache-Control": "no-store",
   "Content-Type": "text/html; charset=utf-8"
@@ -40,7 +47,7 @@ async function notFoundResponse(request, env) {
     return new Response(null, { status: 404, headers: notFoundHeaders });
   }
   try {
-    const asset = await env.ASSETS.fetch("https://inish.in/404.html");
+    const asset = await env.ASSETS.fetch(notFoundAssetUrl);
     if (asset.ok) {
       return new Response(asset.body, { status: 404, headers: notFoundHeaders });
     }

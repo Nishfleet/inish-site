@@ -218,13 +218,16 @@ class MiddlewareContractTests(unittest.TestCase):
 
         # The route contract now lives in public-paths.json; the policy module
         # reads it and the middleware/worker import the decision from policy.
-        # The policy module is the canonical source of the deny branch — no 404
-        # plumbing or HSTS header lives there, so the cross-source check is
-        # split.
+        # The policy module is the canonical source of the deny branch, the
+        # HSTS value, and the branded-404 asset URL — both edges import them
+        # rather than redeclaring literals, so a value change in
+        # public-paths.json does not need a parallel edit on each side and the
+        # branded-404 contract test no longer rides on duplicated strings.
         for name, source in (("worker.js", worker_text), ("_middleware.js", middleware_text)):
             with self.subTest(edge=name):
-                self.assertIn("max-age=31536000; includeSubDomains", source)
-                self.assertIn('env.ASSETS.fetch("https://inish.in/404.html")', source)
+                self.assertIn("hstsHeader", source)
+                self.assertIn("notFoundAssetUrl", source)
+                self.assertIn("env.ASSETS.fetch(notFoundAssetUrl)", source)
                 self.assertIn("status: 404", source)
                 self.assertIn('"Cache-Control": "no-store"', source)
                 self.assertIn('"Content-Type": "text/html; charset=utf-8"', source)
@@ -236,6 +239,11 @@ class MiddlewareContractTests(unittest.TestCase):
                 self.assertIn('request.method === "HEAD"', source)
                 self.assertIn("new Response(null", source)
                 self.assertIn('new Response("Not found"', source)
+                # The edge must import route data from policy.js instead of
+                # inlining it; the literal HSTS value and the 404 hostname
+                # belong to public-paths.json, not the edge sources.
+                self.assertNotIn("max-age=31536000; includeSubDomains", source)
+                self.assertNotIn('https://inish.in/404.html', source)
 
         # The Pages middleware must delegate the decision to the policy module
         # rather than re-implementing it; drift here is the same kind of
@@ -245,12 +253,18 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("from \"./policy.js\"", middleware_text)
         self.assertIn("decide(", middleware_text)
         self.assertIn("canonicalize(", middleware_text)
+        self.assertIn("hstsHeader", middleware_text)
+        self.assertIn("notFoundAssetUrl", middleware_text)
         self.assertIn("from \"./functions/policy.js\"", worker_text)
         self.assertIn("decide(", worker_text)
         self.assertIn("canonicalize(", worker_text)
+        self.assertIn("hstsHeader", worker_text)
+        self.assertIn("notFoundAssetUrl", worker_text)
         self.assertNotIn("const publicPaths = new Set", worker_text)
         self.assertNotIn("const redirects = new Map", worker_text)
         self.assertNotIn("const fontPath =", worker_text)
+        self.assertNotIn('const hstsHeader =', worker_text)
+        self.assertNotIn('const hstsHeader =', middleware_text)
         # The canonical host/scheme rewrite lives in policy.js too; the worker
         # and the Pages middleware must import it rather than inlining their
         # own host checks. Drift here is the same kind of regression as a
