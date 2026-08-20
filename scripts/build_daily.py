@@ -506,8 +506,21 @@ def rss(edition: dict) -> str:
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish's Daily Reads</title><link>https://inish.in/</link><description>A daily read for a founder: AI, product ideas, and demand signals.</description>" + item + "</channel></rss>\n"
 
 
-def sitemap() -> str:
-    body = '<url><loc>https://inish.in/</loc></url>'
+def sitemap(edition: dict) -> str:
+    """The single public URL, stamped with the edition date as <lastmod>.
+
+    The root page is rewritten on every publish, so a sitemap entry without
+    <lastmod> says nothing about when that content changed: a search or AI
+    crawler sees the identical entry on the day a new edition lands as on a day
+    the site sat still, and has to refetch to find out. The stamp is derived
+    from the accepted edition's own date — the same date the page, the RSS
+    pubDate, and latest.json publish — so freshness stays one signal from one
+    source instead of a hand-maintained guess that can drift. W3C Datetime
+    (which the sitemap protocol requires) permits the date-only form, which is
+    exactly the resolution a once-a-day edition actually has.
+    """
+    day = dt.date.fromisoformat(edition["date"])
+    body = f'<url><loc>https://inish.in/</loc><lastmod>{day.isoformat()}</lastmod></url>'
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
 
 
@@ -534,7 +547,7 @@ def main() -> None:
     (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (DAILY / "feed.xml").write_text(rss(latest), encoding="utf-8")
-    (DAILY / "sitemap.xml").write_text(sitemap(), encoding="utf-8")
+    (DAILY / "sitemap.xml").write_text(sitemap(latest), encoding="utf-8")
     print(f"built latest={latest['date']} stories={len(latest['stories'])} scanned={latest['candidate_count']}")
 
 

@@ -3,6 +3,7 @@ import html
 import json
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest.mock import patch
 
@@ -188,6 +189,43 @@ class BuildDailyTests(unittest.TestCase):
         sitemap = (self.public / "sitemap.xml").read_text()
         self.assertEqual(sitemap.count("<loc>"), 1)
         self.assertIn("<loc>https://inish.in/</loc>", sitemap)
+        self.assertIn("<lastmod>2026-08-02</lastmod>", sitemap)
+
+    def test_sitemap_stamps_the_edition_date_as_lastmod(self):
+        """The one sitemap entry carries the edition date as <lastmod>.
+
+        The root page is rewritten on every publish, so an entry with no
+        <lastmod> gives a search or AI crawler no freshness signal at all: the
+        day a new edition lands looks exactly like a day the site sat still.
+        The stamp must come from the accepted edition rather than a
+        hand-maintained constant, so it follows the edition when it rolls over,
+        and it must sit after <loc>, which is the order the sitemap schema
+        requires.
+        """
+        for date in ("2026-08-02", "2026-08-09"):
+            with self.subTest(date=date):
+                # One accepted edition at a time: the fixture stories would
+                # trip the repeat-window validator if the earlier edition
+                # stayed on disk, and the claim under test is only that the
+                # stamp follows whichever edition the build renders.
+                for stale in self.editions.glob("*.json"):
+                    stale.unlink()
+                self.write(edition(date=date))
+                self.build()
+                sitemap = (self.public / "sitemap.xml").read_text()
+                self.assertIn(
+                    f"<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url>",
+                    sitemap,
+                )
+                root = ET.fromstring(sitemap)
+                namespace = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+                urls = root.findall(f"{namespace}url")
+                self.assertEqual(len(urls), 1)
+                self.assertEqual(
+                    [child.tag for child in urls[0]],
+                    [f"{namespace}loc", f"{namespace}lastmod"],
+                )
+                self.assertEqual(urls[0].find(f"{namespace}lastmod").text, date)
 
     def test_rss_item_carries_every_story_of_its_edition(self):
         # The root page rolls over every day, so the RSS item must keep the
@@ -692,6 +730,14 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(
             (builder.ROOT / "index.html").read_text(encoding="utf-8"),
             builder.page(latest),
+        )
+        # The sitemap now carries the edition date as <lastmod>, so it is part
+        # of the generated surface too: a committed sitemap left behind by an
+        # edition rollover would publish a freshness date the site no longer
+        # has, which is worse than publishing none.
+        self.assertEqual(
+            (builder.ROOT / "sitemap.xml").read_text(encoding="utf-8"),
+            builder.sitemap(latest),
         )
 
     def test_keeps_committed_root_assets_untouched(self):
