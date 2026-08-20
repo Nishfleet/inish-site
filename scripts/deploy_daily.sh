@@ -57,19 +57,28 @@ mkdir -p "$SNAPSHOT_ROOT" "$PUBLIC_DIR"
 git archive --format=tar FETCH_HEAD | tar -x -C "$SNAPSHOT_ROOT"
 
 # Root static assets referenced by the generated head, plus the daily feed
-# surface. Copied ONLY from the snapshot — never from the workdir CWD.
-# data/editions and the rest of the tree stay out of the payload: archives are
-# intentionally unpublished. functions/ is not shipped as static assets; the
-# edge logic lives in worker.js, which imports the route contract from
-# functions/policy.js (which in turn reads public-paths.json). This copy line
-# must stay in exact sync with the publicPaths allowlist in public-paths.json
-# (the single source of truth); tests enforce the agreement in both directions.
-cp "$SNAPSHOT_ROOT/index.html" "$SNAPSHOT_ROOT/404.html" \
-   "$SNAPSHOT_ROOT/app.js" "$SNAPSHOT_ROOT/styles.css" \
-   "$SNAPSHOT_ROOT/og-image.svg" "$SNAPSHOT_ROOT/og-image.png" "$SNAPSHOT_ROOT/apple-touch-icon.png" \
-   "$SNAPSHOT_ROOT/latest.json" "$SNAPSHOT_ROOT/feed.xml" \
-   "$SNAPSHOT_ROOT/robots.txt" "$SNAPSHOT_ROOT/sitemap.xml" \
-   "$SNAPSHOT_ROOT/_redirects" \
+# surface. The payload is built from public-paths.json (the route contract),
+# not from a hand-maintained list: every allowlisted root file ships, and
+# the contract is the single source of truth for the public surface. data/
+# and the rest of the tree stay out of the payload: archives are intentionally
+# unpublished. Edge-internal assets (404.html, _redirects) ride alongside the
+# public surface because the live edge needs them; sub-directory paths like
+# /fonts/OFL.txt ship inside the fonts/ directory copy below. Copied ONLY
+# from the snapshot — never from the workdir CWD.
+#
+# functions/ is not shipped as static assets; the edge logic lives in
+# worker.js, which imports the route contract from functions/policy.js
+# (which in turn reads public-paths.json). policy.js rides beside worker.js
+# in the deploy root so the runtime import resolves.
+mapfile -t PUBLIC_ROOT_FILES < <(
+  jq -r '
+    .publicPaths[]
+    | select((. == "/") or test("^/[^/]+$"))
+    | if . == "/" then "index.html" else sub("^/";"") end
+  ' "$SNAPSHOT_ROOT/public-paths.json"
+)
+cp "${PUBLIC_ROOT_FILES[@]/#/$SNAPSHOT_ROOT/}" \
+   "$SNAPSHOT_ROOT/404.html" "$SNAPSHOT_ROOT/_redirects" \
    "$PUBLIC_DIR/"
 cp -R "$SNAPSHOT_ROOT/fonts" "$PUBLIC_DIR/"
 # Worker + wrangler config + the route contract are the live edge path
