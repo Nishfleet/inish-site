@@ -252,7 +252,9 @@ class DeployDailyTests(unittest.TestCase):
         # functions/policy.js reads it and both edge sources import the decision
         # from policy.js — never inlining their own literals — and the deploy
         # must ship the file beside worker.js so the edge can resolve the
-        # import at deploy time.
+        # import at deploy time. The HSTS value and the branded-404 asset URL
+        # are route data too: both must flow from policy.js, never from a
+        # mirrored literal in an edge source.
         contract = json.loads((ROOT / "public-paths.json").read_text())
         self.assertEqual(contract["hstsHeader"], "max-age=31536000; includeSubDomains")
         self.assertIn("/og-image.svg", contract["publicPaths"])
@@ -264,11 +266,19 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn("public-paths.json", policy)
         self.assertIn("new Set(routeContract.publicPaths)", policy)
         self.assertIn("new Map(Object.entries(routeContract.redirects))", policy)
-        for source in (WORKER.read_text(), MIDDLEWARE.read_text()):
-            self.assertIn("policy.js", source)
-            self.assertIn("decide(", source)
-            self.assertNotIn("new Set([", source, "route data must not be inlined in the edge source")
-            self.assertNotIn("new Map([", source, "route data must not be inlined in the edge source")
+        self.assertIn("export const hstsHeader = routeContract.hstsHeader", policy)
+        self.assertIn("export const notFoundAssetUrl", policy)
+        for label, source in (("worker.js", WORKER.read_text()),
+                              ("_middleware.js", MIDDLEWARE.read_text())):
+            with self.subTest(edge=label):
+                self.assertIn("policy.js", source)
+                self.assertIn("decide(", source)
+                self.assertIn("hstsHeader", source)
+                self.assertIn("notFoundAssetUrl", source)
+                self.assertNotIn("new Set([", source, "route data must not be inlined in the edge source")
+                self.assertNotIn("new Map([", source, "route data must not be inlined in the edge source")
+                self.assertNotIn("const hstsHeader =", source, "HSTS value must not be redeclared in the edge source")
+                self.assertNotIn('https://inish.in/404.html', source, "404 asset URL must be derived from canonicalOrigin via policy.js")
         deploy = DEPLOY_SCRIPT.read_text()
         self.assertIn('"$SNAPSHOT_ROOT/public-paths.json"', deploy)
         self.assertIn('"$SNAPSHOT_ROOT/functions/policy.js"', deploy)
