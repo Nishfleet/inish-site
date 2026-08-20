@@ -366,13 +366,21 @@ def json_ld(title: str, description: str, date: str) -> str:
     Truth rules: only what the page itself shows. The site is the daily feed
     and nothing else, so the Person node claims no job title, employer,
     products, or biography — just the name and the one surface verified to
-    belong to Nish.
+    belong to Nish. `knowsAbout` lists the topics the feed itself surfaces
+    (the same section labels that appear in the filter nav), so AI answer
+    engines can match Nish to topic queries, not just resolve the entity.
     """
     person = {
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
         "sameAs": ["https://github.com/nish3451"],
+        "knowsAbout": [
+            "Artificial Intelligence",
+            "Product Development",
+            "Demand Signals",
+            "Software Tools",
+        ],
     }
     graph = [
         {
