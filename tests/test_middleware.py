@@ -66,22 +66,43 @@ def _load_contract():
 
 
 def _payload_root_files():
-    """The root files on deploy_daily.sh's payload copy line (minus the
-    edge-internal 404.html/_redirects), each mapped to its public path."""
-    script = DEPLOY_SCRIPT.read_text().replace("\\\n", " ")
-    matches = list(re.finditer(r'cp (\"\$SNAPSHOT_ROOT/[A-Za-z0-9._-]+\"\s+)+\"\$PUBLIC_DIR/\"', script))
-    if len(matches) != 1:
+    """The root files on deploy_daily.sh's payload copy line.
+
+    The deploy derives this list from public-paths.json (the route contract
+    is the single source of truth for the public surface) plus the edge-
+    internal 404.html and _redirects. The static regex used to scan a hand-
+    written cp line no longer matches: the list is built at runtime via a
+    jq loop over publicPaths, so this function reads the same derivation
+    directly. A regression that puts a manual root-file cp line back in the
+    deploy script is caught by the assertion at the top of the function."""
+    script = DEPLOY_SCRIPT.read_text()
+    if ".publicPaths" not in script:
         raise AssertionError(
-            f"expected exactly one root-file cp line in {DEPLOY_SCRIPT.name}, found {len(matches)}"
+            f"{DEPLOY_SCRIPT.name} must derive the root payload from public-paths.json"
         )
-    return re.findall(r'\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"', matches[0].group(0))
+    if "$SNAPSHOT_ROOT/index.html" in script:
+        raise AssertionError(
+            f"{DEPLOY_SCRIPT.name} has a manual root-file cp line; "
+            f"the public surface must be derived from public-paths.json"
+        )
+    contract = json.loads(CONTRACT.read_text())
+    files = []
+    for path in contract["publicPaths"]:
+        if path == "/":
+            files.append("index.html")
+            continue
+        bare = path.lstrip("/")
+        if "/" not in bare:
+            files.append(bare)
+    files += ["404.html", "_redirects"]
+    return sorted(set(files))
 
 
 def _deployed_public_surface():
     """The public surface the deploy payload ships: "/" for index.html, every
-    other root file on the copy line except the edge-internal 404.html and
-    _redirects, plus the OFL license text that rides inside the fonts/
-    directory copy."""
+    other root file derived from public-paths.json's publicPaths (the route
+    contract), except the edge-internal 404.html and _redirects, plus the OFL
+    license text that rides inside the fonts/ directory copy."""
     paths = {"/"}
     for name in _payload_root_files():
         if name in ("404.html", "_redirects"):
@@ -218,13 +239,16 @@ class MiddlewareContractTests(unittest.TestCase):
 
         # The route contract now lives in public-paths.json; the policy module
         # reads it and the middleware/worker import the decision from policy.
-        # The policy module is the canonical source of the deny branch — no 404
-        # plumbing or HSTS header lives there, so the cross-source check is
-        # split.
+        # The policy module is the canonical source of the deny branch, the
+        # HSTS value, and the branded-404 asset URL — both edges import them
+        # rather than redeclaring literals, so a value change in
+        # public-paths.json does not need a parallel edit on each side and the
+        # branded-404 contract test no longer rides on duplicated strings.
         for name, source in (("worker.js", worker_text), ("_middleware.js", middleware_text)):
             with self.subTest(edge=name):
-                self.assertIn("max-age=31536000; includeSubDomains", source)
-                self.assertIn('env.ASSETS.fetch("https://inish.in/404.html")', source)
+                self.assertIn("hstsHeader", source)
+                self.assertIn("notFoundAssetUrl", source)
+                self.assertIn("env.ASSETS.fetch(notFoundAssetUrl)", source)
                 self.assertIn("status: 404", source)
                 self.assertIn('"Cache-Control": "no-store"', source)
                 self.assertIn('"Content-Type": "text/html; charset=utf-8"', source)
@@ -236,6 +260,11 @@ class MiddlewareContractTests(unittest.TestCase):
                 self.assertIn('request.method === "HEAD"', source)
                 self.assertIn("new Response(null", source)
                 self.assertIn('new Response("Not found"', source)
+                # The edge must import route data from policy.js instead of
+                # inlining it; the literal HSTS value and the 404 hostname
+                # belong to public-paths.json, not the edge sources.
+                self.assertNotIn("max-age=31536000; includeSubDomains", source)
+                self.assertNotIn('https://inish.in/404.html', source)
 
         # The Pages middleware must delegate the decision to the policy module
         # rather than re-implementing it; drift here is the same kind of
@@ -245,12 +274,18 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("from \"./policy.js\"", middleware_text)
         self.assertIn("decide(", middleware_text)
         self.assertIn("canonicalize(", middleware_text)
+        self.assertIn("hstsHeader", middleware_text)
+        self.assertIn("notFoundAssetUrl", middleware_text)
         self.assertIn("from \"./functions/policy.js\"", worker_text)
         self.assertIn("decide(", worker_text)
         self.assertIn("canonicalize(", worker_text)
+        self.assertIn("hstsHeader", worker_text)
+        self.assertIn("notFoundAssetUrl", worker_text)
         self.assertNotIn("const publicPaths = new Set", worker_text)
         self.assertNotIn("const redirects = new Map", worker_text)
         self.assertNotIn("const fontPath =", worker_text)
+        self.assertNotIn('const hstsHeader =', worker_text)
+        self.assertNotIn('const hstsHeader =', middleware_text)
         # The canonical host/scheme rewrite lives in policy.js too; the worker
         # and the Pages middleware must import it rather than inlining their
         # own host checks. Drift here is the same kind of regression as a

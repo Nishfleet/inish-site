@@ -43,6 +43,14 @@ export const redirects = new Map(Object.entries(routeContract.redirects));
 // commitment and nothing in the repository justifies it.
 export const hstsHeader = routeContract.hstsHeader;
 
+// The branded 404 page ships as /404.html in the deploy payload (staged beside
+// index.html by deploy_daily.sh). The edge reads it through the ASSETS binding
+// using this URL — derived from canonicalOrigin so a host change or a rename
+// of the asset are single edits to public-paths.json instead of mirrored
+// literals in both edge sources. The hostname in an internally constructed
+// asset URL is ignored; the path is what matches.
+export const notFoundAssetUrl = new URL("/404.html", canonicalOrigin).href;
+
 // Decide what the middleware should do for `pathname`.
 //
 // The deny branch must stay anchored to the two checks below. A catch-all, a

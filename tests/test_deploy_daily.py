@@ -22,13 +22,13 @@ SHARE_CARD = "og-image.svg"
 RASTER_SHARE_CARD = "og-image.png"
 HOME_SCREEN_ICON = "apple-touch-icon.png"
 
-# The deploy script copies the root files into the payload from SNAPSHOT_ROOT
-# on lines ending with "$PUBLIC_DIR/". The line may wrap with trailing
-# backslashes, and the directory copies (`cp -R`) are separate lines.
-ROOT_COPY_LINE = re.compile(
-    r'^cp (?:\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"\s+)+\"\$PUBLIC_DIR/\"$',
-    re.MULTILINE,
-)
+# The deploy script builds the root payload from public-paths.json (the route
+# contract is the single source of truth for the public surface). The static
+# regex used to scan a hand-written cp line no longer applies — the list is
+# derived at runtime — so the parser runs the same derivation against the
+# contract, then guards the regression where someone reintroduces a manual
+# root-file list and the deploy silently drifts.
+ROUTE_CONTRACT_PATH = ROOT / "public-paths.json"
 
 # Every asset the generated head points at, rendered by build_daily.py as
 # content="https://inish.in/path" or href="/path".
@@ -36,14 +36,37 @@ HEAD_ASSET = re.compile(r'(?:content|href)="(?:https://inish\.in)?(/[A-Za-z0-9._
 
 
 def payload_root_files() -> list[str]:
-    """The root-file allowlist deploy_daily.sh copies into the payload."""
-    script = DEPLOY_SCRIPT.read_text().replace("\\\n", " ")
-    matches = list(ROOT_COPY_LINE.finditer(script))
-    if len(matches) != 1:
+    """The root files deploy_daily.sh copies from the snapshot into the payload.
+
+    The deploy derives this list from public-paths.json's publicPaths (every
+    root-level entry, with `/` mapped to `index.html` for the static layer)
+    plus the edge-internal assets (404.html, _redirects). A regression that
+    puts a hand-maintained cp line back in the script drifts the deploy from
+    the contract and the assertion at the end of this function surfaces it
+    as a missing jq invocation."""
+    script = DEPLOY_SCRIPT.read_text()
+    # The deploy must read public-paths.json's publicPaths to build the
+    # payload; a manual root-file list would drift every time a path is added.
+    if ".publicPaths" not in script:
         raise AssertionError(
-            f"expected exactly one root-file cp line in {DEPLOY_SCRIPT}, found {len(matches)}"
+            f"{DEPLOY_SCRIPT.name} must derive the public surface from public-paths.json"
         )
-    return re.findall(r'\"\$SNAPSHOT_ROOT/([A-Za-z0-9._-]+)\"', matches[0].group(0))
+    if "$SNAPSHOT_ROOT/index.html" in script:
+        raise AssertionError(
+            f"{DEPLOY_SCRIPT.name} has a manual root-file cp line; "
+            f"the public surface must be derived from public-paths.json"
+        )
+    contract = json.loads(ROUTE_CONTRACT_PATH.read_text())
+    files: set[str] = set()
+    for path in contract["publicPaths"]:
+        if path == "/":
+            files.add("index.html")
+            continue
+        bare = path.lstrip("/")
+        if "/" not in bare:
+            files.add(bare)
+    files.update({"404.html", "_redirects"})
+    return sorted(files)
 
 
 def head_root_assets() -> set[str]:
@@ -225,9 +248,14 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn('ACCEPTED_SHA="$(git rev-parse FETCH_HEAD)"', script)
         self.assertIn("git archive --format=tar FETCH_HEAD", script)
         self.assertIn('--root "$SNAPSHOT_ROOT"', script)
-        # Every static root file must be copied from the snapshot path, never CWD.
-        self.assertIn('"$SNAPSHOT_ROOT/index.html"', script)
+        # Every artefact read at deploy time must come from the snapshot path,
+        # never CWD. The root-file list now derives from public-paths.json (the
+        # source of truth), so the cp line references the directory root, not
+        # individual filenames; the contract still ships from SNAPSHOT_ROOT.
+        self.assertIn('"$SNAPSHOT_ROOT/public-paths.json"', script)
         self.assertIn('"$SNAPSHOT_ROOT/latest.json"', script)
+        self.assertIn('"$SNAPSHOT_ROOT/worker.js"', script)
+        self.assertIn('"$SNAPSHOT_ROOT/functions/policy.js"', script)
         self.assertNotRegex(
             script,
             r'^cp (?!.*\$SNAPSHOT_ROOT)(?!-R ).*index\.html',
@@ -252,7 +280,9 @@ class DeployDailyTests(unittest.TestCase):
         # functions/policy.js reads it and both edge sources import the decision
         # from policy.js — never inlining their own literals — and the deploy
         # must ship the file beside worker.js so the edge can resolve the
-        # import at deploy time.
+        # import at deploy time. The HSTS value and the branded-404 asset URL
+        # are route data too: both must flow from policy.js, never from a
+        # mirrored literal in an edge source.
         contract = json.loads((ROOT / "public-paths.json").read_text())
         self.assertEqual(contract["hstsHeader"], "max-age=31536000; includeSubDomains")
         self.assertIn("/og-image.svg", contract["publicPaths"])
@@ -264,11 +294,19 @@ class DeployDailyTests(unittest.TestCase):
         self.assertIn("public-paths.json", policy)
         self.assertIn("new Set(routeContract.publicPaths)", policy)
         self.assertIn("new Map(Object.entries(routeContract.redirects))", policy)
-        for source in (WORKER.read_text(), MIDDLEWARE.read_text()):
-            self.assertIn("policy.js", source)
-            self.assertIn("decide(", source)
-            self.assertNotIn("new Set([", source, "route data must not be inlined in the edge source")
-            self.assertNotIn("new Map([", source, "route data must not be inlined in the edge source")
+        self.assertIn("export const hstsHeader = routeContract.hstsHeader", policy)
+        self.assertIn("export const notFoundAssetUrl", policy)
+        for label, source in (("worker.js", WORKER.read_text()),
+                              ("_middleware.js", MIDDLEWARE.read_text())):
+            with self.subTest(edge=label):
+                self.assertIn("policy.js", source)
+                self.assertIn("decide(", source)
+                self.assertIn("hstsHeader", source)
+                self.assertIn("notFoundAssetUrl", source)
+                self.assertNotIn("new Set([", source, "route data must not be inlined in the edge source")
+                self.assertNotIn("new Map([", source, "route data must not be inlined in the edge source")
+                self.assertNotIn("const hstsHeader =", source, "HSTS value must not be redeclared in the edge source")
+                self.assertNotIn('https://inish.in/404.html', source, "404 asset URL must be derived from canonicalOrigin via policy.js")
         deploy = DEPLOY_SCRIPT.read_text()
         self.assertIn('"$SNAPSHOT_ROOT/public-paths.json"', deploy)
         self.assertIn('"$SNAPSHOT_ROOT/functions/policy.js"', deploy)

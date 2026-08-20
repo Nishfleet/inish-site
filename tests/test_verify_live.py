@@ -347,6 +347,8 @@ class MiddlewareContractTests(unittest.TestCase):
     because the suite is stdlib-only and CI has no Node runtime."""
 
     MIDDLEWARE = ROOT / "functions" / "_middleware.js"
+    WORKER = ROOT / "worker.js"
+    POLICY = ROOT / "functions" / "policy.js"
 
     def test_hsts_set_on_redirect_404_and_passthrough_responses(self):
         source = self.MIDDLEWARE.read_text()
@@ -371,18 +373,27 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("max-age=31536000", header)
         self.assertIn("includeSubDomains", header)
         self.assertNotIn("preload", header)
-        # The middleware must keep applying the contract value; the value
-        # itself is route data read from public-paths.json by policy.js.
-        source = self.MIDDLEWARE.read_text()
-        self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', source)
-        self.assertIn("from \"./policy.js\"", source)
+        # The route contract defines the HSTS value once in public-paths.json;
+        # policy.js re-exports it and both edge sources import the constant.
+        # A regression that redefines the literal in an edge file drifts the
+        # contract silently — assert the import relationship instead.
+        policy_source = self.POLICY.read_text()
+        self.assertIn('export const hstsHeader = routeContract.hstsHeader', policy_source)
+        for label, source in (("_middleware.js", self.MIDDLEWARE.read_text()),
+                              ("worker.js", self.WORKER.read_text())):
+            with self.subTest(edge=label):
+                self.assertIn('headers.set("Strict-Transport-Security", hstsHeader)', source)
+                self.assertIn("hstsHeader", source)
+                self.assertIn('from "./functions/policy.js"', source) if label == "worker.js" \
+                    else self.assertIn('from "./policy.js"', source)
+                self.assertNotIn('const hstsHeader =', source)
 
     def test_public_allowlist_and_redirect_semantics_kept(self):
         # The route contract has one source of truth (public-paths.json);
         # functions/policy.js reads it and the middleware is a thin entrypoint
         # that imports the decision from it. Keep the canonical checks rooted
         # at the policy module, and the middleware 404 plumbing where it lives.
-        policy = Path(__file__).resolve().parents[1] / "functions" / "policy.js"
+        policy = self.POLICY
         policy_source = policy.read_text()
         middleware_source = self.MIDDLEWARE.read_text()
         self.assertIn("public-paths.json", policy_source)
