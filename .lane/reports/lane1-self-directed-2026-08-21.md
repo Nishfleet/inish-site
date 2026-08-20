@@ -2,6 +2,8 @@
 
 Branch: `lane1/self-directed-2026-08-21`
 
+PR: https://github.com/nish3451/inish-site/pull/105
+
 ## Item
 
 Self-directed cycle — descend the ladder on inish-site: walk the live product
