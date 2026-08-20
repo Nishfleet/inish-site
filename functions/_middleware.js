@@ -4,13 +4,17 @@
 // The decision lives in ./policy.js so the deny/allow/redirect branch can be
 // exercised by real tests against the imported function rather than by
 // substring matching on this file.
-import { canonicalize, decide, redirects } from "./policy.js";
+import {
+  canonicalize,
+  decide,
+  hstsHeader,
+  notFoundAssetUrl,
+  redirects
+} from "./policy.js";
 
-// The site is HTTPS-only, so every response from the middleware can carry HSTS.
-// No subdomains exist yet; includeSubDomains keeps any future one under the
-// same policy. Preload is deliberately not claimed: it is a permanent public
-// commitment and nothing in the repository justifies it.
-const hstsHeader = "max-age=31536000; includeSubDomains";
+// HSTS lives in public-paths.json as the single source of truth for the route
+// contract; policy.js re-exports it and the middleware applies it to every
+// response. The value itself is route data, not plumbing.
 
 function withSecurityHeaders(response) {
   response.headers.set("Strict-Transport-Security", hstsHeader);
@@ -20,6 +24,8 @@ function withSecurityHeaders(response) {
 // Mirrors the worker's notFoundResponse exactly: serve the branded /404.html
 // asset through the ASSETS binding with status 404, stream the body, keep HEAD
 // bodyless, and fall back to the historical plain 404 if the asset is missing.
+// The asset URL is route data, derived from canonicalOrigin by policy.js, so
+// the worker and the kept-in-sync middleware always point at the same place.
 const notFoundHeaders = {
   "Cache-Control": "no-store",
   "Content-Type": "text/html; charset=utf-8"
@@ -30,7 +36,7 @@ async function notFoundResponse(request, env) {
     return new Response(null, { status: 404, headers: notFoundHeaders });
   }
   try {
-    const asset = await env.ASSETS.fetch("https://inish.in/404.html");
+    const asset = await env.ASSETS.fetch(notFoundAssetUrl);
     if (asset.ok) {
       return new Response(asset.body, { status: 404, headers: notFoundHeaders });
     }
