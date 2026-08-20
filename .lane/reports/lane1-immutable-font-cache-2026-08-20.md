@@ -32,3 +32,7 @@
 ## Claims
 
 `functions/_middleware.js`, `functions/policy.js` (read-only, no edit needed), `tests/test_middleware_deny.test.mjs`, `tests/test_worker_edge.test.mjs`, `worker.js`
+
+## Completion
+
+- [x] stop revalidating the four unchanged webfonts on every visit by giving `/fonts/*.woff2` a long immutable cache
