@@ -9,6 +9,7 @@
 import {
   canonicalize,
   decide,
+  fontPath,
   hstsHeader,
   notFoundAssetUrl,
   redirects
@@ -17,6 +18,15 @@ import {
 // HSTS lives in public-paths.json as the single source of truth for the route
 // contract; policy.js re-exports it and the worker applies it to every
 // response. The value itself is route data, not plumbing.
+
+// The four webfonts ship under stable, fingerprint-free URLs (styles.css
+// references /fonts/<face>.woff2 directly), so a browser revalidates them on
+// every visit unless the response says otherwise. They never change between
+// editions, so the worker gives them a one-year immutable cache: the browser
+// skips the request entirely after the first fetch. The font pattern is the
+// same narrow one policy.js uses for the deny decision — nothing but woff2
+// files from /fonts can ever receive this header.
+const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
@@ -92,7 +102,11 @@ export default {
     if (decision === "deny") {
       return withSecurityHeaders(await notFoundResponse(request, env));
     }
+    const asset = await env.ASSETS.fetch(request);
+    if (fontPath.test(url.pathname)) {
+      asset.headers.set("Cache-Control", FONT_CACHE_CONTROL);
+    }
     // Assets binding resolves "/" to index.html via html_handling defaults.
-    return withSecurityHeaders(await env.ASSETS.fetch(request));
+    return withSecurityHeaders(asset);
   }
 };

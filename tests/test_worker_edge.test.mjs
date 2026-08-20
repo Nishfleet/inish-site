@@ -34,6 +34,7 @@ import worker from "../worker.js";
 
 const ORIGIN = "https://inish.in";
 const HSTS = "max-age=31536000; includeSubDomains";
+const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 // Negative space mirrors the middleware suite's samples and adds paths that
 // specifically probe the shared policy. /private/notes.txt is the path
@@ -179,6 +180,29 @@ test("allow: the font pattern serves any /fonts/<name>.woff2 from ASSETS", async
     const { response, assets } = await call(path);
     assert.equal(response.status, 200, `expected 200 for ${path}`);
     assert.ok(assets.reads.includes(path), `font ${path} must reach ASSETS`);
+  }
+});
+
+test("cache: every font response carries the one-year immutable cache header", async () => {
+  // The four webfonts are referenced by stable, fingerprint-free URLs, so a
+  // browser revalidates them on every visit unless the response is
+  // immutable. The header must ride on every /fonts/<name>.woff2 response —
+  // the exact pattern the deny policy uses — and on no other static asset.
+  for (const path of FONT_SAMPLES) {
+    const { response } = await call(path);
+    assert.equal(
+      response.headers.get("Cache-Control"),
+      FONT_CACHE_CONTROL,
+      `font ${path} must carry the immutable cache header`
+    );
+  }
+  for (const path of ["/", "/styles.css", "/app.js", "/fonts/OFL.txt"]) {
+    const { response } = await call(path);
+    assert.notEqual(
+      response.headers.get("Cache-Control"),
+      FONT_CACHE_CONTROL,
+      `non-font ${path} must not carry the font immutable cache header`
+    );
   }
 });
 
