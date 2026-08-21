@@ -388,6 +388,39 @@ class MiddlewareContractTests(unittest.TestCase):
                     else self.assertIn('from "./policy.js"', source)
                 self.assertNotIn('const hstsHeader =', source)
 
+    def test_security_headers_are_contract_data_applied_by_both_edges(self):
+        """The non-HSTS security headers follow the same single-source-of-truth
+        rule as HSTS: the values live once in public-paths.json, policy.js
+        derives them from the contract, and both edge entrypoints apply every
+        pair on every response class. A header redeclared (or dropped) in an
+        edge source would drift from the contract silently."""
+        contract = ROUTE_CONTRACT.get("securityHeaders")
+        self.assertIsInstance(contract, dict, "public-paths.json must declare securityHeaders")
+        for name in ("X-Content-Type-Options",
+                     "Referrer-Policy",
+                     "Content-Security-Policy",
+                     "X-Frame-Options"):
+            self.assertTrue(contract.get(name), f"securityHeaders must declare {name}")
+        csp = contract["Content-Security-Policy"]
+        self.assertIn("default-src 'none'", csp, "the CSP must be deny-by-default")
+        self.assertIn("frame-ancestors 'none'", csp, "the CSP must forbid framing")
+        policy_source = self.POLICY.read_text()
+        self.assertIn(
+            "export const securityHeaders = Object.entries(routeContract.securityHeaders)",
+            policy_source,
+            "policy.js must derive securityHeaders from the route contract",
+        )
+        for label, source in (("_middleware.js", self.MIDDLEWARE.read_text()),
+                              ("worker.js", self.WORKER.read_text())):
+            with self.subTest(edge=label):
+                self.assertIn("securityHeaders", source)
+                self.assertIn("for (const [name, value] of securityHeaders)", source)
+                # No edge source may inline a security-header literal; the
+                # contract is the only place a value is written.
+                for name in contract:
+                    self.assertNotIn(f'"{name}":', source)
+                    self.assertNotIn(f'headers.set("{name}", "', source)
+
     def test_public_allowlist_and_redirect_semantics_kept(self):
         # The route contract has one source of truth (public-paths.json);
         # functions/policy.js reads it and the middleware is a thin entrypoint
