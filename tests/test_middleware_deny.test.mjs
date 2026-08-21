@@ -26,6 +26,15 @@ import {
   fontPath
 } from "../functions/policy.js";
 
+// The positive-side samples (allow list, redirect map) are derived straight
+// from public-paths.json — the single source of truth — so adding a public
+// path or a legacy redirect stays a one-file data edit that this suite
+// follows automatically. Only the negative space (DENY_SAMPLES) stays
+// handwritten: those paths must never enter the contract.
+const ROUTE_CONTRACT = JSON.parse(
+  readFileSync(new URL("../public-paths.json", import.meta.url), "utf8")
+);
+
 const DENY_SAMPLES = [
   // None of these are in the allowlist, none of these match the font pattern.
   "/admin",
@@ -47,32 +56,9 @@ const DENY_SAMPLES = [
   "/index.html.bak", // suffix injection on a redirect target
 ];
 
-const ALLOW_SAMPLES = [
-  "/",
-  "/app.js",
-  "/styles.css",
-  "/apple-touch-icon.png",
-  "/og-image.svg",
-  "/og-image.png",
-  "/latest.json",
-  "/feed.xml",
-  "/robots.txt",
-  "/sitemap.xml",
-  "/llms.txt",
-  "/fonts/OFL.txt"
-];
+const ALLOW_SAMPLES = ROUTE_CONTRACT.publicPaths;
 
-const REDIRECT_SAMPLES = [
-  "/index.html",
-  "/daily",
-  "/daily/",
-  "/daily/index.html",
-  "/daily/app.js",
-  "/daily/styles.css",
-  "/daily/latest.json",
-  "/daily/feed.xml",
-  "/daily/sitemap.xml"
-];
+const REDIRECT_SAMPLES = Object.keys(ROUTE_CONTRACT.redirects);
 
 const FONT_SAMPLES = [
   "/fonts/archivo-700.woff2",
@@ -103,23 +89,9 @@ test("allow: every public path is allowed", () => {
 });
 
 test("allow: allowlist is exactly the published surface", () => {
-  assert.deepEqual(
-    [...publicPaths].sort(),
-    [
-      "/",
-      "/app.js",
-      "/styles.css",
-      "/apple-touch-icon.png",
-      "/og-image.svg",
-      "/og-image.png",
-      "/latest.json",
-      "/feed.xml",
-      "/robots.txt",
-      "/sitemap.xml",
-      "/llms.txt",
-      "/fonts/OFL.txt"
-    ].sort()
-  );
+  // The imported policy must derive its set from public-paths.json — an
+  // inline literal here or in policy.js would fork the source of truth.
+  assert.deepEqual([...publicPaths].sort(), [...ROUTE_CONTRACT.publicPaths].sort());
 });
 
 test("redirect: every legacy redirected path is a redirect", () => {
@@ -129,19 +101,11 @@ test("redirect: every legacy redirected path is a redirect", () => {
 });
 
 test("redirect: redirect map is exactly the published surface", () => {
+  // Same derivation rule as the allowlist: the map must come from
+  // public-paths.json, never from a mirrored literal.
   assert.deepEqual(
     [...redirects.entries()].sort(),
-    [
-      ["/daily", "/"],
-      ["/daily/", "/"],
-      ["/daily/app.js", "/app.js"],
-      ["/daily/feed.xml", "/feed.xml"],
-      ["/daily/index.html", "/"],
-      ["/daily/latest.json", "/latest.json"],
-      ["/daily/sitemap.xml", "/sitemap.xml"],
-      ["/daily/styles.css", "/styles.css"],
-      ["/index.html", "/"]
-    ].sort()
+    Object.entries(ROUTE_CONTRACT.redirects).sort()
   );
 });
 
