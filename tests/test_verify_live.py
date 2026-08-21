@@ -65,13 +65,6 @@ def index_payload(date="2026-08-08"):
     return f"<!doctype html><html><head><title>Nish's Daily Reads — {date}</title></head><body>fixture</body></html>\n"
 
 
-SITEMAP = (
-    '<?xml version="1.0" encoding="UTF-8"?>\n'
-    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-    "<url><loc>https://inish.in/</loc></url></urlset>\n"
-)
-
-
 class VerifyLiveTests(unittest.TestCase):
     def test_removes_one_cloudflare_analytics_beacon(self):
         original = b"<html>\n<body>\n<p>feed</p>\n</body>\n</html>\n"
@@ -188,8 +181,9 @@ def make_live_server(root: Path, overrides=None):
     the exact body bytes (served with 200, like a stale asset) or a
     ``(status, body)`` tuple (e.g. a plain-fallback 404). Unknown routes serve
     the branded 404 page with status 404, exactly like the edge worker. A
-    public path with no fixture file serves the branded 404 too, so a route
-    addition fails verification loudly until the fixture carries the file."""
+    public path with no fixture file serves the branded 404 too — after
+    write_fixtures() that can only mean the contract names a file the
+    snapshot never carried, which must fail loudly."""
     routes = {}
     for path in PUBLIC_PATHS:
         if path == "/":
@@ -231,19 +225,23 @@ class LiveVerifierTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
+    # Fixture bodies synthesized when the contract names a file the repo does
+    # not carry (a state test_middleware.py already fails loudly for). Keys
+    # are file suffixes; values are the exact bytes the snapshot would serve.
+    SYNTHETIC_BODIES = {
+        ".html": b"<!doctype html><title>fixture</title>\n",
+        ".json": b"{}\n",
+        ".xml": b'<?xml version="1.0" encoding="UTF-8"?>\n',
+        ".svg": b'<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+        ".png": b"\x89PNG\r\n\x1a\nfixture",
+        ".txt": b"fixture text\n",
+    }
+
     def write_fixtures(self, date="2026-08-08", stories=7):
         edition = edition_payload(date, stories)
         (self.root / "index.html").write_text(index_payload(date))
-        (self.root / "app.js").write_text("app fixture")
-        (self.root / "styles.css").write_text("styles fixture")
         (self.root / "latest.json").write_text(json.dumps(edition) + "\n")
         (self.root / "feed.xml").write_text(rss_payload(date))
-        (self.root / "robots.txt").write_text("User-agent: *\nAllow: /\n")
-        (self.root / "sitemap.xml").write_text(SITEMAP)
-        (self.root / "llms.txt").write_text("# inish.in\n\nCanonical summary of the site.\n")
-        (self.root / "og-image.svg").write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
-        (self.root / "og-image.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-card")
-        (self.root / "apple-touch-icon.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-icon")
         (self.root / "404.html").write_text(
             "<!doctype html><title>Not found</title><p>fixture error desk</p>\n"
         )
@@ -251,6 +249,25 @@ class LiveVerifierTests(unittest.TestCase):
         # The route contract is part of the deployed snapshot; the verifier
         # reads the public surface from it.
         (self.root / "public-paths.json").write_text((ROOT / "public-paths.json").read_text())
+        # Every other public path gets its snapshot bytes from the contract
+        # itself: copy the real repo file when it exists, else synthesize a
+        # minimal stand-in. Adding a public path then stays a single data
+        # edit in public-paths.json — the fixture follows the contract
+        # automatically instead of needing a parallel edit here.
+        written = {"index.html", "latest.json", "feed.xml", "404.html", "public-paths.json"}
+        for path in PUBLIC_PATHS:
+            if path == "/":
+                continue
+            relative = path.lstrip("/")
+            if relative in written:
+                continue
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            source = ROOT / relative
+            if source.is_file():
+                target.write_bytes(source.read_bytes())
+            else:
+                target.write_bytes(self.SYNTHETIC_BODIES.get(target.suffix, b"fixture\n"))
 
     def run_verifier(self, overrides=None):
         output = io.StringIO()
