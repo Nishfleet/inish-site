@@ -360,6 +360,27 @@ class BuildDailyTests(unittest.TestCase):
         # The build keeps the raster share card at the root alongside app.js and styles.css.
         self.assertTrue((self.public / "og-image.png").is_file())
 
+    def test_head_declares_site_name_locale_and_twitter_image_alt(self):
+        # Unfurlers name the source from og:site_name and X's card reader needs
+        # its own twitter:image:alt; og:locale states the page's language. A
+        # shared image_alt constant keeps the two alt tags from drifting.
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:site_name" content="Nish\'s Daily Reads">', head)
+        self.assertIn('<meta property="og:locale" content="en_US">', head)
+        self.assertIn(
+            '<meta name="twitter:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
+            'and early signals of demand \u2014 in plain words.">',
+            head,
+        )
+        self.assertIn('<meta property="og:image:alt" content="', head)
+        self.assertIn('<meta name="twitter:image:alt" content="', head)
+        # The same reader-facing sentence is delivered to both tags.
+        og_alt = head.split('<meta property="og:image:alt" content="', 1)[1].split('"', 1)[0]
+        twitter_alt = head.split('<meta name="twitter:image:alt" content="', 1)[1].split('"', 1)[0]
+        self.assertEqual(og_alt, twitter_alt)
+
     def test_head_uses_raster_social_card(self):
         # X and other raster-only unfurlers exclude SVG card images, so the
         # generated head must point both og:image and twitter:image at the
