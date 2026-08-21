@@ -240,6 +240,7 @@ class LiveVerifierTests(unittest.TestCase):
         (self.root / "feed.xml").write_text(rss_payload(date))
         (self.root / "robots.txt").write_text("User-agent: *\nAllow: /\n")
         (self.root / "sitemap.xml").write_text(SITEMAP)
+        (self.root / "llms.txt").write_text("# inish.in\n\nCanonical summary of the site.\n")
         (self.root / "og-image.svg").write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
         (self.root / "og-image.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-card")
         (self.root / "apple-touch-icon.png").write_bytes(b"\x89PNG\r\n\x1a\nfixture-icon")
