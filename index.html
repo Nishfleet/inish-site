@@ -30,6 +30,7 @@
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@id": "https://inish.in/#website",
         "@type": "WebSite",
         "name": "Nish's Daily Reads",
         "url": "https://inish.in/",
@@ -46,12 +47,16 @@
         ]
       },
       {
+        "@id": "https://inish.in/#article",
         "@type": "Article",
         "headline": "Nish's Daily Reads — 2026-08-21",
         "datePublished": "2026-08-21",
         "mainEntityOfPage": "https://inish.in/",
         "author": {
           "@id": "https://inish.in/#nish"
+        },
+        "isPartOf": {
+          "@id": "https://inish.in/#website"
         }
       }
     ]
