@@ -441,9 +441,10 @@ class BuildDailyTests(unittest.TestCase):
         person = nodes["Person"]
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
-        # Only the one surface verified to belong to Nish; no job title,
-        # employer, products, or biography are claimed.
-        self.assertEqual(person["sameAs"], ["https://github.com/nish3451"])
+        # The two surfaces verified to belong to Nish: the GitHub profile and
+        # Tiny Studio (footer link on inish.in, reciprocal link on tinystudio.in).
+        # No job title, employer, products, or biography are claimed.
+        self.assertEqual(person["sameAs"], ["https://github.com/nish3451", "https://tinystudio.in/"])
         self.assertNotIn("jobTitle", person)
 
         article = nodes["Article"]
