@@ -365,14 +365,14 @@ def json_ld(title: str, description: str, date: str) -> str:
 
     Truth rules: only what the page itself shows. The site is the daily feed
     and nothing else, so the Person node claims no job title, employer,
-    products, or biography — just the name and the one surface verified to
+    products, or biography — just the name and the two surfaces verified to
     belong to Nish.
     """
     person = {
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
-        "sameAs": ["https://github.com/nish3451"],
+        "sameAs": ["https://github.com/nish3451", "https://x.com/NishantRArora"],
     }
     graph = [
         {
