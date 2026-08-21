@@ -399,6 +399,7 @@ def page(edition: dict) -> str:
     title_date = date.strftime("%A, %d %B %Y")
     title = f"Nish's Daily Reads — {edition['date']}"
     description = "A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words."
+    image_alt = "Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words."
     kept_count = len(edition["stories"])
     count_label = f"{edition['candidate_count']} scanned · {kept_count} kept"
     if edition["stories"]:
@@ -440,8 +441,10 @@ def page(edition: dict) -> str:
   <meta name="description" content="{esc(description)}">
   <meta property="og:title" content="{esc(title)}">
   <meta property="og:description" content="{esc(description)}">
+  <meta property="og:site_name" content="Nish's Daily Reads">
+  <meta property="og:locale" content="en_US">
   <meta property="og:image" content="https://inish.in/og-image.png">
-  <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
+  <meta property="og:image:alt" content="{image_alt}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -449,6 +452,7 @@ def page(edition: dict) -> str:
   <meta name="twitter:title" content="{esc(title)}">
   <meta name="twitter:description" content="{esc(description)}">
   <meta name="twitter:image" content="https://inish.in/og-image.png">
+  <meta name="twitter:image:alt" content="{image_alt}">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
