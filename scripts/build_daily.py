@@ -366,16 +366,20 @@ def json_ld(title: str, description: str, date: str) -> str:
     Truth rules: only what the page itself shows. The site is the daily feed
     and nothing else, so the Person node claims no job title, employer,
     products, or biography — just the name and the surfaces verified to
-    belong to Nish. The footer links Tiny Studio as Nish's studio and
-    tinystudio.in reciprocally links to inish.in, so both are owned public
-    links verified by the current surfaces.
+    belong to Nish: the GitHub profile, the X/Twitter account linked from
+    it, and Tiny Studio (footer link on inish.in, reciprocal link on
+    tinystudio.in).
     """
     person = {
         "@id": "https://inish.in/#nish",
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
-        "sameAs": ["https://github.com/nish3451", "https://tinystudio.in/"],
+        "sameAs": [
+            "https://github.com/nish3451",
+            "https://x.com/NishantRArora",
+            "https://tinystudio.in/",
+        ],
     }
     graph = [
         {
