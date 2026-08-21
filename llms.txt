@@ -1,0 +1,22 @@
+# inish.in — Nish's Daily Reads
+
+A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words. Point first, nothing here unless there is a fact under it. Published by Nish (https://github.com/nish3451). The sources of every story remain the source of truth; each story carries a Checked fact linked to its evidence.
+
+## How to read this site
+
+- The root page is the current daily edition. It rolls over every day; there are no archives.
+- Each story carries four parts: a summary, a Checked fact with a link to its evidence, Nish's take, and a caveat.
+- The same edition ships as machine-readable feeds: /latest.json (JSON) and /feed.xml (RSS).
+- /sitemap.xml lists the public surface; /robots.txt allows crawling and AI input. AI training is opted out via `ai-train=no`.
+
+## Essential links
+
+- Home: https://inish.in/
+- Today's edition (JSON): https://inish.in/latest.json
+- RSS feed: https://inish.in/feed.xml
+- Public pages: https://inish.in/ (feed only; no archives, no founder pages)
+
+## Optional
+
+- About the author: https://github.com/nish3451
+- Related: https://tinystudio.in/ — Nish's studio
