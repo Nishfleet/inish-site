@@ -345,6 +345,7 @@ class BuildDailyTests(unittest.TestCase):
         self.write(edition())
         self.build()
         head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:url" content="https://inish.in/">', head)
         self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
         self.assertIn(
             '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
