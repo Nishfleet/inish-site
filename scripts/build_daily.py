@@ -379,6 +379,7 @@ def json_ld(title: str, description: str, date: str) -> str:
     }
     graph = [
         {
+            "@id": "https://inish.in/#website",
             "@type": "WebSite",
             "name": "Nish's Daily Reads",
             "url": "https://inish.in/",
@@ -386,6 +387,7 @@ def json_ld(title: str, description: str, date: str) -> str:
         },
         person,
         {
+            "@id": "https://inish.in/#article",
             "@type": "Article",
             "headline": title,
             "datePublished": date,
@@ -393,6 +395,9 @@ def json_ld(title: str, description: str, date: str) -> str:
             # The article references the canonical person node by @id, so the
             # graph holds one Person entity instead of an inline duplicate.
             "author": {"@id": "https://inish.in/#nish"},
+            # The article is part of the website: an explicit edge that lets
+            # AI engines trace the edition back to its publishing surface.
+            "isPartOf": {"@id": "https://inish.in/#website"},
         },
     ]
     return html_safe_json({"@context": "https://schema.org", "@graph": graph})
