@@ -365,8 +365,10 @@ def json_ld(title: str, description: str, date: str) -> str:
 
     Truth rules: only what the page itself shows. The site is the daily feed
     and nothing else, so the Person node claims no job title, employer,
-    products, or biography — just the name and the one surface verified to
-    belong to Nish.
+    products, or biography — just the name and the surfaces verified to
+    belong to Nish. The footer links Tiny Studio as Nish's studio and
+    tinystudio.in reciprocally links to inish.in, so both are owned public
+    links verified by the current surfaces.
 
     The Article node mirrors the Open Graph meta the head already publishes
     (og:image, og:description) and the edition's own publication date, so AI
@@ -376,13 +378,15 @@ def json_ld(title: str, description: str, date: str) -> str:
     rendered in page(); the date stamp is the edition's own ISO date.
     """
     person = {
+        "@id": "https://inish.in/#nish",
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
-        "sameAs": ["https://github.com/nish3451"],
+        "sameAs": ["https://github.com/nish3451", "https://tinystudio.in/"],
     }
     graph = [
         {
+            "@id": "https://inish.in/#website",
             "@type": "WebSite",
             "name": "Nish's Daily Reads",
             "url": "https://inish.in/",
@@ -390,6 +394,7 @@ def json_ld(title: str, description: str, date: str) -> str:
         },
         person,
         {
+            "@id": "https://inish.in/#article",
             "@type": "Article",
             "headline": title,
             "image": "https://inish.in/og-image.png",
@@ -397,8 +402,12 @@ def json_ld(title: str, description: str, date: str) -> str:
             "dateModified": date,
             "description": description,
             "mainEntityOfPage": "https://inish.in/",
-            # The article references the person above by name and URL only.
-            "author": {"@type": "Person", "name": "Nish", "url": "https://inish.in/"},
+            # The article references the canonical person node by @id, so the
+            # graph holds one Person entity instead of an inline duplicate.
+            "author": {"@id": "https://inish.in/#nish"},
+            # The article is part of the website: an explicit edge that lets
+            # AI engines trace the edition back to its publishing surface.
+            "isPartOf": {"@id": "https://inish.in/#website"},
         },
     ]
     return html_safe_json({"@context": "https://schema.org", "@graph": graph})
@@ -409,6 +418,7 @@ def page(edition: dict) -> str:
     title_date = date.strftime("%A, %d %B %Y")
     title = f"Nish's Daily Reads — {edition['date']}"
     description = "A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words."
+    image_alt = "Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words."
     kept_count = len(edition["stories"])
     count_label = f"{edition['candidate_count']} scanned · {kept_count} kept"
     if edition["stories"]:
@@ -450,8 +460,10 @@ def page(edition: dict) -> str:
   <meta name="description" content="{esc(description)}">
   <meta property="og:title" content="{esc(title)}">
   <meta property="og:description" content="{esc(description)}">
+  <meta property="og:site_name" content="Nish's Daily Reads">
+  <meta property="og:locale" content="en_US">
   <meta property="og:image" content="https://inish.in/og-image.png">
-  <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
+  <meta property="og:image:alt" content="{image_alt}">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -459,6 +471,7 @@ def page(edition: dict) -> str:
   <meta name="twitter:title" content="{esc(title)}">
   <meta name="twitter:description" content="{esc(description)}">
   <meta name="twitter:image" content="https://inish.in/og-image.png">
+  <meta name="twitter:image:alt" content="{image_alt}">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">

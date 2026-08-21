@@ -218,7 +218,6 @@ def main() -> int:
         # middleware serve it through the ASSETS binding); a public request for
         # it must get the same denied branded 404 as any other unknown path.
         "/404.html",
-        "/llms.txt",
         "/archive",
         "/archive/",
         "/archive/index.html",
