@@ -72,6 +72,7 @@ const ALLOW_SAMPLES = [
   "/feed.xml",
   "/robots.txt",
   "/sitemap.xml",
+  "/llms.txt",
   "/fonts/OFL.txt"
 ];
 
