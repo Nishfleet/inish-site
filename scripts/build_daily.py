@@ -369,6 +369,13 @@ def json_ld(title: str, description: str, date: str) -> str:
     belong to Nish. The footer links Tiny Studio as Nish's studio and
     tinystudio.in reciprocally links to inish.in, so both are owned public
     links verified by the current surfaces.
+
+    The Article node mirrors the Open Graph meta the head already publishes
+    (og:image, og:description) and the edition's own publication date, so AI
+    answer engines and search crawlers that read JSON-LD without parsing the
+    OG meta still see the same facts the human-visible page declares. The
+    raster card and the description are the single hard-coded values
+    rendered in page(); the date stamp is the edition's own ISO date.
     """
     person = {
         "@id": "https://inish.in/#nish",
@@ -390,7 +397,10 @@ def json_ld(title: str, description: str, date: str) -> str:
             "@id": "https://inish.in/#article",
             "@type": "Article",
             "headline": title,
+            "image": "https://inish.in/og-image.png",
             "datePublished": date,
+            "dateModified": date,
+            "description": description,
             "mainEntityOfPage": "https://inish.in/",
             # The article references the canonical person node by @id, so the
             # graph holds one Person entity instead of an inline duplicate.
