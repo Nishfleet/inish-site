@@ -11,6 +11,7 @@
     "/feed.xml",
     "/robots.txt",
     "/sitemap.xml",
+    "/llms.txt",
     "/fonts/OFL.txt"
   ],
   "fontPath": "^/fonts/[a-z0-9-]+\\.woff2$",
