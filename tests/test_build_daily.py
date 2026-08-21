@@ -497,6 +497,7 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(site["description"], rendered_description)
 
         person = nodes["Person"]
+        self.assertEqual(person["@id"], "https://inish.in/#nish")
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
         # The two surfaces verified to belong to Nish: the GitHub profile and
@@ -509,7 +510,10 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(article["headline"], rendered_title)
         self.assertEqual(article["datePublished"], "2026-08-02")
         self.assertEqual(article["mainEntityOfPage"], "https://inish.in/")
-        self.assertEqual(article["author"], {"@type": "Person", "name": "Nish", "url": "https://inish.in/"})
+        # The article's author is a node reference to the canonical Person
+        # node, so the graph holds one Person entity rather than an inline
+        # duplicate carrying the same claims.
+        self.assertEqual(article["author"], {"@id": person["@id"]})
 
     def test_head_carries_the_canonical_url(self):
         # The root feed is the site's single public surface and there are no
