@@ -8,6 +8,8 @@
   <meta name="description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
   <meta property="og:title" content="Nish&#x27;s Daily Reads — 2026-08-21">
   <meta property="og:description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
+  <meta property="og:site_name" content="Nish's Daily Reads">
+  <meta property="og:locale" content="en_US">
   <meta property="og:image" content="https://inish.in/og-image.png">
   <meta property="og:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
   <meta property="og:image:type" content="image/png">
@@ -17,6 +19,7 @@
   <meta name="twitter:title" content="Nish&#x27;s Daily Reads — 2026-08-21">
   <meta name="twitter:description" content="A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.">
   <meta name="twitter:image" content="https://inish.in/og-image.png">
+  <meta name="twitter:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
@@ -27,29 +30,34 @@
     "@context": "https://schema.org",
     "@graph": [
       {
+        "@id": "https://inish.in/#website",
         "@type": "WebSite",
         "name": "Nish's Daily Reads",
         "url": "https://inish.in/",
         "description": "A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words."
       },
       {
+        "@id": "https://inish.in/#nish",
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
         "sameAs": [
           "https://github.com/nish3451",
-          "https://x.com/NishantRArora"
+          "https://x.com/NishantRArora",
+          "https://tinystudio.in/"
         ]
       },
       {
+        "@id": "https://inish.in/#article",
         "@type": "Article",
         "headline": "Nish's Daily Reads — 2026-08-21",
         "datePublished": "2026-08-21",
         "mainEntityOfPage": "https://inish.in/",
         "author": {
-          "@type": "Person",
-          "name": "Nish",
-          "url": "https://inish.in/"
+          "@id": "https://inish.in/#nish"
+        },
+        "isPartOf": {
+          "@id": "https://inish.in/#website"
         }
       }
     ]
