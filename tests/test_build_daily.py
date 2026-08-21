@@ -454,6 +454,7 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(set(nodes), {"WebSite", "Person", "Article"})
 
         site = nodes["WebSite"]
+        self.assertEqual(site["@id"], "https://inish.in/#website")
         self.assertEqual(site["name"], "Nish's Daily Reads")
         self.assertEqual(site["url"], "https://inish.in/")
         self.assertEqual(site["description"], rendered_description)
@@ -469,6 +470,7 @@ class BuildDailyTests(unittest.TestCase):
         self.assertNotIn("jobTitle", person)
 
         article = nodes["Article"]
+        self.assertEqual(article["@id"], "https://inish.in/#article")
         self.assertEqual(article["headline"], rendered_title)
         self.assertEqual(article["datePublished"], "2026-08-02")
         self.assertEqual(article["mainEntityOfPage"], "https://inish.in/")
@@ -476,6 +478,9 @@ class BuildDailyTests(unittest.TestCase):
         # node, so the graph holds one Person entity rather than an inline
         # duplicate carrying the same claims.
         self.assertEqual(article["author"], {"@id": person["@id"]})
+        # The article is part of the website: an explicit edge that lets AI
+        # engines trace the edition back to its publishing surface.
+        self.assertEqual(article["isPartOf"], {"@id": site["@id"]})
 
     def test_head_carries_the_canonical_url(self):
         # The root feed is the site's single public surface and there are no
