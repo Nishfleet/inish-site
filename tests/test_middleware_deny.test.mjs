@@ -58,6 +58,7 @@ const ALLOW_SAMPLES = [
   "/feed.xml",
   "/robots.txt",
   "/sitemap.xml",
+  "/llms.txt",
   "/fonts/OFL.txt"
 ];
 
@@ -115,6 +116,7 @@ test("allow: allowlist is exactly the published surface", () => {
       "/feed.xml",
       "/robots.txt",
       "/sitemap.xml",
+      "/llms.txt",
       "/fonts/OFL.txt"
     ].sort()
   );
