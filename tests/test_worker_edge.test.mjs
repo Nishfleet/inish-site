@@ -29,8 +29,10 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import worker from "../worker.js";
+import { securityHeaders } from "../functions/policy.js";
 
 const ORIGIN = "https://inish.in";
 const HSTS = "max-age=31536000; includeSubDomains";
@@ -326,5 +328,79 @@ test("canonical: HEAD on a non-canonical URL still 301s without reading ASSETS",
     );
     assert.equal(response.headers.get("Strict-Transport-Security"), HSTS);
     assert.deepEqual(assets.reads, [], `HEAD canonical redirect must not touch ASSETS`);
+  }
+});
+
+// Security headers beyond HSTS — route data in public-paths.json, applied by
+// withSecurityHeaders on every response class. The behavioral assertions below
+// read the contract file directly (not policy.js's re-export) so a stubbed or
+// emptied export cannot silently pass, and the source-contract suite in
+// tests/test_verify_live.py pins that the edge sources derive the values from
+// the contract instead of redeclaring them.
+
+const CONTRACT = JSON.parse(
+  readFileSync(new URL("../public-paths.json", import.meta.url), "utf8")
+);
+
+test("route contract: securityHeaders carries the hardening set", () => {
+  const names = Object.keys(CONTRACT.securityHeaders ?? {});
+  for (const name of [
+    "X-Content-Type-Options",
+    "Referrer-Policy",
+    "Content-Security-Policy",
+    "X-Frame-Options"
+  ]) {
+    assert.ok(names.includes(name), `public-paths.json must declare ${name}`);
+    assert.ok(CONTRACT.securityHeaders[name].length > 0, `${name} must have a value`);
+  }
+  assert.ok(
+    CONTRACT.securityHeaders["Content-Security-Policy"].includes("default-src 'none'"),
+    "the CSP must be deny-by-default"
+  );
+  assert.ok(
+    CONTRACT.securityHeaders["Content-Security-Policy"].includes("frame-ancestors 'none'"),
+    "the CSP must forbid framing"
+  );
+  // policy.js must expose exactly what the contract declares — no drift.
+  assert.deepEqual(securityHeaders, Object.entries(CONTRACT.securityHeaders));
+});
+
+test("security headers: a served asset carries the full contract set", async () => {
+  const { response } = await call("/styles.css");
+  assert.equal(response.status, 200);
+  for (const [name, value] of securityHeaders) {
+    assert.equal(response.headers.get(name), value, `200 /styles.css must carry ${name}`);
+  }
+});
+
+test("security headers: the branded 404 carries the full contract set", async () => {
+  const { response } = await call("/admin");
+  assert.equal(response.status, 404);
+  for (const [name, value] of securityHeaders) {
+    assert.equal(response.headers.get(name), value, `404 /admin must carry ${name}`);
+  }
+});
+
+test("security headers: a legacy redirect carries the full contract set", async () => {
+  const { response } = await call("/daily/feed.xml");
+  assert.equal(response.status, 301);
+  for (const [name, value] of securityHeaders) {
+    assert.equal(response.headers.get(name), value, `301 /daily/feed.xml must carry ${name}`);
+  }
+});
+
+test("security headers: a canonical-host redirect carries the full contract set", async () => {
+  const { response } = await call("/feed.xml", { origin: "https://www.inish.in" });
+  assert.equal(response.status, 301);
+  for (const [name, value] of securityHeaders) {
+    assert.equal(response.headers.get(name), value, `canonical 301 must carry ${name}`);
+  }
+});
+
+test("security headers: a bodyless HEAD denial still carries the full contract set", async () => {
+  const { response } = await call("/secrets.json", { method: "HEAD" });
+  assert.equal(response.status, 404);
+  for (const [name, value] of securityHeaders) {
+    assert.equal(response.headers.get(name), value, `HEAD 404 must carry ${name}`);
   }
 });
