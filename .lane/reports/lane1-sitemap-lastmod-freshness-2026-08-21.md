@@ -114,3 +114,31 @@ run) ships the accepted `origin/main` surface and clears it. Verify afterwards w
 Worked only in this worktree. Claims published to the lane record's `claims` field before
 editing: `scripts/build_daily.py`, `sitemap.xml`, `tests/test_build_daily.py`,
 `tests/test_verify_live.py`, and this report. No shared report file was touched.
+
+## Repair 2026-08-21: edition rollover left the committed sitemap stale
+
+The PR went red after the 2026-08-21 edition (7 stories) was accepted on main:
+`test_committed_surface_matches_the_newest_accepted_edition` failed with committed
+`<lastmod>2026-08-20</lastmod>` vs the rebuild's `<lastmod>2026-08-21</lastmod>` — exactly
+the stale-rollover drift this test was extended to catch. The branch already contained
+main's head, so no merge was needed; the fix is the same one the test prescribes:
+
+```
+$ python3 scripts/build_daily.py
+built latest=2026-08-21 stories=7 scanned=239
+```
+
+`index.html`, `latest.json`, and `feed.xml` came back byte-identical; only `sitemap.xml`
+moved to the new edition date. Verified green:
+
+```
+$ python3 -m unittest discover -s tests
+Ran 115 tests in 0.999s
+OK
+
+$ node --test "tests/**/*.test.mjs"
+# pass 36  # fail 0
+```
+
+No generator, route, or deploy contract changed in this repair — it is the committed-surface
+regeneration the PR's own guard demands after an edition rollover.
