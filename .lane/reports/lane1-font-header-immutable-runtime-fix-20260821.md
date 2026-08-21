@@ -73,3 +73,20 @@ post-deploy `verify_live.py` parity gate). Two complications handled en route:
 - `scripts/check_live_current.sh` → `verified_live_current commit=c23de44`
   (byte-parity vs origin/main), so the hourly self-heal finds no drift and
   will not fight this deploy; it converges cleanly once #113 merges.
+
+## Follow-up run (2026-08-21, later same day)
+
+Resumed with PR #113 open, checks green (`test` + `classify` SUCCESS,
+mergeable CLEAN). Landed the pending live-delivery evidence above as
+`e03ca63` and re-verified every live claim still holds:
+
+- `/fonts/archivo-400.woff2` → 200, `Cache-Control: public, max-age=31536000, immutable`
+- `/llms.txt`, `/feed.xml`, `/sitemap.xml`, `/robots.txt`, `/og-image.png`,
+  `/styles.css`, `/app.js`, `/apple-touch-icon.png` → all 200 with sane types
+- `/latest.json` → edition 2026-08-21; `/` → 200
+- `http://inish.in/` and `https://www.inish.in/` → 301 → `https://inish.in/`
+
+A tier-1 walk of the live product found no new public-promise gap: every
+candidate issue spotted (sameAs enrichment, og:url, Article image/description,
+sitemap lastmod) is already owned by an open PR (#94, #102–#105, #108), so no
+duplicate work was started.
