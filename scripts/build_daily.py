@@ -371,6 +371,7 @@ def json_ld(title: str, description: str, date: str) -> str:
     links verified by the current surfaces.
     """
     person = {
+        "@id": "https://inish.in/#nish",
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
@@ -389,8 +390,9 @@ def json_ld(title: str, description: str, date: str) -> str:
             "headline": title,
             "datePublished": date,
             "mainEntityOfPage": "https://inish.in/",
-            # The article references the person above by name and URL only.
-            "author": {"@type": "Person", "name": "Nish", "url": "https://inish.in/"},
+            # The article references the canonical person node by @id, so the
+            # graph holds one Person entity instead of an inline duplicate.
+            "author": {"@id": "https://inish.in/#nish"},
         },
     ]
     return html_safe_json({"@context": "https://schema.org", "@graph": graph})
