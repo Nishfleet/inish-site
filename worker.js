@@ -109,10 +109,22 @@ export default {
       return withSecurityHeaders(await notFoundResponse(request, env));
     }
     const asset = await env.ASSETS.fetch(request);
+    // The runtime hands back asset responses with immutable headers, so the
+    // font cache header cannot be set in place — that mutation throws and
+    // surfaces as an edge 1101. Rebuild the response with a fresh Headers
+    // copy instead; every other response class already flows through this
+    // rebuild inside withSecurityHeaders.
+    let response = asset;
     if (fontPath.test(url.pathname)) {
-      asset.headers.set("Cache-Control", FONT_CACHE_CONTROL);
+      const headers = new Headers(asset.headers);
+      headers.set("Cache-Control", FONT_CACHE_CONTROL);
+      response = new Response(asset.body, {
+        status: asset.status,
+        statusText: asset.statusText,
+        headers
+      });
     }
     // Assets binding resolves "/" to index.html via html_handling defaults.
-    return withSecurityHeaders(asset);
+    return withSecurityHeaders(response);
   }
 };
