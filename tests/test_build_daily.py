@@ -1,6 +1,7 @@
 import base64
 import html
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -728,6 +729,17 @@ class BuildDailyTests(unittest.TestCase):
             builder.page(latest),
         )
 
+    def test_canonical_root_asset_list_is_pinned(self):
+        """Both root-asset guards below iterate builder.ASSETS, so a trimmed or
+        emptied tuple would make them pass vacuously and re-open the very drift
+        class they exist to close. Pin the canonical set: every name here is
+        referenced by the generated head and shipped by the deploy copy line.
+        """
+        self.assertEqual(
+            set(builder.ASSETS),
+            {"app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png"},
+        )
+
     def test_keeps_committed_root_assets_untouched(self):
         """A stale daily-style mirror must never overwrite canonical root assets.
 
@@ -735,19 +747,40 @@ class BuildDailyTests(unittest.TestCase):
         #41 each fixed by hand-syncing the builder's daily/ mirror with merged
         root assets: the old build silently reverted the merged fix on the next
         publish until the mirror was re-synced by hand.
+
+        Every name in builder.ASSETS is compared byte for byte. The earlier
+        hand-spelled version asserted only app.js, styles.css and og-image.svg,
+        which left og-image.png and apple-touch-icon.png completely unguarded:
+        a build that copied valid-but-stale images over exactly those two kept
+        the whole CI gate green. Stale mirror copies are real files, not
+        corrupt ones, so the head's PNG-magic check does not catch them either.
         """
         self.write(edition())
-        canonical = (self.public / "styles.css").read_text()
+        canonical = {name: (self.public / name).read_bytes() for name in builder.ASSETS}
         self.build()
-        self.assertEqual((self.public / "styles.css").read_text(), canonical)
-        self.assertEqual((self.public / "app.js").read_text(), "app")
-        self.assertEqual((self.public / "og-image.svg").read_text(), '<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        for name in builder.ASSETS:
+            with self.subTest(asset=name):
+                self.assertEqual((self.public / name).read_bytes(), canonical[name])
 
     def test_build_fails_loudly_when_a_root_asset_is_missing(self):
-        self.write(edition())
-        (self.public / "styles.css").unlink()
-        with self.assertRaisesRegex(FileNotFoundError, "styles.css"):
-            self.build()
+        """Checked for every canonical asset, not just one.
+
+        Deleting only styles.css let the presence gate silently stop covering
+        og-image.svg and both PNGs while the suite stayed green, so a missing
+        share card or touch icon would have shipped to the live site instead of
+        failing the build loudly.
+        """
+        for name in builder.ASSETS:
+            with self.subTest(asset=name):
+                self.write(edition())
+                asset = self.public / name
+                restore = asset.read_bytes()
+                asset.unlink()
+                try:
+                    with self.assertRaisesRegex(FileNotFoundError, re.escape(name)):
+                        self.build()
+                finally:
+                    asset.write_bytes(restore)
 
     def test_removes_stale_archive_output(self):
         self.write(edition())
