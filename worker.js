@@ -12,12 +12,15 @@ import {
   fontPath,
   hstsHeader,
   notFoundAssetUrl,
-  redirects
+  redirects,
+  securityHeaders
 } from "./functions/policy.js";
 
 // HSTS lives in public-paths.json as the single source of truth for the route
 // contract; policy.js re-exports it and the worker applies it to every
-// response. The value itself is route data, not plumbing.
+// response. The value itself is route data, not plumbing. The remaining
+// security headers (nosniff, referrer policy, CSP, frame guard) flow through
+// the same contract and are applied right after HSTS on every response class.
 
 // The four webfonts ship under stable, fingerprint-free URLs (styles.css
 // references /fonts/<face>.woff2 directly), so a browser revalidates them on
@@ -31,6 +34,9 @@ const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
   headers.set("Strict-Transport-Security", hstsHeader);
+  for (const [name, value] of securityHeaders) {
+    headers.set(name, value);
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

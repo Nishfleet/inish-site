@@ -43,6 +43,15 @@ export const redirects = new Map(Object.entries(routeContract.redirects));
 // commitment and nothing in the repository justifies it.
 export const hstsHeader = routeContract.hstsHeader;
 
+// The rest of the security-header set (nosniff, referrer policy, CSP, frame
+// guard), stored as ordered [name, value] pairs so both edge entrypoints apply
+// them in contract order with a plain loop. The page itself is what makes a
+// strict CSP possible: no inline styles, scripts, or handlers, no forms, no
+// frames, every asset self-hosted, and the JSON-LD block is non-executable
+// data that script-src does not govern. Route data lives here for the same
+// reason HSTS does — one edit in public-paths.json, never mirrored literals.
+export const securityHeaders = Object.entries(routeContract.securityHeaders);
+
 // The branded 404 page ships as /404.html in the deploy payload (staged beside
 // index.html by deploy_daily.sh). The edge reads it through the ASSETS binding
 // using this URL — derived from canonicalOrigin so a host change or a rename
