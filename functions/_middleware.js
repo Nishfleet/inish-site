@@ -7,6 +7,7 @@
 import {
   canonicalize,
   decide,
+  fontPath,
   hstsHeader,
   notFoundAssetUrl,
   redirects,
@@ -18,6 +19,13 @@ import {
 // response. The value itself is route data, not plumbing. The remaining
 // security headers (nosniff, referrer policy, CSP, frame guard) flow through
 // the same contract and are applied right after HSTS on every response class.
+
+// Fonts mirror the worker's cache policy: stable URLs, never change between
+// editions, one-year immutable cache so the browser stops revalidating them
+// on every visit. The narrow font pattern keeps the header off everything
+// else. The literal must stay identical to worker.js — the worker is the live
+// edge and this file is its kept-in-sync mirror.
+const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 function withSecurityHeaders(response) {
   response.headers.set("Strict-Transport-Security", hstsHeader);
@@ -86,5 +94,9 @@ export async function onRequest(context) {
   if (decision === "deny") {
     return withSecurityHeaders(await notFoundResponse(context.request, context.env));
   }
-  return withSecurityHeaders(await context.next());
+  const response = await context.next();
+  if (fontPath.test(url.pathname)) {
+    response.headers.set("Cache-Control", FONT_CACHE_CONTROL);
+  }
+  return withSecurityHeaders(response);
 }
