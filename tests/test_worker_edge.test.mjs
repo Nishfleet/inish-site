@@ -209,6 +209,47 @@ test("cache: every font response carries the one-year immutable cache header", a
   }
 });
 
+test("cache: font responses survive the runtime's immutable asset headers", async () => {
+  // The real Workers runtime returns ASSETS responses whose headers reject
+  // mutation; setting Cache-Control in place throws and the edge answers
+  // error 1101 (observed live 2026-08-21). The mock here reproduces that
+  // contract: any in-place header write on the asset response throws, so a
+  // regression back to asset.headers.set() goes red while the rebuild path
+  // stays green.
+  async function callImmutable(path) {
+    const assets = {
+      async fetch(input) {
+        const url = new URL(typeof input === "string" ? input : input.url);
+        const response = new Response(`asset ${url.pathname}`, {
+          status: 200,
+          headers: { "Content-Type": "application/octet-stream" }
+        });
+        // A real Headers whose write path throws: exactly the runtime
+        // contract (reads and copy-construction work, mutation does not).
+        response.headers.set = (name) => {
+          throw new TypeError(
+            `Cannot mutate immutable asset headers (${String(name)})`
+          );
+        };
+        return response;
+      }
+    };
+    const request = new Request(`${ORIGIN}${path}`, { method: "GET" });
+    return worker.fetch(request, { ASSETS: assets });
+  }
+  for (const path of FONT_SAMPLES) {
+    const response = await callImmutable(path);
+    assert.equal(response.status, 200, `font ${path} must still serve 200`);
+    assert.equal(
+      response.headers.get("Cache-Control"),
+      FONT_CACHE_CONTROL,
+      `font ${path} must carry the immutable cache header`
+    );
+  }
+  const plain = await callImmutable("/styles.css");
+  assert.equal(plain.status, 200, "non-font asset must still serve 200");
+});
+
 test("redirect: every legacy path 301s to its target preserving search", async () => {
   for (const [from, to] of REDIRECTS) {
     const search = "?q=1&r=2";
