@@ -359,6 +359,27 @@ class BuildDailyTests(unittest.TestCase):
         # The build keeps the raster share card at the root alongside app.js and styles.css.
         self.assertTrue((self.public / "og-image.png").is_file())
 
+    def test_head_declares_site_name_locale_and_twitter_image_alt(self):
+        # Unfurlers name the source from og:site_name and X's card reader needs
+        # its own twitter:image:alt; og:locale states the page's language. A
+        # shared image_alt constant keeps the two alt tags from drifting.
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        self.assertIn('<meta property="og:site_name" content="Nish\'s Daily Reads">', head)
+        self.assertIn('<meta property="og:locale" content="en_US">', head)
+        self.assertIn(
+            '<meta name="twitter:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
+            'and early signals of demand \u2014 in plain words.">',
+            head,
+        )
+        self.assertIn('<meta property="og:image:alt" content="', head)
+        self.assertIn('<meta name="twitter:image:alt" content="', head)
+        # The same reader-facing sentence is delivered to both tags.
+        og_alt = head.split('<meta property="og:image:alt" content="', 1)[1].split('"', 1)[0]
+        twitter_alt = head.split('<meta name="twitter:image:alt" content="', 1)[1].split('"', 1)[0]
+        self.assertEqual(og_alt, twitter_alt)
+
     def test_head_uses_raster_social_card(self):
         # X and other raster-only unfurlers exclude SVG card images, so the
         # generated head must point both og:image and twitter:image at the
@@ -433,16 +454,19 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(set(nodes), {"WebSite", "Person", "Article"})
 
         site = nodes["WebSite"]
+        self.assertEqual(site["@id"], "https://inish.in/#website")
         self.assertEqual(site["name"], "Nish's Daily Reads")
         self.assertEqual(site["url"], "https://inish.in/")
         self.assertEqual(site["description"], rendered_description)
 
         person = nodes["Person"]
+        self.assertEqual(person["@id"], "https://inish.in/#nish")
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
-        # Only the one surface verified to belong to Nish; no job title,
-        # employer, products, or biography are claimed.
-        self.assertEqual(person["sameAs"], ["https://github.com/nish3451"])
+        # The two surfaces verified to belong to Nish: the GitHub profile and
+        # Tiny Studio (footer link on inish.in, reciprocal link on tinystudio.in).
+        # No job title, employer, products, or biography are claimed.
+        self.assertEqual(person["sameAs"], ["https://github.com/nish3451", "https://tinystudio.in/"])
         self.assertNotIn("jobTitle", person)
         # `knowsAbout` mirrors the filter nav topics the page itself shows
         # (derived from SECTIONS, minus the catch-all Wildcard bucket) so AI
@@ -455,10 +479,17 @@ class BuildDailyTests(unittest.TestCase):
         )
 
         article = nodes["Article"]
+        self.assertEqual(article["@id"], "https://inish.in/#article")
         self.assertEqual(article["headline"], rendered_title)
         self.assertEqual(article["datePublished"], "2026-08-02")
         self.assertEqual(article["mainEntityOfPage"], "https://inish.in/")
-        self.assertEqual(article["author"], {"@type": "Person", "name": "Nish", "url": "https://inish.in/"})
+        # The article's author is a node reference to the canonical Person
+        # node, so the graph holds one Person entity rather than an inline
+        # duplicate carrying the same claims.
+        self.assertEqual(article["author"], {"@id": person["@id"]})
+        # The article is part of the website: an explicit edge that lets AI
+        # engines trace the edition back to its publishing surface.
+        self.assertEqual(article["isPartOf"], {"@id": site["@id"]})
 
     def test_head_carries_the_canonical_url(self):
         # The root feed is the site's single public surface and there are no
