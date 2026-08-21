@@ -56,7 +56,20 @@ Full suites green: `node --test tests/*.test.mjs` 37 pass / 0 fail;
 ## Live delivery
 
 Deployed to live via the guarded publisher path (rollback target captured,
-post-deploy `verify_live.py` parity gate). Re-verified live after the fix:
+post-deploy `verify_live.py` parity gate). Two complications handled en route:
+
+1. The first publisher run of the day (origin/main) published the font-crash
+   worker; its own verify loop caught it, but a concurrent
+   `inish-deploy-if-stale` cycle rolled live back to an 11:22 IST snapshot
+   that predates llms.txt (#107) and the font cache (#100), leaving live
+   stale AND font-broken and ending in `rollback_verify_failed`.
+2. This branch was deployed with the same guarded flow (rollback target
+   captured, verify gate, auto-rollback armed). Re-verified live after the
+   fix:
 
 - `/fonts/archivo-400.woff2` → 200 with `Cache-Control: public, max-age=31536000, immutable`
-- full `verify_live.py` parity against the deployed tree passes
+- `/llms.txt` → 200; `latest.json` → edition 2026-08-21
+- full `verify_live.py` parity passes against the deployed tree
+- `scripts/check_live_current.sh` → `verified_live_current commit=c23de44`
+  (byte-parity vs origin/main), so the hourly self-heal finds no drift and
+  will not fight this deploy; it converges cleanly once #113 merges.
