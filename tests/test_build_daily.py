@@ -453,16 +453,18 @@ class BuildDailyTests(unittest.TestCase):
         block = head.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0]
         data = json.loads(block)
         self.assertEqual(data["@context"], "https://schema.org")
-        nodes = {node["@type"]: node for node in data["@graph"]}
-        self.assertEqual(set(nodes), {"WebSite", "Person", "Article", "Organization"})
+        nodes_by_type = {}
+        for node in data["@graph"]:
+            nodes_by_type.setdefault(node["@type"], []).append(node)
+        self.assertEqual(set(nodes_by_type), {"WebSite", "Person", "Article", "Organization", "Claim"})
 
-        site = nodes["WebSite"]
+        site = nodes_by_type["WebSite"][0]
         self.assertEqual(site["@id"], "https://inish.in/#website")
         self.assertEqual(site["name"], "Nish's Daily Reads")
         self.assertEqual(site["url"], "https://inish.in/")
         self.assertEqual(site["description"], rendered_description)
 
-        person = nodes["Person"]
+        person = nodes_by_type["Person"][0]
         self.assertEqual(person["@id"], "https://inish.in/#nish")
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
@@ -479,15 +481,18 @@ class BuildDailyTests(unittest.TestCase):
             ["https://github.com/nish3451", "https://x.com/NishantRArora", "https://tinystudio.in/"],
         )
         self.assertNotIn("jobTitle", person)
-        organization = nodes["Organization"]
+        organization = nodes_by_type["Organization"][0]
         self.assertEqual(organization["@id"], "https://inish.in/#studio")
         self.assertEqual(organization["@type"], "Organization")
         self.assertEqual(organization["name"], "Tiny Studio")
         self.assertEqual(organization["url"], "https://tinystudio.in/")
         self.assertEqual(person["affiliation"], {"@id": organization["@id"]})
+        # worksFor mirrors affiliation: both point to the same Organization
+        # @id, giving engines the formal employment relationship.
+        self.assertEqual(person["worksFor"], {"@id": organization["@id"]})
         self.assertEqual(set(organization.keys()), {"@id", "@type", "name", "url"})
 
-        article = nodes["Article"]
+        article = nodes_by_type["Article"][0]
         self.assertEqual(article["@id"], "https://inish.in/#article")
         self.assertEqual(article["headline"], rendered_title)
         self.assertEqual(article["datePublished"], "2026-08-02")
@@ -499,6 +504,22 @@ class BuildDailyTests(unittest.TestCase):
         # The article is part of the website: an explicit edge that lets AI
         # engines trace the edition back to its publishing surface.
         self.assertEqual(article["isPartOf"], {"@id": site["@id"]})
+
+        # Each story's Checked fact is a Claim node so AI engines can extract
+        # individual citable passages. The text and url match the visible page
+        # content (the fact paragraph and its evidence link).
+        claims = nodes_by_type["Claim"]
+        self.assertEqual(len(claims), len(edition()["stories"]))
+        for i, claim in enumerate(claims, 1):
+            self.assertEqual(claim["@id"], f"https://inish.in/#claim-{i}")
+            self.assertEqual(claim["@type"], "Claim")
+            self.assertIn("text", claim)
+            self.assertIn("url", claim)
+            self.assertTrue(claim["url"].startswith("https://"))
+            self.assertEqual(claim["author"], {"@id": person["@id"]})
+            self.assertEqual(claim["isPartOf"], {"@id": article["@id"]})
+        # The article's mentions array references every Claim node.
+        self.assertEqual(article["mentions"], [{"@id": c["@id"]} for c in claims])
 
     def test_head_carries_the_canonical_url(self):
         # The root feed is the site's single public surface and there are no
