@@ -530,8 +530,8 @@ def rss(edition: dict) -> str:
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish's Daily Reads</title><link>https://inish.in/</link><description>A daily read for a founder: AI, product ideas, and demand signals.</description>" + item + "</channel></rss>\n"
 
 
-def sitemap() -> str:
-    body = '<url><loc>https://inish.in/</loc></url>'
+def sitemap(date: str) -> str:
+    body = f'<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url>'
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
 
 
@@ -558,7 +558,7 @@ def main() -> None:
     (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
     (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     (DAILY / "feed.xml").write_text(rss(latest), encoding="utf-8")
-    (DAILY / "sitemap.xml").write_text(sitemap(), encoding="utf-8")
+    (DAILY / "sitemap.xml").write_text(sitemap(latest["date"]), encoding="utf-8")
     print(f"built latest={latest['date']} stories={len(latest['stories'])} scanned={latest['candidate_count']}")
 
 

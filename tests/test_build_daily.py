@@ -189,6 +189,7 @@ class BuildDailyTests(unittest.TestCase):
         sitemap = (self.public / "sitemap.xml").read_text()
         self.assertEqual(sitemap.count("<loc>"), 1)
         self.assertIn("<loc>https://inish.in/</loc>", sitemap)
+        self.assertIn("<lastmod>2026-08-02</lastmod>", sitemap)
 
     def test_rss_item_carries_every_story_of_its_edition(self):
         # The root page rolls over every day, so the RSS item must keep the
