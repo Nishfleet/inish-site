@@ -1,6 +1,6 @@
 # Lane report — rel="me" on GitHub, X, and Tiny Studio footer links
 
-Branch: `lane1/rel-me-identity-links` · Date: 2026-08-23 · Item: `1c169817c4`
+Branch: `lane1/rel-me-identity-links` · PR: https://github.com/nish3451/inish-site/pull/122 · Date: 2026-08-23 · Item: `1c169817c4`
 
 ## Item
 
