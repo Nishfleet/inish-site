@@ -481,6 +481,13 @@ class BuildDailyTests(unittest.TestCase):
             ["https://github.com/nish3451", "https://x.com/NishantRArora", "https://tinystudio.in/"],
         )
         self.assertNotIn("jobTitle", person)
+        # `knowsAbout` mirrors the page's own section taxonomy (the filter nav
+        # labels), minus the catch-all Wildcard bucket, so the schema can only
+        # claim topics the feed actually surfaces.
+        self.assertEqual(
+            person["knowsAbout"],
+            sorted(builder.SECTIONS - {"Wildcard"}),
+        )
         organization = nodes_by_type["Organization"][0]
         self.assertEqual(organization["@id"], "https://inish.in/#studio")
         self.assertEqual(organization["@type"], "Organization")

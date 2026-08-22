@@ -373,7 +373,9 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
     as the organization Nish runs, drawn from the footer label and URL.
     The worksFor field mirrors the affiliation: both point to the same
     Organization @id, giving engines both the loose affiliation and the
-    formal employment relationship.
+    formal employment relationship. The `knowsAbout` list is the page's
+    own section taxonomy (the filter nav labels) minus the catch-all Wildcard
+    bucket, so the schema can only claim topics the feed actually surfaces.
 
     Each story's Checked fact is rendered as a Claim node so AI engines
     can extract individual citable passages, not just the page-level
@@ -403,6 +405,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
             "https://x.com/NishantRArora",
             "https://tinystudio.in/",
         ],
+        "knowsAbout": sorted(SECTIONS - {"Wildcard"}),
         "affiliation": {"@id": "https://inish.in/#studio"},
         "worksFor": {"@id": "https://inish.in/#studio"},
     }
