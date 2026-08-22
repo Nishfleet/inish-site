@@ -364,17 +364,23 @@ def json_ld(title: str, description: str, date: str) -> str:
     """The head's structured data: one graph with the site, its person, and the edition.
 
     Truth rules: only what the page itself shows. The site is the daily feed
-    and nothing else, so the Person node claims no job title, employer,
-    products, or biography — just the name and the surfaces verified to
-    belong to Nish: the GitHub profile, the X/Twitter account linked from
-    it, and Tiny Studio (footer link on inish.in, reciprocal link on
-    tinystudio.in).
+    and nothing else, so the Person node claims only the name, the surfaces
+    verified to belong to Nish (the GitHub profile, the X/Twitter account
+    linked from it, and Tiny Studio via the footer link on inish.in and the
+    reciprocal link on tinystudio.in), the description drawn from the page's
+    own meta description, and the occupation drawn from the page's own "a
+    daily read for a founder" language.
     """
     person = {
         "@id": "https://inish.in/#nish",
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
+        "description": description,
+        "hasOccupation": {
+            "@type": "Occupation",
+            "name": "Founder",
+        },
         "sameAs": [
             "https://github.com/nish3451",
             "https://x.com/NishantRArora",
@@ -488,7 +494,7 @@ def page(edition: dict) -> str:
   </main>
   <footer>
     <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a></div>
-    <p class="identity"><a href="https://tinystudio.in/" rel="noopener noreferrer">Tiny Studio ↗</a> — Nish's studio.</p>
+    <p class="identity"><a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish's studio.</p>
     <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
   </footer>
   <script src="/app.js" defer></script>

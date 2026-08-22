@@ -465,8 +465,13 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(person["@id"], "https://inish.in/#nish")
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
-        # Only these three surfaces are verified to belong to Nish; no job
-        # title, employer, products, or biography are claimed.
+        # The description is drawn from the page's own meta description.
+        self.assertEqual(person["description"], rendered_description)
+        # The occupation is drawn from the page's own "a daily read for a
+        # founder" language, expressed as a structured Occupation node.
+        self.assertEqual(person["hasOccupation"], {"@type": "Occupation", "name": "Founder"})
+        # Only these three surfaces are verified to belong to Nish; no
+        # employer, products, or biography are claimed.
         self.assertEqual(
             person["sameAs"],
             ["https://github.com/nish3451", "https://x.com/NishantRArora", "https://tinystudio.in/"],
@@ -560,12 +565,14 @@ class BuildDailyTests(unittest.TestCase):
 
     def test_footer_links_the_owned_studio(self):
         # The merged outbound identity link is part of the renderer, so the
-        # next daily publish cannot silently drop it from the footer.
+        # next daily publish cannot silently drop it from the footer. The
+        # link carries rel="me" to assert identity equivalence alongside the
+        # JSON-LD sameAs entry.
         self.write(edition())
         self.build()
         footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
         self.assertIn(
-            '<p class="identity"><a href="https://tinystudio.in/" rel="noopener noreferrer">Tiny Studio ↗</a> — Nish\'s studio.</p>',
+            '<p class="identity"><a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish\'s studio.</p>',
             footer,
         )
 
