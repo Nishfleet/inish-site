@@ -360,7 +360,7 @@ def html_safe_json(payload: dict) -> str:
     return serialized
 
 
-def json_ld(title: str, description: str, date: str) -> str:
+def json_ld(title: str, description: str, date: str, stories: list) -> str:
     """The head's structured data: one graph with the site, its studio, its person, and the edition.
 
     Truth rules: only what the page itself shows. The site is the daily feed
@@ -371,6 +371,16 @@ def json_ld(title: str, description: str, date: str) -> str:
     own meta description, the occupation drawn from the page's own "a
     daily read for a founder" language, and an affiliation to Tiny Studio
     as the organization Nish runs, drawn from the footer label and URL.
+    The worksFor field mirrors the affiliation: both point to the same
+    Organization @id, giving engines both the loose affiliation and the
+    formal employment relationship.
+
+    Each story's Checked fact is rendered as a Claim node so AI engines
+    can extract individual citable passages, not just the page-level
+    Article. The Claim text is the fact text (already visible on the
+    page), the url is the evidence_url (already linked from the page),
+    and the author references the Person @id. The Article's mentions
+    array references every Claim so the graph connects edition to facts.
     """
     organization = {
         "@id": "https://inish.in/#studio",
@@ -394,6 +404,7 @@ def json_ld(title: str, description: str, date: str) -> str:
             "https://tinystudio.in/",
         ],
         "affiliation": {"@id": "https://inish.in/#studio"},
+        "worksFor": {"@id": "https://inish.in/#studio"},
     }
     graph = [
         {
@@ -415,6 +426,24 @@ def json_ld(title: str, description: str, date: str) -> str:
         },
         organization,
     ]
+    # Each story's Checked fact becomes a Claim node so AI engines can
+    # extract individual citable passages. The text and url are already
+    # visible on the page (the fact paragraph and its evidence link), so
+    # no new claim is invented — existing visible content is structured.
+    claim_ids = []
+    for i, story in enumerate(stories, 1):
+        claim_id = f"https://inish.in/#claim-{i}"
+        claim_ids.append({"@id": claim_id})
+        graph.append({
+            "@id": claim_id,
+            "@type": "Claim",
+            "text": story["fact"],
+            "url": story["evidence_url"],
+            "author": {"@id": "https://inish.in/#nish"},
+            "isPartOf": {"@id": "https://inish.in/#article"},
+        })
+    if claim_ids:
+        graph[2]["mentions"] = claim_ids
     return html_safe_json({"@context": "https://schema.org", "@graph": graph})
 
 
@@ -484,7 +513,7 @@ def page(edition: dict) -> str:
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json">
-{textwrap.indent(json_ld(title, description, edition["date"]), "  ")}
+{textwrap.indent(json_ld(title, description, edition["date"], edition["stories"]), "  ")}
   </script>
 </head>
 <body>
