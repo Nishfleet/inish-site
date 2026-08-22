@@ -454,7 +454,7 @@ class BuildDailyTests(unittest.TestCase):
         data = json.loads(block)
         self.assertEqual(data["@context"], "https://schema.org")
         nodes = {node["@type"]: node for node in data["@graph"]}
-        self.assertEqual(set(nodes), {"WebSite", "Person", "Article"})
+        self.assertEqual(set(nodes), {"WebSite", "Person", "Article", "Organization"})
 
         site = nodes["WebSite"]
         self.assertEqual(site["@id"], "https://inish.in/#website")
@@ -471,13 +471,21 @@ class BuildDailyTests(unittest.TestCase):
         # The occupation is drawn from the page's own "a daily read for a
         # founder" language, expressed as a structured Occupation node.
         self.assertEqual(person["hasOccupation"], {"@type": "Occupation", "name": "Founder"})
-        # Only these three surfaces are verified to belong to Nish; no
-        # employer, products, or biography are claimed.
+        # The GitHub, X/Twitter, and Tiny Studio URLs are verified to belong
+        # to Nish; Tiny Studio is also expressed as an affiliated Organization.
+        # No employer, products, or biography are claimed.
         self.assertEqual(
             person["sameAs"],
             ["https://github.com/nish3451", "https://x.com/NishantRArora", "https://tinystudio.in/"],
         )
         self.assertNotIn("jobTitle", person)
+        organization = nodes["Organization"]
+        self.assertEqual(organization["@id"], "https://inish.in/#studio")
+        self.assertEqual(organization["@type"], "Organization")
+        self.assertEqual(organization["name"], "Tiny Studio")
+        self.assertEqual(organization["url"], "https://tinystudio.in/")
+        self.assertEqual(person["affiliation"], {"@id": organization["@id"]})
+        self.assertEqual(set(organization.keys()), {"@id", "@type", "name", "url"})
 
         article = nodes["Article"]
         self.assertEqual(article["@id"], "https://inish.in/#article")
