@@ -361,16 +361,23 @@ def html_safe_json(payload: dict) -> str:
 
 
 def json_ld(title: str, description: str, date: str) -> str:
-    """The head's structured data: one graph with the site, its person, and the edition.
+    """The head's structured data: one graph with the site, its studio, its person, and the edition.
 
     Truth rules: only what the page itself shows. The site is the daily feed
     and nothing else, so the Person node claims only the name, the surfaces
     verified to belong to Nish (the GitHub profile, the X/Twitter account
     linked from it, and Tiny Studio via the footer link on inish.in and the
     reciprocal link on tinystudio.in), the description drawn from the page's
-    own meta description, and the occupation drawn from the page's own "a
-    daily read for a founder" language.
+    own meta description, the occupation drawn from the page's own "a
+    daily read for a founder" language, and an affiliation to Tiny Studio
+    as the organization Nish runs, drawn from the footer label and URL.
     """
+    organization = {
+        "@id": "https://inish.in/#studio",
+        "@type": "Organization",
+        "name": "Tiny Studio",
+        "url": "https://tinystudio.in/",
+    }
     person = {
         "@id": "https://inish.in/#nish",
         "@type": "Person",
@@ -386,6 +393,7 @@ def json_ld(title: str, description: str, date: str) -> str:
             "https://x.com/NishantRArora",
             "https://tinystudio.in/",
         ],
+        "affiliation": {"@id": "https://inish.in/#studio"},
     }
     graph = [
         {
@@ -402,13 +410,10 @@ def json_ld(title: str, description: str, date: str) -> str:
             "headline": title,
             "datePublished": date,
             "mainEntityOfPage": "https://inish.in/",
-            # The article references the canonical person node by @id, so the
-            # graph holds one Person entity instead of an inline duplicate.
             "author": {"@id": "https://inish.in/#nish"},
-            # The article is part of the website: an explicit edge that lets
-            # AI engines trace the edition back to its publishing surface.
             "isPartOf": {"@id": "https://inish.in/#website"},
         },
+        organization,
     ]
     return html_safe_json({"@context": "https://schema.org", "@graph": graph})
 
