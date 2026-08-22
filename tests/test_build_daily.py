@@ -456,7 +456,7 @@ class BuildDailyTests(unittest.TestCase):
         nodes_by_type = {}
         for node in data["@graph"]:
             nodes_by_type.setdefault(node["@type"], []).append(node)
-        self.assertEqual(set(nodes_by_type), {"WebSite", "Person", "Article", "Organization", "Claim"})
+        self.assertEqual(set(nodes_by_type), {"WebSite", "Person", "Article", "Organization", "Claim", "FAQPage"})
 
         site = nodes_by_type["WebSite"][0]
         self.assertEqual(site["@id"], "https://inish.in/#website")
