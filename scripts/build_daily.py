@@ -383,6 +383,11 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
     page), the url is the evidence_url (already linked from the page),
     and the author references the Person @id. The Article's mentions
     array references every Claim so the graph connects edition to facts.
+
+    An FAQPage node answers five fixed questions about the site itself using
+    only edition-invariant copy (meta description, kicker/dek, the
+    scanned/kept header concept, the quiet-day card, the footer feed links),
+    so its claims stay stable across editions.
     """
     organization = {
         "@id": "https://inish.in/#studio",
@@ -447,6 +452,59 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
         })
     if claim_ids:
         graph[2]["mentions"] = claim_ids
+    # Fixed FAQ about the site itself, drawn only from edition-invariant
+    # page copy (meta description, kicker/dek, scanned/kept header,
+    # quiet-day card, footer links) — never the editor's note or the
+    # day's counts — so the structured claims do not churn per edition.
+    faq_page = {
+        "@id": "https://inish.in/#faq",
+        "@type": "FAQPage",
+        "name": "Nish's Daily Reads",
+        "isPartOf": {"@id": "https://inish.in/#website"},
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Nish's Daily Reads?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Nish's Daily Reads is a daily read for a founder, published at https://inish.in/: AI news, product ideas, and early signals of demand, in plain words.",
+                },
+            },
+            {
+                "@type": "Question",
+                "name": "Who is Nish's Daily Reads for?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The site was built for one reader: a founder. Every story carries a take labeled Nish, and the footer links Nish's studio, Tiny Studio.",
+                },
+            },
+            {
+                "@type": "Question",
+                "name": "How often does Nish's Daily Reads publish?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Once a day. Each edition is a single dated page, and the site calls itself a daily read. When nothing clears the bar, the day's page says so instead of running filler stories.",
+                },
+            },
+            {
+                "@type": "Question",
+                "name": "How are stories chosen?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Candidate sources are scanned and only a few are kept; the page header shows how many were scanned and how many were kept that day. A kept story must carry a Checked fact linking to the source it was verified against, because the page promises nothing here unless there is a fact under it. On a quiet day no stories run at all, because a short edition beats a padded one.",
+                },
+            },
+            {
+                "@type": "Question",
+                "name": "Where can I subscribe?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Through the feeds linked in the page footer: an RSS feed at https://inish.in/feed.xml and a JSON feed at https://inish.in/latest.json.",
+                },
+            },
+        ],
+    }
+    graph.append(faq_page)
     return html_safe_json({"@context": "https://schema.org", "@graph": graph})
 
 
