@@ -400,6 +400,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
         "@type": "Person",
         "name": "Nish",
         "url": "https://inish.in/",
+        "image": "https://avatars.githubusercontent.com/nish3451",
         "description": description,
         "hasOccupation": {
             "@type": "Occupation",
