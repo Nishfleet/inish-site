@@ -468,6 +468,7 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(person["@id"], "https://inish.in/#nish")
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
+        self.assertEqual(person["image"], "https://avatars.githubusercontent.com/nish3451")
         # The description is drawn from the page's own meta description.
         self.assertEqual(person["description"], rendered_description)
         # The occupation is drawn from the page's own "a daily read for a
