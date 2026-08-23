@@ -175,13 +175,41 @@ REDIRECTS = dict(ROUTE_CONTRACT["redirects"])
 PUBLIC_PATHS = list(ROUTE_CONTRACT["publicPaths"])
 
 
+def follow_redirects(base, start_path, fetch, max_redirects=5):
+    """Follow 301/302/307 Location hops; fail on cycles or excess redirects."""
+    visited = set()
+    path = start_path
+    redirect_count = 0
+    while True:
+        route = path.split("?", 1)[0]
+        if route in visited:
+            raise AssertionError(f"redirect cycle detected at {route}")
+        visited.add(route)
+        status, body, location = fetch(base, path)
+        if status not in (301, 302, 307) or not location:
+            return status, body, route, redirect_count
+        if redirect_count >= max_redirects:
+            raise AssertionError(f"too many redirects (>{max_redirects}) starting at {start_path}")
+        redirect_count += 1
+        if location.startswith("http://") or location.startswith("https://"):
+            from urllib.parse import urlparse
+
+            path = urlparse(location).path
+            if urlparse(location).query:
+                path = f"{path}?{urlparse(location).query}"
+        else:
+            path = location
+    return status, body, route, redirect_count
+
+
 def make_live_server(root: Path, overrides=None):
     """A fake verifier fetch() that serves the fixture root like the live
     hostname would, with optional per-route overrides. An override is either
-    the exact body bytes (served with 200, like a stale asset) or a
-    ``(status, body)`` tuple (e.g. a plain-fallback 404). Unknown routes serve
-    the branded 404 page with status 404, exactly like the edge worker. A
-    public path with no fixture file serves the branded 404 too — after
+    the exact body bytes (served with 200, like a stale asset), a
+    ``(status, body)`` tuple (e.g. a plain-fallback 404), or a
+    ``(status, body, location)`` tuple for redirect responses. Unknown routes
+    serve the branded 404 page with status 404, exactly like the edge worker.
+    A public path with no fixture file serves the branded 404 too — after
     write_fixtures() that can only mean the contract names a file the
     snapshot never carried, which must fail loudly."""
     routes = {}
@@ -205,6 +233,9 @@ def make_live_server(root: Path, overrides=None):
         if body is None:
             return 404, (b"" if method == "HEAD" else branded_404), None
         if isinstance(body, tuple):
+            if len(body) == 3:
+                status, body, location = body
+                return status, (b"" if method == "HEAD" else body), location
             status, body = body
             return status, (b"" if method == "HEAD" else body), None
         return 200, (b"" if method == "HEAD" else body), None
@@ -330,6 +361,37 @@ class LiveVerifierTests(unittest.TestCase):
         status, body, _ = fetch("https://inish.in/", "/about", method="HEAD")
         self.assertEqual(status, 301)
         self.assertEqual(body, b"")
+
+    def test_about_terminates_at_canonical_html_without_cycle(self):
+        self.write_fixtures()
+        fetch = make_live_server(self.root)
+        about_html = (self.root / "about.html").read_bytes()
+
+        status, body, final_path, count = follow_redirects(
+            "https://inish.in/", "/about", fetch
+        )
+        self.assertEqual(count, 1)
+        self.assertEqual(final_path, "/about.html")
+        self.assertEqual(status, 200)
+        self.assertEqual(body, about_html)
+
+        status, body, final_path, count = follow_redirects(
+            "https://inish.in/", "/about.html", fetch
+        )
+        self.assertEqual(count, 0)
+        self.assertEqual(final_path, "/about.html")
+        self.assertEqual(status, 200)
+        self.assertEqual(body, about_html)
+
+    def test_about_cycle_is_detected_and_fails(self):
+        self.write_fixtures()
+        fetch = make_live_server(
+            self.root,
+            overrides={"/about.html": (307, b"", "/about")},
+        )
+        with self.assertRaises(AssertionError) as ctx:
+            follow_redirects("https://inish.in/", "/about", fetch)
+        self.assertRegex(str(ctx.exception), r"cycle|redirect", str(ctx.exception))
 
     def test_unrelated_route_checks_still_enforced_when_feeds_match(self):
         # Feeds are fresh; a route-contract violation must still fail the run,

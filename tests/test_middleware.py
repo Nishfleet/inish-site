@@ -221,6 +221,19 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.ttf"))
         self.assertIsNone(self.font_path.fullmatch("/fonts/x.woff2.css"))
 
+    def test_wrangler_html_handling_is_explicit_none(self):
+        wrangler_text = (ROOT / "wrangler.jsonc").read_text()
+        self.assertRegex(
+            wrangler_text,
+            r'"assets"\s*:\s*\{[^}]*"html_handling"\s*:\s*"none"[^}]*\}',
+        )
+
+    def test_about_canonical_form_has_no_cycle(self):
+        self.assertEqual(self.redirects["/about"], "/about.html")
+        self.assertNotIn("/about.html", self.redirects)
+        for line in REDIRECTS_FILE.read_text().splitlines():
+            self.assertFalse(line.startswith("/about.html"))
+
     def test_canonical_origin_is_bare_apex_https(self):
         # The single source of truth for the canonical host/scheme is the
         # canonicalOrigin value in public-paths.json. Pinning it here means a
