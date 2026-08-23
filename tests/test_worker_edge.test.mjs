@@ -107,7 +107,7 @@ const REDIRECTS = [
 // else with 404, and records every URL it was asked to serve. The worker must
 // never hand it a denied path — that forwarding is exactly the defect this
 // suite exists to catch.
-const SERVED = new Set([...ALLOW_SAMPLES, ...FONT_SAMPLES]);
+const SERVED = new Set([...ALLOW_SAMPLES, ...FONT_SAMPLES, "/index.html"]);
 
 function makeAssets() {
   const reads = [];
@@ -123,7 +123,10 @@ function makeAssets() {
         });
       }
       if (SERVED.has(url.pathname)) {
-        const body = url.pathname === "/" ? "<html>index</html>" : `asset ${url.pathname}`;
+        const body =
+          url.pathname === "/" || url.pathname === "/index.html"
+            ? "<html>index</html>"
+            : `asset ${url.pathname}`;
         return new Response(body, { status: 200 });
       }
       return new Response("missing", { status: 404 });
@@ -171,7 +174,8 @@ test("allow: every allowlisted path reaches ASSETS and carries HSTS", async () =
   for (const path of ALLOW_SAMPLES) {
     const { response, assets } = await call(path);
     assert.equal(response.status, 200, `expected 200 for ${path}`);
-    assert.ok(assets.reads.includes(path), `allowlisted ${path} must reach ASSETS`);
+    const assetPath = path === "/" ? "/index.html" : path;
+    assert.ok(assets.reads.includes(assetPath), `allowlisted ${path} must reach ASSETS as ${assetPath}`);
     assert.equal(
       response.headers.get("Strict-Transport-Security"),
       HSTS,
