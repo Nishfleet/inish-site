@@ -358,7 +358,8 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn('<meta property="og:image:height" content="630">', head)
         self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
         self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
-        self.assertEqual(head.count("https://inish.in/og-image.png"), 2)
+        # og:image, twitter:image, and the Article JSON-LD image field share one URL.
+        self.assertEqual(head.count("https://inish.in/og-image.png"), 3)
         # The build keeps the raster share card at the root alongside app.js and styles.css.
         self.assertTrue((self.public / "og-image.png").is_file())
 
@@ -512,6 +513,12 @@ class BuildDailyTests(unittest.TestCase):
         # The article is part of the website: an explicit edge that lets AI
         # engines trace the edition back to its publishing surface.
         self.assertEqual(article["isPartOf"], {"@id": site["@id"]})
+        # The article completes its entity with the share surface's own
+        # metadata: the og:image URL, the page description, and the edition
+        # date mirrored as dateModified (no modification tracking exists).
+        self.assertEqual(article["image"], "https://inish.in/og-image.png")
+        self.assertEqual(article["description"], rendered_description)
+        self.assertEqual(article["dateModified"], article["datePublished"])
 
         # Each story's Checked fact is a Claim node so AI engines can extract
         # individual citable passages. The text and url match the visible page
