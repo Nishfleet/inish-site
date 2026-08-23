@@ -471,8 +471,12 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual(person["name"], "Nish")
         self.assertEqual(person["url"], "https://inish.in/")
         self.assertEqual(person["image"], "https://avatars.githubusercontent.com/nish3451")
-        # The description is drawn from the page's own meta description.
-        self.assertEqual(person["description"], rendered_description)
+        # The Person node carries its own fixed bio, never the site's dek,
+        # pinned here to repo-verifiable claims only.
+        self.assertEqual(
+            person["description"], "Founder of Tiny Studio; publishes Nish's Daily Reads."
+        )
+        self.assertNotEqual(person["description"], rendered_description)
         # The occupation is drawn from the page's own "a daily read for a
         # founder" language, expressed as a structured Occupation node.
         self.assertEqual(person["hasOccupation"], {"@type": "Occupation", "name": "Founder"})

@@ -360,6 +360,11 @@ def html_safe_json(payload: dict) -> str:
     return serialized
 
 
+# The Person node describes Nish himself, not this site; both claims are
+# verifiable from the repo itself (the Tiny Studio links, this very site).
+PERSON_DESCRIPTION = "Founder of Tiny Studio; publishes Nish's Daily Reads."
+
+
 def json_ld(title: str, description: str, date: str, stories: list) -> str:
     """The head's structured data: one graph with the site, its studio, its person, and the edition.
 
@@ -367,10 +372,11 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
     and nothing else, so the Person node claims only the name, the surfaces
     verified to belong to Nish (the GitHub profile, the X/Twitter account
     linked from it, and Tiny Studio via the footer link on inish.in and the
-    reciprocal link on tinystudio.in), the description drawn from the page's
-    own meta description, the occupation drawn from the page's own "a
-    daily read for a founder" language, and an affiliation to Tiny Studio
-    as the organization Nish runs, drawn from the footer label and URL.
+    reciprocal link on tinystudio.in), a fixed, repo-verifiable bio
+    (PERSON_DESCRIPTION) instead of the page's meta description, the
+    occupation drawn from the page's own "a daily read for a founder"
+    language, and an affiliation to Tiny Studio as the organization Nish
+    runs, drawn from the footer label and URL.
     The worksFor field mirrors the affiliation: both point to the same
     Organization @id, giving engines both the loose affiliation and the
     formal employment relationship. The `knowsAbout` list is the page's
@@ -407,7 +413,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
         "name": "Nish",
         "url": "https://inish.in/",
         "image": "https://avatars.githubusercontent.com/nish3451",
-        "description": description,
+        "description": PERSON_DESCRIPTION,
         "hasOccupation": {
             "@type": "Occupation",
             "name": "Founder",
