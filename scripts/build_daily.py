@@ -388,6 +388,12 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
     only edition-invariant copy (meta description, kicker/dek, the
     scanned/kept header concept, the quiet-day card, the footer feed links),
     so its claims stay stable across editions.
+
+    The Article node carries only what the share surface already declares:
+    the image is the og:image URL from the head meta tags, the
+    description is the same page description passed to this function,
+    and dateModified mirrors datePublished because every rebuild
+    rewrites the whole edition.
     """
     organization = {
         "@id": "https://inish.in/#studio",
@@ -428,7 +434,10 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
             "@id": "https://inish.in/#article",
             "@type": "Article",
             "headline": title,
+            "image": "https://inish.in/og-image.png",
+            "description": description,
             "datePublished": date,
+            "dateModified": date,
             "mainEntityOfPage": "https://inish.in/",
             "author": {"@id": "https://inish.in/#nish"},
             "isPartOf": {"@id": "https://inish.in/#website"},
