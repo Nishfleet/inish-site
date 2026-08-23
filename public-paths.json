@@ -12,6 +12,7 @@
     "/robots.txt",
     "/sitemap.xml",
     "/llms.txt",
+    "/about.html",
     "/fonts/OFL.txt"
   ],
   "fontPath": "^/fonts/[a-z0-9-]+\\.woff2$",
@@ -24,7 +25,8 @@
     "/daily/styles.css": "/styles.css",
     "/daily/latest.json": "/latest.json",
     "/daily/feed.xml": "/feed.xml",
-    "/daily/sitemap.xml": "/sitemap.xml"
+    "/daily/sitemap.xml": "/sitemap.xml",
+    "/about": "/about.html"
   },
   "hstsHeader": "max-age=31536000; includeSubDomains",
   "securityHeaders": {

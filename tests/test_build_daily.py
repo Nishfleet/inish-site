@@ -187,8 +187,9 @@ class BuildDailyTests(unittest.TestCase):
         self.assertNotIn("/daily/", feed)
 
         sitemap = (self.public / "sitemap.xml").read_text()
-        self.assertEqual(sitemap.count("<loc>"), 1)
+        self.assertEqual(sitemap.count("<loc>"), 2)
         self.assertIn("<loc>https://inish.in/</loc>", sitemap)
+        self.assertIn("<loc>https://inish.in/about.html</loc>", sitemap)
         self.assertIn("<lastmod>2026-08-02</lastmod>", sitemap)
 
     def test_rss_item_carries_every_story_of_its_edition(self):
@@ -620,6 +621,12 @@ class BuildDailyTests(unittest.TestCase):
             '<p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish\'s profiles and studio.</p>',
             footer,
         )
+
+    def test_footer_includes_about_link(self):
+        self.write(edition())
+        self.build()
+        footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
+        self.assertIn('<a href="/about.html">About</a>', footer)
 
     def test_quiet_day_publishes_a_short_edition(self):
         self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))

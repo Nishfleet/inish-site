@@ -178,6 +178,7 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/daily/latest.json": "/latest.json",
                 "/daily/feed.xml": "/feed.xml",
                 "/daily/sitemap.xml": "/sitemap.xml",
+                "/about": "/about.html",
             },
         )
         for feed in ("/", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml", "/app.js", "/styles.css"):
@@ -190,6 +191,8 @@ class MiddlewareContractTests(unittest.TestCase):
         cases = {
             "/og-image.svg": "static",
             "/og-image.png": "static",
+            "/about.html": "static",
+            "/about": 301,
             "/apple-touch-icon.png": "static",
             "/fonts/archivo-700.woff2": "static",
             "/fonts/OFL.txt": "static",

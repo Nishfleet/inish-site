@@ -76,6 +76,7 @@ const ALLOW_SAMPLES = [
   "/robots.txt",
   "/sitemap.xml",
   "/llms.txt",
+  "/about.html",
   "/fonts/OFL.txt"
 ];
 
@@ -97,7 +98,8 @@ const REDIRECTS = [
   ["/daily/styles.css", "/styles.css"],
   ["/daily/latest.json", "/latest.json"],
   ["/daily/feed.xml", "/feed.xml"],
-  ["/daily/sitemap.xml", "/sitemap.xml"]
+  ["/daily/sitemap.xml", "/sitemap.xml"],
+  ["/about", "/about.html"]
 ];
 
 // A recording ASSETS binding: serves the published surface with 200 (plus the
