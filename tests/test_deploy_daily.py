@@ -152,10 +152,9 @@ exit 0
 VERIFY_STUB = '''#!/usr/bin/env python3
 """Stub scripts/verify_live.py for the behavioral rollback test.
 
-The deployed (accepted) edition never becomes live, so every verification
-attempt for it fails and the loop exhausts; the pre-deploy identity alone
-verifies, so the post-rollback re-verification of the restored version
-succeeds. Every call is recorded in the shared command log.
+Only the restored pre-deploy identity (live edition date AND restored commit)
+verifies; everything else fails and exhausts the loop. Every call is recorded
+in the shared command log.
 """
 import argparse
 import os
@@ -170,7 +169,8 @@ args = parser.parse_args()
 with open(os.environ["COMMAND_LOG"], "a") as log:
     log.write("cmd:verify_live edition=%s commit=%s\\n" % (args.edition_date, args.commit))
 
-if args.edition_date == os.environ["LIVE_EDITION_DATE"]:
+if (args.edition_date == os.environ["LIVE_EDITION_DATE"]
+        and args.commit == os.environ["RESTORED_COMMIT"]):
     print("verified live edition %s (commit %s)" % (args.edition_date, args.commit))
     sys.exit(0)
 print("verify_live stage: edition %s (commit %s) is not live" % (args.edition_date, args.commit))
@@ -187,6 +187,90 @@ def _git(cwd: Path, *args: str) -> str:
         text=True,
     )
     return result.stdout
+
+
+def _run_rollback_scenario(history, live_edition, restored_commit=None):
+    """Run deploy_daily.sh against the hermetic stubbed-provider fixture.
+
+    history: ordered [(edition_date, story_count)]; each entry becomes one
+    commit on origin/main with message "daily: publish <edition_date>".
+    live_edition: the edition the curl stub reports as live.
+    restored_commit: the commit the verify stub accepts as the restored
+    identity; defaults to the FIRST history commit.
+    Returns (result, commands, shas): the CompletedProcess, the ordered
+    command-log lines, and the commit sha of each history entry (oldest first).
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        stubbin = tmp / "stubbin"
+        origin = tmp / "origin.git"
+        work = tmp / "work"
+        run = tmp / "run"
+        command_log = tmp / "commands.log"
+        live_feed = tmp / "live-latest.json"
+
+        # A hermetic origin/main: each history entry is published with the
+        # exact commit message the script's pre-deploy commit lookup greps for.
+        _git(tmp, "init", "--bare", "-b", "main", str(origin))
+        _git(tmp, "clone", str(origin), str(work))
+        shas = []
+        for edition, story_count in history:
+            fixture_payload(work, edition, story_count)
+            _git(work, "add", "-A")
+            _git(work, "commit", "-m", f"daily: publish {edition}")
+            shas.append(_git(work, "rev-parse", "HEAD").strip())
+        _git(work, "push", "-u", "origin", "main")
+
+        if restored_commit is None:
+            restored_commit = shas[0]
+
+        # The run checkout carries the real deploy script plus the verify
+        # stub that only the restored pre-deploy identity can satisfy.
+        _git(tmp, "clone", str(origin), str(run))
+        (run / "scripts").mkdir()
+        shutil.copyfile(DEPLOY_SCRIPT, run / "scripts" / "deploy_daily.sh")
+        (run / "scripts" / "deploy_daily.sh").chmod(0o755)
+        (run / "scripts" / "verify_live.py").write_text(VERIFY_STUB)
+
+        # Stub every external command the script can reach.
+        stubbin.mkdir()
+        for name, body in {
+            "npx": NPX_STUB,
+            "wrangler": WRANGLER_STUB.replace("__PRE_DEPLOY_VERSION_ID__", PRE_DEPLOY_VERSION_ID),
+            "curl": CURL_STUB,
+            "sleep": SLEEP_STUB,
+            "hermes": HERMES_STUB,
+        }.items():
+            stub = stubbin / name
+            stub.write_text(body)
+            stub.chmod(0o755)
+
+        # The live hostname serves live_edition: a newer live edition would
+        # trip the freshness gate before the deploy starts.
+        live_feed.write_text(
+            json.dumps({"date": live_edition, "stories": [{"title": "live"}]}) + "\n"
+        )
+
+        env = os.environ.copy()
+        env["PATH"] = f"{stubbin}:{env['PATH']}"
+        env["CLOUDFLARE_API_TOKEN"] = "fixture-token; provider is stubbed"
+        env["COMMAND_LOG"] = str(command_log)
+        env["LIVE_LATEST_JSON"] = str(live_feed)
+        env["LIVE_EDITION_DATE"] = live_edition
+        env["RESTORED_COMMIT"] = restored_commit
+        result = subprocess.run(
+            [str(run / "scripts" / "deploy_daily.sh")],
+            cwd=str(run),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+
+        output = result.stdout + result.stderr
+        commands = command_log.read_text().splitlines()
+        _ = output
+        return result, commands, shas
 
 
 def fixture_payload(tree: Path, edition: str, story_count: int) -> None:
@@ -394,111 +478,134 @@ class DeployDailyTests(unittest.TestCase):
         # exhausted-live-verification path actually executes. Short-circuiting
         # or deleting the rollback (or the twelve-attempt exhaustion) makes
         # this test red.
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp = Path(tmp)
-            stubbin = tmp / "stubbin"
-            origin = tmp / "origin.git"
-            work = tmp / "work"
-            run = tmp / "run"
-            command_log = tmp / "commands.log"
-            live_feed = tmp / "live-latest.json"
+        result, commands, shas = _run_rollback_scenario(
+            [(LIVE_EDITION, 2), (ACCEPTED_EDITION, 3)],
+            LIVE_EDITION,
+        )
+        pre_deploy_commit = shas[0]
+        accepted_commit = shas[1]
+        output = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 1, output)
 
-            # A hermetic origin/main: the accepted edition on top of the live
-            # edition, published with the exact commit message the script's
-            # pre-deploy commit lookup greps for.
-            _git(tmp, "init", "--bare", "-b", "main", str(origin))
-            _git(tmp, "clone", str(origin), str(work))
-            fixture_payload(work, LIVE_EDITION, 2)
-            _git(work, "add", "-A")
-            _git(work, "commit", "-m", f"daily: publish {LIVE_EDITION}")
-            pre_deploy_commit = _git(work, "rev-parse", "HEAD").strip()
-            fixture_payload(work, ACCEPTED_EDITION, 3)
-            _git(work, "add", "-A")
-            _git(work, "commit", "-m", f"daily: publish {ACCEPTED_EDITION}")
-            accepted_commit = _git(work, "rev-parse", "HEAD").strip()
-            _git(work, "push", "-u", "origin", "main")
+        captures = [c for c in commands if c.startswith("cmd:wrangler deployments ")]
+        deploys = [c for c in commands if c.startswith("cmd:wrangler deploy ")]
+        exhausted = [
+            c for c in commands
+            if c == f"cmd:verify_live edition={ACCEPTED_EDITION} commit={accepted_commit}"
+        ]
+        rollbacks = [
+            c for c in commands
+            if c == f"cmd:wrangler rollback {PRE_DEPLOY_VERSION_ID} --name inish-site"
+        ]
+        restored = [
+            c for c in commands
+            if c == f"cmd:verify_live edition={LIVE_EDITION} commit={pre_deploy_commit}"
+        ]
 
-            # The run checkout carries the real deploy script plus the verify
-            # stub that only the pre-deploy identity can satisfy.
-            _git(tmp, "clone", str(origin), str(run))
-            (run / "scripts").mkdir()
-            shutil.copyfile(DEPLOY_SCRIPT, run / "scripts" / "deploy_daily.sh")
-            (run / "scripts" / "deploy_daily.sh").chmod(0o755)
-            (run / "scripts" / "verify_live.py").write_text(VERIFY_STUB)
+        self.assertEqual(len(captures), 1, commands)
+        self.assertEqual(len(deploys), 1, commands)
+        self.assertEqual(len(exhausted), 12, commands)
+        self.assertEqual(len(rollbacks), 1, commands)
+        self.assertEqual(len(restored), 1, commands)
+        # Order: pre-deploy capture -> deploy -> all twelve exhausted
+        # verifications -> exactly one rollback -> restored-identity
+        # re-verification. No success notification may be sent.
+        self.assertLess(commands.index(captures[0]), commands.index(deploys[0]))
+        self.assertLess(commands.index(deploys[0]), commands.index(exhausted[0]))
+        self.assertLess(commands.index(exhausted[-1]), commands.index(rollbacks[0]))
+        self.assertLess(commands.index(rollbacks[0]), commands.index(restored[0]))
+        self.assertEqual([c for c in commands if c.startswith("cmd:hermes")], [])
+        for needle in (
+            f"rollback_target: version {PRE_DEPLOY_VERSION_ID} currently serves worker inish-site",
+            "rolled_back: worker inish-site restored to version",
+            "rollback_restored: worker inish-site is verified live on version",
+            "it is NOT confirmed live.",
+        ):
+            self.assertIn(needle, output)
 
-            # Stub every external command the script can reach.
-            stubbin.mkdir()
-            for name, body in {
-                "npx": NPX_STUB,
-                "wrangler": WRANGLER_STUB.replace("__PRE_DEPLOY_VERSION_ID__", PRE_DEPLOY_VERSION_ID),
-                "curl": CURL_STUB,
-                "sleep": SLEEP_STUB,
-                "hermes": HERMES_STUB,
-            }.items():
-                stub = stubbin / name
-                stub.write_text(body)
-                stub.chmod(0o755)
+    def test_same_date_republish_reverifies_the_pre_deploy_commit_not_the_just_published_one(self):
+        same_date = "2026-08-20"
+        result, commands, shas = _run_rollback_scenario(
+            [(same_date, 2), (same_date, 3)],
+            same_date,
+        )
+        pre_deploy_commit, accepted_commit = shas[0], shas[1]
+        output = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 1, output)
 
-            # The live hostname serves the pre-deploy edition: a newer live
-            # edition would trip the freshness gate before the deploy starts.
-            live_feed.write_text(
-                json.dumps({"date": LIVE_EDITION, "stories": [{"title": "live"}]}) + "\n"
-            )
+        captures = [c for c in commands if c.startswith("cmd:wrangler deployments ")]
+        deploys = [c for c in commands if c.startswith("cmd:wrangler deploy ")]
+        rollbacks = [
+            c for c in commands
+            if c == f"cmd:wrangler rollback {PRE_DEPLOY_VERSION_ID} --name inish-site"
+        ]
+        restored = [
+            c for c in commands
+            if c == f"cmd:verify_live edition={same_date} commit={pre_deploy_commit}"
+        ]
+        # Pin first: old --max-count=1 --grep re-verifies the just-published
+        # commit, so restored is 0 and rollback_restored never prints.
+        self.assertEqual(len(restored), 1, commands)
+        self.assertEqual(len(rollbacks), 1, commands)
+        self.assertLess(commands.index(rollbacks[0]), commands.index(restored[0]))
+        after_rollback = commands[commands.index(rollbacks[0]) + 1:]
+        self.assertEqual(
+            [c for c in after_rollback
+             if c.startswith("cmd:verify_live ") and f"commit={accepted_commit}" in c],
+            [],
+            commands,
+        )
+        rollback_at = commands.index(rollbacks[0])
+        exhausted = [
+            c for c in commands[:rollback_at]
+            if c == f"cmd:verify_live edition={same_date} commit={accepted_commit}"
+        ]
+        self.assertEqual(len(captures), 1, commands)
+        self.assertEqual(len(deploys), 1, commands)
+        self.assertEqual(len(exhausted), 12, commands)
+        self.assertLess(commands.index(captures[0]), commands.index(deploys[0]))
+        self.assertLess(commands.index(deploys[0]), commands.index(exhausted[0]))
+        self.assertLess(commands.index(exhausted[-1]), commands.index(rollbacks[0]))
+        self.assertLess(commands.index(rollbacks[0]), commands.index(restored[0]))
+        self.assertEqual([c for c in commands if c.startswith("cmd:hermes")], [])
+        for needle in (
+            "rollback_target: version",
+            "rolled_back: worker inish-site restored to version",
+            "rollback_restored: worker inish-site is verified live on version",
+            "it is NOT confirmed live.",
+        ):
+            self.assertIn(needle, output)
 
-            env = os.environ.copy()
-            env["PATH"] = f"{stubbin}:{env['PATH']}"
-            env["CLOUDFLARE_API_TOKEN"] = "fixture-token; provider is stubbed"
-            env["COMMAND_LOG"] = str(command_log)
-            env["LIVE_LATEST_JSON"] = str(live_feed)
-            env["LIVE_EDITION_DATE"] = LIVE_EDITION
-            result = subprocess.run(
-                [str(run / "scripts" / "deploy_daily.sh")],
-                cwd=str(run),
-                env=env,
-                capture_output=True,
-                text=True,
-                timeout=120,
-            )
+    def test_unresolvable_pre_deploy_commit_still_rolls_back_and_fails_loud(self):
+        result, commands, shas = _run_rollback_scenario(
+            [("2026-08-13", 3)], "2001-01-01", restored_commit="no-such-commit"
+        )
+        output = result.stdout + result.stderr
+        self.assertEqual(result.returncode, 1, output)
 
-            output = result.stdout + result.stderr
-            self.assertEqual(result.returncode, 1, output)
-            commands = command_log.read_text().splitlines()
+        captures = [c for c in commands if c.startswith("cmd:wrangler deployments ")]
+        deploys = [c for c in commands if c.startswith("cmd:wrangler deploy ")]
+        exhausted = [
+            c for c in commands
+            if c == f"cmd:verify_live edition=2026-08-13 commit={shas[0]}"
+        ]
+        rollbacks = [
+            c for c in commands
+            if c == f"cmd:wrangler rollback {PRE_DEPLOY_VERSION_ID} --name inish-site"
+        ]
+        live_edition_verifies = [
+            c for c in commands if c.startswith("cmd:verify_live edition=2001-01-01")
+        ]
 
-            captures = [c for c in commands if c.startswith("cmd:wrangler deployments ")]
-            deploys = [c for c in commands if c.startswith("cmd:wrangler deploy ")]
-            exhausted = [
-                c for c in commands
-                if c == f"cmd:verify_live edition={ACCEPTED_EDITION} commit={accepted_commit}"
-            ]
-            rollbacks = [
-                c for c in commands
-                if c == f"cmd:wrangler rollback {PRE_DEPLOY_VERSION_ID} --name inish-site"
-            ]
-            restored = [
-                c for c in commands
-                if c == f"cmd:verify_live edition={LIVE_EDITION} commit={pre_deploy_commit}"
-            ]
-
-            self.assertEqual(len(captures), 1, commands)
-            self.assertEqual(len(deploys), 1, commands)
-            self.assertEqual(len(exhausted), 12, commands)
-            self.assertEqual(len(rollbacks), 1, commands)
-            self.assertEqual(len(restored), 1, commands)
-            # Order: pre-deploy capture -> deploy -> all twelve exhausted
-            # verifications -> exactly one rollback -> restored-identity
-            # re-verification. No success notification may be sent.
-            self.assertLess(commands.index(captures[0]), commands.index(deploys[0]))
-            self.assertLess(commands.index(deploys[0]), commands.index(exhausted[0]))
-            self.assertLess(commands.index(exhausted[-1]), commands.index(rollbacks[0]))
-            self.assertLess(commands.index(rollbacks[0]), commands.index(restored[0]))
-            self.assertEqual([c for c in commands if c.startswith("cmd:hermes")], [])
-            for needle in (
-                f"rollback_target: version {PRE_DEPLOY_VERSION_ID} currently serves worker inish-site",
-                "rolled_back: worker inish-site restored to version",
-                "rollback_restored: worker inish-site is verified live on version",
-                "it is NOT confirmed live.",
-            ):
-                self.assertIn(needle, output)
+        self.assertEqual(len(rollbacks), 1, commands)
+        self.assertEqual(len(exhausted), 12, commands)
+        self.assertEqual(live_edition_verifies, [], commands)
+        self.assertLess(commands.index(captures[0]), commands.index(deploys[0]))
+        self.assertLess(commands.index(deploys[0]), commands.index(exhausted[-1]))
+        self.assertLess(commands.index(exhausted[-1]), commands.index(rollbacks[0]))
+        self.assertEqual([c for c in commands if c.startswith("cmd:hermes")], [])
+        self.assertIn("rollback_verify_failed", output)
+        self.assertIn("cannot be resolved", output)
 
     def test_deploy_is_not_attempted_when_the_predeploy_version_cannot_be_captured(self):
         # An unreversible deploy must not start: if the version currently
