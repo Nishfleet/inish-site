@@ -601,15 +601,15 @@ class BuildDailyTests(unittest.TestCase):
             self.assertIn(required, declarations)
 
     def test_footer_links_the_owned_studio(self):
-        # The merged outbound identity link is part of the renderer, so the
-        # next daily publish cannot silently drop it from the footer. The
+        # The merged outbound identity links are part of the renderer, so the
+        # next daily publish cannot silently drop them from the footer. Each
         # link carries rel="me" to assert identity equivalence alongside the
         # JSON-LD sameAs entry.
         self.write(edition())
         self.build()
         footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
         self.assertIn(
-            '<p class="identity"><a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish\'s studio.</p>',
+            '<p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish\'s profiles and studio.</p>',
             footer,
         )
 
