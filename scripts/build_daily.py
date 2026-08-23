@@ -598,7 +598,7 @@ def page(edition: dict) -> str:
 {cards}
   </main>
   <footer>
-    <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a></div>
+    <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a><a href="/about.html">About</a></div>
     <p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish's profiles and studio.</p>
     <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
   </footer>
@@ -636,7 +636,7 @@ def rss(edition: dict) -> str:
 
 
 def sitemap(date: str) -> str:
-    body = f'<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url>'
+    body = f'<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url><url><loc>https://inish.in/about.html</loc><lastmod>{date}</lastmod></url>'
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
 
 

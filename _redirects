@@ -7,3 +7,4 @@
 /daily/latest.json /latest.json 301
 /daily/feed.xml /feed.xml 301
 /daily/sitemap.xml /sitemap.xml 301
+/about /about.html 301

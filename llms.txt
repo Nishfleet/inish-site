@@ -14,7 +14,8 @@ A daily read for a founder: AI news, product ideas, and early signals of demand 
 - Home: https://inish.in/
 - Today's edition (JSON): https://inish.in/latest.json
 - RSS feed: https://inish.in/feed.xml
-- Public pages: https://inish.in/ (feed only; no archives, no founder pages)
+- About: https://inish.in/about.html
+- Public pages: https://inish.in/ (feed only; no archives)
 
 ## Optional
 

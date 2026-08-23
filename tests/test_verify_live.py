@@ -319,6 +319,18 @@ class LiveVerifierTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("verified_feed_only date=2026-08-08", output)
 
+    def test_about_html_reaches_byte_check_and_about_redirects(self):
+        self.write_fixtures()
+        fetch = make_live_server(self.root)
+
+        status, body, _ = fetch("https://inish.in/", "/about.html")
+        self.assertEqual(status, 200)
+        self.assertEqual(body, (self.root / "about.html").read_bytes())
+
+        status, body, _ = fetch("https://inish.in/", "/about", method="HEAD")
+        self.assertEqual(status, 301)
+        self.assertEqual(body, b"")
+
     def test_unrelated_route_checks_still_enforced_when_feeds_match(self):
         # Feeds are fresh; a route-contract violation must still fail the run,
         # proving the parity guard did not narrow verification to feeds alone.
