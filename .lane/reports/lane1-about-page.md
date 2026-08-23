@@ -1,8 +1,8 @@
 # Lane 1 evidence — canonical `/about` identity surface
 
 **Branch:** `lane1-about-page`  
-**Item:** `fe7b0f5293` — add canonical `/about` page for AI engines  
-**Date:** 2026-08-23
+**PR:** https://github.com/nish3451/inish-site/pull/125  
+**Commit:** `fd75bb4`
 
 ## What shipped
 
