@@ -51,6 +51,12 @@ env:
 jobs:
   classify:
     runs-on: ubuntu-latest
+    # Observed history: median ~0.5min, healthy max ~0.6min. The 1202.4min
+    # outlier was a queued run, not execution. 10min is ~16x the healthy max
+    # and well under the 360min hosted-runner cap; a hung gh API call here
+    # would otherwise hold the review-gate concurrency group indefinitely
+    # (the 2026-08-23/24 fleet stall).
+    timeout-minutes: 10
     # The `classify` context is REQUIRED on main. This job must run on every
     # pull_request event the protection cares about: GitHub treats a skipped
     # required context as satisfied, so a job-level `if:` turned the gate into
