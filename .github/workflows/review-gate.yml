@@ -40,7 +40,7 @@ env:
 
 jobs:
   classify:
-    runs-on: [self-hosted, linux, x64, vps-verify]
+    runs-on: ubuntu-latest
     # The `classify` context is REQUIRED on main. This job must run on every
     # pull_request event the protection cares about: GitHub treats a skipped
     # required context as satisfied, so a job-level `if:` turned the gate into

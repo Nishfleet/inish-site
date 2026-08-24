@@ -36,7 +36,7 @@ concurrency:
 
 jobs:
   check:
-    runs-on: [self-hosted, linux, x64, vps-verify]
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Check out source
