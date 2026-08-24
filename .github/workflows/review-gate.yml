@@ -35,6 +35,16 @@ permissions:
   pull-requests: write
   issues: read
 
+concurrency:
+  # One live run per PR head; superseded runs cancel instead of queueing.
+  # The `classify` context IS branch-protection required on this repo (the
+  # protection list is ['classify', 'test']), so paths-ignore is NOT used
+  # here - a SKIPPED required context counts as SATISFIED and would let
+  # the gate lie. The existing classifier already handles docs-only PRs as
+  # 'low risk, no deep review', so no in-job fast path is needed.
+  group: review-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 env:
   MONTHLY_CAP: "5"
 

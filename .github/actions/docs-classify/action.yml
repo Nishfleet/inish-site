@@ -1,0 +1,101 @@
+name: Docs-classify
+description: Detect whether a pull request is docs-only so required-context jobs can take the fast path.
+
+# Standalone composite action consumed by every required-context job in
+# .github/workflows/pr-checks.yml. The output lets each job skip its heavy
+# install/build/test steps on a docs-only diff while still reaching a real
+# "success" conclusion (the job always runs; only its heavy steps are gated).
+#
+# Fail-closed: any detection problem, an empty diff, a missing API token, or
+# a non-pull_request event classifies as NOT docs-only, so the full suite
+# runs. This is the rule from 2026-08-23: a SKIPPED required check counts
+# as SATISFIED, and silently skipping the gate is worse than running it.
+#
+# Conservative allowlist: prose and evidence files only. Workflow files,
+# scripts, tests, public/*.txt, brand assets, lockfiles, package.json, etc.
+# all mean a real product surface changed and force the full suite.
+
+inputs:
+  github-token:
+    description: Token used to call the GitHub REST API for the PR file list.
+    required: true
+    default: ${{ github.token }}
+  pull-request-number:
+    description: The pull request number to classify. Defaults to the PR that triggered the workflow.
+    required: false
+    default: ${{ github.event.pull_request.number }}
+
+outputs:
+  docs-only:
+    description: '"true" if the PR is docs-only (prose/evidence), "false" otherwise (including detection failures).'
+    value: ${{ steps.classify.outputs.docs-only }}
+
+runs:
+  using: composite
+  steps:
+    - name: Classify the PR
+      id: classify
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        REPO: ${{ github.repository }}
+        PR_NUMBER: ${{ inputs.pull-request-number }}
+      run: |
+        set -euo pipefail
+
+        # Non-pull_request events (push to main, workflow_dispatch) MUST run
+        # the full suite. Only PR events get the fast path.
+        if [ "${{ github.event_name }}" != "pull_request" ]; then
+          echo "docs-only=false" >> "$GITHUB_OUTPUT"
+          echo "Not a pull_request event; full suite will run." >&2
+          exit 0
+        fi
+
+        # Missing PR number = detection problem = fail closed (run full suite).
+        if [ -z "$PR_NUMBER" ]; then
+          echo "docs-only=false" >> "$GITHUB_OUTPUT"
+          echo "Missing PR number; full suite will run." >&2
+          exit 0
+        fi
+
+        # Fetch every file changed by the PR. --paginate keeps the call
+        # bounded; gitleaks-style per-file iteration is fine here because
+        # the PR file list is small (hundreds at the absolute max, usually
+        # tens). On any API failure: full suite.
+        if ! FILES=$(gh api --paginate \
+              "repos/${REPO}/pulls/${PR_NUMBER}/files?per_page=100" \
+              --jq '[.[].filename] | @tsv' 2>/dev/null); then
+          echo "docs-only=false" >> "$GITHUB_OUTPUT"
+          echo "PR file listing failed; full suite will run." >&2
+          exit 0
+        fi
+
+        # Empty diff = detection problem = full suite.
+        if [ -z "$FILES" ]; then
+          echo "docs-only=false" >> "$GITHUB_OUTPUT"
+          echo "Empty diff; full suite will run." >&2
+          exit 0
+        fi
+
+        # Conservative allowlist. Anything not on it forces the full suite.
+        DOCS_ONLY=true
+        while IFS=$'\t' read -r f; do
+          [ -z "$f" ] && continue
+          case "$f" in
+            *.md|*.mdx|*.rst|*.adoc|*.txt) ;;
+            docs/*|.lane/*|.evidence/*|evidence/*|reports/*) ;;
+            LICENSE*|.gitignore|.gitattributes|.editorconfig|.gitmodules) ;;
+            *CHANGELOG*) ;;
+            *)
+              DOCS_ONLY=false
+              break
+              ;;
+          esac
+        done <<< "$FILES"
+
+        echo "docs-only=${DOCS_ONLY}" >> "$GITHUB_OUTPUT"
+        if [ "$DOCS_ONLY" = "true" ]; then
+          echo "Docs-only PR; heavy checks will be skipped." >&2
+        else
+          echo "Product-surface diff detected; full suite will run." >&2
+        fi

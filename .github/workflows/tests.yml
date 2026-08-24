@@ -26,17 +26,40 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # The `test` context is REQUIRED on main (branch protection: ['classify',
+    # 'test']), so paths-ignore is FORBIDDEN here: a SKIPPED required context
+    # counts as SATISFIED, which would let docs-only PRs merge without the
+    # Python + Node suites running. Standing rule 2026-08-23: a required
+    # context uses a docs-only fast path INSIDE the job instead, classifying
+    # the diff before any heavy step and skipping install/setup/test on
+    # prose-only PRs. The job always runs and always reaches a real
+    # conclusion, so the gate stays honest.
     steps:
+      - name: Classify the PR (docs-only fast path)
+        id: docs
+        uses: ./.github/actions/docs-classify
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docs-only fast path
+        if: steps.docs.outputs.docs-only == 'true'
+        run: |
+          echo "::notice::Docs-only PR - full test suite skipped (required \`test\` context still ran and reported success)."
+
       - name: Check out source
+        if: steps.docs.outputs.docs-only != 'true'
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - name: Set up Python
+        if: steps.docs.outputs.docs-only != 'true'
         uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
         with:
           python-version: '3.12'
 
       - name: Run the Python unit tests
         # No third-party dependencies: the suite is stdlib unittest only.
+        # Discovery over tests/ pins the contract test_workflow_contract.py
+        # asserts: every committed test_*.py in tests/ runs.
+        if: steps.docs.outputs.docs-only != 'true'
         run: python3 -m unittest discover -s tests -v
 
       - name: Run the Node tests
@@ -44,5 +67,8 @@ jobs:
         # Discovery-based, like the Python side: every committed *.test.mjs
         # under tests/ runs, so a future regression cannot sit outside CI.
         # (Node runs the glob itself; the directory form would be treated as
-        # a module entry point.)
+        # a module entry point.) test_workflow_contract.py pins this exact
+        # command so a single-file invocation cannot silently omit future
+        # committed tests.
+        if: steps.docs.outputs.docs-only != 'true'
         run: node --test "tests/**/*.test.mjs"
