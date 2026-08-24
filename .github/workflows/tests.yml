@@ -1,14 +1,11 @@
-# The test gate for pull requests.
-#
-# main became protected on 2026-08-08 requiring only `classify` - the review-gate
-# labeller, which passes regardless of whether the code works. With Phase 3
-# auto-merge armed, that let a green-looking PR land untested. This workflow adds
-# the real gate: the repository's own test suites - the Python unittest suite
-# AND the Node test suite (tests/test_middleware_deny.test.mjs proves the
-# middleware deny branch behaviorally; omitting it keeps CI green when the deny
-# branch is disabled). Keep the job name `test` stable; branch protection
-# requires it by exact name.
 name: Tests
+
+# Thin caller for the canonical reusable PR-checks workflow.
+# The standard (timeout-minutes, concurrency+cancel, batched CI + gitleaks,
+# docs-only fast path, 7-day SARIF retention) lives in nish3451/shared-workflows
+# and is applied here by construction. Updates on the `v1` branch propagate
+# automatically. Do not override the called workflow's steps — pass inputs
+# instead.
 
 on:
   pull_request:
@@ -17,58 +14,15 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   test:
+    # Job name kept stable as `test` per the repo's existing convention.
     name: test
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    # The `test` context is REQUIRED on main (branch protection: ['classify',
-    # 'test']), so paths-ignore is FORBIDDEN here: a SKIPPED required context
-    # counts as SATISFIED, which would let docs-only PRs merge without the
-    # Python + Node suites running. Standing rule 2026-08-23: a required
-    # context uses a docs-only fast path INSIDE the job instead, classifying
-    # the diff before any heavy step and skipping install/setup/test on
-    # prose-only PRs. The job always runs and always reaches a real
-    # conclusion, so the gate stays honest.
-    steps:
-      - name: Classify the PR (docs-only fast path)
-        id: docs
-        uses: ./.github/actions/docs-classify
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Docs-only fast path
-        if: steps.docs.outputs.docs-only == 'true'
-        run: |
-          echo "::notice::Docs-only PR - full test suite skipped (required \`test\` context still ran and reported success)."
-
-      - name: Check out source
-        if: steps.docs.outputs.docs-only != 'true'
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-
-      - name: Set up Python
-        if: steps.docs.outputs.docs-only != 'true'
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
-        with:
-          python-version: '3.12'
-
-      - name: Run the Python unit tests
-        # No third-party dependencies: the suite is stdlib unittest only.
-        # Discovery over tests/ pins the contract test_workflow_contract.py
-        # asserts: every committed test_*.py in tests/ runs.
-        if: steps.docs.outputs.docs-only != 'true'
-        run: python3 -m unittest discover -s tests -v
-
-      - name: Run the Node tests
-        # No third-party dependencies: node:test and node:assert only.
-        # Discovery-based, like the Python side: every committed *.test.mjs
-        # under tests/ runs, so a future regression cannot sit outside CI.
-        # (Node runs the glob itself; the directory form would be treated as
-        # a module entry point.) test_workflow_contract.py pins this exact
-        # command so a single-file invocation cannot silently omit future
-        # committed tests.
-        if: steps.docs.outputs.docs-only != 'true'
-        run: node --test "tests/**/*.test.mjs"
+    uses: nish3451/shared-workflows/.github/workflows/pr-checks.yml@v1
+    with:
+      # No package-lock.json in this repo: skip npm install AND npm cache.
+      install-command: ""
+      # Python unittest (stdlib) + Node node:test — both dependency-free.
+      verify-command: python3 -m unittest discover -s tests -v && node --test "tests/**/*.test.mjs"
+      python-version: "3.12"
+    secrets: inherit
