@@ -116,7 +116,7 @@ fi
 # npx and Wrangler write their cache and debug logs to home-directory defaults
 # (~/.npm, ~/.wrangler/logs) unless told otherwise. This VPS has recurring
 # read-only-FS episodes where exactly those paths return EROFS; a deploy that
-# cannot write its own caches strands the accepted edition until the next run
+# cannot write its own caches strands the accepted edition till the next run
 # (observed 2026-08-09: the edition merged but the deploy preflight tripped).
 # Keep the defaults when they are writable so the warm npx cache is reused;
 # otherwise relocate both into the per-run temp directory, which is rebuilt
@@ -134,7 +134,7 @@ fi
 # Pages:Edit; Pages OAuth on this host expired 2026-08-04 and is non-refreshable
 # without an interactive login.
 #
-# A failed deploy is otherwise not retried until the next daily run, so the
+# A failed deploy is otherwise not retried till the next daily run, so the
 # accepted edition would sit un-deployed for a day on a transient failure (a
 # read-only window, a network blip). Retry the same payload a bounded number of
 # times and fail loudly only after the last attempt.
