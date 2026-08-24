@@ -14,7 +14,7 @@ BLOCKED — external account write; cannot be done by this lane with available c
 - `gh api -X PATCH /user -f blog=https://inish.in/` → HTTP 404, `This API operation needs the "user" scope`.
 - Machine token scopes: `gist`, `read:org`, `repo`, `workflow` — no `user` scope. Only credential on host (`/home/nish/.config/gh/hosts.yml`, one nish3451 entry; no GITHUB_TOKEN/GH_TOKEN env).
 - `gh auth refresh -h github.com -s user` is an interactive device flow (needs a human), per prior runs.
-- Browser path re-checked this run (Camoufox): `github.com/settings/profile` redirects to the login page; Google account chooser shows the shared Google profile `nishant345@gmail.com` as **Signed out**. No usable browser session exists for the account write.
+- Browser path re-checked this run (Camoufox): `github.com/settings/profile` redirects to the login page; Google account chooser shows Nish's personal Gmail as **Signed out**. No usable browser session exists for the account write.
 
 ## What closes the item (either action by Nish)
 
