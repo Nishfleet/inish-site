@@ -108,7 +108,10 @@ export default {
     if (decision === "deny") {
       return withSecurityHeaders(await notFoundResponse(request, env));
     }
-    const asset = await env.ASSETS.fetch(request);
+    // html_handling "none" serves only literal asset paths: "/" is not index.html.
+    const assetUrl = new URL(url.pathname === "/" ? "/index.html" : url.pathname, url.origin);
+    assetUrl.search = url.search;
+    const asset = await env.ASSETS.fetch(new Request(assetUrl, request));
     // The runtime hands back asset responses with immutable headers, so the
     // font cache header cannot be set in place — that mutation throws and
     // surfaces as an edge 1101. Rebuild the response with a fresh Headers
@@ -124,7 +127,8 @@ export default {
         headers
       });
     }
-    // Assets binding resolves "/" to index.html via html_handling defaults.
+    // Assets binding serves literal paths when html_handling is "none"; the
+    // worker maps "/" to the deployed index.html snapshot.
     return withSecurityHeaders(response);
   }
 };
