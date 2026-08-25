@@ -143,6 +143,10 @@ fi
 # served inish.in before this publish, so the version currently serving 100% of
 # traffic is captured BEFORE deploying, and bound to the SHA about to be
 # published. Without a rollback target an unreversible deploy must not start.
+# The restored identity (the pre-deploy commit) is also bound before publishing:
+# resolving it after a failed verification could grab the just-published commit
+# on a same-date republish, because two commits on main can share the message
+# `daily: publish $LIVE_EDITION_DATE`.
 PRE_DEPLOY_VERSION="$(
   (
     cd "$DEPLOY_ROOT" && npx --yes wrangler deployments list --name inish-site --json \
@@ -155,6 +159,22 @@ if [[ -z "$PRE_DEPLOY_VERSION" ]]; then
   exit 1
 fi
 echo "rollback_target: version $PRE_DEPLOY_VERSION currently serves worker inish-site; about to publish $ACCEPTED_SHA" >&2
+
+# Bind the restored identity NOW, before anything is published: the pre-deploy
+# commit is the newest daily-publish commit for the live edition, excluding
+# the commit about to be published. Resolving this after a failed verification
+# instead would let a same-date republish resolve to the just-published commit
+# itself (two commits can share "daily: publish $DATE"), checking the restored
+# site against the wrong snapshot. An empty value is legal here — the live
+# edition may predate this history or come from an out-of-band publish; if a
+# rollback then fires, the post-rollback path fails loudly exactly as before.
+PRE_DEPLOY_COMMIT="$(
+  git log --format=%H FETCH_HEAD --grep="^daily: publish ${LIVE_EDITION_DATE}$" \
+    | grep -v "^${ACCEPTED_SHA}$" | head -n 1 || true
+)"
+if [[ -z "$PRE_DEPLOY_COMMIT" ]]; then
+  echo "rollback_target: no commit found for the live edition $LIVE_EDITION_DATE; if rollback fires, the restored identity cannot be re-verified automatically" >&2
+fi
 
 DEPLOY_ATTEMPTS=3
 DEPLOY_FAILURE=""
@@ -201,12 +221,10 @@ if ! (cd "$DEPLOY_ROOT" && npx --yes wrangler rollback "$PRE_DEPLOY_VERSION" --n
 fi
 echo "rolled_back: worker inish-site restored to version $PRE_DEPLOY_VERSION; re-verifying the restored identity" >&2
 
-# Re-verify the restored live identity with the same verification path the
-# deploy uses (verify_live.py against a pristine snapshot), pointed at the
-# pre-deploy edition: the daily publish commit for the edition date that was
-# live before this deploy.
+# Re-verify the restored identity against the pre-deploy edition/commit bound
+# at capture time. Resolving it here could match the just-published commit
+# on a same-date rerun.
 mkdir -p "$PRE_SNAPSHOT_ROOT"
-PRE_DEPLOY_COMMIT="$(git log --format=%H --max-count=1 FETCH_HEAD --grep="^daily: publish $LIVE_EDITION_DATE$" || true)"
 if [[ -z "$PRE_DEPLOY_COMMIT" ]]; then
   echo "rollback_verify_failed: worker inish-site rolled back to version $PRE_DEPLOY_VERSION but the pre-deploy commit for edition $LIVE_EDITION_DATE cannot be resolved, so the restored identity cannot be re-verified — a human must verify worker inish-site at version $PRE_DEPLOY_VERSION" >&2
   echo "The accepted edition in the repository was left untouched; it is NOT confirmed live." >&2
