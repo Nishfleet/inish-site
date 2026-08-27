@@ -8,3 +8,6 @@
 /daily/feed.xml /feed.xml 301
 /daily/sitemap.xml /sitemap.xml 301
 /about /about.html 301
+/privacy /privacy.html 301
+/terms /terms.html 301
+/contact /contact.html 301
