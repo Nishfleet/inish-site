@@ -108,7 +108,17 @@ export default {
     if (decision === "deny") {
       return withSecurityHeaders(await notFoundResponse(request, env));
     }
-    const asset = await env.ASSETS.fetch(request);
+    // wrangler.jsonc sets assets.html_handling to "none" so Cloudflare Assets
+    // does not auto-redirect /about.html -> /about (the loop fixed in #129).
+    // A side effect of "none" is that the binding no longer resolves "/" to
+    // index.html either, so the worker must request the index asset by its
+    // real path. A direct /index.html request still 301s to "/" via the
+    // redirects map above before reaching this point, so only the canonical
+    // "/" entry reaches this rewrite.
+    const assetRequest = url.pathname === "/"
+      ? new Request(new URL("/index.html", url), request)
+      : request;
+    const asset = await env.ASSETS.fetch(assetRequest);
     // The runtime hands back asset responses with immutable headers, so the
     // font cache header cannot be set in place — that mutation throws and
     // surfaces as an edge 1101. Rebuild the response with a fresh Headers
@@ -124,7 +134,6 @@ export default {
         headers
       });
     }
-    // Assets binding resolves "/" to index.html via html_handling defaults.
     return withSecurityHeaders(response);
   }
 };
