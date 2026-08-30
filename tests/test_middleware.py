@@ -113,11 +113,23 @@ def _deployed_public_surface():
 
 
 def _redirects_file_map():
-    """The redirect map carried by the static _redirects artifact, which must
-    mirror the edge contract (the Pages path is no longer deployed, so this is
-    the only independent copy of the redirect list)."""
+    """The redirect map carried by the static _redirects artifact.
+
+    _redirects is applied to env.ASSETS.fetch() calls on the Workers edge, so
+    it carries only the redirects that must fire from the asset layer. The
+    Worker (run_worker_first) handles every incoming redirect via the policy
+    redirects map before ASSETS is reached, so most contract redirects are
+    harmless mirrors here — except /index.html -> /, which the Worker also
+    uses internally to rewrite "/" to "/index.html" under html_handling:
+    "none". If /index.html -> / lived in _redirects it would 301 the internal
+    rewrite back to "/", looping the root, so that one redirect is Worker-owned
+    and intentionally absent from _redirects (see the file's header comment).
+    """
     result = {}
     for line in REDIRECTS_FILE.read_text().splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
         source, target, code = line.split()
         assert code == "301", f"unexpected redirect code in {REDIRECTS_FILE.name}: {line}"
         result[source] = target
@@ -183,9 +195,16 @@ class MiddlewareContractTests(unittest.TestCase):
         )
         for feed in ("/", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml", "/app.js", "/styles.css"):
             self.assertEqual(self.middleware_status(feed), "static")
-        # The edge contract and the static _redirects artifact must agree
-        # exactly; either one drifting alone is a contract break.
-        self.assertEqual(self.redirects, _redirects_file_map())
+        # The edge contract and the static _redirects artifact must agree,
+        # with one deliberate exception: /index.html -> / is Worker-owned
+        # (the Worker rewrites "/" to "/index.html" under html_handling:
+        # "none", so the rule must NOT also live in _redirects or it 301s the
+        # internal rewrite back to "/" and loops the root). Every other
+        # contract redirect must be mirrored in _redirects exactly.
+        self.assertEqual(
+            _redirects_file_map(),
+            {k: v for k, v in self.redirects.items() if k != "/index.html"},
+        )
 
     def test_metadata_assets_reach_static_layer_and_arbitrary_paths_stay_404(self):
         cases = {
@@ -323,7 +342,12 @@ class MiddlewareContractTests(unittest.TestCase):
         # license text the shipped stylesheet references; no new redirect, the
         # deny surface still 404s, and the 404 asset itself stays internal.
         self.assertEqual(self.public_paths, _deployed_public_surface())
-        self.assertEqual(self.redirects, _redirects_file_map())
+        # /index.html -> / is Worker-owned (see test_feed_paths_and_redirects
+        # for the rationale); _redirects mirrors every other contract redirect.
+        self.assertEqual(
+            _redirects_file_map(),
+            {k: v for k, v in self.redirects.items() if k != "/index.html"},
+        )
         for path in ("/404.html", "/admin", "/secrets.json", "/daily/2026-08-09"):
             with self.subTest(denied=path):
                 self.assertEqual(self.middleware_status(path), 404)

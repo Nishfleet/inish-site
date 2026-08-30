@@ -30,6 +30,27 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(HERE, "..");
+
+// The real Cloudflare ASSETS binding applies the deployed _redirects file to
+// env.ASSETS.fetch() calls (verified live, fleet-ops#2248: a /index.html -> /
+// rule in _redirects 301'd the Worker's internal "/" -> "/index.html" rewrite
+// back to "/", looping the root). Modeling _redirects here is what catches a
+// regression where a Worker-owned redirect is re-added to _redirects — the
+// stub 301s the internal fetch and the homepage test goes red. Comment and
+// blank lines are skipped, matching the _redirects format.
+const ASSET_REDIRECTS = new Map();
+for (const line of readFileSync(join(ROOT, "_redirects"), "utf8").split(/\r?\n/)) {
+  const stripped = line.trim();
+  if (!stripped || stripped.startsWith("#")) continue;
+  const [source, target, code] = line.split(/\s+/);
+  assert.equal(code, "301", `unexpected redirect code in _redirects: ${line}`);
+  ASSET_REDIRECTS.set(source, target);
+}
 
 import worker from "../worker.js";
 import { securityHeaders } from "../functions/policy.js";
@@ -102,12 +123,26 @@ const REDIRECTS = [
   ["/about", "/about.html"]
 ];
 
-// A recording ASSETS binding: serves the published surface with 200 (plus the
-// branded /404.html the worker's notFoundResponse reads), answers anything
-// else with 404, and records every URL it was asked to serve. The worker must
-// never hand it a denied path — that forwarding is exactly the defect this
-// suite exists to catch.
-const SERVED = new Set([...ALLOW_SAMPLES, ...FONT_SAMPLES]);
+// A recording ASSETS binding that models wrangler.jsonc's
+// assets.html_handling: "none" (set in #129 to stop the /about.html -> /about
+// 307 loop). Under "none" the binding serves asset files by their real path
+// only: it does NOT auto-resolve "/" to index.html, so a bare "/" request 404s
+// and the worker must rewrite "/" to "/index.html" before fetching. Modeling
+// "none" here is what catches a regression where the worker stops rewriting
+// "/" — the live edge 404s the homepage while this stub (under the old default
+// "auto-trailing-slash" model) would have served it and let the suite pass.
+// The binding also serves the branded /404.html the worker's notFoundResponse
+// reads, answers anything else with 404, and records every URL it was asked to
+// serve. The worker must never hand it a denied path — that forwarding is
+// exactly the defect this suite exists to catch.
+// The asset files the binding can serve by real path under html_handling:
+// "none": the public surface minus "/" (which is a route, not a file) plus
+// the index.html file the worker rewrites "/" to, plus the fonts.
+const SERVED = new Set([
+  ...ALLOW_SAMPLES.filter((p) => p !== "/"),
+  "/index.html",
+  ...FONT_SAMPLES
+]);
 
 function makeAssets() {
   const reads = [];
@@ -116,19 +151,39 @@ function makeAssets() {
     async fetch(input) {
       const url = new URL(typeof input === "string" ? input : input.url);
       reads.push(url.pathname);
+      // _redirects is applied to env.ASSETS.fetch() calls on the real edge.
+      // A redirect match returns 301 to the target (hostname is irrelevant;
+      // only the pathname reaches the worker, which resolves it itself).
+      if (ASSET_REDIRECTS.has(url.pathname)) {
+        return new Response(null, {
+          status: 301,
+          headers: { Location: ASSET_REDIRECTS.get(url.pathname) }
+        });
+      }
       if (url.pathname === "/404.html") {
         return new Response("<html>branded 404</html>", {
           status: 200,
           headers: { "Content-Type": "text/html" }
         });
       }
+      // html_handling: "none" — "/" is not auto-resolved to index.html.
+      if (url.pathname === "/") {
+        return new Response("missing", { status: 404 });
+      }
       if (SERVED.has(url.pathname)) {
-        const body = url.pathname === "/" ? "<html>index</html>" : `asset ${url.pathname}`;
-        return new Response(body, { status: 200 });
+        return new Response(`asset ${url.pathname}`, { status: 200 });
       }
       return new Response("missing", { status: 404 });
     }
   };
+}
+
+// The asset path the worker must request for a given public path under
+// html_handling: "none": "/" rewrites to "/index.html", every other path is
+// fetched as-is. Assertions compare against this so a dropped "/" rewrite
+// goes red instead of silently passing.
+function assetPathFor(path) {
+  return path === "/" ? "/index.html" : path;
 }
 
 async function call(path, { method = "GET", search = "", origin = ORIGIN } = {}) {
@@ -171,7 +226,12 @@ test("allow: every allowlisted path reaches ASSETS and carries HSTS", async () =
   for (const path of ALLOW_SAMPLES) {
     const { response, assets } = await call(path);
     assert.equal(response.status, 200, `expected 200 for ${path}`);
-    assert.ok(assets.reads.includes(path), `allowlisted ${path} must reach ASSETS`);
+    // Under html_handling: "none" the worker rewrites "/" to "/index.html"
+    // before fetching; every other path is fetched as-is.
+    assert.ok(
+      assets.reads.includes(assetPathFor(path)),
+      `allowlisted ${path} must reach ASSETS (as ${assetPathFor(path)})`
+    );
     assert.equal(
       response.headers.get("Strict-Transport-Security"),
       HSTS,

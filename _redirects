@@ -1,4 +1,10 @@
-/index.html / 301
+# /index.html -> / is intentionally absent here. The Worker (run_worker_first)
+# redirects /index.html to / for real requests via the policy redirects map, so
+# the rule never needs to fire from _redirects. Keeping it here would intercept
+# the Worker's internal "/" -> "/index.html" asset fetch (html_handling: "none"
+# needs that rewrite to serve the homepage) and 301 it back to "/", looping the
+# root. _redirects is applied to env.ASSETS.fetch() calls, so it must omit this
+# one redirect the Worker owns.
 /daily / 301
 /daily/ / 301
 /daily/index.html / 301
