@@ -13,7 +13,10 @@
     "/sitemap.xml",
     "/llms.txt",
     "/about.html",
-    "/fonts/OFL.txt"
+    "/fonts/OFL.txt",
+    "/privacy.html",
+    "/terms.html",
+    "/contact.html"
   ],
   "fontPath": "^/fonts/[a-z0-9-]+\\.woff2$",
   "redirects": {
@@ -26,7 +29,10 @@
     "/daily/latest.json": "/latest.json",
     "/daily/feed.xml": "/feed.xml",
     "/daily/sitemap.xml": "/sitemap.xml",
-    "/about": "/about.html"
+    "/about": "/about.html",
+    "/privacy": "/privacy.html",
+    "/terms": "/terms.html",
+    "/contact": "/contact.html"
   },
   "hstsHeader": "max-age=31536000; includeSubDomains",
   "securityHeaders": {

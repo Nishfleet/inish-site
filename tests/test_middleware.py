@@ -191,6 +191,9 @@ class MiddlewareContractTests(unittest.TestCase):
                 "/daily/feed.xml": "/feed.xml",
                 "/daily/sitemap.xml": "/sitemap.xml",
                 "/about": "/about.html",
+                "/privacy": "/privacy.html",
+                "/terms": "/terms.html",
+                "/contact": "/contact.html",
             },
         )
         for feed in ("/", "/latest.json", "/feed.xml", "/robots.txt", "/sitemap.xml", "/app.js", "/styles.css"):

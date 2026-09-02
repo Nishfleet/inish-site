@@ -98,6 +98,9 @@ const ALLOW_SAMPLES = [
   "/sitemap.xml",
   "/llms.txt",
   "/about.html",
+  "/privacy.html",
+  "/terms.html",
+  "/contact.html",
   "/fonts/OFL.txt"
 ];
 
@@ -120,7 +123,10 @@ const REDIRECTS = [
   ["/daily/latest.json", "/latest.json"],
   ["/daily/feed.xml", "/feed.xml"],
   ["/daily/sitemap.xml", "/sitemap.xml"],
-  ["/about", "/about.html"]
+  ["/about", "/about.html"],
+  ["/privacy", "/privacy.html"],
+  ["/terms", "/terms.html"],
+  ["/contact", "/contact.html"]
 ];
 
 // A recording ASSETS binding that models wrangler.jsonc's
