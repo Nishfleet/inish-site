@@ -222,12 +222,23 @@ class BuildDailyTests(unittest.TestCase):
         self.assertGreater(icon.stat().st_size, 8)
         self.assertTrue(icon.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
 
+    def test_head_carries_the_canonical_source_url(self):
+        self.write(edition())
+        self.build()
+        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+        # Exactly one canonical: the root feed is the only public page, so any
+        # second canonical (or a date-specific one) would split the sources.
+        self.assertEqual(head.count('<link rel="canonical" href="https://inish.in/">'), 1)
+
     def test_quiet_day_publishes_a_short_edition(self):
         self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
         self.build()
         page = (self.public / "index.html").read_text()
         self.assertIn("Nothing cleared the bar today", page)
         self.assertNotIn("data-filter", page)
+        # A zero-story edition still names its canonical source URL.
+        head = page.split("</head>", 1)[0]
+        self.assertEqual(head.count('<link rel="canonical" href="https://inish.in/">'), 1)
         self.assertEqual(json.loads((self.public / "latest.json").read_text())["stories"], [])
 
     # --- the fact gate ---------------------------------------------------

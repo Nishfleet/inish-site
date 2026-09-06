@@ -371,6 +371,8 @@ def page(edition: dict) -> str:
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://inish.in/og-image.svg">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
+  <!-- One root feed, one canonical source URL. -->
+  <link rel="canonical" href="https://inish.in/">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
