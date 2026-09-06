@@ -7,6 +7,12 @@ pool can only paraphrase marketing. Every candidate here therefore carries an
 `evidence_class` saying what kind of proof exists for it, and discussion
 threads are pulled alongside links so criticism is in the pool, not just
 announcements.
+
+Discussion provenance is kept on each candidate as `discussion_url` (Hacker
+News, Show HN, Lobsters). When a fact is verified against the discussion
+rather than the linked article, the edition's `evidence_url` must be that
+`discussion_url` — the builder renders the "Checked" line as a link to it, so
+the provenance survives into the published page instead of being dropped.
 """
 
 from __future__ import annotations

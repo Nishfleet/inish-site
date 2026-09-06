@@ -41,23 +41,37 @@ env:
 jobs:
   classify:
     runs-on: [self-hosted, linux, x64, vps-verify]
-    if: github.event.pull_request.draft == false
+    # The `classify` context is REQUIRED on main. This job must run on every
+    # pull_request event the protection cares about: GitHub treats a skipped
+    # required context as satisfied, so a job-level `if:` turned the gate into
+    # a formality (PR #42 merged 2026-08-10 with classify SKIPPED because the
+    # draft condition evaluated false). Draft handling therefore lives INSIDE
+    # the job as an explicit step - a draft PR still produces an executed,
+    # successful required context.
     steps:
+      - name: Draft PRs are exempt, never skipped
+        if: github.event.pull_request.draft == true
+        run: echo "::notice::Draft PR - classification deliberately deferred; no label budget consumed. The required classify context still executed and will re-run when this PR is marked ready for review."
+
       - name: Decide whether this PR earns a review
         id: gate
+        if: github.event.pull_request.draft == false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
+          # No `|| true` anywhere here: a failed file listing or budget query
+          # means this job could not classify, and that must fail the required
+          # context loudly instead of guessing.
           gh api --paginate "repos/$REPO/pulls/$PR/files" \
-            --jq '.[] | [.filename, .additions, .deletions] | @tsv' > files.tsv || true
+            --jq '.[] | [.filename, .additions, .deletions] | @tsv' > files.tsv
 
           MONTH_START="$(date -u +%Y-%m-01)"
           SPENT="$(gh api -X GET search/issues \
             -f "q=repo:$REPO is:pr label:review:deep created:>=$MONTH_START" \
-            --jq '.total_count' 2>/dev/null || echo 0)"
+            --jq '.total_count')"
           echo "spent=$SPENT" >> "$GITHUB_OUTPUT"
 
           SPENT="$SPENT" python3 - <<'PY' >> "$GITHUB_OUTPUT"
@@ -136,6 +150,6 @@ jobs:
           echo "::notice::Deep review requested (${{ steps.gate.outputs.level }}) — ${{ steps.gate.outputs.why }}. Budget ${{ steps.gate.outputs.budget }}."
 
       - name: Explain the skip
-        if: steps.gate.outputs.spend != 'yes'
+        if: steps.gate.outputs.spend != 'yes' && github.event.pull_request.draft == false
         run: |
           echo "::notice::No deep review — ${{ steps.gate.outputs.level }}: ${{ steps.gate.outputs.why }}. Budget ${{ steps.gate.outputs.budget }}. sgscan and crgate still run locally; add the review:deep label by hand to override."

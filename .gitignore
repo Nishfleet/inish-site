@@ -1,5 +1,7 @@
 .DS_Store
 .wrangler/
+# Fleet-desk snapshot dropped at the repo root; not site content
+/data.json
 data/candidates/
 __pycache__/
 *.pyc

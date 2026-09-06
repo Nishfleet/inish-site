@@ -3,8 +3,11 @@
 # main became protected on 2026-08-08 requiring only `classify` - the review-gate
 # labeller, which passes regardless of whether the code works. With Phase 3
 # auto-merge armed, that let a green-looking PR land untested. This workflow adds
-# the real gate: the repository's own unittest suite. Keep the job name `test`
-# stable; branch protection requires it by exact name.
+# the real gate: the repository's own test suites - the Python unittest suite
+# AND the Node test suite (tests/test_middleware_deny.test.mjs proves the
+# middleware deny branch behaviorally; omitting it keeps CI green when the deny
+# branch is disabled). Keep the job name `test` stable; branch protection
+# requires it by exact name.
 name: Tests
 
 on:
@@ -32,6 +35,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run the unit tests
+      - name: Run the Python unit tests
         # No third-party dependencies: the suite is stdlib unittest only.
         run: python3 -m unittest discover -s tests -v
+
+      - name: Run the Node tests
+        # No third-party dependencies: node:test and node:assert only.
+        # Discovery-based, like the Python side: every committed *.test.mjs
+        # under tests/ runs, so a future regression cannot sit outside CI.
+        # (Node runs the glob itself; the directory form would be treated as
+        # a module entry point.)
+        run: node --test "tests/**/*.test.mjs"

@@ -1,12 +1,11 @@
-# Scheduled caller for scripts/check_live_current.sh.
+# Manual caller for scripts/check_live_current.sh.
 #
 # deploy_daily.sh verifies live parity only at deploy time, so a daily
 # publisher run that never fires (a missed schedule, a stalled agent job)
 # leaves inish.in silently stale until the next deploy happens to run — a
 # real stall lasted 32 hours on 2026-08-10 while merged head metadata and a
 # mobile fix sat undelivered. check_live_current.sh closes that blind spot
-# with a deploy-free, token-free parity check; this workflow is its
-# scheduled caller.
+# with a deploy-free, token-free parity check.
 #
 # The job deliberately carries no secrets: the script fetches origin/main
 # fresh and byte-compares the live hostname against that snapshot. A stale
@@ -14,18 +13,18 @@
 # the named failing files and routes, visible in the Actions tab without
 # anyone polling the hostname.
 #
-# `schedule` fires only for workflows on the default branch. The workflow is
-# also manually dispatchable (Actions tab or `gh workflow run`) — the daily
+# Schedule note: this workflow is deliberately NOT scheduled. GitHub's
+# `schedule` events are delivered late or not at all for hours at a time
+# (recurring on this repo since 2026-08-10, with 7+ hour silent gaps), which
+# is exactly the blind spot the hourly sweep exists to close. The hourly
+# sweep therefore runs on the VPS's own scheduler via install/live-current-
+# check.timer (see install/live-current-check.service); this workflow stays
+# as the manual dispatch path (Actions tab or `gh workflow run`) — the daily
 # runbook asks for exactly that before trusting that a merged change reached
 # the site.
 name: Live current check
 
 on:
-  schedule:
-    # Hourly, UTC. The daily publisher targets Asia/Kolkata; an hourly sweep
-    # bounds staleness detection to about an hour regardless of when the
-    # publisher run was supposed to fire.
-    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
