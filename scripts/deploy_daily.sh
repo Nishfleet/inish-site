@@ -45,7 +45,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 mkdir -p "$PUBLIC_DIR"
-cp index.html 404.html app.js styles.css latest.json feed.xml robots.txt sitemap.xml _redirects "$PUBLIC_DIR/"
+cp index.html 404.html app.js styles.css og-image.svg apple-touch-icon.png latest.json feed.xml robots.txt sitemap.xml _redirects "$PUBLIC_DIR/"
 cp -R functions "$PUBLIC_DIR/"
 cp -R fonts "$PUBLIC_DIR/"
 
