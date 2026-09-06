@@ -222,6 +222,17 @@ class BuildDailyTests(unittest.TestCase):
         self.assertGreater(icon.stat().st_size, 8)
         self.assertTrue(icon.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
 
+    def test_head_carries_the_root_canonical_url(self):
+        for payload in (
+            edition(),
+            edition(stories=0, editor_note="Nothing today survived a second look at the source."),
+        ):
+            with self.subTest(stories=len(payload["stories"])):
+                self.write(payload)
+                self.build()
+                head = (self.public / "index.html").read_text().split("</head>", 1)[0]
+                self.assertEqual(head.count('<link rel="canonical" href="https://inish.in/">'), 1)
+
     def test_quiet_day_publishes_a_short_edition(self):
         self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
         self.build()
