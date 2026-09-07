@@ -1,0 +1,4 @@
+{
+  "deploy_command": "echo 'inish-site deploy handled by VPS deploy_daily.sh (scripts/deploy_daily.sh); this CI deploy step is a no-op acknowledgement so the canonical fleet deploy-on-green gate passes — see fleet-ops#red-deploy for the sync that brought this workflow to a repo whose actual production path is the VPS script, not the GitHub Actions deployer.'",
+  "health_url": ""
+}
