@@ -8,8 +8,18 @@ name: Auto-merge arm
 # human wait, and keeps working when any one agent is out of usage.
 #
 # Opt-outs (the ONLY ones): draft PRs, the `no-auto-merge` label at creation,
-# or `[no-merge]` in the title. Scheduled sweeps that must never self-merge
-# open DRAFT PRs.
+# `[no-merge]` in the title, or the `blocked-by-judge` label. Scheduled sweeps
+# that must never self-merge open DRAFT PRs; judge-blocked PRs carry the label
+# instead (fleet-ops#4557: a blocking review must mean "not yet", and the #7724
+# regression — armed 81s after the label — is what this opt-out exists to stop).
+#
+# NOTE ON WHY THE LABEL CHECK RUNS TWICE: the job `if:` reads the labels from
+# the `pull_request` event payload, which is a snapshot at trigger time. A label
+# added by a judge between the snapshot and the arm step would not be visible
+# there. `Check judge-blocked before arming` therefore re-reads the PR's live
+# labels through the API immediately before arming and gates the arm step on
+# the result. The `if:` is the cheap first filter; the step is the one that
+# actually decides.
 #
 # Arms under a nishfleet-worker App installation token, not GITHUB_TOKEN and
 # not a human PAT (fleet-ops#1469): a merge under GITHUB_TOKEN would not
@@ -47,7 +57,8 @@ jobs:
     if: >-
       github.event.pull_request.draft == false &&
       !contains(github.event.pull_request.title, '[no-merge]') &&
-      !contains(join(github.event.pull_request.labels.*.name, ','), 'no-auto-merge')
+      !contains(join(github.event.pull_request.labels.*.name, ','), 'no-auto-merge') &&
+      !contains(join(github.event.pull_request.labels.*.name, ','), 'blocked-by-judge')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -87,8 +98,31 @@ jobs:
           private-key: ${{ secrets.NISHFLEET_WORKER_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
-      - name: Arm auto-merge
+      # Re-reads the PR's live labels through the API (fleet-ops#8136): the
+      # job `if:` above only sees the event payload snapshot, so a
+      # blocked-by-judge label added in the window between that snapshot and
+      # this step would still arm. This is the check that actually decides;
+      # a judge-blocked PR leaves with auto_merge:null and a notice, which is
+      # the exact #7724 outcome reversed. Exit 0 keeps the check itself green
+      # — the refusal is a skip, not a failure.
+      - name: Check judge-blocked before arming
+        id: judge
         if: ${{ steps.check.outputs.present == 'true' }}
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          labels="$(gh api "repos/$REPO/pulls/$PR" --jq '[.labels[].name] | join(",")')"
+          if [[ ",$labels," == *",blocked-by-judge,"* ]]; then
+            echo "blocked=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::PR #$PR carries blocked-by-judge — refusing to arm auto-merge (fleet-ops#4557)."
+          else
+            echo "blocked=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Arm auto-merge
+        if: ${{ steps.check.outputs.present == 'true' && steps.judge.outputs.blocked == 'false' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           PR: ${{ github.event.pull_request.number }}
