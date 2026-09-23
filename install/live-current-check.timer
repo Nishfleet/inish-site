@@ -3,8 +3,8 @@
 # GitHub's `schedule` events are delivered late or not at all for hours at a
 # time (recurring on this repo since 2026-08-10, with 7+ hour silent gaps),
 # so the hourly parity sweep cannot depend on the Actions scheduler. This
-# timer fires reliably on the VPS; the Actions workflow remains as a manual
-# dispatch path and a fallback, not the primary schedule.
+# timer fires reliably on the VPS; the Actions workflow copy was cut as a
+# superseded remnant (PR #154), so this timer is the only schedule.
 #
 # Matches the workflow's 0 * * * * (top of the hour, UTC). Offset from :00
 # so the VPS sweep lands ~2 minutes after the GitHub one would have, keeping

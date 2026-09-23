@@ -129,11 +129,16 @@ class CheckLiveCurrentTests(unittest.TestCase):
 
     def test_hourly_schedule_lives_on_the_vps_timer_not_the_workflow(self):
         # GitHub's `schedule` events stall for hours (the recurring failure
-        # this fix exists to close), so the workflow must not carry a cron
-        # and the hourly cadence must live in the committed VPS timer.
-        workflow = (ROOT / ".github" / "workflows" / "live-current-check.yml").read_text()
-        self.assertNotIn("schedule:", workflow)
-        self.assertNotIn("cron:", workflow)
+        # this fix exists to close), so the hourly cadence must live in the
+        # committed VPS timer, never in a workflow cron. The workflow itself
+        # was cut as a superseded remnant in 911f5e9 (#154): assert it stays
+        # gone, so no schedule trigger can return under that path.
+        self.assertFalse(
+            (ROOT / ".github" / "workflows" / "live-current-check.yml").exists(),
+            ".github/workflows/live-current-check.yml was cut in #154; the "
+            "hourly cadence lives on install/live-current-check.timer — do "
+            "not resurrect the workflow",
+        )
         timer = TIMER.read_text()
         self.assertIn("[Timer]", timer)
         self.assertIn("OnCalendar=", timer)
