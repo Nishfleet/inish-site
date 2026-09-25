@@ -1,12 +1,11 @@
 # The test gate for pull requests.
 #
-# main became protected on 2026-08-08 requiring only `classify` - the review-gate
-# labeller, which passes regardless of whether the code works. With Phase 3
-# auto-merge armed, that let a green-looking PR land untested. This workflow adds
-# the real gate: the repository's own test suites - the Python unittest suite
+# main requires this job (`test`) plus `Gitleaks` via the repo ruleset
+# `main-required-checks`. This workflow is the real gate: the repository's own
+# test suites - the Python unittest suite
 # AND the Node test suite (tests/test_middleware_deny.test.mjs proves the
 # middleware deny branch behaviorally; omitting it keeps CI green when the deny
-# branch is disabled). Keep the job name `test` stable; branch protection
+# branch is disabled). Keep the job name `test` stable; the ruleset
 # requires it by exact name.
 name: Tests
 
