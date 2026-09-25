@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 POLICY = ROOT / "functions" / "policy.js"
 MIDDLEWARE = ROOT / "functions" / "_middleware.js"
 WORKER = ROOT / "worker.js"
-DEPLOY_SCRIPT = ROOT / "scripts" / "deploy_daily.sh"
+ASSETSIGNORE = ROOT / ".assetsignore"
 CONTRACT = ROOT / "public-paths.json"
 REDIRECTS_FILE = ROOT / "_redirects"
 PAGE_404 = ROOT / "404.html"
@@ -66,36 +66,15 @@ def _load_contract():
 
 
 def _payload_root_files():
-    """The root files on deploy_daily.sh's payload copy line.
-
-    The deploy derives this list from public-paths.json (the route contract
-    is the single source of truth for the public surface) plus the edge-
-    internal 404.html and _redirects. The static regex used to scan a hand-
-    written cp line no longer matches: the list is built at runtime via a
-    jq loop over publicPaths, so this function reads the same derivation
-    directly. A regression that puts a manual root-file cp line back in the
-    deploy script is caught by the assertion at the top of the function."""
-    script = DEPLOY_SCRIPT.read_text()
-    if ".publicPaths" not in script:
-        raise AssertionError(
-            f"{DEPLOY_SCRIPT.name} must derive the root payload from public-paths.json"
-        )
-    if "$SNAPSHOT_ROOT/index.html" in script:
-        raise AssertionError(
-            f"{DEPLOY_SCRIPT.name} has a manual root-file cp line; "
-            f"the public surface must be derived from public-paths.json"
-        )
-    contract = json.loads(CONTRACT.read_text())
-    files = []
-    for path in contract["publicPaths"]:
-        if path == "/":
-            files.append("index.html")
-            continue
-        bare = path.lstrip("/")
-        if "/" not in bare:
-            files.append(bare)
-    files += ["404.html", "_redirects"]
-    return sorted(set(files))
+    """The root files wrangler uploads: the `!name` lines in .assetsignore
+    that name a root file. The file must start by ignoring everything (`*`)
+    and must re-allow the fonts/ directory."""
+    lines = [l.strip() for l in ASSETSIGNORE.read_text().splitlines() if l.strip()]
+    if lines[0] != "*":
+        raise AssertionError(".assetsignore must start with `*`")
+    if "!fonts/" not in lines or "!fonts/**" not in lines:
+        raise AssertionError(".assetsignore must re-allow fonts/ and fonts/**")
+    return sorted({l[1:] for l in lines if l.startswith("!") and "/" not in l})
 
 
 def _deployed_public_surface():
@@ -162,10 +141,10 @@ class MiddlewareContractTests(unittest.TestCase):
     def test_allowlist_is_exactly_the_deployed_surface(self):
         # Exact equality is the narrowness guard, anchored on real artifacts
         # instead of a literal: the allowlist must be exactly the public files
-        # the deploy payload ships — the root files on deploy_daily.sh's copy
-        # line (minus the edge-internal 404.html/_redirects) plus the license
+        # the deploy payload ships — the root files .assetsignore allows (minus
+        # the edge-internal 404.html/_redirects) plus the license
         # text that ships inside fonts/. A path addition needs the data edit
-        # and the file on the copy line, never a test edit.
+        # and the file's line in .assetsignore, never a test edit.
         self.assertEqual(self.public_paths, _deployed_public_surface())
 
     def test_every_public_path_names_a_real_file(self):

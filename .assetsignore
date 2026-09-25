@@ -1,0 +1,17 @@
+*
+!index.html
+!app.js
+!styles.css
+!apple-touch-icon.png
+!og-image.svg
+!og-image.png
+!latest.json
+!feed.xml
+!robots.txt
+!sitemap.xml
+!llms.txt
+!about.html
+!404.html
+!_redirects
+!fonts/
+!fonts/**
