@@ -1,7 +1,7 @@
 # JSON feed — `/latest.json`
 
 The canonical machine-readable feed for the current edition. Built by
-`scripts/build_daily.py` and written to `public/latest.json` at publish
+`inish_daily/build_daily.py` and written to `public/latest.json` at publish
 time. The old `/daily/latest.json` URL 301s to this path.
 
 ## How users reach it

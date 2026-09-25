@@ -11,7 +11,7 @@
 // The route DATA — the publicPaths allowlist, the font pattern, the redirects,
 // the HSTS value, and the canonical origin — has ONE source of truth:
 // public-paths.json. worker.js and this file both read it, and
-// scripts/verify_live.py plus the test suite derive their expectations from
+// inish_daily/verify_live.py plus the test suite derive their expectations from
 // it, so adding a public path is a single data edit instead of a multi-file
 // contract change. This module derives the constants from that file and
 // exposes the decision as a pure function; the render of `decide()` is the

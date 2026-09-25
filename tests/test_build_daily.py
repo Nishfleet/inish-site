@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-import scripts.build_daily as builder
+import inish_daily.build_daily as builder
 
 # Deliberately varied: the validator rejects editions whose stories share
 # phrasing, so the fixture cannot be a single template repeated N times.

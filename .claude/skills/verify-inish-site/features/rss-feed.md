@@ -1,7 +1,7 @@
 # RSS feed — `/feed.xml`
 
 The single-item RSS 2.0 feed for the current edition. Built by
-`scripts/build_daily.py` from the same stories the index page renders
+`inish_daily/build_daily.py` from the same stories the index page renders
 and written to the deployed `public/feed.xml` at publish time. The
 old `/daily/feed.xml` URL 301s to this path.
 
@@ -49,6 +49,6 @@ only, not a rolling list.
 ## Local honesty note
 
 The local 200 on `/feed.xml` is a real worker-driven 200. The live
-verifier (`scripts/verify_live.py`) byte-compares the live `feed.xml`
+verifier (`inish_daily/verify_live.py`) byte-compares the live `feed.xml`
 against the accepted `feed.xml` and reports a precise diff on any
 mismatch — never a generic byte difference.

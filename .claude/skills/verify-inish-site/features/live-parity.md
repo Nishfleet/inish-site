@@ -1,4 +1,4 @@
-# Live parity — `scripts/verify_live.py`
+# Live parity — `inish_daily/verify_live.py`
 
 The byte-level proof the worker gate + asset binding + feeds match the accepted edition.
 
@@ -12,7 +12,7 @@ SNAPSHOT_ROOT="$(mktemp -d)"
 git -C /home/nish/workspaces/products/inish-site archive --format=tar origin/main \
     | tar -x -C "$SNAPSHOT_ROOT"
 EDITION_DATE="$(jq -er '.date' "$SNAPSHOT_ROOT/latest.json")"
-python3 scripts/verify_live.py \
+python3 -m inish_daily.verify_live \
     --root "$SNAPSHOT_ROOT" --edition-date "$EDITION_DATE" --commit "$ACCEPTED_SHA"
 rm -rf "$SNAPSHOT_ROOT"
 ```

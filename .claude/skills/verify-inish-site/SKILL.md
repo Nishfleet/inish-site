@@ -66,7 +66,7 @@ PID=<pid> BASE_URL=http://127.0.0.1:<port>/ TEMPDIR=<path>
 
 ### Secondary — real production edge (live E2E)
 
-For a live probe the harness uses `scripts/verify_live.py` directly:
+For a live probe the harness uses `inish_daily/verify_live.py` directly:
 
 ```bash
 ACCEPTED_SHA="$(git -C /home/nish/workspaces/products/inish-site rev-parse origin/main)"
@@ -74,7 +74,7 @@ SNAPSHOT_ROOT="$(mktemp -d)"
 git -C /home/nish/workspaces/products/inish-site archive --format=tar origin/main \
     | tar -x -C "$SNAPSHOT_ROOT"
 EDITION_DATE="$(jq -er '.date' "$SNAPSHOT_ROOT/latest.json")"
-python3 scripts/verify_live.py \
+python3 -m inish_daily.verify_live \
     --root "$SNAPSHOT_ROOT" --edition-date "$EDITION_DATE" --commit "$ACCEPTED_SHA"
 rm -rf "$SNAPSHOT_ROOT"
 ```
@@ -159,7 +159,7 @@ Two drive styles:
   `https://inish.in/` (live). Local exposes every allow + redirect +
   deny path; live exposes the `/` body and the apex canonicalize
   redirect that local loopback bypasses.
-- **Live verifier drive** — `python3 scripts/verify_live.py` against a
+- **Live verifier drive** — `python3 -m inish_daily.verify_live` against a
   pristine origin/main snapshot. The byte-level proof the workergate
   + asset binding + feeds match the accepted edition; this is the
   same check the VPS timer runs every hour.

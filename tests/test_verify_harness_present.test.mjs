@@ -40,7 +40,7 @@ const SKILL_PATH = ".claude/skills/verify-inish-site/SKILL.md";
 const FEATURES_DIR = ".claude/skills/verify-inish-site/features";
 const LAUNCH_SCRIPT = "scripts/launch_local.sh";
 const INPROCESS_TEST = "tests/test_worker_edge.test.mjs";
-const LIVE_E2E = "scripts/verify_live.py";
+const LIVE_E2E = "inish_daily/verify_live.py";
 const POLICY_MODULE = "functions/policy.js";
 
 function repoExists(relativePath) {
@@ -162,7 +162,7 @@ test("harness: the in-process worker test the harness advertises still exists", 
 });
 
 test("harness: the live E2E script the harness advertises still exists", () => {
-  // The SKILL.md names scripts/verify_live.py as the live-edge byte
+  // The SKILL.md names inish_daily/verify_live.py as the live-edge byte
   // parity proof. A LAUNCH section that points at a missing script
   // is the exact class of regression this suite exists to catch.
   assert.ok(
