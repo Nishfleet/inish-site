@@ -163,8 +163,8 @@ def main() -> int:
 
     # Every public path must answer with the exact snapshot bytes: the identity
     # assets referenced by the generated head (the social share card and the
-    # iOS touch icon) are staged by deploy_daily.sh and allowed through the
-    # worker allowlist, but nothing verified they actually reached the live
+    # iOS touch icon) are included in the assets payload by .assetsignore and
+    # allowed through the worker allowlist, but nothing verified they actually reached the live
     # hostname; a deploy that dropped them again would have passed verification.
     byte_checks = {"/": "index.html"}
     for path in sorted(public_paths - {"/"}):

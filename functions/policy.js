@@ -52,8 +52,8 @@ export const hstsHeader = routeContract.hstsHeader;
 // reason HSTS does — one edit in public-paths.json, never mirrored literals.
 export const securityHeaders = Object.entries(routeContract.securityHeaders);
 
-// The branded 404 page ships as /404.html in the deploy payload (staged beside
-// index.html by deploy_daily.sh). The edge reads it through the ASSETS binding
+// The branded 404 page ships as /404.html in the deploy payload (allowed beside
+// index.html by .assetsignore). The edge reads it through the ASSETS binding
 // using this URL — derived from canonicalOrigin so a host change or a rename
 // of the asset are single edits to public-paths.json instead of mirrored
 // literals in both edge sources. The hostname in an internally constructed

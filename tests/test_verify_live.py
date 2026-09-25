@@ -529,25 +529,5 @@ class MiddlewareContractTests(unittest.TestCase):
         self.assertIn("/daily/", ROUTE_CONTRACT["redirects"])
 
 
-class DeployScriptContractTests(unittest.TestCase):
-    SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "deploy_daily.sh"
-
-    def test_notification_comes_only_after_successful_verification(self):
-        script = self.SCRIPT.read_text()
-        self.assertEqual(script.count("hermes send"), 1)
-        self.assertLess(script.index("scripts/verify_live.py"), script.index("hermes send"))
-        self.assertLess(script.index("hermes send"), script.index("verified_live"))
-
-    def test_failure_path_prints_the_specific_stage_and_never_notifies(self):
-        script = self.SCRIPT.read_text()
-        self.assertIn("Failing stage", script)
-        stage_printed = script.index('"$VERIFY_STAGE"')
-        self.assertGreater(stage_printed, script.index("done"))
-        self.assertGreater(script.index("left untouched"), stage_printed)
-        # The only hermes call sits above the failure path, so a failed
-        # verification cannot reach it.
-        self.assertLess(script.index("hermes send"), script.index("Failing stage"))
-
-
 if __name__ == "__main__":
     unittest.main()

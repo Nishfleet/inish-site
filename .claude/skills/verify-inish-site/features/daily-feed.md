@@ -49,9 +49,8 @@ grep -c '<title>Nish&#x27;s Daily Reads' /tmp/verify-inish-local-feed.html
 grep -c 'class="story ' /tmp/verify-inish-local-feed.html
 ```
 
-This is the same byte stream the deploy script copies into the
-payload under `DEPLOY_ROOT/public/index.html` (see
-`scripts/deploy_daily.sh`). The live verifier (`scripts/verify_live.py`)
+This is the same byte stream `wrangler deploy` uploads as the
+`/index.html` asset (see `.assetsignore`). The live verifier (`scripts/verify_live.py`)
 byte-compares this file against the live response.
 
 ## What proves success

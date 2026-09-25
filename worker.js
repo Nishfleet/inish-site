@@ -44,8 +44,8 @@ function withSecurityHeaders(response) {
   });
 }
 
-// The branded 404 page ships in the assets payload as /404.html (staged by
-// deploy_daily.sh beside index.html) and is served through the ASSETS binding,
+// The branded 404 page ships in the assets payload as /404.html (allowed by
+// .assetsignore beside index.html) and is served through the ASSETS binding,
 // so the edge never embeds markup. The hostname in an internally constructed
 // asset URL is ignored; the path is what matches. Unknown paths keep their 404
 // status, the asset body is streamed rather than buffered, HEAD requests stay
