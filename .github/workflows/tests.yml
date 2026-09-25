@@ -45,3 +45,23 @@ jobs:
         # (Node runs the glob itself; the directory form would be treated as
         # a module entry point.)
         run: node --test "tests/**/*.test.mjs"
+
+  # no-glue: the shared fleet gate (fleet-ops#8756). One composite action in
+  # Nishfleet/fleet-ops; a job named `no-glue` invokes it as a step so the
+  # check context is exactly `no-glue` for the main-required-checks ruleset.
+  # inish_daily/** and tests/** carry this repo's own .py/.mjs code and are
+  # passed as extra-allowed; script dirs and shell extensions stay banned.
+  # The inherited scripts/launch_local.sh is grandfathered — the gate only
+  # fails on ADDED files.
+  no-glue:
+    name: no-glue
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: Nishfleet/fleet-ops/.github/actions/no-glue@main
+        with:
+          extra-allowed: "inish_daily/** tests/**"
