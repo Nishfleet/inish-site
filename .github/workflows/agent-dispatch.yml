@@ -14,7 +14,7 @@ on:
   pull_request_target:
     types: [dequeued, auto_merge_disabled]
   workflow_run:
-    workflows: [CI]
+    workflows: ["Tests"]
     types: [completed]
   schedule:
     - cron: '17 */6 * * *'
