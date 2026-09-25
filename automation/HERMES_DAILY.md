@@ -19,34 +19,6 @@ Publish one source-backed edition to `https://inish.in/`, then send Nish the ver
    - The wrapper relocates its npm cache and Wrangler log directory into its own per-run temp directory when the home-directory defaults (`~/.npm`, `~/.wrangler/logs`) are not writable, and retries a transiently failing deploy up to three times. This VPS's recurring read-only-FS episodes are a host condition the wrapper is built to ride out, so do not preflight-block the deploy on the writability of those default paths — run the wrapper and judge the run only by `verified_live` or the named failing stage. If the deploy stage does fail, do not edit site code or editions to "fix" it: rerun `inish-publish-now` (or the next daily run) once the filesystem is writable again.
 9. Report success only when the deploy script prints `verified_live`. Otherwise report the exact failing stage without claiming publication.
 
-## Checking live parity without deploying
-
-`deploy_daily.sh` verifies only at deploy time, so a publisher run that never
-fires (a missed schedule, a stalled agent job) leaves the live hostname
-silently stale — a real stall lasted 32 hours on 2026-08-10 while merged head
-metadata and a mobile fix sat undelivered. `scripts/check_live_current.sh`
-closes that blind spot: it fetches `origin/main` fresh, snapshots it, and runs
-the full `verify_live.py` parity suite against the live hostname without
-deploying or touching any token. It prints `verified_live_current` when live
-matches origin/main, or `LIVE_IS_STALE` with the named failing files and routes
-otherwise. Run it before trusting that a merged change reached the site.
-
-The repo also schedules it: the `Live current check` workflow
-(`.github/workflows/live-current-check.yml`) runs it on the VPS self-hosted
-runner with no secrets, and can be triggered by hand from the Actions tab
-(`workflow_dispatch`). A stale check reds that run with `LIVE_IS_STALE`; the
-fix is still a deploy, not a code edit.
-
-The hourly sweep itself does not depend on GitHub scheduling: GitHub's
-`schedule` events are delivered late or not at all for hours at a time
-(recurring since 2026-08-10, with 7+ hour silent gaps), so the hourly cadence
-runs as a systemd timer on the VPS (`install/live-current-check.timer`,
-payload `scripts/run_live_current_check.sh`, installed as
-`/etc/systemd/system/live-current-check.{service,timer}`). The workflow is
-kept as the manual dispatch path; it no longer carries a `schedule` trigger.
-A failing sweep leaves the timer's unit failed; recover by deploying the
-accepted edition, then `sudo systemctl start live-current-check.service`.
-
 ## Who this is for
 
 One reader: Nish, a **non-technical founder**. He is building and selling products, not reading code. Write for him and nobody else.
