@@ -1,4 +1,0 @@
-{
-  "deploy_command": "npx --yes wrangler deploy",
-  "health_url": "https://inish.in/latest.json"
-}
