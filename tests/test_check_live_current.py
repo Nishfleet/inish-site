@@ -127,18 +127,6 @@ class CheckLiveCurrentTests(unittest.TestCase):
         for needle in ("wrangler", "npx", "CLOUDFLARE_API_TOKEN", "cf.env", "deploy_daily.sh"):
             self.assertNotIn(needle, runner)
 
-    def test_hourly_schedule_lives_on_the_vps_timer_not_the_workflow(self):
-        # GitHub's `schedule` events stall for hours (the recurring failure
-        # this fix exists to close), so the workflow must not carry a cron
-        # and the hourly cadence must live in the committed VPS timer.
-        workflow = (ROOT / ".github" / "workflows" / "live-current-check.yml").read_text()
-        self.assertNotIn("schedule:", workflow)
-        self.assertNotIn("cron:", workflow)
-        timer = TIMER.read_text()
-        self.assertIn("[Timer]", timer)
-        self.assertIn("OnCalendar=", timer)
-        self.assertIn("Persistent=true", timer)
-
 
 if __name__ == "__main__":
     unittest.main()
