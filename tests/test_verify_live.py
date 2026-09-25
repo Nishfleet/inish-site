@@ -8,8 +8,8 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
-import scripts.verify_live as verifier
-from scripts.verify_live import json_feed_mismatch, rss_feed_mismatch, without_cloudflare_beacon
+import inish_daily.verify_live as verifier
+from inish_daily.verify_live import json_feed_mismatch, rss_feed_mismatch, without_cloudflare_beacon
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -167,7 +167,7 @@ class FeedParityTests(unittest.TestCase):
         self.assertIn("not a valid single-item RSS", rss_feed_mismatch(local, b"<rss><channel>"))
 
 
-# The route contract mirrors scripts/verify_live.py's single source of truth
+# The route contract mirrors inish_daily/verify_live.py's single source of truth
 # (public-paths.json), so the mock hostname behaves like the real one for the
 # route checks that must keep working.
 ROUTE_CONTRACT = json.loads((ROOT / "public-paths.json").read_text())

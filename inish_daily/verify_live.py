@@ -229,7 +229,7 @@ def main() -> int:
         "/MEMORY.md",
         "/ERRORS.md",
         "/automation/HERMES_DAILY.md",
-        "/scripts/build_daily.py",
+        "/inish_daily/build_daily.py",
         "/tests/test_build_daily.py",
         f"/data/editions/{args.edition_date}.json",
         f"/data/candidates/{args.edition_date}.json",

@@ -3,7 +3,7 @@
 The anonymous marketing feed that IS the site. inish.in replaced the founder
 surface on 2026-08-03 (Nish); the feed at `/` is the only thing the
 homepage serves, and the page itself is the generator output from
-`scripts/build_daily.py`.
+`inish_daily/build_daily.py`.
 
 ## How users reach it
 
@@ -50,7 +50,7 @@ grep -c 'class="story ' /tmp/verify-inish-local-feed.html
 ```
 
 This is the same byte stream `wrangler deploy` uploads as the
-`/index.html` asset (see `.assetsignore`). The live verifier (`scripts/verify_live.py`)
+`/index.html` asset (see `.assetsignore`). The live verifier (`inish_daily/verify_live.py`)
 byte-compares this file against the live response.
 
 ## What proves success
