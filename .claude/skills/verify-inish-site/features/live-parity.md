@@ -1,38 +1,8 @@
-# Live parity — `scripts/verify_live.py` + `scripts/check_live_current.sh`
+# Live parity — `scripts/verify_live.py`
 
-The byte-level proof the workergate + asset binding + feeds match the
-accepted edition. This is the check the VPS hourly
-`live-current-check.timer` runs every hour on its own scheduler
-(PR #81 moved the cadence off GitHub's `schedule` events because
-they were delivered late or not at all for hours at a time,
-recurring since 2026-08-10).
-
-## How users reach it
-
-`scripts/check_live_current.sh` is the deploy-free, token-free parity
-check. It fetches `origin/main` into a private cache clone
-(`~/.cache/inish-live-current-check/main`), derives the accepted SHA
-from `FETCH_HEAD`, archives the snapshot, and runs
-`scripts/verify_live.py` against `https://inish.in/`. The verify
-byte-compares every public path against the snapshot and additionally
-compares `latest.json` and `feed.xml` whole against the accepted
-edition. A stale live site fails the run loudly with the observed
-date and story mismatch — never a generic byte difference.
-
-The systemd unit is `install/live-current-check.service` and the
-timer is `install/live-current-check.timer`. The wrapper is
-`scripts/run_live_current_check.sh`. The unit type is `oneshot` and
-the timer is hourly at `*:02`; an install path is `/etc/systemd/system/`.
+The byte-level proof the worker gate + asset binding + feeds match the accepted edition.
 
 ## How to drive it
-
-### Hourly VPS sweep (always running)
-
-```bash
-systemctl --user status live-current-check.timer
-journalctl -u live-current-check.service --since -1h | tail -20
-# Expect: status=0/SUCCESS with verified_live_current commit=<main HEAD>
-```
 
 ### Ad-hoc live probe
 
@@ -74,6 +44,4 @@ observed-vs-expected diff.
 but the byte-level feed parity is only provable against the live
 edge — the local binding's snapshot is staged from the same
 `origin/main` the verify script archives, so a `diff` between them
-would catch a contract drift the local launch would not. The VPS
-timer is the always-on watch; the ad-hoc probe is the on-demand
-override.
+would catch a contract drift the local launch would not.

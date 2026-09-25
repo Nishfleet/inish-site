@@ -66,9 +66,7 @@ PID=<pid> BASE_URL=http://127.0.0.1:<port>/ TEMPDIR=<path>
 
 ### Secondary — real production edge (live E2E)
 
-The VPS hourly `live-current-check.timer` runs `scripts/check_live_current.sh`
-against `https://inish.in/` on its own scheduler. For an ad-hoc live probe
-the harness uses `scripts/verify_live.py` directly:
+For a live probe the harness uses `scripts/verify_live.py` directly:
 
 ```bash
 ACCEPTED_SHA="$(git -C /home/nish/workspaces/products/inish-site rev-parse origin/main)"
