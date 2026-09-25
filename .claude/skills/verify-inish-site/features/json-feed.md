@@ -6,8 +6,7 @@ time. The old `/daily/latest.json` URL 301s to this path.
 
 ## How users reach it
 
-`GET https://inish.in/latest.json` — read by the live verifier, the
-deploy_daily.sh parity check, and any external feed consumer that
+`GET https://inish.in/latest.json` — read by the live verifier and any external feed consumer that
 prefers JSON over RSS.
 
 ## How to drive it

@@ -15,9 +15,8 @@ Publish one source-backed edition to `https://inish.in/`, then send Nish the ver
 5. Run `python3 scripts/build_daily.py`, `python3 -m unittest discover -s tests -v`, and `python3 -m py_compile scripts/build_daily.py`.
 6. Review the rendered page for the candidate proof, empty copy, duplicates, unsupported claims, functional filters, and broken source URLs.
 7. Commit only the edition and generated root feed files with `daily: publish YYYY-MM-DD`, then push `main`.
-8. Run `scripts/deploy_daily.sh`. It deploys the accepted `origin/main` edition via Cloudflare Workers (fleet token at `~/.config/fleet-console/cf.env`) from a pristine snapshot of `origin/main` (fetched fresh inside the script), so the workdir may be on any branch — the deploy payload and live verification both read from that snapshot, never from local files. The only freshness gate is a loud refusal when the accepted edition is older than the edition the live hostname serves (the site is never rolled back). It sends Nish the verified Telegram link only after every check passes.
-   - The wrapper relocates its npm cache and Wrangler log directory into its own per-run temp directory when the home-directory defaults (`~/.npm`, `~/.wrangler/logs`) are not writable, and retries a transiently failing deploy up to three times. This VPS's recurring read-only-FS episodes are a host condition the wrapper is built to ride out, so do not preflight-block the deploy on the writability of those default paths — run the wrapper and judge the run only by `verified_live` or the named failing stage. If the deploy stage does fail, do not edit site code or editions to "fix" it: rerun `inish-publish-now` (or the next daily run) once the filesystem is writable again.
-9. Report success only when the deploy script prints `verified_live`. Otherwise report the exact failing stage without claiming publication.
+8. Pushing `main` deploys: the `Deploy production` workflow runs `npx --yes wrangler deploy` (`.github/deploy-config.json`) once the push is green. Wait for that run to finish green.
+9. Verify live from a clean `main` checkout: `python3 scripts/verify_live.py --root . --edition-date YYYY-MM-DD --commit <pushed SHA>`. Report success and send Nish the live link on Telegram only when it exits 0; otherwise report the exact failing stage without claiming publication.
 
 ## Who this is for
 
