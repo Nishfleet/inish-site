@@ -22,8 +22,8 @@ The property under test is the workflow FILE, not the suites:
    fall outside CI, which is exactly the defect class this suite exists to
    catch.
 
-Parser honesty: this is a conservative line-based reader, not a YAML parser,
-mirroring tests/test_review_gate_classify.py. It guarantees the properties
+Parser honesty: this is a conservative line-based reader, not a YAML parser.
+It guarantees the properties
 above only for plain, non-anchored, non-templated YAML like this repository's
 workflow files. It cannot follow YAML anchors or merge keys, cannot evaluate
 `${{ }}` templating, and would misread a workflow that duplicated the test job
