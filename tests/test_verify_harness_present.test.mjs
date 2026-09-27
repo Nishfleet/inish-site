@@ -141,8 +141,9 @@ test("harness: LAUNCH points at npm run dev and its committed config", () => {
   );
   // package.json's dev script must be the exact command SKILL.md
   // advertises — the flag set is load-bearing: dropping --persist-to
-  // reload-loops the server (its state writes land inside the watched
-  // repo-root asset directory), and changing --port silently diverges
+  // reload-loops the server (its state dir lands at
+  // .local-e2e-template/.wrangler/state inside the watched repo-root
+  // asset tree — observed), and changing --port silently diverges
   // the SKILL.md probes from the launch. An includes() check that names
   // only the config path would pass while the launch is broken.
   const scripts = JSON.parse(

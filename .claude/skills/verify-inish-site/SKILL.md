@@ -5,7 +5,8 @@ description: Launch, health-check, drive, and prove the inish.in edge (Nish's Da
 
 inish.in (repo `inish-site`) is a static HTML/CSS/JS feed served by a single
 Cloudflare Worker (`worker.js`) on `workers.dev` + the `inish.in` apex, with
-asset binding `ASSETS` rooted at the deployed `public/` directory. The
+asset binding `ASSETS` rooted at the repo root (`assets.directory`
+`"./"`), filtered by `.assetsignore` down to the deployed payload. The
 public route contract — `publicPaths`, `fontPath`, `redirects`, `hstsHeader`,
 `securityHeaders` — has one source of truth: `public-paths.json`. `worker.js`
 and the kept-in-sync Pages mirror `functions/_middleware.js` both import
@@ -25,13 +26,13 @@ npm run dev > /tmp/verify-inish-site.log 2>&1 &
 echo $! > /tmp/verify-inish-site.pid
 ```
 
-`npm run dev` runs `npx --yes wrangler dev --config .local-e2e-template/wrangler.local.jsonc --ip 127.0.0.1 --port 4891 --persist-to /tmp/verify-inish-site-state`. That config's `main` is `.local-e2e-template/worker-local.js`, a URL-rewrite shim that imports the production `worker.js` and re-emits each loopback request with a `https://inish.in/` URL so `canonicalize()` accepts it. Its asset directory is the repo root, filtered by `.assetsignore` to exactly the deployed payload. It has no apex routes and stages nothing. `--persist-to` keeps wrangler's local state outside the repo: the asset watcher ignores nothing, so state writes inside the watched directory would reload-loop the server forever.
+`npm run dev` runs `npx --yes wrangler dev --config .local-e2e-template/wrangler.local.jsonc --ip 127.0.0.1 --port 4891 --persist-to /tmp/verify-inish-site-state`. That config's `main` is `.local-e2e-template/worker-local.js`, a URL-rewrite shim that imports the production `worker.js` and re-emits each loopback request with a `https://inish.in/` URL so `canonicalize()` accepts it. Its asset directory is the repo root, filtered by `.assetsignore` to exactly the deployed payload. It has no apex routes and stages nothing. `--persist-to` is load-bearing, not cosmetic: the dev watcher reloads on in-tree writes, and without it the state dir lands at `.local-e2e-template/.wrangler/state` inside the watched repo-root asset tree — observed behavior is a `Reloading local server` loop that never settles. With the flag, the only in-tree writes are one-time startup bundle tmp dirs the server settles past.
 
 - BASE_URL is `http://127.0.0.1:4891/`.
 - Readiness: poll `curl -fsS http://127.0.0.1:4891/about.html` every 500ms for up to 90s until it returns 200. Probe `/about.html`, not `/` (see EVIDENCE / Known local divergences). The feed surfaces (`/feed.xml`, `/latest.json`, `/sitemap.xml`, `/llms.txt`, `/about.html`, the fonts, the raster social card) all serve 200 once the worker is listening.
 - Redirects answer with the canonical `https://inish.in/` origin in `Location` (see `features/legacy-redirects.md`).
 - Loopback only — never expose this to a non-loopback interface.
-- One local launch per host: port 4891 and the `/tmp/verify-inish-site.*` paths are fixed and shared. If `ss -tlnp | grep -F ":4891 "` already shows a listener, another worktree's server owns it — reuse it or wait; never clear it by name-matching (see CLEANUP). If the recorded PID exits before readiness, read the log instead of polling dead air for 90s.
+- One local launch per host: port 4891 and the `/tmp/verify-inish-site.*` paths are fixed and shared. If `ss -tlnp | grep -F ":4891 "` already shows a listener, another worktree's server owns it — wait for it to exit; probing it would verify foreign code, and it must never be cleared by name-matching (see CLEANUP). If the recorded PID exits before readiness, read the log instead of polling dead air for 90s.
 
 ### Secondary — real production edge (live E2E)
 
@@ -126,8 +127,8 @@ Two drive styles:
 
 - **HTTP drive** — curl against the loopback server (local) or
   `https://inish.in/` (live). Local exposes every allow + redirect +
-  deny path; live exposes the `/` body and the apex canonicalize
-  redirect that local loopback bypasses.
+  deny path and the `/` body; live adds the apex canonicalize
+  redirect that the local shim bypasses.
 - **Live verifier drive** — `python3 -m inish_daily.verify_live` against a
   pristine origin/main snapshot. The byte-level proof the workergate
   + asset binding + feeds match the accepted edition; this is the
@@ -178,11 +179,13 @@ fetch, so `html_handling: "none"` (which only stops the binding's own
   `features/daily-feed.md` documents how to drive the feed locally via
   `git show origin/main:index.html` and how to drive it live via
   `curl https://inish.in/`.
-- The local 301 to `https://inish.in/about.html` is the worker telling
-  loopback clients to follow the apex. The local shim accepts
-  loopback (so the worker proceeds) but the production worker still
-  emits the 301 when the test reaches it without the shim. The
-  harness never relies on the 301 going to the live site.
+- Local redirect `Location` values are apex-absolute — `/index.html`
+  301s to `https://inish.in/` — because the shim rewrites the request
+  URL before the worker sees it, so the worker's own canonicalize
+  redirect never fires locally and the redirect map resolves against
+  the rewritten origin. Following a local `Location` leaves the
+  loopback sandbox for the live site, so the harness records
+  `%{redirect_url}` instead of following.
 
 Store evidence OUTSIDE the repo tree. Cleanup never deletes the
 captured HTML, JSON, RSS, headers, or the wrangler log.
