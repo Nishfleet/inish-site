@@ -54,7 +54,7 @@ The full deny sample set is in `tests/test_worker_edge.test.mjs`'s
 ## Local honesty note
 
 The local deny probe is a real worker-driven 404 with the real
-branded 404 body — the local binding serves the staged `404.html`
+branded 404 body — the local binding serves the repo-root `404.html`
 through the asset binding the same way the live binding does.
 A `pkill` of the worker (or a `wrangler dev` restart) does not
 change the deny path; the deny branch is a pure function of

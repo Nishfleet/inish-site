@@ -31,6 +31,7 @@ echo $! > /tmp/verify-inish-site.pid
 - Readiness: poll `curl -fsS http://127.0.0.1:4891/about.html` every 500ms for up to 90s until it returns 200. Probe `/about.html`, not `/` (see EVIDENCE / Known local divergences). The feed surfaces (`/feed.xml`, `/latest.json`, `/sitemap.xml`, `/llms.txt`, `/about.html`, the fonts, the raster social card) all serve 200 once the worker is listening.
 - Redirects answer with the canonical `https://inish.in/` origin in `Location` (see `features/legacy-redirects.md`).
 - Loopback only — never expose this to a non-loopback interface.
+- One local launch per host: port 4891 and the `/tmp/verify-inish-site.*` paths are fixed and shared. If `ss -tlnp | grep -F ":4891 "` already shows a listener, another worktree's server owns it — reuse it or wait; never clear it by name-matching (see CLEANUP). If the recorded PID exits before readiness, read the log instead of polling dead air for 90s.
 
 ### Secondary — real production edge (live E2E)
 
@@ -112,7 +113,7 @@ Per-feature steps live in `features/`:
 
 | Feature | File |
 | --- | --- |
-| Daily feed `/` (live only — local 404s, see EVIDENCE) | `features/daily-feed.md` |
+| Daily feed `/` (proof via live curl or deployed source — see EVIDENCE) | `features/daily-feed.md` |
 | About page `/about.html` | `features/about-page.md` |
 | RSS feed `/feed.xml` | `features/rss-feed.md` |
 | JSON feed `/latest.json` | `features/json-feed.md` |
@@ -203,4 +204,6 @@ ss -tlnp | grep -F ":4891 "  # must print nothing
   `*.tsbuildinfo`, and `worker-configuration.d.ts` untouched. This
   harness never runs `npm install` or any build step.
 - Cleanup preserves evidence. Teardown never deletes the captured
-  HTML, JSON, RSS, headers, or the wrangler log.
+  HTML, JSON, RSS, headers, or the wrangler log — but a later
+  `npm run dev` relaunch truncates `/tmp/verify-inish-site.log`, so
+  copy evidence out before relaunching.
