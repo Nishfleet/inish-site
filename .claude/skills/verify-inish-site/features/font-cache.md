@@ -57,5 +57,6 @@ The local font cache is identical to live: same `worker.js`, same
 `policy.js`, same `fontPath` regex. The wrangler default
 preserves the spaces the worker emits, so a local probe and a
 live probe of the same path return the same `Cache-Control` value.
-A `wrangler dev --local` that strips or rewrites this header would
-be a wrangler bug to report upstream, not a harness regression.
+A `wrangler dev` (local by default) that strips or rewrites this
+header would be a wrangler bug to report upstream, not a harness
+regression.

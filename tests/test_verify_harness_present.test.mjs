@@ -139,14 +139,23 @@ test("harness: LAUNCH points at npm run dev and its committed config", () => {
     repoExists(LAUNCH_CONFIG),
     `LAUNCH contract needs ${LAUNCH_CONFIG} on disk`
   );
-  // package.json's dev script must point at the committed config — a dev
-  // script that names a different config (or none) defeats the harness.
+  // package.json's dev script must be the exact command SKILL.md
+  // advertises — the flag set is load-bearing: dropping --persist-to
+  // reload-loops the server (its state writes land inside the watched
+  // repo-root asset directory), and changing --port silently diverges
+  // the SKILL.md probes from the launch. An includes() check that names
+  // only the config path would pass while the launch is broken.
   const scripts = JSON.parse(
     readFileSync(resolve(repoRoot, "package.json"), "utf8")
   ).scripts;
   assert.ok(
-    scripts.dev.includes(LAUNCH_CONFIG),
-    `package.json scripts.dev must reference ${LAUNCH_CONFIG}`
+    typeof scripts.dev === "string",
+    "package.json must define a scripts.dev launch command"
+  );
+  assert.equal(
+    scripts.dev,
+    `npx --yes wrangler dev --config ${LAUNCH_CONFIG} --ip 127.0.0.1 --port 4891 --persist-to /tmp/verify-inish-site-state`,
+    "package.json scripts.dev must be the exact launch command SKILL.md names"
   );
   // The SKILL.md must name the start command — a LAUNCH section that
   // describes a different start command (or none) defeats the harness.

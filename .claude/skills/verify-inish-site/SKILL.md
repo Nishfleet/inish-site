@@ -169,7 +169,7 @@ in a transcript is not proof.
 **Known local divergences.** The local wrangler binding differs from
 the live binding on `/`:
 
-- Local `wrangler dev --local` with `html_handling: "none"` serves only
+- Local `npm run dev` (wrangler dev, local by default) with `html_handling: "none"` serves only
   literal asset paths; `GET /` returns 404 from the asset binding, then
   the worker would 301 to `/index.html` (the policy redirects map
   points `/index.html` to `/`), so `/` is unreachable in the local
