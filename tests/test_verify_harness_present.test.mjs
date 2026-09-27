@@ -14,8 +14,9 @@
 // this repo before the next heartbeat tick would have noticed.
 //
 // The harness being pinned here is itself the in-process proof — the
-// SKILL.md, the features/ map, the LAUNCH script, and the in-process
-// worker test together make the "did we keep the harness on HEAD?"
+// SKILL.md, the features/ map, the LAUNCH command (`npm run dev` and its
+// committed config), and the in-process worker test together make the
+// "did we keep the harness on HEAD?"
 // question a one-line grep instead of a stand-up ask. fleet-ops#963
 // (a stale re-firing of fleet-ops#770) is the gap this test was added
 // against: a canary tick that landed 45 seconds after PR #138 merged,
@@ -38,7 +39,7 @@ const REQUIRED_HEADINGS = ["LAUNCH", "DOCTOR", "DRIVE", "EVIDENCE", "CLEANUP"];
 
 const SKILL_PATH = ".claude/skills/verify-inish-site/SKILL.md";
 const FEATURES_DIR = ".claude/skills/verify-inish-site/features";
-const LAUNCH_SCRIPT = "scripts/launch_local.sh";
+const LAUNCH_CONFIG = ".local-e2e-template/wrangler.local.jsonc";
 const INPROCESS_TEST = "tests/test_worker_edge.test.mjs";
 const LIVE_E2E = "inish_daily/verify_live.py";
 const POLICY_MODULE = "functions/policy.js";
@@ -128,21 +129,31 @@ test("harness: features/ map is a non-empty directory of .md files", () => {
   }
 });
 
-test("harness: LAUNCH points at the deterministic local launch script", () => {
+test("harness: LAUNCH points at npm run dev and its committed config", () => {
   // The standing rule says LAUNCH must name the exact start command. The
-  // shipped launch script is the only one in the repo: it stages a temp
-  // dir, rewrites canonicalOrigin to loopback, and probes /about.html.
-  // If the script goes away, the LAUNCH section's promise is broken.
+  // launch is `npm run dev`, a package.json script that runs wrangler dev
+  // on the committed .local-e2e-template/wrangler.local.jsonc. If the
+  // config or the package.json script goes away, the LAUNCH section's
+  // promise is broken.
   assert.ok(
-    repoExists(LAUNCH_SCRIPT),
-    `LAUNCH contract needs ${LAUNCH_SCRIPT} on disk`
+    repoExists(LAUNCH_CONFIG),
+    `LAUNCH contract needs ${LAUNCH_CONFIG} on disk`
   );
-  // The SKILL.md must reference the script — a LAUNCH section that
+  // package.json's dev script must point at the committed config — a dev
+  // script that names a different config (or none) defeats the harness.
+  const scripts = JSON.parse(
+    readFileSync(resolve(repoRoot, "package.json"), "utf8")
+  ).scripts;
+  assert.ok(
+    scripts.dev.includes(LAUNCH_CONFIG),
+    `package.json scripts.dev must reference ${LAUNCH_CONFIG}`
+  );
+  // The SKILL.md must name the start command — a LAUNCH section that
   // describes a different start command (or none) defeats the harness.
   const body = readSkillBody();
   assert.ok(
-    body.includes("launch_local.sh"),
-    "LAUNCH section must name scripts/launch_local.sh as the start command"
+    body.includes("npm run dev"),
+    "LAUNCH section must name `npm run dev` as the start command"
   );
 });
 

@@ -18,51 +18,19 @@ a launch, and whoever ships a feature updates the matching file in
 
 ## LAUNCH
 
-### Primary — deterministic local Worker (use this)
+### Primary — local Worker via `npm run dev` (use this)
 
 ```bash
-scripts/launch_local.sh            # default port 4891
-# or
-scripts/launch_local.sh 4920       # custom port
+npm run dev > /tmp/verify-inish-site.log 2>&1 &
+echo $! > /tmp/verify-inish-site.pid
 ```
 
-What it does, in order:
+`npm run dev` runs `npx --yes wrangler dev --config .local-e2e-template/wrangler.local.jsonc --ip 127.0.0.1 --port 4891 --persist-to /tmp/verify-inish-site-state`. That config's `main` is `.local-e2e-template/worker-local.js`, a URL-rewrite shim that imports the production `worker.js` and re-emits each loopback request with a `https://inish.in/` URL so `canonicalize()` accepts it. Its asset directory is the repo root, filtered by `.assetsignore` to exactly the deployed payload. It has no apex routes and stages nothing. `--persist-to` keeps wrangler's local state outside the repo: the asset watcher ignores nothing, so state writes inside the watched directory would reload-loop the server forever.
 
-1. Lints `public-paths.json` (loud exit 1 on malformed JSON).
-2. Stages a temp working dir under `/tmp/verify-inish-site.XXXXXX/` with the
-   production `worker.js` byte-identical, the production
-   `functions/policy.js` byte-identical, and `public-paths.json` with
-   `canonicalOrigin` rewritten to `http://127.0.0.1:<port>/` via `jq`
-   (preserves field order and formatting).
-3. Copies `.local-e2e-template/worker-local.js` (a 30-line URL-rewrite shim
-   that imports the production worker and re-emits each loopback request
-   with a `https://inish.in/` URL so the worker's `canonicalize()` check
-   accepts it) and a stripped `wrangler.local.jsonc` (no apex routes, no
-   `workers_dev` preview flag).
-4. Mirrors the public payload into the temp `public/` directory
-   (root HTML, CSS, JS, fonts, the raster social share card, RSS/JSON/sitemap
-   feeds, the branded `/404.html`, `_redirects`).
-5. Runs `npx wrangler dev --local` in the temp dir. The runtime listens on
-   `127.0.0.1:<port>` and serves from the staged asset directory.
-6. Probes `http://127.0.0.1:<port>/about.html` every 500ms for up to 90s.
-   The probe is the asset-served 200 path, NOT the root, because the local
-   binding has the same `html_handling: "none"` as production but does not
-   serve the `index.html` content for `/` the way the live binding does (see
-   EVIDENCE / Known local divergences).
-
-Output is one machine-readable line:
-
-```
-PID=<pid> BASE_URL=http://127.0.0.1:<port>/ TEMPDIR=<path>
-```
-
-- Readiness: `curl -fsS http://127.0.0.1:<port>/about.html` returns 200. The
-  feed surfaces (`/feed.xml`, `/latest.json`, `/sitemap.xml`,
-  `/llms.txt`, `/about.html`, the fonts, the raster social card) all
-  serve 200 the moment the worker is listening.
+- BASE_URL is `http://127.0.0.1:4891/`.
+- Readiness: poll `curl -fsS http://127.0.0.1:4891/about.html` every 500ms for up to 90s until it returns 200. Probe `/about.html`, not `/` (see EVIDENCE / Known local divergences). The feed surfaces (`/feed.xml`, `/latest.json`, `/sitemap.xml`, `/llms.txt`, `/about.html`, the fonts, the raster social card) all serve 200 once the worker is listening.
+- Redirects answer with the canonical `https://inish.in/` origin in `Location` (see `features/legacy-redirects.md`).
 - Loopback only — never expose this to a non-loopback interface.
-- Always launched in the background with stdout+stderr captured to
-  `TEMPDIR/wrangler.log`; record the PID and the BASE_URL.
 
 ### Secondary — real production edge (live E2E)
 
@@ -175,8 +143,8 @@ the worker's own tests prove the deny branch is wired correctly:
 
 ## EVIDENCE
 
-**Worker log.** Captured launch log is at `TEMPDIR/wrangler.log`
-(machine-readable path on the launch line). The log is one line per
+**Worker log.** Captured launch log is at `/tmp/verify-inish-site.log`.
+The log is one line per
 request with status and latency, secrets redacted by the wrangler
 default; no log is shipped to stdout otherwise.
 
@@ -229,16 +197,12 @@ other worktrees (fleet-ops#533).
 
 ```bash
 kill -- -"$(ps -o pgid= -p "$(cat /tmp/verify-inish-site.pid)" | tr -d ' ')" 2>/dev/null
-ss -tlnp | grep -F ":$(cat /tmp/verify-inish-site.port) "  # must print nothing
-rm -rf "$(cat /tmp/verify-inish-site.tmpdir)"
+ss -tlnp | grep -F ":4891 "  # must print nothing
 ```
 
-- `.wrangler/e2e-state` is not used by this harness; `launch_local.sh`
-  stages state under `/tmp/verify-inish-site.XXXXXX/` and the trap
-  removes it on EXIT (or via the cleanup block above).
+- `npm run dev` stages no temp dir; `--persist-to /tmp/verify-inish-site-state` keeps wrangler's local state outside the repo (bundle tmp dirs still land under the git-ignored `.local-e2e-template/.wrangler/`).
 - Leave `.wrangler/state` (the developer's own local DB), `node_modules`,
   `*.tsbuildinfo`, and `worker-configuration.d.ts` untouched. This
-  harness never runs `npm install`, `npm run typecheck`, or any other
-  build step.
+  harness never runs `npm install` or any build step.
 - Cleanup preserves evidence. Teardown never deletes the captured
   HTML, JSON, RSS, headers, or the wrangler log.

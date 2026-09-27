@@ -22,10 +22,9 @@
 //   harness SKILL.md tells agents to probe a non-root path when they
 //   need an asset-served 200 locally.
 //
-// Lives under .local-e2e-template/ so the harness script copies it into
-// the temp work dir alongside the real worker. Never imported from the
-// production wrangler.jsonc.
-import productionWorker from "./worker.js";
+// Lives under .local-e2e-template/ beside wrangler.local.jsonc; `npm run dev`
+// serves it. Never imported from the production wrangler.jsonc.
+import productionWorker from "../worker.js";
 
 function rewriteRequestUrl(request) {
   const url = new URL(request.url);
