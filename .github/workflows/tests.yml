@@ -48,7 +48,7 @@ jobs:
 
       - name: No helper scripts
         # Regrowth gate (#160): this repo ships zero helper scripts.
-        run: test -z "$(git ls-files scripts bin tools ops .specify '*.sh')"
+        run: out=$(git ls-files scripts bin tools ops .specify '*.sh') && test -z "$out"
 
   # no-glue: the shared fleet gate (fleet-ops#8756). One composite action in
   # Nishfleet/fleet-ops; a job named `no-glue` invokes it as a step so the
