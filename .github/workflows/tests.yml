@@ -46,6 +46,10 @@ jobs:
         # a module entry point.)
         run: node --test "tests/**/*.test.mjs"
 
+      - name: No helper scripts
+        # Regrowth gate (#160): this repo ships zero helper scripts.
+        run: out=$(git ls-files scripts bin tools ops .specify '*.sh') && test -z "$out"
+
   # no-glue: the shared fleet gate (fleet-ops#8756). One composite action in
   # Nishfleet/fleet-ops; a job named `no-glue` invokes it as a step so the
   # check context is exactly `no-glue` for the main-required-checks ruleset.
