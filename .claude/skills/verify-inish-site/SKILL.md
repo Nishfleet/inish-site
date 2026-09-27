@@ -166,16 +166,14 @@ header. The full set is `Strict-Transport-Security`,
 observable state from its `features/` file, captured to files. A claim
 in a transcript is not proof.
 
-**Known local divergences.** The local wrangler binding differs from
-the live binding on `/`:
+**Known local divergences.** `GET /` returns 200 locally exactly as
+live — the worker rewrites `/` to `/index.html` before the asset
+fetch, so `html_handling: "none"` (which only stops the binding's own
+`/` -> `index.html` resolution) strands nothing. What differs:
 
-- Local `npm run dev` (wrangler dev, local by default) with `html_handling: "none"` serves only
-  literal asset paths; `GET /` returns 404 from the asset binding, then
-  the worker would 301 to `/index.html` (the policy redirects map
-  points `/index.html` to `/`), so `/` is unreachable in the local
-  launch even with the URL-rewrite shim. The live edge serves `/` with
-  200 (the live binding has the same `html_handling` flag but resolves
-  `/` to the deployed `index.html` content). The harness's
+- Readiness probes use `/about.html`, a literal asset path: it proves
+  the ASSETS binding serves the deployed payload without also
+  exercising the worker's `/` rewrite. The harness's
   `features/daily-feed.md` documents how to drive the feed locally via
   `git show origin/main:index.html` and how to drive it live via
   `curl https://inish.in/`.

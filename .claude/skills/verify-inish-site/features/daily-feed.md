@@ -70,7 +70,9 @@ byte-compares this file against the live response.
 ## Local honesty note
 
 With the `html_handling: "none"` flag the live binding uses, the local
-binding does not auto-resolve `/` to `index.html`. The SKILL.md EVIDENCE section
-documents the divergence; the harness never uses a local `/` 200 as
-proof the feed is wired correctly. The two paths above (live curl,
-deployed source from git) are the only things that prove the feed.
+binding does not auto-resolve `/` to `index.html`; the worker's own
+`/` -> `/index.html` rewrite serves it anyway, so local `/` returns
+200 just like live. The SKILL.md EVIDENCE section covers the remaining
+divergences; the harness never uses a local `/` 200 as proof the feed
+is wired correctly. The two paths above (live curl, deployed source
+from git) are the only things that prove the feed.

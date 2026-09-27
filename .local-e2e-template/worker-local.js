@@ -13,14 +13,11 @@
 //   preserved exactly so the deny/allow/redirect tree runs as it would
 //   for the live edge.
 //
-// Known local divergence (documented in the harness SKILL.md):
-//   With html_handling "none", the local wrangler dev binding serves
-//   only literal asset paths; "/" is not mapped to index.html. The
-//   live inish.in binding serves "/" with 200. A future fix on main
-//   would close the gap. The shim does not paper over it — the local
-//   launch reports what the local binding actually does, and the
-//   harness SKILL.md tells agents to probe a non-root path when they
-//   need an asset-served 200 locally.
+// Local/live parity on "/" (documented in the harness SKILL.md):
+//   the production worker rewrites "/" to "/index.html" before the
+//   asset fetch, so html_handling "none" strands nothing and "/" serves
+//   200 locally exactly as it does live. Probes still use a literal
+//   asset path (/about.html) to isolate the binding's own serving.
 //
 // Lives under .local-e2e-template/ beside wrangler.local.jsonc; `npm run dev`
 // serves it. Never imported from the production wrangler.jsonc.
