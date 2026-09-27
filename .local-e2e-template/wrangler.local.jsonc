@@ -1,0 +1,11 @@
+{
+  "name": "inish-site-local",
+  "main": "worker-local.js",
+  "compatibility_date": "2026-08-01",
+  "assets": {
+    "directory": "../",
+    "binding": "ASSETS",
+    "run_worker_first": ["/*"],
+    "html_handling": "none"
+  }
+}

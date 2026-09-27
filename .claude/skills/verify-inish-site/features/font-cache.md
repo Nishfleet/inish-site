@@ -13,7 +13,7 @@ from `/fonts` can ever receive this header.
 
 ```bash
 BASE=http://127.0.0.1:4891
-for face in archivo-700 archivo-400 archivo-italic-700 space-mono-700; do
+for face in archivo-700 archivo-400 archivo-400-italic space-mono-700; do
     cc=$(curl -sI "$BASE/fonts/${face}.woff2" \
         | awk 'tolower($1)=="cache-control:"{$1=""; sub(/^ /, ""); print}' \
         | tr -d '\r\n')
@@ -57,5 +57,6 @@ The local font cache is identical to live: same `worker.js`, same
 `policy.js`, same `fontPath` regex. The wrangler default
 preserves the spaces the worker emits, so a local probe and a
 live probe of the same path return the same `Cache-Control` value.
-A `wrangler dev --local` that strips or rewrites this header would
-be a wrangler bug to report upstream, not a harness regression.
+A `wrangler dev` (local by default) that strips or rewrites this
+header would be a wrangler bug to report upstream, not a harness
+regression.

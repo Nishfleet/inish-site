@@ -51,8 +51,7 @@ jobs:
   # check context is exactly `no-glue` for the main-required-checks ruleset.
   # inish_daily/** and tests/** carry this repo's own .py/.mjs code and are
   # passed as extra-allowed; script dirs and shell extensions stay banned.
-  # The inherited scripts/launch_local.sh is grandfathered — the gate only
-  # fails on ADDED files.
+  # The gate only fails on ADDED files.
   no-glue:
     name: no-glue
     runs-on: ubuntu-latest

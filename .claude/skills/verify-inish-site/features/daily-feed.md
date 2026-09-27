@@ -15,7 +15,8 @@ auth, no account.
 
 ### Live (the only path that proves the full body)
 
-The local launch cannot drive `/` — see EVIDENCE / Known local
+A local `/` fetch returns 200 but proves only that the binding
+serves, not the deployed head — see EVIDENCE / Known local
 divergences in `SKILL.md`. The live probe is:
 
 ```bash
@@ -37,10 +38,11 @@ that prefix, not the escaped form).
 
 ### Local (asset-bound proof without the runtime body)
 
-The local binding serves literal paths, so a local `/` probe would 404
-even when the worker is correct. To prove the feed *content* locally
-without depending on the asset binding's `/` handling, the harness
-reads the generated head straight from the deployed source:
+A local `curl /` returns 200 — the worker rewrites `/` to
+`/index.html` before the asset fetch — but a local fetch proves only
+that the binding serves, not that the deployed head carries today's
+feed. To prove the feed *content* the harness reads the generated
+head straight from the deployed source:
 
 ```bash
 git -C /home/nish/workspaces/products/inish-site show origin/main:index.html \
@@ -70,7 +72,9 @@ byte-compares this file against the live response.
 ## Local honesty note
 
 With the `html_handling: "none"` flag the live binding uses, the local
-binding does not auto-resolve `/` to `index.html`. `scripts/launch_local.sh`
-documents the divergence; the harness never uses a local `/` 200 as
-proof the feed is wired correctly. The two paths above (live curl,
-deployed source from git) are the only things that prove the feed.
+binding does not auto-resolve `/` to `index.html`; the worker's own
+`/` -> `/index.html` rewrite serves it anyway, so local `/` returns
+200 just like live. The SKILL.md EVIDENCE section covers the remaining
+divergences; the harness never uses a local `/` 200 as proof the feed
+is wired correctly. The two paths above (live curl, deployed source
+from git) are the only things that prove the feed.

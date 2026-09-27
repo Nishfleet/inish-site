@@ -42,6 +42,7 @@ observed-vs-expected diff.
 `verify_live.py` is live-only. The local launch's `/about.html`,
 `/feed.xml`, and `/latest.json` 200s are real worker-driven 200s,
 but the byte-level feed parity is only provable against the live
-edge — the local binding's snapshot is staged from the same
-`origin/main` the verify script archives, so a `diff` between them
-would catch a contract drift the local launch would not.
+edge — the local binding serves the checked-out worktree, which is
+not necessarily the `origin/main` snapshot the verify script
+archives, so a `diff` between them catches contract drift the local
+launch would not.
