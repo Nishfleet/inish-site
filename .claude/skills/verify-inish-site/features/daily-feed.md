@@ -15,7 +15,8 @@ auth, no account.
 
 ### Live (the only path that proves the full body)
 
-The local launch cannot drive `/` — see EVIDENCE / Known local
+A local `/` fetch returns 200 but proves only that the binding
+serves, not the deployed head — see EVIDENCE / Known local
 divergences in `SKILL.md`. The live probe is:
 
 ```bash

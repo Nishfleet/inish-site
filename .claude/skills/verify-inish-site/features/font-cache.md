@@ -13,7 +13,7 @@ from `/fonts` can ever receive this header.
 
 ```bash
 BASE=http://127.0.0.1:4891
-for face in archivo-700 archivo-400 archivo-italic-700 space-mono-700; do
+for face in archivo-700 archivo-400 archivo-400-italic space-mono-700; do
     cc=$(curl -sI "$BASE/fonts/${face}.woff2" \
         | awk 'tolower($1)=="cache-control:"{$1=""; sub(/^ /, ""); print}' \
         | tr -d '\r\n')
