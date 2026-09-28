@@ -89,7 +89,7 @@ def top_comments(object_id: str) -> list[str]:
         return []
     try:
         item = get_json(f"https://hn.algolia.com/api/v1/items/{object_id}", timeout=15)
-    except Exception:
+    except (OSError, ValueError):  # network or bad JSON; comments are optional context
         return []
     comments = []
     for child in (item.get("children") or [])[:12]:
@@ -209,7 +209,11 @@ def feed(url: str, source: str, lens: str, evidence: str, limit: int = 20, agent
                 "lens": lens,
                 "title": title,
                 "url": link,
-                "description": strip_tags(node.findtext("atom:summary", default="", namespaces=ns))[:600],
+                # Reddit's Atom carries the post body in <content> and has no <summary>.
+                "description": strip_tags(
+                    node.findtext("atom:summary", default="", namespaces=ns)
+                    or node.findtext("atom:content", default="", namespaces=ns)
+                )[:600],
                 "published": node.findtext("atom:updated", default="", namespaces=ns),
             })
     return items
