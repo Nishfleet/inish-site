@@ -19,14 +19,18 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import functools
 import time
 import html
 import json
+import os
 import subprocess
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+from inish_daily import jev_rank
 
 ROOT = Path(__file__).resolve().parents[1]
 USER_AGENT = "inish-daily/1.0 (+https://inish.in/)"
@@ -296,6 +300,23 @@ def main() -> int:
         except Exception as exc:  # Keep the other independent sources useful.
             errors.append(f"{name}: {type(exc).__name__}: {exc}")
 
+    ranked_by = None
+    jev_key = os.environ.get("TYPESAFE_API_KEY")
+    if not jev_key:
+        errors.append("jev: skipped, TYPESAFE_API_KEY is not set; candidates are in fetch order")
+    elif not candidates:
+        errors.append("jev: skipped, no candidates to rank")
+    else:
+        try:
+            ranked = jev_rank.rank(
+                candidates, day.isoformat(), jev_key,
+                fetch_page=functools.partial(jev_rank.page_text, agent=BROWSER_AGENT),
+            )
+            ranked_by = ranked[0]["jev"]["model"]
+            candidates = ranked
+        except Exception as exc:  # A ranking failure must never block the edition.
+            errors.append(f"jev: {type(exc).__name__}: {exc}; candidates are in fetch order")
+
     by_class: dict[str, int] = {}
     by_lens: dict[str, int] = {}
     for candidate in candidates:
@@ -311,12 +332,14 @@ def main() -> int:
         "by_evidence_class": by_class,
         "by_lens": by_lens,
         "source_errors": errors,
+        "ranked_by": ranked_by,
         "candidates": candidates,
     }
     output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
     print(output)
     print(f"candidates={len(candidates)} by_class={by_class}")
     print(f"by_lens={by_lens} source_errors={len(errors)}")
+    print(f"ranked_by={ranked_by}")
     return 0 if candidates else 1
 
 
