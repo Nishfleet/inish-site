@@ -1,11 +1,5 @@
-// Live edge worker for inish.in (Workers + static assets).
-// The public route contract — the publicPaths allowlist, the font pattern, the
-// redirects — has ONE source of truth: functions/policy.js. worker.js and the
-// Pages mirror functions/_middleware.js both import it, so adding a public
-// path is a single edit in the policy module, never a hunt through mirrored
-// literals. Pages Functions are no longer the production edge path — the VPS
-// fleet token can deploy Workers but not Cloudflare Pages, and OAuth expired
-// 2026-08-04 left the site four days stale.
+// Live edge worker for inish.in (Workers + static assets). Route policy lives
+// in policy.js; route data lives in public-paths.json.
 import {
   canonicalize,
   decide,
@@ -14,7 +8,7 @@ import {
   notFoundAssetUrl,
   redirects,
   securityHeaders
-} from "./functions/policy.js";
+} from "./policy.js";
 
 // HSTS lives in public-paths.json as the single source of truth for the route
 // contract; policy.js re-exports it and the worker applies it to every

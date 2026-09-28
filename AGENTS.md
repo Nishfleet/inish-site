@@ -1,11 +1,6 @@
 # Project AGENTS
 
-Follow `~/.codex/AGENTS.md` first, then this repo-specific layer.
-
-## Project Rules
-
-- Keep implementation truth in this repo's code and docs.
-- Read `MEMORY.md` before making architectural, product, deploy, or positioning decisions.
-- Read `ERRORS.md` before retrying setup, build, deploy, or debugging approaches.
-- Keep the site lightweight: static HTML, CSS, and Cloudflare Pages/Functions only unless a stronger need is proven.
-- Make the smallest change that solves the current task and verify it before calling it done.
+- Read `MEMORY.md` before architectural, deploy, or positioning decisions; read `ERRORS.md` before retrying a failed approach.
+- Keep the site lightweight: static HTML, CSS, JS, and the one Worker. No helper scripts.
+- Work on `main`. Run `npm test` before pushing; the push deploys.
+- Check visual changes in a browser at desktop and phone widths before pushing.

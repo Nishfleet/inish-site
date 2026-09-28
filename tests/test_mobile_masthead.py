@@ -15,7 +15,7 @@ import unittest
 from pathlib import Path
 
 STYLES = Path(
-    os.environ.get("MOBILE_MASTHEAD_STYLES", Path(__file__).resolve().parents[1] / "styles.css")
+    os.environ.get("MOBILE_MASTHEAD_STYLES", Path(__file__).resolve().parents[1] / "public" / "styles.css")
 )
 
 

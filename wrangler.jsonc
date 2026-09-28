@@ -11,8 +11,11 @@
     { "pattern": "www.inish.in", "zone_name": "inish.in" },
     { "pattern": "www.inish.in/*", "zone_name": "inish.in" }
   ],
+  // `wrangler dev` presents requests as the first route's host; match the
+  // live scheme so the worker's canonical-origin redirect stays quiet locally.
+  "dev": { "upstream_protocol": "https" },
   "assets": {
-    "directory": "./",
+    "directory": "./public",
     "binding": "ASSETS",
     "run_worker_first": ["/*"],
     "html_handling": "none"

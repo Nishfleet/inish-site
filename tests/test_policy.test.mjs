@@ -1,17 +1,9 @@
-// Behavioral tests for the Pages middleware route decision.
+// Behavioral tests for the edge route decision in policy.js.
 //
-// The Python test_middleware.py suite proves the publicPaths/redirects/font
-// pattern stay in sync with the source. This suite proves the runtime
-// decision still denies unlisted paths: it imports the pure decide() from
-// functions/policy.js and checks its verdict against the real surface,
-// which a `false &&` prefix or any other denial short-circuit would fail.
-//
-// The canonicalize() suite at the bottom pins the host/scheme side of the
-// same contract — http://, www., and the combined cases all collapse to
-// https://inish.in/{path}{search}, while the bare-apex HTTPS URL stays
-// canonical (no self-redirect).
-//
-// node --test runs this file directly; no transpiler, no third-party deps.
+// decide() is exercised against the real surface, so a `false &&` prefix or
+// any other short-circuit of the deny branch fails here. The canonicalize()
+// suite pins the host/scheme side: http://, www., and the combined cases all
+// collapse to https://inish.in/{path}{search}; the canonical URL is left alone.
 
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -24,7 +16,7 @@ import {
   publicPaths,
   redirects,
   fontPath
-} from "../functions/policy.js";
+} from "../policy.js";
 
 // The positive-side samples (allow list, redirect map) are derived straight
 // from public-paths.json — the single source of truth — so adding a public
@@ -132,27 +124,6 @@ test("font: the narrow pattern only matches /fonts/<name>.woff2", () => {
   assert.ok(fontPath.test("/fonts/archivo-700.woff2"));
   assert.equal(fontPath.test("/fonts/x.ttf"), false);
   assert.equal(fontPath.test("/fonts/../app.js"), false);
-});
-
-test("cache: middleware mirrors the worker's immutable font cache header", () => {
-  // The Pages middleware is the worker's kept-in-sync mirror; the font cache
-  // policy must stay identical in both edge sources. The worker is the live
-  // edge — if the literal drifts here, the mirror serves a different cache
-  // contract than the production path.
-  const worker = readFileSync(new URL("../worker.js", import.meta.url), "utf8");
-  const middleware = readFileSync(new URL("../functions/_middleware.js", import.meta.url), "utf8");
-  const header = "public, max-age=31536000, immutable";
-  assert.ok(worker.includes(header), "worker.js must set the immutable font cache header");
-  assert.ok(middleware.includes(header), "middleware must set the same immutable font cache header");
-  assert.equal(
-    worker.match(/const FONT_CACHE_CONTROL = "([^"]+)"/)?.[1],
-    middleware.match(/const FONT_CACHE_CONTROL = "([^"]+)"/)?.[1],
-    "both edges must share the exact font cache header literal"
-  );
-  // The header must be applied against the same narrow font pattern the deny
-  // decision uses, never a widened check.
-  assert.ok(middleware.includes("fontPath.test(url.pathname)"));
-  assert.ok(worker.includes("fontPath.test(url.pathname)"));
 });
 
 test("redirect: redirects take precedence over the allowlist", () => {

@@ -22,13 +22,9 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
-DAILY = ROOT
-# These committed root assets are canonical: the generated head references
-# every one of them, and nothing in the build may overwrite them. The old build
-# copied them from a stale daily/ mirror, which silently reverted merged root
-# fixes on every publish (drift classes #27, #33/#45, and #41 each needed a
-# hand re-sync of the mirror); the mirror is deleted and the build now only
-# fails loudly if a referenced root asset goes missing.
+DAILY = ROOT / "public"
+# Committed assets the generated page references. The build never writes them;
+# it only fails loudly if one goes missing.
 ASSETS = ("app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
@@ -649,14 +645,11 @@ def sitemap(date: str) -> str:
 
 
 def check_root_assets() -> None:
-    """The generated page references these committed root assets; the build
-    fails loudly if any of them is missing. The root is canonical: nothing is
-    ever copied over it from a mirror, because a stale mirror is exactly what
-    kept reverting merged root fixes (drift classes #27, #33/#45, #41)."""
+    """Fail loudly if a committed asset the generated page references is missing."""
     for name in ASSETS:
         asset = DAILY / name
         if not asset.is_file():
-            raise FileNotFoundError(f"Missing root asset referenced by the daily page: {asset}")
+            raise FileNotFoundError(f"Missing asset referenced by the daily page: {asset}")
 
 
 def main() -> None:

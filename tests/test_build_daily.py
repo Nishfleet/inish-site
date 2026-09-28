@@ -398,7 +398,7 @@ class BuildDailyTests(unittest.TestCase):
         self.assertNotIn("og-image.svg", head)
         # The committed card is a real PNG with the promised dimensions,
         # validated with the standard library only (signature + IHDR fields).
-        card = (Path(__file__).resolve().parents[1] / "og-image.png").read_bytes()
+        card = (Path(__file__).resolve().parents[1] / "public" / "og-image.png").read_bytes()
         self.assertTrue(card.startswith(b"\x89PNG\r\n\x1a\n"), "og-image.png is not a PNG")
         self.assertEqual(
             (int.from_bytes(card[16:20], "big"), int.from_bytes(card[20:24], "big")),
@@ -423,7 +423,7 @@ class BuildDailyTests(unittest.TestCase):
     def test_head_declares_a_desktop_favicon(self):
         # Browsers ask for /favicon.ico by default; declaring the pinned
         # apple-touch-icon as the favicon gives desktop tabs an icon without
-        # adding a new binary or touching middleware.
+        # adding a new binary or touching the worker.
         self.write(edition())
         self.build()
         head = (self.public / "index.html").read_text().split("</head>", 1)[0]
@@ -600,7 +600,7 @@ class BuildDailyTests(unittest.TestCase):
         status = page.split('id="filter-status"', 1)[1].split(">", 1)[0]
         self.assertIn('class="visually-hidden"', page.split('id="filter-status"', 1)[0])
         self.assertNotIn('style="', status)
-        styles = (Path(__file__).resolve().parents[1] / "styles.css").read_text()
+        styles = (Path(__file__).resolve().parents[1] / "public" / "styles.css").read_text()
         rule = styles.split(".visually-hidden {", 1)
         self.assertEqual(len(rule), 2, "styles.css must define a .visually-hidden rule")
         declarations = rule[1].split("}", 1)[0]
@@ -780,15 +780,15 @@ class BuildDailyTests(unittest.TestCase):
         # the accepted edition and the committed surface must fail here.
         latest = builder.load_latest()
         self.assertEqual(
-            (builder.ROOT / "latest.json").read_text(encoding="utf-8"),
+            (builder.DAILY / "latest.json").read_text(encoding="utf-8"),
             json.dumps(latest, indent=2, ensure_ascii=False) + "\n",
         )
         self.assertEqual(
-            (builder.ROOT / "feed.xml").read_text(encoding="utf-8"),
+            (builder.DAILY / "feed.xml").read_text(encoding="utf-8"),
             builder.rss(latest),
         )
         self.assertEqual(
-            (builder.ROOT / "index.html").read_text(encoding="utf-8"),
+            (builder.DAILY / "index.html").read_text(encoding="utf-8"),
             builder.page(latest),
         )
 

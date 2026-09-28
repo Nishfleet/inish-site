@@ -1,31 +1,9 @@
-// Behavioral tests for the deployed Worker route decision (worker.js).
+// Behavioral tests for the live edge (worker.js).
 //
-// worker.js is the live edge for inish.in. It imports the deny policy
-// (publicPaths / fontPath / redirects) from functions/policy.js — the single
-// source of truth — and keeps only the response plumbing inline. The Python
-// suites prove that import by substring-matching the source; a runtime
-// mutation like prefixing the deny check with `false &&`, or widening the
-// policy allowlist, keeps every current test green while unlisted paths reach
-// the ASSETS binding and can be served as static content.
-//
-// This suite drives the worker's default export directly with a recording
-// ASSETS stub: denied paths must return 404 with the branded-404 read only
-// (zero asset reads at all for HEAD), allowlisted paths must actually reach
-// ASSETS, and redirects must preserve search and carry HSTS. The recording
-// stub makes every assertion behavioral — it proves what the edge serves, not
-// what the source says.
-//
-// Mutation experiments (run locally, reverted before commit; the suite goes
-// red for each): a `false &&` prefix on the deny check, adding a deny sample
-// to the policy's publicPaths allowlist, dropping `destination.search =` from
-// the redirect, and dropping the HSTS set in withSecurityHeaders.
-//
-// node --test runs this file directly; no transpiler, no third-party deps.
-// CI executes it through the required `test` job's Node discovery step
-// (`node --test "tests/**/*.test.mjs"`, added by the required-CI Node-family
-// packet): because the file lives under tests/, it is inside that scope.
-// package.json's `test` script currently names only the middleware suite;
-// discovery-based CI covers both.
+// Drives the worker's default export with a recording ASSETS stub: denied
+// paths return the branded 404 (no asset reads for HEAD), allowlisted paths
+// reach ASSETS, redirects keep their search string and carry HSTS. Every
+// assertion is about what the edge serves, not what the source says.
 
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -44,7 +22,7 @@ const ROOT = join(HERE, "..");
 // stub 301s the internal fetch and the homepage test goes red. Comment and
 // blank lines are skipped, matching the _redirects format.
 const ASSET_REDIRECTS = new Map();
-for (const line of readFileSync(join(ROOT, "_redirects"), "utf8").split(/\r?\n/)) {
+for (const line of readFileSync(join(ROOT, "public", "_redirects"), "utf8").split(/\r?\n/)) {
   const stripped = line.trim();
   if (!stripped || stripped.startsWith("#")) continue;
   const [source, target, code] = line.split(/\s+/);
@@ -53,13 +31,13 @@ for (const line of readFileSync(join(ROOT, "_redirects"), "utf8").split(/\r?\n/)
 }
 
 import worker from "../worker.js";
-import { securityHeaders } from "../functions/policy.js";
+import { securityHeaders } from "../policy.js";
 
 const ORIGIN = "https://inish.in";
 const HSTS = "max-age=31536000; includeSubDomains";
 const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
-// Negative space mirrors the middleware suite's samples and adds paths that
+// Negative space mirrors tests/test_policy.test.mjs samples and adds paths that
 // specifically probe the shared policy. /private/notes.txt is the path
 // used by the allowlist-widening mutation experiment: adding it to the
 // policy's publicPaths must turn this suite red.
@@ -461,9 +439,7 @@ test("canonical: HEAD on a non-canonical URL still 301s without reading ASSETS",
 // Security headers beyond HSTS — route data in public-paths.json, applied by
 // withSecurityHeaders on every response class. The behavioral assertions below
 // read the contract file directly (not policy.js's re-export) so a stubbed or
-// emptied export cannot silently pass, and the source-contract suite in
-// tests/test_verify_live.py pins that the edge sources derive the values from
-// the contract instead of redeclaring them.
+// emptied export cannot silently pass.
 
 const CONTRACT = JSON.parse(
   readFileSync(new URL("../public-paths.json", import.meta.url), "utf8")
