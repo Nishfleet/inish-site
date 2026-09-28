@@ -5,7 +5,7 @@ Durable project truth that the code alone does not tell you.
 ## How it works
 
 - inish.in is Nish Daily. The feed is the root page; there are no archives (old `/daily/*` links 301 to the root equivalents, archive URLs 404).
-- The site is static files served by one Cloudflare Worker (`worker.js`, route policy in `policy.js`, route data in `public-paths.json`). `.assetsignore` decides which repo-root files ship.
+- The site is static files served by one Cloudflare Worker (`worker.js`, route policy in `policy.js`, route data in `public-paths.json`). Everything in `public/` ships; nothing else does.
 - `inish_daily/fetch_candidates.py` gathers the day's candidates; `inish_daily/build_daily.py` renders `data/editions/<date>.json` into `index.html`, `latest.json`, `feed.xml` and `sitemap.xml`. Page styling is `styles.css`.
 - Every push to `main` runs the `CI` workflow: tests, then `wrangler deploy`, then a live smoke check. Pull requests run tests only. `main` takes direct pushes (ruleset `main-no-force-push` blocks only force-push and deletion).
 - Local: `npm run dev` (wrangler dev), `npm test` (Node + Python suites).

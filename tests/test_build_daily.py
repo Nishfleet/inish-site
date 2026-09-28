@@ -575,9 +575,11 @@ class BuildDailyTests(unittest.TestCase):
                     self.assertNotIn("filter-status", page)
                     continue
                 filters = page.split('<nav class="filters"', 1)[1].split("</nav>", 1)[0]
+                # Hidden until app.js runs, so no-JS readers never see dead buttons.
+                self.assertTrue(filters.startswith(' aria-label="Filter stories" hidden>'))
                 self.assertEqual(filters.count('aria-pressed="true"'), 1)
                 self.assertIn(
-                    '<button class="active" data-filter="all" aria-pressed="true">All</button>',
+                    '<button type="button" class="active" data-filter="all" aria-pressed="true">All</button>',
                     filters,
                 )
                 pressed_false = filters.count('aria-pressed="false"')

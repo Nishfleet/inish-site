@@ -497,7 +497,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
                 "name": "How often does Nish's Daily Reads publish?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Once a day. Each edition is a single dated page, and the site calls itself a daily read. When nothing clears the bar, the day's page says so instead of running filler stories.",
+                    "text": "Once a day, in the morning India time. The home page always carries the latest edition; older editions are not kept. When nothing clears the bar, the page says so instead of running filler stories.",
                 },
             },
             {
@@ -513,7 +513,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
                 "name": "Where can I subscribe?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Through the feeds linked in the page footer: an RSS feed at https://inish.in/feed.xml and a JSON feed at https://inish.in/latest.json.",
+                    "text": "Through the feeds linked in the page footer: an RSS feed at https://inish.in/feed.xml and the latest edition as JSON at https://inish.in/latest.json.",
                 },
             },
         ],
@@ -544,9 +544,9 @@ def page(edition: dict) -> str:
         # visible count so the static markup matches app.js's runtime updates.
         status_noun = "story" if kept_count == 1 else "stories"
         filters = f"""
-    <nav class="filters" aria-label="Filter stories">
-      <button class="active" data-filter="all" aria-pressed="true">All</button>
-      {''.join(f'<button data-filter="{esc(section)}" aria-pressed="false">{esc(section)}</button>' for section in present)}
+    <nav class="filters" aria-label="Filter stories" hidden>
+      <button type="button" class="active" data-filter="all" aria-pressed="true">All</button>
+      {''.join(f'<button type="button" data-filter="{esc(section)}" aria-pressed="false">{esc(section)}</button>' for section in present)}
     </nav>
     <p class="visually-hidden" id="filter-status" role="status" aria-live="polite">Showing all {kept_count} {status_noun}</p>"""
     else:
@@ -584,6 +584,8 @@ def page(edition: dict) -> str:
   <meta name="twitter:image:alt" content="{image_alt}">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f4efe5">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
@@ -604,7 +606,7 @@ def page(edition: dict) -> str:
   <footer>
     <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a><a href="/about.html">About</a></div>
     <p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish's profiles and studio.</p>
-    <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
+    <p>Picked and checked daily by Nish's agent. Sources remain the source of truth.</p>
   </footer>
   <script src="/app.js" defer></script>
 </body>
@@ -633,14 +635,23 @@ def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
     link = "https://inish.in/"
     description = rss_item_description(edition)
-    published = dt.datetime.combine(day, dt.time(0), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
+    # The daily run starts at 07:30 IST (02:00 UTC).
+    published = dt.datetime.combine(day, dt.time(2), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"inish-daily-{day.isoformat()}"
     item = f"<item><title>Nish's Daily Reads — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\"><channel><title>Nish's Daily Reads</title><link>https://inish.in/</link><description>A daily read for a founder: AI, product ideas, and demand signals.</description>" + item + "</channel></rss>\n"
+    return (
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\"><channel>"
+        "<title>Nish's Daily Reads</title><link>https://inish.in/</link>"
+        "<atom:link href=\"https://inish.in/feed.xml\" rel=\"self\" type=\"application/rss+xml\"/>"
+        "<description>A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.</description>"
+        f"<language>en</language><lastBuildDate>{published}</lastBuildDate>"
+        + item + "</channel></rss>\n"
+    )
 
 
 def sitemap(date: str) -> str:
-    body = f'<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url><url><loc>https://inish.in/about.html</loc><lastmod>{date}</lastmod></url>'
+    body = f'<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url><url><loc>https://inish.in/about.html</loc></url>'
     return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
 
 

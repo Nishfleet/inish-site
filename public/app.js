@@ -1,5 +1,9 @@
 const filterStatus = document.getElementById("filter-status");
 
+// The filter bar ships hidden so it never shows as dead buttons without
+// JavaScript; reveal it now that the handlers below will run.
+document.querySelector(".filters")?.removeAttribute("hidden");
+
 // Keep the ARIA pressed state mirroring the visible .active class, so the
 // accessible state cannot drift from what is shown.
 function setPressedState(selected) {
@@ -34,4 +38,5 @@ document.querySelectorAll("[data-filter]").forEach((button) => {
 
 // Initialize from the static markup: the server-rendered page marks "All" as
 // active and the live region starts with the matching announcement.
-setPressedState(document.querySelector("[data-filter].active") ?? document.querySelector("[data-filter]"));
+const initialFilter = document.querySelector("[data-filter].active") ?? document.querySelector("[data-filter]");
+if (initialFilter) setPressedState(initialFilter);

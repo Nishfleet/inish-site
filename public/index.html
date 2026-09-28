@@ -23,6 +23,8 @@
   <meta name="twitter:image:alt" content="Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words.">
   <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="/apple-touch-icon.png">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f4efe5">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
   <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
@@ -224,7 +226,7 @@
             "name": "How often does Nish's Daily Reads publish?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Once a day. Each edition is a single dated page, and the site calls itself a daily read. When nothing clears the bar, the day's page says so instead of running filler stories."
+              "text": "Once a day, in the morning India time. The home page always carries the latest edition; older editions are not kept. When nothing clears the bar, the page says so instead of running filler stories."
             }
           },
           {
@@ -240,7 +242,7 @@
             "name": "Where can I subscribe?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Through the feeds linked in the page footer: an RSS feed at https://inish.in/feed.xml and a JSON feed at https://inish.in/latest.json."
+              "text": "Through the feeds linked in the page footer: an RSS feed at https://inish.in/feed.xml and the latest edition as JSON at https://inish.in/latest.json."
             }
           }
         ]
@@ -254,9 +256,9 @@
   <header class="masthead">
     <div class="masthead-top"><a href="/">inish.in</a><span>Monday, 28 September 2026</span><span>227 scanned · 7 kept</span></div>
     <div class="title-row"><div><p class="kicker">Built for one reader</p><h1>Nish's Daily Reads</h1></div><p class="dek">AI, product ideas, and where demand is building. Plain words, point first, nothing here unless there is a fact under it.</p></div>
-    <nav class="filters" aria-label="Filter stories">
-      <button class="active" data-filter="all" aria-pressed="true">All</button>
-      <button data-filter="AI" aria-pressed="false">AI</button><button data-filter="Demand signals" aria-pressed="false">Demand signals</button><button data-filter="Product ideas" aria-pressed="false">Product ideas</button><button data-filter="Tools" aria-pressed="false">Tools</button><button data-filter="Wildcard" aria-pressed="false">Wildcard</button>
+    <nav class="filters" aria-label="Filter stories" hidden>
+      <button type="button" class="active" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="AI" aria-pressed="false">AI</button><button type="button" data-filter="Demand signals" aria-pressed="false">Demand signals</button><button type="button" data-filter="Product ideas" aria-pressed="false">Product ideas</button><button type="button" data-filter="Tools" aria-pressed="false">Tools</button><button type="button" data-filter="Wildcard" aria-pressed="false">Wildcard</button>
     </nav>
     <p class="visually-hidden" id="filter-status" role="status" aria-live="polite">Showing all 7 stories</p>
   </header>
@@ -371,7 +373,7 @@
   <footer>
     <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a><a href="/about.html">About</a></div>
     <p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish's profiles and studio.</p>
-    <p>Curated by Hermes on Nish's VPS. Sources remain the source of truth.</p>
+    <p>Picked and checked daily by Nish's agent. Sources remain the source of truth.</p>
   </footer>
   <script src="/app.js" defer></script>
 </body>
