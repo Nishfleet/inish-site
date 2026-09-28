@@ -607,15 +607,16 @@ footer > p:last-child {
   }
 }
 
-/* The lead story used one narrow column and left the right half of a wide
-   screen empty. Split it: headline and summary on the left, the checked /
-   take / caveat block on the right, so it fills the width and takes less
-   vertical room. */
+/* Wide screens split the lead story. The left column carries the voice:
+   summary, then Nish's take, then the source link. The right column carries
+   the evidence: what was checked and the caveat. Splitting the notes this way
+   keeps both columns about the same height; stacking all three notes on the
+   right left a tall empty hole under the summary. */
 @media (min-width: 1000px) {
   .story-lead .story-body {
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto 1fr;
     column-gap: 56px;
     align-items: start;
   }
@@ -625,6 +626,10 @@ footer > p:last-child {
     grid-column: 1 / -1;
   }
 
+  .story-lead h2 {
+    max-width: 30ch;
+  }
+
   .story-lead > .story-body > p {
     grid-column: 1;
     grid-row: 3;
@@ -632,19 +637,32 @@ footer > p:last-child {
   }
 
   .story-lead .story-notes {
-    grid-column: 2;
-    grid-row: 3 / span 2;
-    margin-top: 4px;
+    display: contents;
+  }
+
+  .story-lead .take {
+    grid-column: 1;
+    grid-row: 4;
+    margin-top: 20px;
+    font-size: 19px;
   }
 
   .story-lead .source-link {
     grid-column: 1;
-    grid-row: 4;
-    align-self: start;
+    grid-row: 5;
+    margin-top: 18px;
   }
 
-  .story-lead h2 {
-    max-width: 30ch;
+  .story-lead .fact {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 2px;
+  }
+
+  .story-lead .caveat {
+    grid-column: 2;
+    grid-row: 4 / span 2;
+    margin-top: 16px;
   }
 }
 
