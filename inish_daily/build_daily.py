@@ -143,12 +143,21 @@ def validate_url(value: object, label: str = "Story") -> str:
     return url
 
 
+NOT_JUST = re.compile(r"\bnot (?:just|merely)\b", re.IGNORECASE)
+
+
 def validate_text(value: object, field: str, minimum: int, maximum: int) -> str:
     if not isinstance(value, str):
         raise ValueError(f"{field} must be a string")
     text = value.strip()
     if not minimum <= len(text) <= maximum:
         raise ValueError(f"{field} must contain {minimum}-{maximum} characters; found {len(text)}")
+    # The two loudest machine-writing tells. A comma or a full stop does the
+    # em dash's job; "not just X, but Y" is said directly as Y.
+    if "\u2014" in text:
+        raise ValueError(f"{field} uses an em dash; use a comma or a full stop: {text!r}")
+    if NOT_JUST.search(text):
+        raise ValueError(f"{field} uses 'not just X, but Y'; state the point directly: {text!r}")
     return text
 
 
@@ -465,7 +474,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
                 "name": "What is Nish's Daily Reads?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Nish's Daily Reads is a daily read for a founder, published at https://inish.in/: AI news, product ideas, and early signals of demand, in plain words.",
+                    "text": "A single page at https://inish.in/ with AI news and early signs of what people will pay for, rebuilt each morning for a founder. Every story links the fact it was checked against.",
                 },
             },
             {
@@ -473,7 +482,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
                 "name": "Who is Nish's Daily Reads for?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "The site was built for one reader: a founder. Every story carries a take labeled Nish.",
+                    "text": "Nish, a founder who builds and sells products. The page is public so anyone can read along, and every story ends with a take labeled Nish.",
                 },
             },
             {
@@ -489,7 +498,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
                 "name": "How are stories chosen?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Candidate sources are scanned and only a few are kept; the page header shows how many were scanned and how many were kept that day. A kept story must carry a Checked fact linking to the source it was verified against, because the page promises nothing here unless there is a fact under it. On a quiet day no stories run at all, because a short edition beats a padded one.",
+                    "text": "Each morning an AI agent reads every candidate from Hacker News, TechCrunch, OpenAI, Reddit, Google News, Product Hunt, Lobsters and GitHub. The page header shows how many it scanned and how many it kept. A story runs only if it carries a Checked fact that links to its source. When nothing passes, no stories run.",
                 },
             },
             {
@@ -510,8 +519,8 @@ def page(edition: dict) -> str:
     date = dt.date.fromisoformat(edition["date"])
     title_date = date.strftime("%A, %d %B %Y")
     title = f"Nish's Daily Reads — {edition['date']}"
-    description = "A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words."
-    image_alt = "Nish's Daily Reads: AI news, product ideas, and early signals of demand — in plain words."
+    description = "AI news and early signs of what people will pay for, picked each morning for a founder. Every story links the fact it was checked against."
+    image_alt = "Nish's Daily Reads: AI news and early signs of what people will pay for, picked each morning for a founder."
     kept_count = len(edition["stories"])
     count_label = f"{edition['candidate_count']} scanned · {kept_count} kept"
     if edition["stories"]:
@@ -581,16 +590,16 @@ def page(edition: dict) -> str:
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
     <div class="masthead-top"><a href="/">inish.in</a><span>{esc(title_date)}</span><span>{esc(count_label)}</span></div>
-    <div class="title-row"><div><p class="kicker">Built for one reader</p><h1>Nish's Daily Reads</h1></div><p class="dek">AI, product ideas, and where demand is building. Plain words, point first, nothing here unless there is a fact under it.</p></div>{filters}
+    <div class="title-row"><div><p class="kicker">Built for one reader</p><h1>Nish's Daily Reads</h1></div><p class="dek">AI news and early signs of what people will pay for, in plain words. A story runs only if it links a fact it was checked against.</p></div>{filters}
   </header>
   <main id="stories" class="stories">
-    <section class="edition-note"><span>Editor’s note</span><p>{esc(edition['editor_note'])}</p></section>
+    <section class="edition-note"><span>Editor's note</span><p>{esc(edition['editor_note'])}</p></section>
 {cards}
   </main>
   <footer>
     <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a><a href="/about.html">About</a></div>
-    <p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> — Nish's profiles.</p>
-    <p>Picked and checked daily by Nish's agent. Sources remain the source of truth.</p>
+    <p class="identity">Nish on <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a></p>
+    <p>Picked and checked each morning by Nish's AI agent.</p>
   </footer>
   <script src="/app.js" defer></script>
 </body>
@@ -628,7 +637,7 @@ def rss(edition: dict) -> str:
         "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\"><channel>"
         "<title>Nish's Daily Reads</title><link>https://inish.in/</link>"
         "<atom:link href=\"https://inish.in/feed.xml\" rel=\"self\" type=\"application/rss+xml\"/>"
-        "<description>A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words.</description>"
+        "<description>AI news and early signs of what people will pay for, picked each morning for a founder. Every story links the fact it was checked against.</description>"
         f"<language>en</language><lastBuildDate>{published}</lastBuildDate>"
         + item + "</channel></rss>\n"
     )

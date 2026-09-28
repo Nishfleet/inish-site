@@ -42,6 +42,8 @@ Never assume the reader knows what a token, an inference cost, a repo, a merge, 
 
 Short sentences. No sentence should need re-reading. If a sentence has two ideas in it, make it two sentences.
 
+No em dashes and no "not just X, but Y": the builder rejects both, so use a comma or a full stop and say Y directly. Also avoid the other machine tells: "signal" as a filler noun, lists forced into threes, and closing lines like "X, not Y" that restate the point.
+
 ## The bar
 
 **A story earns its place by being checked, not by being interesting.** Open the primary source and read it. If you cannot pull one concrete, verifiable detail out of it — a number, a price, a date, a percentage, a direct quote — the item does not run. No exceptions, and no substituting the source's own adjectives for evidence.

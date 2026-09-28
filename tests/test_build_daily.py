@@ -350,8 +350,8 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn('<meta property="og:url" content="https://inish.in/">', head)
         self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
         self.assertIn(
-            '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
-            'and early signals of demand \u2014 in plain words.">',
+            '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news and early signs of '
+            'what people will pay for, picked each morning for a founder.">',
             head,
         )
         self.assertIn('<meta property="og:image:type" content="image/png">', head)
@@ -374,8 +374,8 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn('<meta property="og:site_name" content="Nish\'s Daily Reads">', head)
         self.assertIn('<meta property="og:locale" content="en_US">', head)
         self.assertIn(
-            '<meta name="twitter:image:alt" content="Nish\'s Daily Reads: AI news, product ideas, '
-            'and early signals of demand \u2014 in plain words.">',
+            '<meta name="twitter:image:alt" content="Nish\'s Daily Reads: AI news and early signs of '
+            'what people will pay for, picked each morning for a founder.">',
             head,
         )
         self.assertIn('<meta property="og:image:alt" content="', head)
@@ -617,7 +617,7 @@ class BuildDailyTests(unittest.TestCase):
         self.build()
         footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
         self.assertIn(
-            '<p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> — Nish\'s profiles.</p>',
+            '<p class="identity">Nish on <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a></p>',
             footer,
         )
 
@@ -685,6 +685,23 @@ class BuildDailyTests(unittest.TestCase):
         payload = edition()
         payload["stories"][0]["take"] = "Speed is a poor substitute for a Ratchet replay I can actually inspect."
         self.assertRejects(payload, "aphorism pattern")
+
+    def test_rejects_em_dashes_in_any_story_text(self):
+        # Em dashes are the loudest AI tell in the copy (12 in the 2026-09-28
+        # edition). Every reader-facing field goes through the same check.
+        for field in ("title", "summary", "fact", "take", "caveat"):
+            with self.subTest(field=field):
+                payload = edition()
+                payload["stories"][0][field] = payload["stories"][0][field] + " — and more 42."
+                self.assertRejects(payload, "em dash")
+        payload = edition()
+        payload["editor_note"] = payload["editor_note"] + " — and more."
+        self.assertRejects(payload, "em dash")
+
+    def test_rejects_not_just_x_but_y(self):
+        payload = edition()
+        payload["stories"][0]["take"] = "I read the Ratchet news as a capital problem, not just a software one."
+        self.assertRejects(payload, "not just")
 
     def test_rejects_two_takes_opening_the_same_way(self):
         payload = edition()

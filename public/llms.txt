@@ -1,22 +1,18 @@
-# inish.in — Nish's Daily Reads
+# inish.in: Nish's Daily Reads
 
-A daily read for a founder: AI news, product ideas, and early signals of demand — in plain words. Point first, nothing here unless there is a fact under it. Published by Nish (https://github.com/nish3451). The sources of every story remain the source of truth; each story carries a Checked fact linked to its evidence.
+AI news and early signs of what people will pay for, picked each morning for a founder. Every story links the fact it was checked against. Published by Nish (https://github.com/nish3451); an AI agent does the reading and writing under Nish's rules.
 
 ## How to read this site
 
-- The root page is the current daily edition. It rolls over every day; there are no archives.
-- Each story carries four parts: a summary, a Checked fact with a link to its evidence, Nish's take, and a caveat.
-- The same edition ships as machine-readable feeds: /latest.json (JSON) and /feed.xml (RSS).
-- /sitemap.xml lists the public surface; /robots.txt allows crawling and AI input. AI training is opted out via `ai-train=no`.
+- The home page is today's edition. It is replaced each morning; there is no archive.
+- Each story has a summary, a Checked fact linked to its source, a take labeled Nish, and a But line with the caveat.
+- The same edition is available as JSON (/latest.json) and RSS (/feed.xml).
+- /sitemap.xml lists every public page. /robots.txt allows crawling and AI answers, and opts out of AI training with `ai-train=no`.
 
-## Essential links
+## Links
 
-- Home: https://inish.in/
-- Today's edition (JSON): https://inish.in/latest.json
+- Today's edition: https://inish.in/
+- Today's edition as JSON: https://inish.in/latest.json
 - RSS feed: https://inish.in/feed.xml
 - About: https://inish.in/about.html
-- Public pages: https://inish.in/ and https://inish.in/about.html (no archives)
-
-## Optional
-
-- About the author: https://github.com/nish3451
+- Nish on GitHub: https://github.com/nish3451
