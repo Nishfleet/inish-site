@@ -358,26 +358,20 @@ def html_safe_json(payload: dict) -> str:
     return serialized
 
 
-# The Person node describes Nish himself, not this site; both claims are
-# verifiable from the repo itself (the Tiny Studio links, this very site).
-PERSON_DESCRIPTION = "Founder of Tiny Studio; publishes Nish's Daily Reads."
+# The Person node describes Nish himself, not this site; it claims only what
+# this very site shows.
+PERSON_DESCRIPTION = "Founder; publishes Nish's Daily Reads."
 
 
 def json_ld(title: str, description: str, date: str, stories: list) -> str:
-    """The head's structured data: one graph with the site, its studio, its person, and the edition.
+    """The head's structured data: one graph with the site, its person, and the edition.
 
     Truth rules: only what the page itself shows. The site is the daily feed
     and nothing else, so the Person node claims only the name, the surfaces
-    verified to belong to Nish (the GitHub profile, the X/Twitter account
-    linked from it, and Tiny Studio via the footer link on inish.in and the
-    reciprocal link on tinystudio.in), a fixed, repo-verifiable bio
-    (PERSON_DESCRIPTION) instead of the page's meta description, the
-    occupation drawn from the page's own "a daily read for a founder"
-    language, and an affiliation to Tiny Studio as the organization Nish
-    runs, drawn from the footer label and URL.
-    The worksFor field mirrors the affiliation: both point to the same
-    Organization @id, giving engines both the loose affiliation and the
-    formal employment relationship. The `knowsAbout` list is the page's
+    verified to belong to Nish (the GitHub profile and the X/Twitter account
+    linked from it, both in the footer), a fixed bio (PERSON_DESCRIPTION)
+    instead of the page's meta description, and the occupation drawn from the
+    page's own "a daily read for a founder" language. The `knowsAbout` list is the page's
     own section taxonomy (the filter nav labels) minus the catch-all Wildcard
     bucket, so the schema can only claim topics the feed actually surfaces.
 
@@ -399,12 +393,6 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
     and dateModified mirrors datePublished because every rebuild
     rewrites the whole edition.
     """
-    organization = {
-        "@id": "https://inish.in/#studio",
-        "@type": "Organization",
-        "name": "Tiny Studio",
-        "url": "https://tinystudio.in/",
-    }
     person = {
         "@id": "https://inish.in/#nish",
         "@type": "Person",
@@ -419,11 +407,8 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
         "sameAs": [
             "https://github.com/nish3451",
             "https://x.com/NishantRArora",
-            "https://tinystudio.in/",
         ],
         "knowsAbout": sorted(SECTIONS - {"Wildcard"}),
-        "affiliation": {"@id": "https://inish.in/#studio"},
-        "worksFor": {"@id": "https://inish.in/#studio"},
     }
     graph = [
         {
@@ -446,7 +431,6 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
             "author": {"@id": "https://inish.in/#nish"},
             "isPartOf": {"@id": "https://inish.in/#website"},
         },
-        organization,
     ]
     # Each story's Checked fact becomes a Claim node so AI engines can
     # extract individual citable passages. The text and url are already
@@ -489,7 +473,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
                 "name": "Who is Nish's Daily Reads for?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "The site was built for one reader: a founder. Every story carries a take labeled Nish, and the footer links Nish's studio, Tiny Studio.",
+                    "text": "The site was built for one reader: a founder. Every story carries a take labeled Nish.",
                 },
             },
             {
@@ -605,7 +589,7 @@ def page(edition: dict) -> str:
   </main>
   <footer>
     <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a><a href="/about.html">About</a></div>
-    <p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish's profiles and studio.</p>
+    <p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> — Nish's profiles.</p>
     <p>Picked and checked daily by Nish's agent. Sources remain the source of truth.</p>
   </footer>
   <script src="/app.js" defer></script>

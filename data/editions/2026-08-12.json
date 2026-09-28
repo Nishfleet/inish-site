@@ -22,7 +22,7 @@
       "section": "Demand signals",
       "summary": "River AI, founded by former xAI researcher Igor Babuschkin, has raised a huge round only two months after coming out of stealth. Its pitch is that people and companies should train open models into assistants they can actually own and improve.",
       "fact": "River says its API supports reinforcement learning and LoRA fine-tuning, and that a complex training run can take 15 to 20 minutes without an infrastructure team.",
-      "take": "I do not see River's funding headline as the main signal. I see a shift from asking people to write better prompts toward giving them a model they can teach. That is a much larger product surface for Tiny Studio to watch.",
+      "take": "I do not see River's funding headline as the main signal. I see a shift from asking people to write better prompts toward giving them a model they can teach. That is a much larger product surface to watch.",
       "caveat": "The speed and cost claims are company claims, and the product is too young to show whether the promised training workflow works outside demos."
     }
   ]

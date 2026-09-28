@@ -458,7 +458,7 @@ class BuildDailyTests(unittest.TestCase):
         nodes_by_type = {}
         for node in data["@graph"]:
             nodes_by_type.setdefault(node["@type"], []).append(node)
-        self.assertEqual(set(nodes_by_type), {"WebSite", "Person", "Article", "Organization", "Claim", "FAQPage"})
+        self.assertEqual(set(nodes_by_type), {"WebSite", "Person", "Article", "Claim", "FAQPage"})
 
         site = nodes_by_type["WebSite"][0]
         self.assertEqual(site["@id"], "https://inish.in/#website")
@@ -474,18 +474,17 @@ class BuildDailyTests(unittest.TestCase):
         # The Person node carries its own fixed bio, never the site's dek,
         # pinned here to repo-verifiable claims only.
         self.assertEqual(
-            person["description"], "Founder of Tiny Studio; publishes Nish's Daily Reads."
+            person["description"], "Founder; publishes Nish's Daily Reads."
         )
         self.assertNotEqual(person["description"], rendered_description)
         # The occupation is drawn from the page's own "a daily read for a
         # founder" language, expressed as a structured Occupation node.
         self.assertEqual(person["hasOccupation"], {"@type": "Occupation", "name": "Founder"})
-        # The GitHub, X/Twitter, and Tiny Studio URLs are verified to belong
-        # to Nish; Tiny Studio is also expressed as an affiliated Organization.
+        # The GitHub and X/Twitter URLs are verified to belong to Nish.
         # No employer, products, or biography are claimed.
         self.assertEqual(
             person["sameAs"],
-            ["https://github.com/nish3451", "https://x.com/NishantRArora", "https://tinystudio.in/"],
+            ["https://github.com/nish3451", "https://x.com/NishantRArora"],
         )
         self.assertNotIn("jobTitle", person)
         # `knowsAbout` mirrors the page's own section taxonomy (the filter nav
@@ -495,16 +494,10 @@ class BuildDailyTests(unittest.TestCase):
             person["knowsAbout"],
             sorted(builder.SECTIONS - {"Wildcard"}),
         )
-        organization = nodes_by_type["Organization"][0]
-        self.assertEqual(organization["@id"], "https://inish.in/#studio")
-        self.assertEqual(organization["@type"], "Organization")
-        self.assertEqual(organization["name"], "Tiny Studio")
-        self.assertEqual(organization["url"], "https://tinystudio.in/")
-        self.assertEqual(person["affiliation"], {"@id": organization["@id"]})
-        # worksFor mirrors affiliation: both point to the same Organization
-        # @id, giving engines the formal employment relationship.
-        self.assertEqual(person["worksFor"], {"@id": organization["@id"]})
-        self.assertEqual(set(organization.keys()), {"@id", "@type", "name", "url"})
+        # Nish runs no studio on this site: no Organization, affiliation or employer.
+        self.assertNotIn("Organization", nodes_by_type)
+        self.assertNotIn("affiliation", person)
+        self.assertNotIn("worksFor", person)
 
         article = nodes_by_type["Article"][0]
         self.assertEqual(article["@id"], "https://inish.in/#article")
@@ -624,9 +617,24 @@ class BuildDailyTests(unittest.TestCase):
         self.build()
         footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
         self.assertIn(
-            '<p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> · <a href="https://tinystudio.in/" rel="me noopener noreferrer">Tiny Studio ↗</a> — Nish\'s profiles and studio.</p>',
+            '<p class="identity"><a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a> — Nish\'s profiles.</p>',
             footer,
         )
+
+    def test_no_page_mentions_tiny_studio(self):
+        # Nish asked (2026-09-28) for every Tiny Studio mention to go. This
+        # covers the generated page and feeds plus every hand-written file
+        # that ships from public/, so neither path can bring it back.
+        self.write(edition())
+        self.build()
+        shipped = [self.public / name for name in ("index.html", "latest.json", "feed.xml", "sitemap.xml")]
+        shipped += [
+            path for path in (Path(__file__).resolve().parents[1] / "public").rglob("*")
+            if path.suffix in {".html", ".txt", ".xml", ".json", ".js", ".css", ".svg"}
+        ]
+        for path in shipped:
+            with self.subTest(path=path.name):
+                self.assertNotRegex(path.read_text().lower(), r"tiny\s*studio")
 
     def test_footer_includes_about_link(self):
         self.write(edition())
