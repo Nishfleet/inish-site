@@ -1,10 +1,10 @@
 # Hermes daily publishing contract
 
-Run this only on `netcup-rs2000` in `/home/nish/workspaces/products/inish-site/.worktrees/vps-daily-publish` (dedicated publisher worktree on `main`). Do not use the product root checkout — fleet lanes check out PR branches there.
+Run this on `netcup-rs2000` in a fresh checkout of `origin/main`. The fleet's `agent` workflow (Nishfleet/fleet-ops `.github/workflows/agent.yml`, job `inish-daily`) starts it every day at 07:30 IST. Never use the product root checkout: fleet lanes check out PR branches there.
 
 ## Goal
 
-Publish one source-backed edition to `https://inish.in/`, then send Nish the verified live link on Telegram.
+Publish one source-backed edition to `https://inish.in/`, then print `published: YYYY-MM-DD <live url>` as the last line. The run fails without that line.
 
 ## Steps
 
@@ -14,9 +14,9 @@ Publish one source-backed edition to `https://inish.in/`, then send Nish the ver
 4. Write `data/editions/YYYY-MM-DD.json` using the schema below. Put the lead first, the two supporting stories next, and the remaining stories last; the builder assigns those positions their visual prominence.
 5. Run `python3 -m inish_daily.build_daily`, `python3 -m unittest discover -s tests -v`, and `python3 -m py_compile inish_daily/build_daily.py`.
 6. Review the rendered page for the candidate proof, empty copy, duplicates, unsupported claims, functional filters, and broken source URLs.
-7. Commit only the edition and generated root feed files with `daily: publish YYYY-MM-DD`, then push `main`.
-8. Pushing `main` deploys: the `Deploy production` workflow runs `npx --yes wrangler deploy` (`.github/deploy-config.json`) once the push is green. Wait for that run to finish green.
-9. Verify live from a clean `main` checkout: `python3 -m inish_daily.verify_live --root . --edition-date YYYY-MM-DD --commit <pushed SHA>`. Report success and send Nish the live link on Telegram only when it exits 0; otherwise report the exact failing stage without claiming publication.
+7. Commit only the edition and generated root feed files with `daily: publish YYYY-MM-DD` on branch `daily/YYYY-MM-DD`, push it, open a PR, and arm auto-merge: `gh pr merge <n> --auto --squash`. `main` takes no direct pushes (ruleset: required checks). Wait for the PR to merge.
+8. The merge deploys: the `Deploy production` workflow runs `npx --yes wrangler deploy` (`.github/deploy-config.json`) on the push to `main`. Wait for that run to finish green.
+9. Verify live from a clean `main` checkout at the merge commit: `python3 -m inish_daily.verify_live --root . --edition-date YYYY-MM-DD --commit <merge SHA>`. Print the `published:` line only when it exits 0; otherwise print `publish-failed: <stage>` with the exact failing stage and exit non-zero.
 
 ## Who this is for
 
