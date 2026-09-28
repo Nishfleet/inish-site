@@ -518,7 +518,7 @@ def json_ld(title: str, description: str, date: str, stories: list) -> str:
 def page(edition: dict) -> str:
     date = dt.date.fromisoformat(edition["date"])
     title_date = date.strftime("%A, %d %B %Y")
-    title = f"Nish's Daily Reads — {edition['date']}"
+    title = f"Nish's Daily Reads · {edition['date']}"
     description = "AI news and early signs of what people will pay for, picked each morning for a founder. Every story links the fact it was checked against."
     image_alt = "Nish's Daily Reads: AI news and early signs of what people will pay for, picked each morning for a founder."
     kept_count = len(edition["stories"])
@@ -631,7 +631,7 @@ def rss(edition: dict) -> str:
     # The daily run starts at 07:30 IST (02:00 UTC).
     published = dt.datetime.combine(day, dt.time(2), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"inish-daily-{day.isoformat()}"
-    item = f"<item><title>Nish's Daily Reads — {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
+    item = f"<item><title>Nish's Daily Reads · {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
     return (
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\"><channel>"
