@@ -146,6 +146,12 @@ h1 {
   font: italic 20px/1.32 var(--display);
 }
 
+/* When the dek sits under the headline (404) instead of beside it, the
+   headline's descenders need room. */
+h1 + .dek {
+  margin-top: 18px;
+}
+
 .filters {
   display: flex;
   gap: 0;
@@ -192,10 +198,15 @@ a:focus-visible {
 .edition-note {
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: 160px minmax(0, 1fr);
-  gap: 28px;
-  padding: 20px 0 19px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 8px 16px;
+  padding: 24px 0;
   border-bottom: 1px solid var(--ink);
+}
+
+.edition-note span,
+.edition-note p {
+  grid-column: 2;
 }
 
 .edition-note span {
@@ -216,26 +227,22 @@ a:focus-visible {
   grid-template-columns: 34px minmax(0, 1fr);
   gap: 16px;
   min-width: 0;
-  padding: 21px 0 22px;
+  padding: 24px 0;
   border-bottom: 1px solid var(--rule);
 }
 
 .story-lead {
   grid-column: 1 / -1;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 22px;
-  padding: 28px 0 27px;
+  padding: 32px 0;
   border-bottom: 3px double var(--ink);
 }
 
 .story-feature {
-  padding-top: 24px;
-  padding-bottom: 25px;
+  padding: 28px 0;
 }
 
 .story-brief {
-  padding-top: 18px;
-  padding-bottom: 19px;
+  padding: 22px 0;
 }
 
 .story-number {
@@ -281,8 +288,6 @@ a:focus-visible {
 }
 
 .story-brief h2 {
-  margin-top: 9px;
-  margin-bottom: 10px;
   font-size: clamp(22px, 2.1vw, 29px);
   line-height: 1.04;
 }
@@ -300,7 +305,7 @@ a:focus-visible {
 
 .story p {
   max-width: 82ch;
-  margin: 0 0 10px;
+  margin: 0;
   font-size: 15px;
 }
 
@@ -312,6 +317,14 @@ a:focus-visible {
 .story-brief p {
   font-size: 14px;
   line-height: 1.46;
+}
+
+.story-notes {
+  margin-top: 16px;
+}
+
+.story-brief .story-notes {
+  margin-top: 12px;
 }
 
 .story .fact,
@@ -326,7 +339,6 @@ a:focus-visible {
 }
 
 .story .fact {
-  margin-top: 15px;
   border-left-color: var(--ink);
   font-family: var(--mono);
   font-size: 12.5px;
@@ -338,12 +350,14 @@ a:focus-visible {
 .story .fact a {
   color: var(--ink);
   text-decoration: underline;
+  text-decoration-color: var(--rule);
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
 .story .fact a:hover {
   color: var(--red);
+  text-decoration-color: currentcolor;
 }
 
 .story .take {
@@ -363,7 +377,6 @@ a:focus-visible {
 }
 
 .story-brief .fact {
-  margin-top: 12px;
   font-size: 11.5px;
 }
 
@@ -416,12 +429,23 @@ a:focus-visible {
   display: none;
 }
 
+.story:last-child {
+  border-bottom: 0;
+}
+
+@media (min-width: 821px) {
+  .story:nth-child(odd of .story:not(.story-lead)):nth-last-child(2 of .story:not(.story-lead)) {
+    border-bottom: 0;
+  }
+}
+
 footer {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 30px;
-  margin: 34px 0 22px;
-  padding: 22px 0 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px 30px;
+  align-items: baseline;
+  margin: 8px 0 0;
+  padding: 20px 0 36px;
   border-top: 3px double var(--ink);
   font-size: 13px;
 }
@@ -429,22 +453,27 @@ footer {
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 13px;
-  margin-top: 8px;
+  gap: 18px;
 }
 
 .footer-links a {
   color: inherit;
 }
 
+.identity {
+  margin: 0;
+  text-align: right;
+}
+
 .identity a {
   color: inherit;
 }
 
-footer > p {
+footer > p:last-child {
   grid-column: 1 / -1;
-  margin: 8px 0;
+  margin: 0;
   color: var(--muted);
+  font-size: 12px;
 }
 
 @media (max-width: 820px) {
@@ -485,13 +514,55 @@ footer > p {
     font-size: 18px;
   }
 
+  /* Five filters cannot share one row: wrap them instead of hiding the
+     last ones behind a sideways scroll nobody sees. */
+  .filters {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .filters button {
+    min-height: 40px;
+    border-right: 0;
+    padding: 10px 18px 10px 0;
+  }
+
+  .edition-note p {
+    font-size: 17px;
+  }
+
   .stories {
     grid-template-columns: 1fr;
   }
 
   .edition-note {
     grid-template-columns: 1fr;
-    gap: 8px;
+  }
+
+  .edition-note span,
+  .edition-note p {
+    grid-column: 1;
+  }
+
+  /* A hanging number column costs a sixth of a phone's width. Put the number
+     on the meta line and give the story the full width below it. */
+  .story {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 12px;
+  }
+
+  .story-body {
+    display: contents;
+  }
+
+  .story-number {
+    padding-top: 0;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .story-body > :not(.story-meta) {
+    grid-column: 1 / -1;
   }
 
   .story-lead,
@@ -501,11 +572,19 @@ footer > p {
   }
 
   .story-lead h2 {
-    max-width: 16ch;
+    max-width: none;
+  }
+
+  .story-lead .take {
+    font-size: 18px;
   }
 
   footer {
     grid-template-columns: 1fr;
+  }
+
+  .identity {
+    text-align: left;
   }
 
   h1 {
@@ -519,13 +598,12 @@ footer > p {
     font-size: 10px;
   }
 
-  .story-lead {
-    grid-template-columns: 34px minmax(0, 1fr);
-    gap: 15px;
+  h1 {
+    font-size: clamp(48px, 16vw, 68px);
   }
 
   .story-lead h2 {
-    font-size: clamp(36px, 12vw, 54px);
+    font-size: clamp(32px, 9.5vw, 44px);
   }
 }
 
@@ -537,7 +615,8 @@ footer > p {
   .story-lead .story-body {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    column-gap: 48px;
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 56px;
     align-items: start;
   }
 
@@ -546,26 +625,16 @@ footer > p {
     grid-column: 1 / -1;
   }
 
-  .story-lead > .story-body > p:not(.fact):not(.take):not(.caveat) {
+  .story-lead > .story-body > p {
     grid-column: 1;
-    max-width: none;
-    margin-bottom: 0;
-  }
-
-  .story-lead .fact {
-    grid-column: 2;
     grid-row: 3;
-    margin-top: 0;
+    max-width: none;
   }
 
-  .story-lead .take {
+  .story-lead .story-notes {
     grid-column: 2;
-    grid-row: 4;
-  }
-
-  .story-lead .caveat {
-    grid-column: 2;
-    grid-row: 5;
+    grid-row: 3 / span 2;
+    margin-top: 4px;
   }
 
   .story-lead .source-link {
@@ -589,8 +658,7 @@ footer > p {
 }
 
 .error-main {
-  padding: 26px 0 32px;
-  border-bottom: 3px double var(--ink);
+  padding: 32px 0 64px;
 }
 
 .back-link {
