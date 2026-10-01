@@ -603,3 +603,13 @@ test("style hashes: non-HTML assets without the header are untouched", async () 
     CONTRACT.securityHeaders["Content-Security-Policy"]
   );
 });
+
+test("CSP: Cloudflare Web Analytics origins are named, nothing is wildcarded or inline", () => {
+  const csp = CONTRACT.securityHeaders["Content-Security-Policy"];
+  const directive = (name) =>
+    csp.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name} `));
+  assert.equal(directive("script-src"), "script-src 'self' https://static.cloudflareinsights.com");
+  assert.equal(directive("connect-src"), "connect-src https://cloudflareinsights.com");
+  assert.ok(!csp.includes("unsafe-inline"), "the CSP must never allow unsafe-inline");
+  assert.ok(!csp.includes("*"), "the CSP must name origins, never wildcard them");
+});
