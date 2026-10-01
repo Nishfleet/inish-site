@@ -4,6 +4,7 @@ import {
   canonicalize,
   decide,
   fontPath,
+  htmlHeaders,
   hstsHeader,
   notFoundAssetUrl,
   redirects,
@@ -122,6 +123,18 @@ export default {
     if (fontPath.test(url.pathname)) {
       const headers = new Headers(asset.headers);
       headers.set("Cache-Control", FONT_CACHE_CONTROL);
+      response = new Response(asset.body, {
+        status: asset.status,
+        statusText: asset.statusText,
+        headers
+      });
+    }
+    const contentType = asset.headers.get("Content-Type") ?? "";
+    if (asset.status === 200 && contentType.startsWith("text/html")) {
+      const headers = new Headers(response.headers);
+      for (const [name, value] of htmlHeaders) {
+        headers.set(name, value);
+      }
       response = new Response(asset.body, {
         status: asset.status,
         statusText: asset.statusText,
