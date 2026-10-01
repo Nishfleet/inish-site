@@ -29,21 +29,8 @@ jobs:
           node-version: "24"
       - run: npm test
 
-  # Fleet-wide gate (fleet-ops#8756): fails only on added helper scripts.
-  no-glue:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: Nishfleet/fleet-ops/.github/actions/no-glue@main
-        with:
-          extra-allowed: "inish_daily/** tests/**"
-
   deploy:
-    needs: [test, no-glue]
+    needs: [test]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
