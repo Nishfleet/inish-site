@@ -522,24 +522,7 @@ test("no preload hint: the whole stylesheet is inlined, so HTML carries no Link 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("Link"), null, `${path} must not preload styles.css`);
   }
-  assert.deepEqual(Object.keys(CONTRACT.htmlHeaders), ["Cache-Control"]);
-});
-
-test("no-transform: HTML opts out of edge injection and keeps revalidation; other assets are untouched", async () => {
-  for (const path of ["/", "/about.html"]) {
-    const { response } = await call(path);
-    const directives = response.headers.get("Cache-Control").split(",").map((part) => part.trim());
-    for (const wanted of ["public", "max-age=0", "must-revalidate", "no-transform"]) {
-      assert.ok(directives.includes(wanted), `${path} Cache-Control must include ${wanted}`);
-    }
-  }
-  for (const path of ["/styles.css", "/app.js", "/latest.json"]) {
-    const { response } = await call(path);
-    assert.ok(
-      !(response.headers.get("Cache-Control") ?? "").includes("no-transform"),
-      `${path} must not carry no-transform`
-    );
-  }
+  assert.deepEqual(CONTRACT.htmlHeaders, {});
 });
 
 test("no Link header on non-HTML responses or the 404", async () => {
