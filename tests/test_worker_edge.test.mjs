@@ -538,6 +538,72 @@ test("early hints: the preload target is same-origin so style-src 'self' covers 
   assert.match(CONTRACT.htmlHeaders.Link, /^<\/styles\.css>;/);
 });
 
+// Build-time inline-style hashes: build.mjs publishes the sha256 of each
+// inlined <style> block as X-Style-Hashes on the asset (dist/_headers). The
+// worker widens style-src by exactly those hashes and never exposes the header.
+
+const HASH_A = "'sha256-p6Yxjd+yDzlohSSUThXMlMzIJ/WR/en0qGJRQ68kLBM='";
+const HASH_B = "'sha256-XEnzjSrhvbZE7qdYbg93iKCq9fXmuE2dd0yPw8cJ7m0='";
+
+async function callWithHashHeader(path, hashes) {
+  const assets = {
+    async fetch(input) {
+      const { pathname } = new URL(typeof input === "string" ? input : input.url);
+      const headers = new Headers({ "Content-Type": "text/html; charset=utf-8" });
+      if (hashes !== null) headers.set("X-Style-Hashes", hashes);
+      return new Response(`asset ${pathname}`, { status: 200, headers });
+    }
+  };
+  return worker.fetch(new Request(`${ORIGIN}${path}`), { ASSETS: assets });
+}
+
+function styleSrc(response) {
+  return response.headers
+    .get("Content-Security-Policy")
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith("style-src "));
+}
+
+test("style hashes: a page with inlined CSS gets its hashes in style-src, no unsafe-inline", async () => {
+  const response = await callWithHashHeader("/", `${HASH_A} ${HASH_B}`);
+  assert.equal(styleSrc(response), `style-src 'self' ${HASH_A} ${HASH_B}`);
+  assert.equal(response.headers.get("X-Style-Hashes"), null, "the internal header must not leak");
+  assert.ok(!response.headers.get("Content-Security-Policy").includes("unsafe-inline"));
+});
+
+test("style hashes: the branded 404 carries the hashes of its inlined CSS", async () => {
+  const assets = {
+    async fetch() {
+      return new Response("<html>branded 404</html>", {
+        status: 200,
+        headers: { "Content-Type": "text/html", "X-Style-Hashes": HASH_A }
+      });
+    }
+  };
+  const response = await worker.fetch(new Request(`${ORIGIN}/admin`), { ASSETS: assets });
+  assert.equal(response.status, 404);
+  assert.equal(styleSrc(response), `style-src 'self' ${HASH_A}`);
+  assert.equal(response.headers.get("X-Style-Hashes"), null);
+});
+
+test("style hashes: no header, or a malformed one, leaves the contract CSP unchanged", async () => {
+  const contractCsp = CONTRACT.securityHeaders["Content-Security-Policy"];
+  for (const hashes of [null, "'unsafe-inline'", `${HASH_A}; script-src *`, "'sha256-!'"]) {
+    const response = await callWithHashHeader("/", hashes);
+    assert.equal(response.headers.get("Content-Security-Policy"), contractCsp);
+    assert.equal(response.headers.get("X-Style-Hashes"), null);
+  }
+});
+
+test("style hashes: non-HTML assets without the header are untouched", async () => {
+  const { response } = await call("/styles.css");
+  assert.equal(
+    response.headers.get("Content-Security-Policy"),
+    CONTRACT.securityHeaders["Content-Security-Policy"]
+  );
+});
+
 test("CSP: Cloudflare Web Analytics origins are named, nothing is wildcarded or inline", () => {
   const csp = CONTRACT.securityHeaders["Content-Security-Policy"];
   const directive = (name) =>
