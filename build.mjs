@@ -10,7 +10,7 @@ await cp(source, output, { recursive: true });
 
 const beasties = new Beasties({
   path: output,
-  preload: "body",
+  inlineThreshold: 65536,
   pruneSource: false,
   logLevel: "warn"
 });

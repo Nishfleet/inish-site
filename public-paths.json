@@ -29,13 +29,11 @@
     "/about": "/about.html"
   },
   "hstsHeader": "max-age=31536000; includeSubDomains",
-  "htmlHeaders": {
-    "Link": "</styles.css>; rel=preload; as=style"
-  },
+  "htmlHeaders": {},
   "securityHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Content-Security-Policy": "default-src 'none'; style-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src https://cloudflareinsights.com; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    "Content-Security-Policy": "default-src 'none'; style-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     "X-Frame-Options": "DENY"
   }
 }

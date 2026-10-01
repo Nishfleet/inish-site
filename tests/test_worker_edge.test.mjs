@@ -516,26 +516,20 @@ test("security headers: a bodyless HEAD denial still carries the full contract s
   }
 });
 
-const STYLES_PRELOAD = "</styles.css>; rel=preload; as=style";
-
-test("early hints: HTML pages carry the stylesheet preload Link header", async () => {
+test("no preload hint: the whole stylesheet is inlined, so HTML carries no Link header", async () => {
   for (const path of ["/", "/about.html"]) {
     const { response } = await call(path);
     assert.equal(response.status, 200);
-    assert.equal(response.headers.get("Link"), STYLES_PRELOAD, `${path} must preload styles.css`);
+    assert.equal(response.headers.get("Link"), null, `${path} must not preload styles.css`);
   }
+  assert.deepEqual(CONTRACT.htmlHeaders, {});
 });
 
-test("early hints: non-HTML responses and the 404 carry no Link header", async () => {
+test("no Link header on non-HTML responses or the 404", async () => {
   for (const path of ["/latest.json", "/styles.css", "/app.js", "/admin"]) {
     const { response } = await call(path);
     assert.equal(response.headers.get("Link"), null, `${path} must not carry Link`);
   }
-});
-
-test("early hints: the preload target is same-origin so style-src 'self' covers it", () => {
-  assert.ok(CONTRACT.securityHeaders["Content-Security-Policy"].includes("style-src 'self'"));
-  assert.match(CONTRACT.htmlHeaders.Link, /^<\/styles\.css>;/);
 });
 
 // Build-time inline-style hashes: build.mjs publishes the sha256 of each
@@ -609,7 +603,7 @@ test("CSP: Cloudflare Web Analytics origins are named, nothing is wildcarded or 
   const directive = (name) =>
     csp.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name} `));
   assert.equal(directive("script-src"), "script-src 'self' https://static.cloudflareinsights.com");
-  assert.equal(directive("connect-src"), "connect-src https://cloudflareinsights.com");
+  assert.equal(directive("connect-src"), "connect-src 'self' https://cloudflareinsights.com");
   assert.ok(!csp.includes("unsafe-inline"), "the CSP must never allow unsafe-inline");
   assert.ok(!csp.includes("*"), "the CSP must name origins, never wildcard them");
 });
