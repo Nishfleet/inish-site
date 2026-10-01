@@ -22,6 +22,10 @@ Durable project truth that the code alone does not tell you.
 - Banning filler words: the writer rotates to synonyms. Structural constraints the builder can enforce work; vocabulary bans do not.
 - Sourcing from brand-new GitHub repos: their only evidence is their own README.
 
+## Performance
+
+- Cloudflare Web Analytics auto-injection: its cross-origin beacon script adds about 370 ms to Lighthouse's simulated LCP (measured 1230 -> 1602 ms locally over HTTP/2). HTML responses carry `no-transform` (htmlHeaders in `public-paths.json`) so the edge does not inject it. The CSP still names the analytics origins; re-adding the beacon needs the site token and must load after the `load` event.
+
 ## Open items outside this repo
 
 - GitHub profile website field for `nish3451` should be `https://inish.in/`; it needs a `user`-scoped token or a manual edit at github.com/settings/profile.
