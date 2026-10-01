@@ -32,10 +32,9 @@ export const hstsHeader = routeContract.hstsHeader;
 // reason HSTS does — one edit in public-paths.json, never mirrored literals.
 export const securityHeaders = Object.entries(routeContract.securityHeaders);
 
-// Headers added to HTML responses only. No Link preload header: build.mjs
-// inlines the whole stylesheet. Cache-Control keeps the asset default and adds
-// no-transform, so the edge does not inject the third-party analytics beacon
-// into the page. Route data lives in public-paths.json like everything above.
+// Headers added to HTML responses only. Empty today: build.mjs inlines the whole
+// stylesheet, so there is nothing to preload. Route data lives in
+// public-paths.json like everything above.
 export const htmlHeaders = Object.entries(routeContract.htmlHeaders);
 
 // The branded 404 page ships as public/404.html. The edge reads it through the ASSETS binding

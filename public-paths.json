@@ -29,9 +29,7 @@
     "/about": "/about.html"
   },
   "hstsHeader": "max-age=31536000; includeSubDomains",
-  "htmlHeaders": {
-    "Cache-Control": "public, max-age=0, must-revalidate, no-transform"
-  },
+  "htmlHeaders": {},
   "securityHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
