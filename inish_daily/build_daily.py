@@ -580,7 +580,6 @@ def page(edition: dict) -> str:
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#f4efe5">
   <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
-  <link rel="preload" href="/fonts/archivo-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json">
 {textwrap.indent(json_ld(title, description, edition["date"], edition["stories"]), "  ")}
