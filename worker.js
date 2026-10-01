@@ -8,7 +8,9 @@ import {
   hstsHeader,
   notFoundAssetUrl,
   redirects,
-  securityHeaders
+  securityHeaders,
+  styleHashesHeader,
+  withStyleHashes
 } from "./policy.js";
 
 // HSTS lives in public-paths.json as the single source of truth for the route
@@ -29,8 +31,13 @@ const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
   headers.set("Strict-Transport-Security", hstsHeader);
+  const styleHashes = headers.get(styleHashesHeader);
+  headers.delete(styleHashesHeader);
   for (const [name, value] of securityHeaders) {
-    headers.set(name, value);
+    headers.set(
+      name,
+      name === "Content-Security-Policy" ? withStyleHashes(value, styleHashes) : value
+    );
   }
   return new Response(response.body, {
     status: response.status,
@@ -60,7 +67,10 @@ async function notFoundResponse(request, env) {
   try {
     const asset = await env.ASSETS.fetch(notFoundAssetUrl);
     if (asset.ok) {
-      return new Response(asset.body, { status: 404, headers: notFoundHeaders });
+      const headers = new Headers(notFoundHeaders);
+      const styleHashes = asset.headers.get(styleHashesHeader);
+      if (styleHashes !== null) headers.set(styleHashesHeader, styleHashes);
+      return new Response(asset.body, { status: 404, headers });
     }
   } catch {
     // The asset or binding failed; fall back rather than surfacing an error.

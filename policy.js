@@ -60,3 +60,17 @@ export function canonicalize(url) {
   if (url.protocol === "https:" && url.hostname === "inish.in") return null;
   return new URL(url.pathname + url.search, canonicalOrigin).href;
 }
+
+// Build-time inline-style hashes. build.mjs inlines each page's critical CSS
+// and publishes the sha256 of every <style> block in dist/_headers as an
+// internal X-Style-Hashes header on the asset. The worker allows exactly those
+// blocks in style-src, so the CSP never needs 'unsafe-inline' and no hash is
+// maintained by hand. Anything not shaped like a list of sha256 sources is
+// ignored, so a malformed header cannot widen the policy.
+export const styleHashesHeader = "X-Style-Hashes";
+const styleHashList = /^'sha256-[A-Za-z0-9+/]+={0,2}'( 'sha256-[A-Za-z0-9+/]+={0,2}')*$/;
+
+export function withStyleHashes(csp, hashes) {
+  if (hashes === null || !styleHashList.test(hashes)) return csp;
+  return csp.replace("style-src 'self'", `style-src 'self' ${hashes}`);
+}
