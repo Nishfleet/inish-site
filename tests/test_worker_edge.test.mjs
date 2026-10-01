@@ -149,7 +149,15 @@ function makeAssets() {
         return new Response("missing", { status: 404 });
       }
       if (SERVED.has(url.pathname)) {
-        return new Response(`asset ${url.pathname}`, { status: 200 });
+        const type = url.pathname.endsWith(".html")
+          ? "text/html; charset=utf-8"
+          : url.pathname.endsWith(".json")
+            ? "application/json"
+            : "application/octet-stream";
+        return new Response(`asset ${url.pathname}`, {
+          status: 200,
+          headers: { "Content-Type": type }
+        });
       }
       return new Response("missing", { status: 404 });
     }
@@ -506,4 +514,26 @@ test("security headers: a bodyless HEAD denial still carries the full contract s
   for (const [name, value] of securityHeaders) {
     assert.equal(response.headers.get(name), value, `HEAD 404 must carry ${name}`);
   }
+});
+
+const STYLES_PRELOAD = "</styles.css>; rel=preload; as=style";
+
+test("early hints: HTML pages carry the stylesheet preload Link header", async () => {
+  for (const path of ["/", "/about.html"]) {
+    const { response } = await call(path);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Link"), STYLES_PRELOAD, `${path} must preload styles.css`);
+  }
+});
+
+test("early hints: non-HTML responses and the 404 carry no Link header", async () => {
+  for (const path of ["/latest.json", "/styles.css", "/app.js", "/admin"]) {
+    const { response } = await call(path);
+    assert.equal(response.headers.get("Link"), null, `${path} must not carry Link`);
+  }
+});
+
+test("early hints: the preload target is same-origin so style-src 'self' covers it", () => {
+  assert.ok(CONTRACT.securityHeaders["Content-Security-Policy"].includes("style-src 'self'"));
+  assert.match(CONTRACT.htmlHeaders.Link, /^<\/styles\.css>;/);
 });

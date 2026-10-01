@@ -32,6 +32,12 @@ export const hstsHeader = routeContract.hstsHeader;
 // reason HSTS does — one edit in public-paths.json, never mirrored literals.
 export const securityHeaders = Object.entries(routeContract.securityHeaders);
 
+// Headers added to HTML responses only. The Link preload lets Cloudflare Early
+// Hints (103) start the render-blocking stylesheet fetch during TTFB; a
+// same-origin stylesheet preload is covered by style-src 'self', so the CSP is
+// unchanged. Route data lives in public-paths.json like everything above.
+export const htmlHeaders = Object.entries(routeContract.htmlHeaders);
+
 // The branded 404 page ships as public/404.html. The edge reads it through the ASSETS binding
 // using this URL — derived from canonicalOrigin so a host change or a rename
 // of the asset are single edits to public-paths.json instead of mirrored
