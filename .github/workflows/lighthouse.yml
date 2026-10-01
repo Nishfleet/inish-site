@@ -1,0 +1,26 @@
+name: Lighthouse
+
+# Audits the live pages against the fleet speed budget (fleet-ops
+# config/lighthouserc.json) after every successful production deployment and
+# weekly. A red job is the signal.
+
+on:
+  deployment_status:
+  schedule:
+    - cron: "53 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lighthouse:
+    name: lighthouse
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    uses: Nishfleet/fleet-ops/.github/workflows/lighthouse.yml@main
+    permissions:
+      contents: read
+    with:
+      urls: |
+        https://inish.in/
+        https://inish.in/about.html
