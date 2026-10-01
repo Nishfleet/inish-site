@@ -537,3 +537,13 @@ test("early hints: the preload target is same-origin so style-src 'self' covers 
   assert.ok(CONTRACT.securityHeaders["Content-Security-Policy"].includes("style-src 'self'"));
   assert.match(CONTRACT.htmlHeaders.Link, /^<\/styles\.css>;/);
 });
+
+test("CSP: Cloudflare Web Analytics origins are named, nothing is wildcarded or inline", () => {
+  const csp = CONTRACT.securityHeaders["Content-Security-Policy"];
+  const directive = (name) =>
+    csp.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name} `));
+  assert.equal(directive("script-src"), "script-src 'self' https://static.cloudflareinsights.com");
+  assert.equal(directive("connect-src"), "connect-src https://cloudflareinsights.com");
+  assert.ok(!csp.includes("unsafe-inline"), "the CSP must never allow unsafe-inline");
+  assert.ok(!csp.includes("*"), "the CSP must name origins, never wildcard them");
+});
