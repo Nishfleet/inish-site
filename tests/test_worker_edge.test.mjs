@@ -607,3 +607,12 @@ test("CSP: Cloudflare Web Analytics origins are named, nothing is wildcarded or 
   assert.ok(!csp.includes("unsafe-inline"), "the CSP must never allow unsafe-inline");
   assert.ok(!csp.includes("*"), "the CSP must name origins, never wildcard them");
 });
+
+test("no page preloads a webfont: the early font request is charged to LCP by Lighthouse's simulation", () => {
+  for (const name of ["index.html", "about.html"]) {
+    const html = readFileSync(join(ROOT, "public", name), "utf8");
+    assert.doesNotMatch(html, /<link[^>]+rel="preload"/, `${name} must not carry a preload hint`);
+  }
+  const generator = readFileSync(join(ROOT, "inish_daily", "build_daily.py"), "utf8");
+  assert.doesNotMatch(generator, /rel="preload"/);
+});
