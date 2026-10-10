@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch a small, auditable candidate pool for the Nish Daily editor.
+"""Fetch a small, auditable candidate pool for The Daily (nish.sh/daily).
 
 Pool quality decides edition quality. A week-old repository with 15 stars has
 no evidence behind it except its own README, so an editor working from that
@@ -24,6 +24,7 @@ import time
 import html
 import json
 import os
+import re
 import subprocess
 import urllib.parse
 import urllib.request
@@ -33,7 +34,8 @@ from pathlib import Path
 from inish_daily import jev_rank
 
 ROOT = Path(__file__).resolve().parents[1]
-USER_AGENT = "inish-daily/1.0 (+https://inish.in/)"
+USER_AGENT = "the-daily/1.0 (+https://nish.sh/daily)"
+SOURCES_FILE = Path(__file__).with_name("sources.json")
 
 # Reddit serves its JSON API 403 to anything that looks automated, but the RSS
 # feeds still answer 200 for a browser user-agent. It rate-limits hard, so the
@@ -42,7 +44,6 @@ BROWSER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
-REDDIT_SUBS = (("SaaS", "Product ideas"), ("startups", "Demand signals"), ("Entrepreneur", "Demand signals"))
 REDDIT_PAUSE = 4.0
 REDDIT_RETRIES = 3
 
@@ -230,26 +231,21 @@ def google_news(query: str, lens: str) -> list[dict]:
     return feed(url, "Google News", lens, INDEPENDENT, limit=15)
 
 
-def reddit() -> list[dict]:
-    """Where people say out loud what they want and what they will pay for."""
-    items: list[dict] = []
-    failures: list[str] = []
-    for index, (sub, lens) in enumerate(REDDIT_SUBS):
-        if index:
-            time.sleep(REDDIT_PAUSE)
-        url = f"https://www.reddit.com/r/{sub}/top/.rss?t=day"
-        for attempt in range(REDDIT_RETRIES):
-            try:
-                items.extend(feed(url, f"r/{sub}", lens, INDEPENDENT, 15, agent=BROWSER_AGENT))
-                break
-            except Exception as exc:
-                if attempt == REDDIT_RETRIES - 1:
-                    failures.append(f"r/{sub}: {type(exc).__name__}")
-                else:
-                    time.sleep(REDDIT_PAUSE * (attempt + 2))
-    if failures and not items:
-        raise RuntimeError("; ".join(failures))
-    return items
+def reddit(sub: str, source: str, lens: str) -> list[dict]:
+    """Where people say out loud what they want and what they will pay for.
+
+    One subreddit per call. Reddit rate-limits hard, so a 429 is retried with a
+    growing pause and, in the end, reported as this source's error only.
+    """
+    url = f"https://www.reddit.com/r/{sub}/top/.rss?t=day"
+    for attempt in range(REDDIT_RETRIES):
+        try:
+            return feed(url, source, lens, INDEPENDENT, 15, agent=BROWSER_AGENT)
+        except Exception:
+            if attempt == REDDIT_RETRIES - 1:
+                raise
+            time.sleep(REDDIT_PAUSE * (attempt + 2))
+    return []
 
 
 def show_hn() -> list[dict]:
@@ -272,6 +268,72 @@ def show_hn() -> list[dict]:
     return items
 
 
+SOURCE_TYPES = ("hacker_news", "show_hn", "lobsters", "github", "rss", "google_news", "reddit")
+
+
+def load_sources(path: Path = SOURCES_FILE) -> dict:
+    """Read and check sources.json, the one place a site is added or removed."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    groups = {group["id"] for group in data["groups"]}
+    seen: set[str] = set()
+    for source in data["sources"]:
+        for key in ("id", "name", "type", "group", "lens", "evidence"):
+            if not isinstance(source.get(key), str) or not source[key]:
+                raise ValueError(f"{path}: source needs a non-empty {key}: {source}")
+        if source["id"] in seen:
+            raise ValueError(f"{path}: duplicate source id {source['id']}")
+        seen.add(source["id"])
+        if source["type"] not in SOURCE_TYPES:
+            raise ValueError(f"{path}: {source['id']} has unknown type {source['type']}")
+        if source["group"] not in groups:
+            raise ValueError(f"{path}: {source['id']} names unknown group {source['group']}")
+        if source["evidence"] not in (INDEPENDENT, SELF_REPORTED, PREPRINT):
+            raise ValueError(f"{path}: {source['id']} has unknown evidence class {source['evidence']}")
+        need = {"rss": "url", "google_news": "query", "reddit": "sub"}.get(source["type"])
+        if need and not isinstance(source.get(need), str):
+            raise ValueError(f"{path}: {source['id']} (type {source['type']}) needs {need}")
+    for pattern in data.get("filters", {}).get("skip_title_regex", []):
+        re.compile(pattern)
+    return data
+
+
+def skipped_title(title: str, patterns: list[str]) -> bool:
+    return any(re.search(pattern, title, re.IGNORECASE) for pattern in patterns)
+
+
+def load_source(source: dict, day: dt.date, skip: list[str] | None = None) -> list[dict]:
+    """Fetch one configured source and tag every candidate with where it came from."""
+    kind = source["type"]
+    if kind == "hacker_news":
+        items = hacker_news()
+    elif kind == "show_hn":
+        items = show_hn()
+    elif kind == "lobsters":
+        items = lobsters()
+    elif kind == "github":
+        items = github(day)
+    elif kind == "rss":
+        items = feed(
+            source["url"], source["name"], source["lens"], source["evidence"], source.get("limit", 20),
+            agent=BROWSER_AGENT if source.get("browser_agent") else USER_AGENT,
+        )
+        if source.get("title_prefix"):
+            for item in items:
+                item["title"] = f"{source['title_prefix']}: {item['title']}"
+    elif kind == "google_news":
+        items = google_news(source["query"], source["lens"])
+    else:
+        items = reddit(source["sub"], source["name"], source["lens"])
+    # Hype, listicles and "X now matches Y" parity news are dropped before
+    # ranking, so Jev never spends a grade on them.
+    items = [item for item in items if not skipped_title(item["title"], skip or [])]
+    for item in items:
+        item["source"] = source["name"]
+        item["source_id"] = source["id"]
+        item["group"] = source["group"]
+    return items
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=dt.date.today().isoformat())
@@ -280,25 +342,25 @@ def main() -> int:
     output = ROOT / "data" / "candidates" / f"{day.isoformat()}.json"
     output.parent.mkdir(parents=True, exist_ok=True)
 
+    config = load_sources()
     candidates: list[dict] = []
     errors: list[str] = []
-    for name, loader in (
-        ("hacker_news", hacker_news),
-        ("show_hn", show_hn),
-        ("lobsters", lobsters),
-        ("github", lambda: github(day)),
-        ("openai_news", lambda: feed("https://openai.com/news/rss.xml", "OpenAI", "AI", SELF_REPORTED, 12)),
-        ("techcrunch_ai", lambda: feed("https://techcrunch.com/category/artificial-intelligence/feed/", "TechCrunch", "AI", INDEPENDENT, 20)),
-        ("product_hunt", lambda: feed("https://www.producthunt.com/feed", "Product Hunt", "Product ideas", SELF_REPORTED, 20)),
-        ("news_ai", lambda: google_news("AI model release OR pricing OR capability when:3d", "AI")),
-        ("news_funding", lambda: google_news("AI startup raises funding round when:3d", "Demand signals")),
-        ("news_adoption", lambda: google_news("companies spending on AI agents adoption budget when:7d", "Demand signals")),
-        ("reddit", reddit),
-    ):
+    report: list[dict] = []
+    previous_reddit = False
+    seen_urls: set[str] = set()
+    for source in config["sources"]:
+        if source["type"] == "reddit" and previous_reddit:
+            time.sleep(REDDIT_PAUSE)
+        previous_reddit = source["type"] == "reddit"
         try:
-            candidates.extend(loader())
+            items = load_source(source, day, config.get("filters", {}).get("skip_title_regex", []))
+            fresh = [item for item in items if item["url"] not in seen_urls]
+            seen_urls.update(item["url"] for item in fresh)
+            candidates.extend(fresh)
+            report.append({"id": source["id"], "name": source["name"], "group": source["group"], "count": len(items), "error": None})
         except Exception as exc:  # Keep the other independent sources useful.
-            errors.append(f"{name}: {type(exc).__name__}: {exc}")
+            errors.append(f"{source['id']}: {type(exc).__name__}: {exc}")
+            report.append({"id": source["id"], "name": source["name"], "group": source["group"], "count": 0, "error": type(exc).__name__})
 
     ranked_by = None
     jev_key = os.environ.get("TYPESAFE_API_KEY")
@@ -332,6 +394,7 @@ def main() -> int:
         "by_evidence_class": by_class,
         "by_lens": by_lens,
         "source_errors": errors,
+        "sources": report,
         "ranked_by": ranked_by,
         "candidates": candidates,
     }

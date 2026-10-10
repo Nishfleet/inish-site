@@ -1,0 +1,645 @@
+{
+ "date": "2026-08-02",
+ "generated_at": "2026-08-02T02:11:00+00:00",
+ "candidate_count": 32,
+ "by_evidence_class": {},
+ "by_lens": {},
+ "source_errors": [
+  "reddit-saas: HTTPError: 429"
+ ],
+ "sources": [
+  {
+   "id": "s0",
+   "name": "S0",
+   "group": "ai",
+   "count": 0,
+   "error": "HTTPError"
+  },
+  {
+   "id": "s1",
+   "name": "S1",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s2",
+   "name": "S2",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s3",
+   "name": "S3",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s4",
+   "name": "S4",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s5",
+   "name": "S5",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s6",
+   "name": "S6",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s7",
+   "name": "S7",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s8",
+   "name": "S8",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s9",
+   "name": "S9",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s10",
+   "name": "S10",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s11",
+   "name": "S11",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  },
+  {
+   "id": "s12",
+   "name": "S12",
+   "group": "ai",
+   "count": 3,
+   "error": null
+  }
+ ],
+ "ranked_by": "jev-latest",
+ "candidates": [
+  {
+   "source": "TechCrunch",
+   "source_id": "techcrunch",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "A lab cuts the price of its small model by 80 percent",
+   "url": "https://ai-news.example/price-cut",
+   "description": "The cheaper tier now costs a fifth of last month's price.",
+   "jev": {
+    "priority": 0.9,
+    "fit": 3.6,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Ratchet",
+   "source_id": "ratchet",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Ratchet ships deterministic replays",
+   "url": "https://ratchet.example/launch",
+   "description": "Already picked as a story.",
+   "jev": {
+    "priority": 0.8,
+    "fit": 3.2,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Hugging Face",
+   "source_id": "hugging-face",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 2",
+   "url": "https://ai-news.example/item-2",
+   "description": "Short description for AI item 2.",
+   "jev": {
+    "priority": 0.7000000000000001,
+    "fit": 2.8000000000000003,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Simon Willison",
+   "source_id": "simon-willison",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 3",
+   "url": "https://ai-news.example/item-3",
+   "description": "Short description for AI item 3.",
+   "jev": {
+    "priority": 0.65,
+    "fit": 2.6,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "OpenAI",
+   "source_id": "openai",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 4",
+   "url": "https://ai-news.example/item-4",
+   "description": "Short description for AI item 4.",
+   "jev": {
+    "priority": 0.6000000000000001,
+    "fit": 2.4000000000000004,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Google AI",
+   "source_id": "google-ai",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 5",
+   "url": "https://ai-news.example/item-5",
+   "description": "Short description for AI item 5.",
+   "jev": {
+    "priority": 0.55,
+    "fit": 2.2,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Hugging Face",
+   "source_id": "hugging-face",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 6",
+   "url": "https://ai-news.example/item-6",
+   "description": "Short description for AI item 6.",
+   "jev": {
+    "priority": 0.5,
+    "fit": 2.0,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Simon Willison",
+   "source_id": "simon-willison",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 7",
+   "url": "https://ai-news.example/item-7",
+   "description": "Short description for AI item 7.",
+   "jev": {
+    "priority": 0.45,
+    "fit": 1.8,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "OpenAI",
+   "source_id": "openai",
+   "group": "ai",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "AI fixture headline number 8",
+   "url": "https://ai-news.example/item-8",
+   "description": "Short description for AI item 8.",
+   "jev": {
+    "priority": 0.4,
+    "fit": 1.6,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Hacker News",
+   "source_id": "hacker-news",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 0",
+   "url": "https://dev.example/item-0",
+   "description": "",
+   "jev": {
+    "priority": 0.6,
+    "fit": 2.4,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "points": 400,
+    "comments": 120
+   },
+   "discussion_url": "https://news.ycombinator.com/item?id=100"
+  },
+  {
+   "source": "Lobsters",
+   "source_id": "lobsters",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 1",
+   "url": "https://dev.example/item-1",
+   "description": "",
+   "jev": {
+    "priority": 0.57,
+    "fit": 2.28,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "stars": 1201
+   }
+  },
+  {
+   "source": "GitHub",
+   "source_id": "github",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 2",
+   "url": "https://dev.example/item-2",
+   "description": "",
+   "jev": {
+    "priority": 0.54,
+    "fit": 2.16,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "stars": 1202
+   }
+  },
+  {
+   "source": "Hacker News",
+   "source_id": "hacker-news",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 3",
+   "url": "https://dev.example/item-3",
+   "description": "",
+   "jev": {
+    "priority": 0.51,
+    "fit": 2.04,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "points": 370,
+    "comments": 117
+   },
+   "discussion_url": "https://news.ycombinator.com/item?id=103"
+  },
+  {
+   "source": "Lobsters",
+   "source_id": "lobsters",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 4",
+   "url": "https://dev.example/item-4",
+   "description": "",
+   "jev": {
+    "priority": 0.48,
+    "fit": 1.92,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "stars": 1204
+   }
+  },
+  {
+   "source": "GitHub",
+   "source_id": "github",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 5",
+   "url": "https://dev.example/item-5",
+   "description": "",
+   "jev": {
+    "priority": 0.44999999999999996,
+    "fit": 1.7999999999999998,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "stars": 1205
+   }
+  },
+  {
+   "source": "Hacker News",
+   "source_id": "hacker-news",
+   "group": "dev",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Dev fixture headline number 6",
+   "url": "https://dev.example/item-6",
+   "description": "",
+   "jev": {
+    "priority": 0.42,
+    "fit": 1.68,
+    "page_read": true,
+    "model": "jev-latest"
+   },
+   "signals": {
+    "points": 340,
+    "comments": 114
+   },
+   "discussion_url": "https://news.ycombinator.com/item?id=106"
+  },
+  {
+   "source": "Show HN",
+   "source_id": "show-hn",
+   "group": "product",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Product fixture headline number 0",
+   "url": "https://product.example/item-0",
+   "description": "",
+   "jev": {
+    "priority": 0.5,
+    "fit": 2.0,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Product Hunt",
+   "source_id": "product-hunt",
+   "group": "product",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Product fixture headline number 1",
+   "url": "https://product.example/item-1",
+   "description": "",
+   "jev": {
+    "priority": 0.46,
+    "fit": 1.84,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Show HN",
+   "source_id": "show-hn",
+   "group": "product",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Product fixture headline number 2",
+   "url": "https://product.example/item-2",
+   "description": "",
+   "jev": {
+    "priority": 0.42,
+    "fit": 1.68,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Product Hunt",
+   "source_id": "product-hunt",
+   "group": "product",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Product fixture headline number 3",
+   "url": "https://product.example/item-3",
+   "description": "",
+   "jev": {
+    "priority": 0.38,
+    "fit": 1.52,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Show HN",
+   "source_id": "show-hn",
+   "group": "product",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Product fixture headline number 4",
+   "url": "https://product.example/item-4",
+   "description": "",
+   "jev": {
+    "priority": 0.33999999999999997,
+    "fit": 1.3599999999999999,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Google News",
+   "source_id": "google-news",
+   "group": "news",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "News fixture headline number 0",
+   "url": "https://press.example/item-0",
+   "description": "Funding round coverage.",
+   "jev": {
+    "priority": 0.55,
+    "fit": 2.2,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Google News",
+   "source_id": "google-news",
+   "group": "news",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "News fixture headline number 1",
+   "url": "https://press.example/item-1",
+   "description": "Funding round coverage.",
+   "jev": {
+    "priority": 0.5,
+    "fit": 2.0,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Google News",
+   "source_id": "google-news",
+   "group": "news",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "News fixture headline number 2",
+   "url": "https://press.example/item-2",
+   "description": "Funding round coverage.",
+   "jev": {
+    "priority": 0.45000000000000007,
+    "fit": 1.8000000000000003,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Google News",
+   "source_id": "google-news",
+   "group": "news",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "News fixture headline number 3",
+   "url": "https://press.example/item-3",
+   "description": "Funding round coverage.",
+   "jev": {
+    "priority": 0.4,
+    "fit": 1.6,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "r/SaaS",
+   "source_id": "r/saas",
+   "group": "reddit",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Reddit fixture headline number 0",
+   "url": "https://www.reddit.com/r/x/comments/0/t/",
+   "description": "",
+   "jev": {
+    "priority": 0.4,
+    "fit": 1.6,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "r/startups",
+   "source_id": "r/startups",
+   "group": "reddit",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Reddit fixture headline number 1",
+   "url": "https://www.reddit.com/r/x/comments/1/t/",
+   "description": "",
+   "jev": {
+    "priority": 0.37,
+    "fit": 1.48,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "r/SaaS",
+   "source_id": "r/saas",
+   "group": "reddit",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Reddit fixture headline number 2",
+   "url": "https://www.reddit.com/r/x/comments/2/t/",
+   "description": "",
+   "jev": {
+    "priority": 0.34,
+    "fit": 1.36,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "r/startups",
+   "source_id": "r/startups",
+   "group": "reddit",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Reddit fixture headline number 3",
+   "url": "https://www.reddit.com/r/x/comments/3/t/",
+   "description": "",
+   "jev": {
+    "priority": 0.31000000000000005,
+    "fit": 1.2400000000000002,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "r/SaaS",
+   "source_id": "r/saas",
+   "group": "reddit",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Reddit fixture headline number 4",
+   "url": "https://www.reddit.com/r/x/comments/4/t/",
+   "description": "",
+   "jev": {
+    "priority": 0.28,
+    "fit": 1.12,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "r/startups",
+   "source_id": "r/startups",
+   "group": "reddit",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Off topic joke thread",
+   "url": "https://skipped.example/offtopic",
+   "description": "A joke.",
+   "jev": {
+    "priority": 0,
+    "fit": 0,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  },
+  {
+   "source": "Krebs on Security",
+   "source_id": "krebs-on-security",
+   "group": "security",
+   "evidence_class": "independent",
+   "lens": "Tools",
+   "title": "Security fixture headline",
+   "url": "https://sec.example/one",
+   "description": "",
+   "jev": {
+    "priority": 0.3,
+    "fit": 1.2,
+    "page_read": true,
+    "model": "jev-latest"
+   }
+  }
+ ]
+}

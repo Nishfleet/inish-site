@@ -22,5 +22,4 @@ jobs:
       contents: read
     with:
       urls: |
-        https://inish.in/
-        https://inish.in/about.html
+        https://nish.sh/daily

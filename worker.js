@@ -1,32 +1,20 @@
-// Live edge worker for inish.in (Workers + static assets). Route policy lives
-// in policy.js; route data lives in public-paths.json.
+// Edge worker for The Daily (https://nish.sh/daily) and the retired inish.in.
+// Workers + static assets. Route policy lives in policy.js; route data lives in
+// public-paths.json.
+//
+// Routes (wrangler.jsonc): nish.sh/daily and nish.sh/daily/* are more specific
+// than the zone's catch-all nish.sh/* (fleet-console), so Cloudflare sends only
+// the daily page here. inish.in and www.inish.in stay routed to this worker
+// solely to answer every request with a permanent redirect.
 import {
-  canonicalize,
-  decide,
-  fontPath,
-  htmlHeaders,
+  assetFor,
   hstsHeader,
   notFoundAssetUrl,
-  redirects,
+  redirectFor,
   securityHeaders,
   styleHashesHeader,
   withStyleHashes
 } from "./policy.js";
-
-// HSTS lives in public-paths.json as the single source of truth for the route
-// contract; policy.js re-exports it and the worker applies it to every
-// response. The value itself is route data, not plumbing. The remaining
-// security headers (nosniff, referrer policy, CSP, frame guard) flow through
-// the same contract and are applied right after HSTS on every response class.
-
-// The four webfonts ship under stable, fingerprint-free URLs (styles.css
-// references /fonts/<face>.woff2 directly), so a browser revalidates them on
-// every visit unless the response says otherwise. They never change between
-// editions, so the worker gives them a one-year immutable cache: the browser
-// skips the request entirely after the first fetch. The font pattern is the
-// same narrow one policy.js uses for the deny decision — nothing but woff2
-// files from /fonts can ever receive this header.
-const FONT_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
@@ -46,15 +34,9 @@ function withSecurityHeaders(response) {
   });
 }
 
-// The branded 404 page ships in public/ as /404.html and is served through
-// the ASSETS binding,
-// so the edge never embeds markup. The hostname in an internally constructed
-// asset URL is ignored; the path is what matches. Unknown paths keep their 404
-// status, the asset body is streamed rather than buffered, HEAD requests stay
-// bodyless, and a failed asset fetch falls back to the historical plain 404.
-// The asset URL itself is route data: policy.js derives it from canonicalOrigin,
-// so a canonical-host change is a single edit and so is a rename of the 404
-// asset to a path other than /404.html.
+// The branded 404 page ships in public/ as /404.html and is read through the
+// ASSETS binding, so the edge never embeds markup. HEAD stays bodyless and a
+// failed asset fetch falls back to a plain 404.
 const notFoundHeaders = {
   "Cache-Control": "no-store",
   "Content-Type": "text/html; charset=utf-8"
@@ -75,82 +57,25 @@ async function notFoundResponse(request, env) {
   } catch {
     // The asset or binding failed; fall back rather than surfacing an error.
   }
-  return new Response("Not found", {
-    status: 404,
-    headers: { "Cache-Control": "no-store" }
-  });
+  return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    // Canonicalize to https://inish.in{path}{search} before any path-based
-    // decision runs: http://, www., and the combined cases all collapse to a
-    // single 301 instead of serving three extra copies of the site.
-    const canonical = canonicalize(url);
-    if (canonical !== null) {
-      return withSecurityHeaders(
-        new Response(null, {
-          status: 301,
-          headers: { Location: canonical }
-        })
-      );
-    }
-    const decision = decide(url.pathname);
-    const target = redirects.get(url.pathname);
-    if (target) {
-      const destination = new URL(target, url.origin);
-      destination.search = url.search;
+    const moved = redirectFor(url);
+    if (moved !== null) {
       // Manual 301 instead of Response.redirect(): the runtime's redirect
       // response has immutable headers, so HSTS could not be added to it.
-      return withSecurityHeaders(
-        new Response(null, {
-          status: 301,
-          headers: { Location: destination.href }
-        })
-      );
+      return withSecurityHeaders(new Response(null, { status: 301, headers: { Location: moved } }));
     }
-    if (decision === "deny") {
+    const path = assetFor(url.pathname);
+    if (path === null) {
       return withSecurityHeaders(await notFoundResponse(request, env));
     }
-    // wrangler.jsonc sets assets.html_handling to "none" so Cloudflare Assets
-    // does not auto-redirect /about.html -> /about (the loop fixed in #129).
-    // A side effect of "none" is that the binding no longer resolves "/" to
-    // index.html either, so the worker must request the index asset by its
-    // real path. A direct /index.html request still 301s to "/" via the
-    // redirects map above before reaching this point, so only the canonical
-    // "/" entry reaches this rewrite.
-    const assetRequest = url.pathname === "/"
-      ? new Request(new URL("/index.html", url), request)
-      : request;
-    const asset = await env.ASSETS.fetch(assetRequest);
-    // The runtime hands back asset responses with immutable headers, so the
-    // font cache header cannot be set in place — that mutation throws and
-    // surfaces as an edge 1101. Rebuild the response with a fresh Headers
-    // copy instead; every other response class already flows through this
-    // rebuild inside withSecurityHeaders.
-    let response = asset;
-    if (fontPath.test(url.pathname)) {
-      const headers = new Headers(asset.headers);
-      headers.set("Cache-Control", FONT_CACHE_CONTROL);
-      response = new Response(asset.body, {
-        status: asset.status,
-        statusText: asset.statusText,
-        headers
-      });
-    }
-    const contentType = asset.headers.get("Content-Type") ?? "";
-    if (asset.status === 200 && contentType.startsWith("text/html")) {
-      const headers = new Headers(response.headers);
-      for (const [name, value] of htmlHeaders) {
-        headers.set(name, value);
-      }
-      response = new Response(asset.body, {
-        status: asset.status,
-        statusText: asset.statusText,
-        headers
-      });
-    }
-    return withSecurityHeaders(response);
+    // html_handling is "none", so the binding serves files by their real path
+    // only; /daily and /daily/ are rewritten to the index file here.
+    const asset = await env.ASSETS.fetch(new Request(new URL(path, url), request));
+    return withSecurityHeaders(asset);
   }
 };

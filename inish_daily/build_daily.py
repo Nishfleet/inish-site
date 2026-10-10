@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Validate editions and render the latest Nish Daily feed at the site root.
+"""Validate editions and render the latest edition of The Daily (nish.sh/daily).
 
 The validator is the editorial gate. An edition that reads like generic AI copy
-should fail here rather than reach inish.in, so most of this file is refusal
-logic: every story must carry a checkable detail, every take must be first
-person and anchored to that story, and nothing may repeat itself or a recent
-edition.
+should fail here rather than reach nish.sh, so most of the top of this file is
+refusal logic: every story must carry a checkable detail, every take must be
+first person and anchored to that story, and nothing may repeat itself or a
+recent edition.
+
+The page itself is rendered from one "front" document (see compose_front):
+the validated edition plus the section cards and the wire. The cards and the
+wire come from the day's ranked candidate pool unless the edition carries its
+own `sections` and `wire`, so a later editor step can write them directly.
 """
 
 from __future__ import annotations
@@ -15,19 +20,28 @@ import html
 import ipaddress
 import json
 import re
-import shutil
-import textwrap
 from pathlib import Path
 from urllib.parse import urlparse
 
+from inish_daily import fetch_candidates
+
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
-DAILY = ROOT / "public"
+# Everything the site serves lives under /daily, so the file path is the URL path.
+DAILY = ROOT / "public" / "daily"
+CANDIDATES = ROOT / "data" / "candidates"
+POOLS = ROOT / "data" / "pools"
+SITE_URL = "https://nish.sh/daily"
+SITE_NAME = "The Daily"
+IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
 # Committed assets the generated page references. The build never writes them;
 # it only fails loudly if one goes missing.
-ASSETS = ("app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png")
+ASSETS = ("styles.css", "favicon.svg")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
+# An editor step may write the cards and the wire itself; otherwise they are
+# derived from the day's candidate pool.
+OPTIONAL_EDITION_FIELDS = {"sections", "wire"}
 # evidence_url is the exact source the fact was verified against. It may equal
 # url (the primary source carries the claim) or be a separate HTTPS URL — a
 # discussion thread, a data page, a primary document — when the fact's evidence
@@ -292,8 +306,12 @@ def load_latest() -> dict:
         raise ValueError("No editions found")
     path = edition_paths[0]
     edition = json.loads(path.read_text())
-    if set(edition) != REQUIRED_EDITION_FIELDS:
-        raise ValueError(f"{path}: edition fields must be exactly {sorted(REQUIRED_EDITION_FIELDS)}")
+    fields = set(edition)
+    if not REQUIRED_EDITION_FIELDS <= fields or fields - REQUIRED_EDITION_FIELDS - OPTIONAL_EDITION_FIELDS:
+        raise ValueError(
+            f"{path}: edition fields must be {sorted(REQUIRED_EDITION_FIELDS)} "
+            f"plus optionally {sorted(OPTIONAL_EDITION_FIELDS)}"
+        )
     day = dt.date.fromisoformat(edition["date"])
     if path.stem != day.isoformat():
         raise ValueError(f"Edition filename/date mismatch: {path}")
@@ -318,289 +336,342 @@ def load_latest() -> dict:
 
     check_edition_repetition(clean_stories)
     check_edition_balance(clean_stories)
-    return {
+    clean = {
         "date": day.isoformat(),
         "candidate_count": candidate_count,
         "editor_note": validate_text(edition["editor_note"], "editor_note", 20, 400),
         "stories": clean_stories,
     }
+    if "sections" in edition:
+        clean["sections"] = validate_sections(edition["sections"], path)
+    if "wire" in edition:
+        clean["wire"] = validate_feed_items(edition["wire"], f"{path}: wire")
+    return clean
 
+
+# --- the front page: cards and wire ------------------------------------------
+
+CARD_ITEMS = 5
+WIRE_ITEMS = 14
+WIRE_PER_SOURCE = 3
+POOL_PER_GROUP = 20
+BLURB_CHARS = 140
+FEED_ITEM_FIELDS = {"title", "url", "source", "blurb", "signal", "discussion_url"}
+
+
+def clean_line(value: object, limit: int) -> str:
+    """Source text is untrusted: one plain line, bounded, never markup."""
+    text = " ".join(str(value or "").split())
+    if len(text) > limit:
+        text = text[: limit - 1].rstrip() + "…"
+    return text
+
+
+def feed_item(raw: object, label: str) -> dict:
+    """Normalize one linked item (a card row or a wire line)."""
+    if not isinstance(raw, dict) or not {"title", "url", "source"} <= set(raw) or set(raw) - FEED_ITEM_FIELDS:
+        raise ValueError(f"{label}: item fields must be title, url, source plus optionally blurb, signal, discussion_url")
+    title = clean_line(raw["title"], 200)
+    source = clean_line(raw["source"], 100)
+    if len(title) < 2 or not source:
+        raise ValueError(f"{label}: item needs a title and a source")
+    discussion = raw.get("discussion_url") or ""
+    return {
+        "title": title,
+        "url": validate_url(raw["url"], label="item"),
+        "source": source,
+        "blurb": clean_line(raw.get("blurb"), BLURB_CHARS * 2),
+        "signal": clean_line(raw.get("signal"), 60),
+        "discussion_url": validate_url(discussion, label="discussion") if discussion else "",
+    }
+
+
+def validate_feed_items(raw: object, label: str) -> list[dict]:
+    if not isinstance(raw, list):
+        raise ValueError(f"{label} must be a list")
+    return [feed_item(item, label) for item in raw]
+
+
+def validate_sections(raw: object, path: Path) -> list[dict]:
+    if not isinstance(raw, list):
+        raise ValueError(f"{path}: sections must be a list")
+    sections = []
+    for section in raw:
+        if not isinstance(section, dict) or set(section) != {"id", "label", "items"}:
+            raise ValueError(f"{path}: a section needs exactly id, label and items")
+        ident = str(section["id"])
+        if not re.fullmatch(r"[a-z0-9-]{1,30}", ident):
+            raise ValueError(f"{path}: section id must be lowercase letters, digits and hyphens: {ident!r}")
+        sections.append({
+            "id": ident,
+            "label": clean_line(section["label"], 30),
+            "items": validate_feed_items(section["items"], f"{path}: section {ident}"),
+        })
+    return sections
+
+
+def signal_text(candidate: dict) -> str:
+    signals = candidate.get("signals") or {}
+    parts = []
+    for key, label in (("points", "pts"), ("score", "pts"), ("stars", "stars"), ("comments", "comments")):
+        value = signals.get(key)
+        if isinstance(value, int) and not isinstance(value, bool) and value > 0:
+            parts.append(f"{value:,} {label}")
+    return " · ".join(parts)
+
+
+def compact_pool(payload: dict, config: dict) -> dict:
+    """Shrink a day's candidate file to what the page shows.
+
+    The candidate file is large (page text, discussions) and not committed. The
+    pool keeps only the linked items, best-first as Jev ordered them, so the
+    page can be rebuilt from committed data alone.
+    """
+    reported = payload.get("sources")
+    if isinstance(reported, list) and reported:
+        total = len(reported)
+        ok = sum(1 for source in reported if source.get("count", 0) > 0)
+    else:
+        total = len(config["sources"])
+        ok = len({c.get("source_id") for c in payload.get("candidates", [])} - {None})
+    groups = {group["id"] for group in config["groups"]}
+    kept: dict[str, int] = {}
+    items = []
+    for candidate in payload.get("candidates", []):
+        group = candidate.get("group")
+        if group not in groups or kept.get(group, 0) >= POOL_PER_GROUP:
+            continue
+        discussion = candidate.get("discussion_url") or ""
+        try:
+            item = feed_item({
+                "title": candidate.get("title", ""),
+                "url": candidate.get("url", ""),
+                "source": candidate.get("source", ""),
+                "blurb": candidate.get("description", ""),
+                "signal": signal_text(candidate),
+                "discussion_url": discussion,
+            }, "pool")
+        except ValueError:
+            # A candidate with a bad link is dropped from the page, never the build.
+            continue
+        item["blurb"] = clean_line(item["blurb"], BLURB_CHARS)
+        item["group"] = group
+        priority = (candidate.get("jev") or {}).get("priority")
+        item["priority"] = round(priority, 3) if isinstance(priority, (int, float)) else None
+        items.append(item)
+        kept[group] = kept.get(group, 0) + 1
+    return {
+        "date": payload["date"],
+        "generated_at": payload.get("generated_at", ""),
+        "candidate_count": payload.get("candidate_count", len(items)),
+        "ranked_by": payload.get("ranked_by"),
+        "sources": {"ok": ok, "total": total},
+        "items": items,
+    }
+
+
+def load_pool(day: dt.date, config: dict) -> tuple[dict | None, bool]:
+    """The day's pool, and whether it was just derived from a candidate file."""
+    candidates = CANDIDATES / f"{day.isoformat()}.json"
+    if candidates.is_file():
+        return compact_pool(json.loads(candidates.read_text(encoding="utf-8")), config), True
+    stored = POOLS / f"{day.isoformat()}.json"
+    if stored.is_file():
+        return json.loads(stored.read_text(encoding="utf-8")), False
+    return None, False
+
+
+def compose_front(edition: dict, pool: dict | None, config: dict) -> dict:
+    """The one document the page renders: edition + cards + wire + source count."""
+    front = dict(edition)
+    front["sources"] = {"ok": 0, "total": len(config["sources"])}
+    front["generated_at"] = ""
+    labels = {group["id"]: group["label"] for group in config["groups"]}
+    if pool is not None:
+        front["sources"] = dict(pool["sources"])
+        front["generated_at"] = pool.get("generated_at", "")
+        ranked = pool.get("ranked_by") is not None
+        taken = {canonical_url(story["url"]) for story in edition["stories"]}
+        for key in ("sections", "wire"):
+            for entry in edition.get(key, []):
+                for item in (entry["items"] if key == "sections" else [entry]):
+                    taken.add(canonical_url(item["url"]))
+        shown = []
+        for item in pool["items"]:
+            if canonical_url(item["url"]) in taken:
+                continue
+            # Jev gives a priority of 0 to a skip; a skip is not worth a card.
+            if ranked and not item.get("priority"):
+                continue
+            shown.append(item)
+        used: set[int] = set()
+        if "sections" not in edition:
+            sections = []
+            for group in config["groups"]:
+                picks = [(i, item) for i, item in enumerate(shown) if item["group"] == group["id"]][:CARD_ITEMS]
+                if picks:
+                    used.update(i for i, _ in picks)
+                    sections.append({"id": group["id"], "label": labels[group["id"]], "items": [item_view(item) for _, item in picks]})
+            front["sections"] = sections
+        if "wire" not in edition:
+            per_source: dict[str, int] = {}
+            wire = []
+            for i, item in enumerate(shown):
+                if i in used or per_source.get(item["source"], 0) >= WIRE_PER_SOURCE:
+                    continue
+                per_source[item["source"]] = per_source.get(item["source"], 0) + 1
+                wire.append(item_view(item))
+                if len(wire) == WIRE_ITEMS:
+                    break
+            front["wire"] = wire
+    front.setdefault("sections", [])
+    front.setdefault("wire", [])
+    return front
+
+
+def item_view(item: dict) -> dict:
+    return {key: item.get(key, "") for key in ("title", "url", "source", "blurb", "signal", "discussion_url")}
+
+
+# --- rendering ----------------------------------------------------------------
 
 def story_card(story: dict, index: int, prominence: str) -> str:
     domain = urlparse(story["url"]).netloc.removeprefix("www.")
+    heading = "h2" if prominence == "lead" else "h3"
+    # The lead carries the full read (checked fact, Nish's take, the caveat).
+    # Picks stay short so the section cards and the wire sit on the first
+    # screens; the RSS item and latest.json keep every field of every story.
+    notes = ""
+    if prominence == "lead":
+        notes = f"""
+          <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
+          <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
+          <p class="note caveat"><b>But</b> {esc(story['caveat'])}</p>"""
     return f"""
-      <article class="story story-{esc(prominence)}" data-section="{esc(story['section'])}">
-        <div class="story-number">{index:02d}</div>
-        <div class="story-body">
-          <div class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></div>
-          <h2><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></h2>
-          <p>{esc(story['summary'])}</p>
-          <div class="story-notes">
-            <p class="fact"><strong>Checked</strong> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
-            <p class="take"><strong>Nish</strong> {esc(story['take'])}</p>
-            <p class="caveat"><strong>But</strong> {esc(story['caveat'])}</p>
-          </div>
-          <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} ↗</a>
-        </div>
-      </article>"""
+        <article class="story story-{esc(prominence)}">
+          <p class="kicker">{esc(story['section'])} <span>{esc(story['source'])}</span></p>
+          <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
+          <p class="summary">{esc(story['summary'])}</p>{notes}
+          <a class="more" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} &#8599;</a>
+        </article>"""
 
 
-def prominence_for(index: int) -> str:
-    if index == 1:
-        return "lead"
-    if index in (2, 3):
-        return "feature"
-    return "brief"
+def item_row(item: dict, show_source: bool) -> str:
+    meta = [esc(item["source"])] if show_source else []
+    if item.get("signal"):
+        meta.append(esc(item["signal"]))
+    discussion = ""
+    if item.get("discussion_url"):
+        discussion = f' <a class="talk" href="{esc(item["discussion_url"])}" rel="noopener noreferrer">discuss</a>'
+    blurb = f'<span class="blurb">{esc(item["blurb"])}</span>' if item.get("blurb") else ""
+    return (
+        f'<li><a class="t" href="{esc(item["url"])}" rel="noopener noreferrer">{esc(item["title"])}</a>'
+        f'{blurb}<span class="meta">{" &middot; ".join(meta)}{discussion}</span></li>'
+    )
 
 
-def html_safe_json(payload: dict) -> str:
-    """Serialize a payload that parses as JSON yet cannot escape its script tag.
-
-    The unicode escapes are JSON escapes: an extractor sees the original
-    characters after parsing, while the serialized text contains no "<" that
-    could open "</script>" and no "&" that a lenient HTML reader could mistake
-    for an entity. This is the JSON-safe counterpart of esc() for script text.
-    """
-    serialized = json.dumps(payload, indent=2, ensure_ascii=False)
-    for character, escape in (("<", "\\u003c"), (">", "\\u003e"), ("&", "\\u0026")):
-        serialized = serialized.replace(character, escape)
-    return serialized
+def edition_date_label(date: dt.date) -> str:
+    return date.strftime("%A, %-d %B %Y")
 
 
-# The Person node describes Nish himself, not this site; it claims only what
-# this very site shows.
-PERSON_DESCRIPTION = "Founder; publishes Nish's Daily Reads."
+def updated_label(generated_at: str) -> str:
+    try:
+        moment = dt.datetime.fromisoformat(generated_at)
+    except ValueError:
+        return ""
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=dt.timezone.utc)
+    return moment.astimezone(IST).strftime("%H:%M IST")
 
 
-def json_ld(title: str, description: str, date: str, stories: list) -> str:
-    """The head's structured data: one graph with the site, its person, and the edition.
-
-    Truth rules: only what the page itself shows. The site is the daily feed
-    and nothing else, so the Person node claims only the name, the surfaces
-    verified to belong to Nish (the GitHub profile and the X/Twitter account
-    linked from it, both in the footer), a fixed bio (PERSON_DESCRIPTION)
-    instead of the page's meta description, and the occupation drawn from the
-    page's own "a daily read for a founder" language. The `knowsAbout` list is the page's
-    own section taxonomy (the filter nav labels) minus the catch-all Wildcard
-    bucket, so the schema can only claim topics the feed actually surfaces.
-
-    Each story's Checked fact is rendered as a Claim node so AI engines
-    can extract individual citable passages, not just the page-level
-    Article. The Claim text is the fact text (already visible on the
-    page), the url is the evidence_url (already linked from the page),
-    and the author references the Person @id. The Article's mentions
-    array references every Claim so the graph connects edition to facts.
-
-    An FAQPage node answers five fixed questions about the site itself using
-    only edition-invariant copy (meta description, kicker/dek, the
-    scanned/kept header concept, the quiet-day card, the footer feed links),
-    so its claims stay stable across editions.
-
-    The Article node carries only what the share surface already declares:
-    the image is the og:image URL from the head meta tags, the
-    description is the same page description passed to this function,
-    and dateModified mirrors datePublished because every rebuild
-    rewrites the whole edition.
-    """
-    person = {
-        "@id": "https://inish.in/#nish",
-        "@type": "Person",
-        "name": "Nish",
-        "url": "https://inish.in/",
-        "image": "https://avatars.githubusercontent.com/nish3451",
-        "description": PERSON_DESCRIPTION,
-        "hasOccupation": {
-            "@type": "Occupation",
-            "name": "Founder",
-        },
-        "sameAs": [
-            "https://github.com/nish3451",
-            "https://x.com/NishantRArora",
-        ],
-        "knowsAbout": sorted(SECTIONS - {"Wildcard"}),
-    }
-    graph = [
-        {
-            "@id": "https://inish.in/#website",
-            "@type": "WebSite",
-            "name": "Nish's Daily Reads",
-            "url": "https://inish.in/",
-            "description": description,
-        },
-        person,
-        {
-            "@id": "https://inish.in/#article",
-            "@type": "Article",
-            "headline": title,
-            "image": "https://inish.in/og-image.png",
-            "description": description,
-            "datePublished": date,
-            "dateModified": date,
-            "mainEntityOfPage": "https://inish.in/",
-            "author": {"@id": "https://inish.in/#nish"},
-            "isPartOf": {"@id": "https://inish.in/#website"},
-        },
-    ]
-    # Each story's Checked fact becomes a Claim node so AI engines can
-    # extract individual citable passages. The text and url are already
-    # visible on the page (the fact paragraph and its evidence link), so
-    # no new claim is invented — existing visible content is structured.
-    claim_ids = []
-    for i, story in enumerate(stories, 1):
-        claim_id = f"https://inish.in/#claim-{i}"
-        claim_ids.append({"@id": claim_id})
-        graph.append({
-            "@id": claim_id,
-            "@type": "Claim",
-            "text": story["fact"],
-            "url": story["evidence_url"],
-            "author": {"@id": "https://inish.in/#nish"},
-            "isPartOf": {"@id": "https://inish.in/#article"},
-        })
-    if claim_ids:
-        graph[2]["mentions"] = claim_ids
-    # Fixed FAQ about the site itself, drawn only from edition-invariant
-    # page copy (meta description, kicker/dek, scanned/kept header,
-    # quiet-day card, footer links) — never the editor's note or the
-    # day's counts — so the structured claims do not churn per edition.
-    faq_page = {
-        "@id": "https://inish.in/#faq",
-        "@type": "FAQPage",
-        "name": "Nish's Daily Reads",
-        "isPartOf": {"@id": "https://inish.in/#website"},
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "What is Nish's Daily Reads?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "A single page at https://inish.in/ with AI news and early signs of what people will pay for, rebuilt each morning for a founder. Every story links the fact it was checked against.",
-                },
-            },
-            {
-                "@type": "Question",
-                "name": "Who is Nish's Daily Reads for?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Nish, a founder who builds and sells products. The page is public so anyone can read along, and every story ends with a take labeled Nish.",
-                },
-            },
-            {
-                "@type": "Question",
-                "name": "How often does Nish's Daily Reads publish?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Once a day, in the morning India time. The home page always carries the latest edition; older editions are not kept. When nothing clears the bar, the page says so instead of running filler stories.",
-                },
-            },
-            {
-                "@type": "Question",
-                "name": "How are stories chosen?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Each morning an AI agent reads every candidate from Hacker News, TechCrunch, OpenAI, Reddit, Google News, Product Hunt, Lobsters and GitHub. The page header shows how many it scanned and how many it kept. A story runs only if it carries a Checked fact that links to its source. When nothing passes, no stories run.",
-                },
-            },
-            {
-                "@type": "Question",
-                "name": "Where can I subscribe?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Through the feeds linked in the page footer: an RSS feed at https://inish.in/feed.xml and the latest edition as JSON at https://inish.in/latest.json.",
-                },
-            },
-        ],
-    }
-    graph.append(faq_page)
-    return html_safe_json({"@context": "https://schema.org", "@graph": graph})
-
-
-def page(edition: dict) -> str:
-    date = dt.date.fromisoformat(edition["date"])
-    title_date = date.strftime("%A, %d %B %Y")
-    title = f"Nish's Daily Reads · {edition['date']}"
-    description = "AI news and early signs of what people will pay for, picked each morning for a founder. Every story links the fact it was checked against."
-    image_alt = "Nish's Daily Reads: AI news and early signs of what people will pay for, picked each morning for a founder."
-    kept_count = len(edition["stories"])
-    count_label = f"{edition['candidate_count']} scanned · {kept_count} kept"
-    if edition["stories"]:
-        cards = "\n".join(
-            story_card(story, index, prominence_for(index))
-            for index, story in enumerate(edition["stories"], 1)
-        )
-        # Only sections that ran today: a filter that leads to an empty page is a
-        # promise the edition did not keep.
-        present = [section for section in sorted(SECTIONS) if any(s["section"] == section for s in edition["stories"])]
-        # The merged filter accessibility contract: exactly one button is
-        # aria-pressed=true (the active All filter), every other filter is
-        # explicitly false, and a polite live region announces the initial
-        # visible count so the static markup matches app.js's runtime updates.
-        status_noun = "story" if kept_count == 1 else "stories"
-        filters = f"""
-    <nav class="filters" aria-label="Filter stories" hidden>
-      <button type="button" class="active" data-filter="all" aria-pressed="true">All</button>
-      {''.join(f'<button type="button" data-filter="{esc(section)}" aria-pressed="false">{esc(section)}</button>' for section in present)}
-    </nav>
-    <p class="visually-hidden" id="filter-status" role="status" aria-live="polite">Showing all {kept_count} {status_noun}</p>"""
+def meta_bar(front: dict) -> str:
+    sources = front["sources"]
+    if sources["ok"]:
+        parts = [f"Compiled from <b>{sources['ok']} of {sources['total']}</b> sources"]
     else:
-        cards = """
-      <article class="story story-lead quiet-day">
-        <div class="story-number">00</div>
-        <div class="story-body">
-          <h2>Nothing cleared the bar today</h2>
-          <p>Every candidate was a launch post, a repost, or something I could not check. A short edition beats a padded one.</p>
-        </div>
-      </article>"""
-        filters = ""
+        parts = [f"<b>{sources['total']}</b> sources"]
+    parts.append(f"{front['candidate_count']} items read")
+    kept = len(front["stories"])
+    parts.append(f"{kept} picked" if kept else "no picks today")
+    updated = updated_label(front.get("generated_at", ""))
+    if updated:
+        parts.append(f"updated {esc(updated)}")
+    return "".join(f"<span>{part}</span>" for part in parts)
+
+
+def page(front: dict) -> str:
+    date = dt.date.fromisoformat(front["date"])
+    title = f"{SITE_NAME} · {front['date']}"
+    description = "A daily front page: AI, dev, product and startup news compiled from a fixed list of sites, with the day's best stories checked against their sources."
+    stories = front["stories"]
+    nav = []
+    if stories:
+        nav.append(("lead", "Lead"))
+        if len(stories) > 1:
+            nav.append(("picks", "Picks"))
+    for section in front["sections"]:
+        nav.append((f"s-{section['id']}", section["label"]))
+    if front["wire"]:
+        nav.append(("wire", "Wire"))
+    nav_html = "".join(f'<a href="#{esc(anchor)}">{esc(label)}</a>' for anchor, label in nav)
+    if stories:
+        lead = f'<section id="lead" class="lead" aria-label="Lead story">{story_card(stories[0], 1, "lead")}\n      </section>'
+        picks = ""
+        if len(stories) > 1:
+            cards = "".join(story_card(story, index, "pick") for index, story in enumerate(stories[1:], 2))
+            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">More picks</h2><div class="pick-grid">{cards}</div></section>'
+    else:
+        lead = '<section id="lead" class="lead quiet"><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></section>'
+        picks = ""
+    cards_html = "".join(
+        f'<section id="s-{esc(section["id"])}" class="card"><h2 class="label">{esc(section["label"])}</h2>'
+        f'<ol>{"".join(item_row(item, True) for item in section["items"])}</ol></section>'
+        for section in front["sections"]
+    )
+    cards_html = f'\n      <div class="cards">{cards_html}</div>' if cards_html else ""
+    wire = ""
+    if front["wire"]:
+        wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item, True) for item in front["wire"])}</ul></aside>'
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{esc(title)}</title>
-  <link rel="canonical" href="https://inish.in/">
+  <link rel="canonical" href="{SITE_URL}">
   <meta name="description" content="{esc(description)}">
-  <meta property="og:url" content="https://inish.in/">
   <meta property="og:title" content="{esc(title)}">
   <meta property="og:description" content="{esc(description)}">
-  <meta property="og:site_name" content="Nish's Daily Reads">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:image" content="https://inish.in/og-image.png">
-  <meta property="og:image:alt" content="{image_alt}">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{esc(title)}">
-  <meta name="twitter:description" content="{esc(description)}">
-  <meta name="twitter:image" content="https://inish.in/og-image.png">
-  <meta name="twitter:image:alt" content="{image_alt}">
-  <link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/apple-touch-icon.png">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f4efe5">
-  <link rel="alternate" type="application/rss+xml" title="Nish's Daily Reads" href="https://inish.in/feed.xml">
-  <link rel="stylesheet" href="/styles.css">
-  <script type="application/ld+json">
-{textwrap.indent(json_ld(title, description, edition["date"], edition["stories"]), "  ")}
-  </script>
+  <meta property="og:url" content="{SITE_URL}">
+  <meta property="og:site_name" content="{SITE_NAME}">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f1e7">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17150f">
+  <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
+  <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
+  <link rel="stylesheet" href="/daily/styles.css">
 </head>
 <body>
-  <a class="skip" href="#stories">Skip to stories</a>
-  <header class="masthead">
-    <div class="masthead-top"><a href="/">inish.in</a><span>{esc(title_date)}</span><span>{esc(count_label)}</span></div>
-    <div class="title-row"><div><p class="kicker">Built for one reader</p><h1>Nish's Daily Reads</h1></div><p class="dek">AI news and early signs of what people will pay for, in plain words. A story runs only if it links a fact it was checked against.</p></div>{filters}
-  </header>
-  <main id="stories" class="stories">
-    <section class="edition-note"><span>Editor's note</span><p>{esc(edition['editor_note'])}</p></section>
-{cards}
-  </main>
-  <footer>
-    <div class="footer-links"><a href="/feed.xml">RSS</a><a href="/latest.json">JSON</a><a href="/about.html">About</a></div>
-    <p class="identity">Nish on <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a></p>
-    <p>Picked and checked each morning by Nish's AI agent.</p>
-  </footer>
-  <script src="/app.js" defer></script>
+  <div class="paper">
+    <header class="masthead">
+      <h1><a href="/daily">{SITE_NAME}</a></h1>
+      <p class="dateline"><time datetime="{esc(front['date'])}">{esc(edition_date_label(date))}</time></p>
+    </header>
+    <p class="metabar">{meta_bar(front)}</p>
+    <nav class="nav" aria-label="Sections">{nav_html}</nav>
+    <div class="layout">
+    <main>
+      <p class="editor-note"><b>Editor's note</b> {esc(front['editor_note'])}</p>
+      {lead}{picks}{cards_html}
+    </main>{wire}
+    </div>
+    <footer>
+      <a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a>
+      <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub &#8599;</a>
+      <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X &#8599;</a>
+      <span>Compiled each morning, 07:30 IST, from the sites listed in sources.json.</span>
+    </footer>
+  </div>
 </body>
 </html>
 """
@@ -608,7 +679,7 @@ def page(edition: dict) -> str:
 
 def rss_item_description(edition: dict) -> str:
     """The item body: the editor's note plus every story, so a subscriber who
-    reads the feed in a reader still sees the edition after the root page has
+    reads the feed in a reader still sees the edition after the page has
     rolled over to a newer day. The assembled HTML is escaped once as a whole,
     so the description is character data (per RSS practice) and one story's
     ampersand or angle bracket cannot corrupt another's markup.
@@ -625,29 +696,23 @@ def rss_item_description(edition: dict) -> str:
 
 def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
-    link = "https://inish.in/"
     description = rss_item_description(edition)
     # The daily run starts at 07:30 IST (02:00 UTC).
     published = dt.datetime.combine(day, dt.time(2), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
-    guid = f"inish-daily-{day.isoformat()}"
-    item = f"<item><title>Nish's Daily Reads · {day.isoformat()}</title><link>{link}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
+    guid = f"the-daily-{day.isoformat()}"
+    item = f"<item><title>{SITE_NAME} · {day.isoformat()}</title><link>{SITE_URL}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
     return (
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\"><channel>"
-        "<title>Nish's Daily Reads</title><link>https://inish.in/</link>"
-        "<atom:link href=\"https://inish.in/feed.xml\" rel=\"self\" type=\"application/rss+xml\"/>"
-        "<description>AI news and early signs of what people will pay for, picked each morning for a founder. Every story links the fact it was checked against.</description>"
+        f"<title>{SITE_NAME}</title><link>{SITE_URL}</link>"
+        f"<atom:link href=\"{SITE_URL}/feed.xml\" rel=\"self\" type=\"application/rss+xml\"/>"
+        "<description>A daily front page: AI, dev, product and startup news, with the day's best stories checked against their sources.</description>"
         f"<language>en</language><lastBuildDate>{published}</lastBuildDate>"
         + item + "</channel></rss>\n"
     )
 
 
-def sitemap(date: str) -> str:
-    body = f'<url><loc>https://inish.in/</loc><lastmod>{date}</lastmod></url><url><loc>https://inish.in/about.html</loc></url>'
-    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n'
-
-
-def check_root_assets() -> None:
+def check_assets() -> None:
     """Fail loudly if a committed asset the generated page references is missing."""
     for name in ASSETS:
         asset = DAILY / name
@@ -656,19 +721,19 @@ def check_root_assets() -> None:
 
 
 def main() -> None:
+    config = fetch_candidates.load_sources()
     latest = load_latest()
     DAILY.mkdir(parents=True, exist_ok=True)
-    check_root_assets()
-    archive_root = DAILY / "archive"
-    if archive_root.is_symlink() or archive_root.is_file():
-        archive_root.unlink()
-    elif archive_root.is_dir():
-        shutil.rmtree(archive_root)
-    (DAILY / "index.html").write_text(page(latest), encoding="utf-8")
-    (DAILY / "latest.json").write_text(json.dumps(latest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    (DAILY / "feed.xml").write_text(rss(latest), encoding="utf-8")
-    (DAILY / "sitemap.xml").write_text(sitemap(latest["date"]), encoding="utf-8")
-    print(f"built latest={latest['date']} stories={len(latest['stories'])} scanned={latest['candidate_count']}")
+    check_assets()
+    pool, derived = load_pool(dt.date.fromisoformat(latest["date"]), config)
+    if derived:
+        POOLS.mkdir(parents=True, exist_ok=True)
+        (POOLS / f"{latest['date']}.json").write_text(json.dumps(pool, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    front = compose_front(latest, pool, config)
+    (DAILY / "index.html").write_text(page(front), encoding="utf-8")
+    (DAILY / "latest.json").write_text(json.dumps(front, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (DAILY / "feed.xml").write_text(rss(front), encoding="utf-8")
+    print(f"built latest={front['date']} stories={len(front['stories'])} scanned={front['candidate_count']} sources={front['sources']['ok']}/{front['sources']['total']}")
 
 
 if __name__ == "__main__":

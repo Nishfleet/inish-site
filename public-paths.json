@@ -1,35 +1,15 @@
 {
-  "canonicalOrigin": "https://inish.in/",
+  "canonicalHost": "nish.sh",
+  "dailyUrl": "https://nish.sh/daily",
+  "pagePaths": ["/daily", "/daily/", "/daily/index.html"],
+  "indexAsset": "/daily/index.html",
   "publicPaths": [
-    "/",
-    "/app.js",
-    "/styles.css",
-    "/apple-touch-icon.png",
-    "/og-image.svg",
-    "/og-image.png",
-    "/latest.json",
-    "/feed.xml",
-    "/robots.txt",
-    "/sitemap.xml",
-    "/llms.txt",
-    "/about.html",
-    "/fonts/OFL.txt"
+    "/daily/styles.css",
+    "/daily/favicon.svg",
+    "/daily/latest.json",
+    "/daily/feed.xml"
   ],
-  "fontPath": "^/fonts/[a-z0-9-]+\\.woff2$",
-  "redirects": {
-    "/index.html": "/",
-    "/daily": "/",
-    "/daily/": "/",
-    "/daily/index.html": "/",
-    "/daily/app.js": "/app.js",
-    "/daily/styles.css": "/styles.css",
-    "/daily/latest.json": "/latest.json",
-    "/daily/feed.xml": "/feed.xml",
-    "/daily/sitemap.xml": "/sitemap.xml",
-    "/about": "/about.html"
-  },
   "hstsHeader": "max-age=31536000; includeSubDomains",
-  "htmlHeaders": {},
   "securityHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",

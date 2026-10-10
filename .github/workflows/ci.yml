@@ -39,7 +39,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: production
-      url: https://inish.in/
+      url: https://nish.sh/daily
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -54,4 +54,5 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Live smoke check
-        run: curl -fsS -o /dev/null --retry 5 --retry-all-errors --retry-delay 10 https://inish.in/latest.json
+        run: curl -fsS -o /dev/null --retry 5 --retry-all-errors --retry-delay 10 https://nish.sh/daily/latest.json
+          test "$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://inish.in/)" = "301 https://nish.sh/daily"
