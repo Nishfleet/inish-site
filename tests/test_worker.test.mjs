@@ -13,7 +13,8 @@ import { assetFor, redirectFor } from "../policy.js";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CONTRACT = JSON.parse(readFileSync(join(ROOT, "public-paths.json"), "utf8"));
 const DAILY = "https://nish.sh/daily";
-const HSTS = "max-age=31536000; includeSubDomains";
+// No includeSubDomains: this worker owns only /daily on nish.sh, not the whole zone.
+const HSTS = "max-age=31536000";
 
 // The files the binding can serve under html_handling "none": real paths only.
 const SERVED = new Set(["/daily/index.html", ...CONTRACT.publicPaths, "/404.html"]);
@@ -68,6 +69,16 @@ test("inish.in: every request is a 301 to https://nish.sh/daily", async () => {
 test("nish.sh: plain http moves to https and keeps path and query", () => {
   assert.equal(redirectFor(new URL("http://nish.sh/daily?x=1")), "https://nish.sh/daily?x=1");
   assert.equal(redirectFor(new URL("https://nish.sh/daily")), null);
+});
+
+test("http://nish.sh/daily?x=1 through the worker is one 301 to https with the query intact", async () => {
+  const { response } = await call("http://nish.sh/daily?x=1&next=/daily/daily");
+  assert.equal(response.status, 301);
+  assert.equal(response.headers.get("Location"), "https://nish.sh/daily?x=1&next=/daily/daily");
+});
+
+test("the HSTS value never claims subdomains", () => {
+  assert.ok(!CONTRACT.hstsHeader.includes("includeSubDomains"));
 });
 
 test("nish.sh/daily and /daily/ serve the index page with a 200, no redirect", async () => {

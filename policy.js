@@ -24,8 +24,10 @@ export const notFoundAssetUrl = new URL("/404.html", dailyUrl).href;
 // permanent redirect to the daily page. On nish.sh only plain http moves.
 export function redirectFor(url) {
   if (url.hostname !== canonicalHost) return dailyUrl;
-  if (url.protocol !== "https:") return new URL(url.pathname + url.search, dailyUrl).href.replace("/daily/daily", "/daily");
-  return null;
+  if (url.protocol === "https:") return null;
+  const secure = new URL(url);
+  secure.protocol = "https:";
+  return secure.href;
 }
 
 // The asset to serve for `pathname` on nish.sh, or null for a 404.

@@ -54,5 +54,6 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Live smoke check
-        run: curl -fsS -o /dev/null --retry 5 --retry-all-errors --retry-delay 10 https://nish.sh/daily/latest.json
+        run: |
+          curl -fsS -o /dev/null --retry 5 --retry-all-errors --retry-delay 10 https://nish.sh/daily/latest.json
           test "$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://inish.in/)" = "301 https://nish.sh/daily"

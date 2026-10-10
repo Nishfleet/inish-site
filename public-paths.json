@@ -9,7 +9,7 @@
     "/daily/latest.json",
     "/daily/feed.xml"
   ],
-  "hstsHeader": "max-age=31536000; includeSubDomains",
+  "hstsHeader": "max-age=31536000",
   "securityHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
