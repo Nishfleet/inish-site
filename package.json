@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "inish.in: static daily feed served by a Cloudflare Worker (worker.js) with static assets.",
+  "description": "The Daily: nish.sh/daily front page served by a Cloudflare Worker (worker.js) with static assets. inish.in only redirects here.",
   "scripts": {
     "build": "node build.mjs",
     "dev": "npm run build && wrangler dev",

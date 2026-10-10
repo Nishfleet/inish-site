@@ -1,4 +1,3 @@
-import base64
 import html
 import json
 import re
@@ -8,6 +7,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import inish_daily.build_daily as builder
+
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
 # Deliberately varied: the validator rejects editions whose stories share
 # phrasing, so the fixture cannot be a single template repeated N times.
@@ -127,23 +128,16 @@ class BuildDailyTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.editions = self.root / "data" / "editions"
-        self.public = self.root / "public"
+        self.public = self.root / "public" / "daily"
+        self.candidates = self.root / "data" / "candidates"
+        self.pools = self.root / "data" / "pools"
         self.editions.mkdir(parents=True)
-        self.public.mkdir()
-        # The committed root assets the generated head references. They are
-        # canonical: the build must never overwrite them, only check they exist.
-        (self.public / "app.js").write_text("app")
+        self.candidates.mkdir(parents=True)
+        self.public.mkdir(parents=True)
+        # The committed assets the generated head references. The build must
+        # never overwrite them, only check they exist.
         (self.public / "styles.css").write_text("styles")
-        (self.public / "og-image.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
-        # A real 1x1 PNG so the icon fixture is a valid image, not just bytes.
-        (self.public / "apple-touch-icon.png").write_bytes(
-            base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
-        )
-        # The raster share card is pinned at the build root (no daily/ source,
-        # like the touch icon), so the fixture lives at the public destination.
-        (self.public / "og-image.png").write_bytes(
-            base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
-        )
+        (self.public / "favicon.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
 
     def tearDown(self):
         self.temp.cleanup()
@@ -156,6 +150,8 @@ class BuildDailyTests(unittest.TestCase):
         with (
             patch.object(builder, "EDITIONS", self.editions),
             patch.object(builder, "DAILY", self.public),
+            patch.object(builder, "CANDIDATES", self.candidates),
+            patch.object(builder, "POOLS", self.pools),
         ):
             builder.main()
 
@@ -171,26 +167,197 @@ class BuildDailyTests(unittest.TestCase):
 
     # --- rendering -------------------------------------------------------
 
-    def test_builds_latest_feed_at_root(self):
+    # --- rendering -------------------------------------------------------
+
+    def write_candidates(self, day="2026-08-02", ranked=True):
+        payload = json.loads((FIXTURES / "candidates.json").read_text())
+        payload["date"] = day
+        if not ranked:
+            payload["ranked_by"] = None
+            for candidate in payload["candidates"]:
+                candidate.pop("jev", None)
+        (self.candidates / f"{day}.json").write_text(json.dumps(payload))
+
+    def test_builds_the_daily_files_under_daily(self):
         self.write(edition())
         self.build()
-        for filename in ("index.html", "app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png", "latest.json", "feed.xml", "sitemap.xml"):
+        for filename in ("index.html", "styles.css", "favicon.svg", "latest.json", "feed.xml"):
             self.assertTrue((self.public / filename).exists(), filename)
-        self.assertFalse((self.public / "archive").exists())
-        self.assertNotIn("archive", (self.public / "index.html").read_text())
         self.assertEqual(json.loads((self.public / "latest.json").read_text())["date"], "2026-08-02")
-
         feed = (self.public / "feed.xml").read_text()
         self.assertEqual(feed.count("<item>"), 1)
-        self.assertIn("<link>https://inish.in/</link>", feed)
-        self.assertIn('<guid isPermaLink="false">inish-daily-2026-08-02</guid>', feed)
-        self.assertNotIn("/daily/", feed)
+        self.assertIn("<link>https://nish.sh/daily</link>", feed)
+        self.assertIn('<guid isPermaLink="false">the-daily-2026-08-02</guid>', feed)
+        self.assertNotIn("inish.in", feed)
 
-        sitemap = (self.public / "sitemap.xml").read_text()
-        self.assertEqual(sitemap.count("<loc>"), 2)
-        self.assertIn("<loc>https://inish.in/</loc>", sitemap)
-        self.assertIn("<loc>https://inish.in/about.html</loc>", sitemap)
-        self.assertIn("<lastmod>2026-08-02</lastmod>", sitemap)
+    def test_page_renders_from_a_fixture_edition(self):
+        self.write(edition(stories=4, candidate_count=229))
+        self.write_candidates()
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertIn("<title>The Daily \u00b7 2026-08-02</title>", page)
+        self.assertIn("<h1><a href=\"/daily\">The Daily</a></h1>", page)
+        self.assertIn("Sunday, 2 August 2026", page)
+        self.assertIn("Compiled from <b>12 of 13</b> sources", page)
+        self.assertIn("229 items read", page)
+        self.assertIn("4 picked", page)
+        self.assertIn("updated 07:41 IST", page)
+        # One lead, the rest as picks, each carrying the three labels.
+        self.assertEqual(page.count('class="story story-lead"'), 1)
+        self.assertEqual(page.count('class="story story-pick"'), 3)
+        # The lead carries the checked fact, the take and the caveat; picks are short.
+        self.assertEqual(page.count("<b>Checked</b>"), 1)
+        self.assertEqual(page.count("<b>Nish</b>"), 1)
+        self.assertEqual(page.count("<b>But</b>"), 1)
+        # Section nav, section cards by source group, and the wire.
+        for anchor in ("lead", "picks", "s-ai", "s-dev", "s-product", "s-news", "s-reddit", "wire"):
+            self.assertIn(f'<a href="#{anchor}">', page)
+            self.assertIn(f'id="{anchor}"', page)
+        self.assertNotIn("<script", page)
+
+    def test_every_listed_item_links_to_its_original(self):
+        self.write(edition(stories=2))
+        self.write_candidates()
+        self.build()
+        front = json.loads((self.public / "latest.json").read_text())
+        page = (self.public / "index.html").read_text()
+        items = [item for section in front["sections"] for item in section["items"]] + front["wire"]
+        self.assertGreater(len(items), 10)
+        for item in items:
+            self.assertIn(f'href="{html.escape(item["url"], quote=True)}"', page)
+        for story in front["stories"]:
+            self.assertIn(f'href="{html.escape(story["url"], quote=True)}"', page)
+        lead = front["stories"][0]
+        self.assertIn(f'<a href="{html.escape(lead["evidence_url"], quote=True)}" rel="noopener noreferrer">{html.escape(lead["fact"], quote=True)}</a>', page)
+
+    def test_cards_skip_stories_already_picked_and_jev_skips(self):
+        self.write(edition(stories=1))
+        self.write_candidates()
+        self.build()
+        front = json.loads((self.public / "latest.json").read_text())
+        urls = [item["url"] for section in front["sections"] for item in section["items"]] + [i["url"] for i in front["wire"]]
+        self.assertNotIn(SAMPLE_STORIES[0]["url"], urls)
+        self.assertNotIn("https://skipped.example/offtopic", urls)
+        self.assertEqual(len(urls), len(set(urls)))
+        for section in front["sections"]:
+            self.assertLessEqual(len(section["items"]), builder.CARD_ITEMS)
+        self.assertLessEqual(len(front["wire"]), builder.WIRE_ITEMS)
+
+    def test_the_pool_is_kept_so_the_page_rebuilds_without_the_candidate_file(self):
+        self.write(edition())
+        self.write_candidates()
+        self.build()
+        first = (self.public / "index.html").read_text()
+        self.assertTrue((self.pools / "2026-08-02.json").exists())
+        (self.candidates / "2026-08-02.json").unlink()
+        self.build()
+        self.assertEqual((self.public / "index.html").read_text(), first)
+
+    def test_without_a_pool_the_page_still_builds_from_the_picks(self):
+        self.write(edition())
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertIn('id="lead"', page)
+        self.assertNotIn('id="wire"', page)
+        self.assertIn(f"<b>{len(builder.fetch_candidates.load_sources()['sources'])}</b> sources", page)
+
+    def test_an_unranked_pool_keeps_fetch_order_and_every_item(self):
+        self.write(edition(stories=1))
+        self.write_candidates(ranked=False)
+        self.build()
+        front = json.loads((self.public / "latest.json").read_text())
+        urls = [item["url"] for section in front["sections"] for item in section["items"]] + [i["url"] for i in front["wire"]]
+        self.assertIn("https://skipped.example/offtopic", urls)
+
+    def test_an_edition_may_carry_its_own_sections_and_wire(self):
+        # The later editor step writes these directly; the pool is then ignored
+        # for them and the page renders exactly what the edition says.
+        payload = edition(stories=1)
+        payload["sections"] = [{"id": "ai", "label": "AI", "items": [
+            {"title": "Editor-chosen item", "url": "https://editor.example/a", "source": "Editor", "blurb": "Why it matters."}]}]
+        payload["wire"] = [{"title": "Wire line", "url": "https://editor.example/w", "source": "Editor"}]
+        self.write(payload)
+        self.write_candidates()
+        self.build()
+        front = json.loads((self.public / "latest.json").read_text())
+        self.assertEqual([s["id"] for s in front["sections"]], ["ai"])
+        self.assertEqual([i["title"] for i in front["wire"]], ["Wire line"])
+        page = (self.public / "index.html").read_text()
+        self.assertIn("Editor-chosen item", page)
+        self.assertIn("Why it matters.", page)
+
+    def test_rejects_a_bad_link_in_editor_written_sections(self):
+        payload = edition(stories=1)
+        payload["wire"] = [{"title": "Wire line", "url": "http://editor.example/w", "source": "Editor"}]
+        self.assertRejects(payload, "Only public HTTPS")
+
+    def test_markup_in_source_titles_is_escaped(self):
+        self.write(edition(stories=1))
+        self.write_candidates()
+        path = self.candidates / "2026-08-02.json"
+        payload = json.loads(path.read_text())
+        payload["candidates"][0]["title"] = '<img src=x onerror=alert(1)> & "quotes"'
+        path.write_text(json.dumps(payload))
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertNotIn("<img src=x", page)
+        self.assertIn("&lt;img src=x onerror=alert(1)&gt; &amp; &quot;quotes&quot;", page)
+
+    def test_a_candidate_with_an_unsafe_link_is_dropped_not_fatal(self):
+        self.write(edition(stories=1))
+        self.write_candidates()
+        path = self.candidates / "2026-08-02.json"
+        payload = json.loads(path.read_text())
+        payload["candidates"][0]["url"] = "javascript:alert(1)"
+        path.write_text(json.dumps(payload))
+        self.build()
+        self.assertNotIn("javascript:", (self.public / "index.html").read_text())
+
+    def test_quiet_day_publishes_a_short_edition(self):
+        self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
+        self.write_candidates()
+        self.build()
+        page = (self.public / "index.html").read_text()
+        self.assertIn("Nothing cleared the bar today", page)
+        self.assertIn("no picks today", page)
+        self.assertIn('id="wire"', page)
+        self.assertEqual(json.loads((self.public / "latest.json").read_text())["stories"], [])
+
+    def test_no_shipped_file_still_names_the_retired_site(self):
+        self.write(edition())
+        self.write_candidates()
+        self.build()
+        root = Path(__file__).resolve().parents[1]
+        shipped = list(self.public.iterdir()) + [
+            path for path in (root / "public").rglob("*") if path.is_file() and path.suffix in {".html", ".css", ".svg", ".json", ".xml"}
+        ]
+        for path in shipped:
+            with self.subTest(path=path.name):
+                text = path.read_text().lower()
+                self.assertNotIn("inish.in", text)
+                self.assertNotIn("nish's daily reads", text)
+                self.assertNotRegex(text, r"tiny\s*studio")
+
+    def test_committed_surface_matches_the_newest_accepted_edition(self):
+        # Deliberately NOT patched to temp dirs: the committed generated
+        # surface must equal exactly what the builder renders from the newest
+        # accepted edition and its stored pool, so a hand edit or a stale build
+        # fails here.
+        config = builder.fetch_candidates.load_sources()
+        latest = builder.load_latest()
+        pool, _ = builder.load_pool(__import__("datetime").date.fromisoformat(latest["date"]), config)
+        front = builder.compose_front(latest, pool, config)
+        self.assertEqual(
+            (builder.DAILY / "latest.json").read_text(encoding="utf-8"),
+            json.dumps(front, indent=2, ensure_ascii=False) + "\n",
+        )
+        self.assertEqual((builder.DAILY / "feed.xml").read_text(encoding="utf-8"), builder.rss(front))
+        self.assertEqual((builder.DAILY / "index.html").read_text(encoding="utf-8"), builder.page(front))
+
+    def test_asset_list_is_pinned(self):
+        # The guards below iterate builder.ASSETS; an emptied tuple would make
+        # them pass vacuously.
+        self.assertEqual(set(builder.ASSETS), {"styles.css", "favicon.svg"})
 
     def test_rss_item_carries_every_story_of_its_edition(self):
         # The root page rolls over every day, so the RSS item must keep the
@@ -254,37 +421,6 @@ class BuildDailyTests(unittest.TestCase):
             f"<p><strong>But</strong> {story['caveat']}</p>",
         )
 
-    def test_renders_prominence_and_the_three_labels(self):
-        self.write(edition(stories=6))
-        self.build()
-        page = (self.public / "index.html").read_text()
-        self.assertEqual(page.count('<article class="story'), 6)
-        self.assertEqual(page.count('class="story story-lead"'), 1)
-        self.assertEqual(page.count('class="story story-feature"'), 2)
-        self.assertEqual(page.count('class="story story-brief"'), 3)
-        self.assertEqual(page.count("<strong>Checked</strong>"), 6)
-        self.assertEqual(page.count("<strong>Nish</strong>"), 6)
-        self.assertEqual(page.count("<strong>But</strong>"), 6)
-        self.assertNotIn("Nish's angle", page)
-        self.assertIn("70 scanned · 6 kept", page)
-
-    def test_every_checked_fact_links_to_its_evidence(self):
-        # A "Checked" claim must be clickable through to the exact source it
-        # was verified against, not a bare assertion the reader has to hunt
-        # for. The label stays outside the link so the accessible name is the
-        # fact sentence itself.
-        self.write(edition(stories=4))
-        self.build()
-        page = (self.public / "index.html").read_text()
-        self.assertEqual(page.count('<p class="fact"><strong>Checked</strong> <a href='), 4)
-        for index in range(4):
-            story = SAMPLE_STORIES[index]
-            self.assertIn(
-                f'<a href="{html.escape(story["evidence_url"], quote=True)}" '
-                f'rel="noopener noreferrer">{html.escape(story["fact"], quote=True)}</a>',
-                page,
-            )
-
     def cross_source_story(self):
         """A story whose Checked fact is only supported by a separate source.
 
@@ -304,36 +440,6 @@ class BuildDailyTests(unittest.TestCase):
             "caveat": "Points and comment counts are engagement, not an endorsement of the feature.",
         }
 
-    def test_checked_fact_renders_its_evidence_link(self):
-        # The exact-evidence contract: a fact verified against a discussion
-        # thread must link to that thread, while the story still links to the
-        # primary source. Both links render; neither is dropped or collapsed
-        # into the other.
-        payload = edition(stories=1, date="2026-08-02")
-        payload["stories"][0] = self.cross_source_story()
-        self.write(payload)
-        self.build()
-        page = (self.public / "index.html").read_text()
-        self.assertIn(
-            '<p class="fact"><strong>Checked</strong> '
-            '<a href="https://news.ycombinator.com/item?id=49222824" rel="noopener noreferrer">'
-            "Hacker News logged 168 points and 70 comments on the discussion of the launch.</a></p>",
-            page,
-        )
-        self.assertIn(
-            '<h2><a href="https://code.claude.com/docs/en/cross-session-messaging" rel="noopener noreferrer">'
-            "Claude Code messages cross sessions now</a></h2>",
-            page,
-        )
-        # The fact must not masquerade as a story link: wrapping it in the
-        # primary-source URL would send the reader to a page that does not
-        # contain the claim.
-        self.assertNotIn(
-            '<a href="https://code.claude.com/docs/en/cross-session-messaging" rel="noopener noreferrer">'
-            "Hacker News logged 168 points",
-            page,
-        )
-
     def test_rejects_cross_source_fact_without_evidence_url(self):
         # A story whose fact is only supported by a separate source must carry
         # that evidence URL, or the whole edition is rejected. "Checked" with
@@ -342,313 +448,6 @@ class BuildDailyTests(unittest.TestCase):
         payload["stories"][0] = self.cross_source_story()
         del payload["stories"][0]["evidence_url"]
         self.assertRejects(payload, "story fields must be exactly")
-
-    def test_head_carries_social_share_metadata(self):
-        self.write(edition())
-        self.build()
-        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:url" content="https://inish.in/">', head)
-        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
-        self.assertIn(
-            '<meta property="og:image:alt" content="Nish\'s Daily Reads: AI news and early signs of '
-            'what people will pay for, picked each morning for a founder.">',
-            head,
-        )
-        self.assertIn('<meta property="og:image:type" content="image/png">', head)
-        self.assertIn('<meta property="og:image:width" content="1200">', head)
-        self.assertIn('<meta property="og:image:height" content="630">', head)
-        self.assertIn('<meta name="twitter:card" content="summary_large_image">', head)
-        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
-        # og:image, twitter:image, and the Article JSON-LD image field share one URL.
-        self.assertEqual(head.count("https://inish.in/og-image.png"), 3)
-        # The build keeps the raster share card at the root alongside app.js and styles.css.
-        self.assertTrue((self.public / "og-image.png").is_file())
-
-    def test_head_declares_site_name_locale_and_twitter_image_alt(self):
-        # Unfurlers name the source from og:site_name and X's card reader needs
-        # its own twitter:image:alt; og:locale states the page's language. A
-        # shared image_alt constant keeps the two alt tags from drifting.
-        self.write(edition())
-        self.build()
-        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:site_name" content="Nish\'s Daily Reads">', head)
-        self.assertIn('<meta property="og:locale" content="en_US">', head)
-        self.assertIn(
-            '<meta name="twitter:image:alt" content="Nish\'s Daily Reads: AI news and early signs of '
-            'what people will pay for, picked each morning for a founder.">',
-            head,
-        )
-        self.assertIn('<meta property="og:image:alt" content="', head)
-        self.assertIn('<meta name="twitter:image:alt" content="', head)
-        # The same reader-facing sentence is delivered to both tags.
-        og_alt = head.split('<meta property="og:image:alt" content="', 1)[1].split('"', 1)[0]
-        twitter_alt = head.split('<meta name="twitter:image:alt" content="', 1)[1].split('"', 1)[0]
-        self.assertEqual(og_alt, twitter_alt)
-
-    def test_head_uses_raster_social_card(self):
-        # X and other raster-only unfurlers exclude SVG card images, so the
-        # generated head must point both og:image and twitter:image at the
-        # committed 1200x630 PNG and declare it as image/png.
-        self.write(edition())
-        self.build()
-        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<meta property="og:image" content="https://inish.in/og-image.png">', head)
-        self.assertIn('<meta property="og:image:type" content="image/png">', head)
-        self.assertIn('<meta name="twitter:image" content="https://inish.in/og-image.png">', head)
-        self.assertNotIn("og-image.svg", head)
-        # The committed card is a real PNG with the promised dimensions,
-        # validated with the standard library only (signature + IHDR fields).
-        card = (Path(__file__).resolve().parents[1] / "public" / "og-image.png").read_bytes()
-        self.assertTrue(card.startswith(b"\x89PNG\r\n\x1a\n"), "og-image.png is not a PNG")
-        self.assertEqual(
-            (int.from_bytes(card[16:20], "big"), int.from_bytes(card[20:24], "big")),
-            (1200, 630),
-            "og-image.png must be exactly 1200x630",
-        )
-
-    def test_head_carries_apple_touch_icon(self):
-        self.write(edition())
-        self.build()
-        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn(
-            '<link rel="apple-touch-icon" sizes="180x180" type="image/png" href="/apple-touch-icon.png">',
-            head,
-        )
-        # The build keeps the icon at the root and the copy is a real PNG.
-        icon = self.public / "apple-touch-icon.png"
-        self.assertTrue(icon.is_file())
-        self.assertGreater(icon.stat().st_size, 8)
-        self.assertTrue(icon.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"))
-
-    def test_head_declares_a_desktop_favicon(self):
-        # Browsers ask for /favicon.ico by default; declaring the pinned
-        # apple-touch-icon as the favicon gives desktop tabs an icon without
-        # adding a new binary or touching the worker.
-        self.write(edition())
-        self.build()
-        head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-        self.assertIn('<link rel="icon" type="image/png" href="/apple-touch-icon.png">', head)
-
-    def test_head_carries_truthful_structured_data_and_share_titles(self):
-        # Every share tag and every JSON-LD value is derived from the strings
-        # the page really renders — never invented copy.
-        self.write(edition())
-        self.build()
-        page = (self.public / "index.html").read_text()
-        head = page.split("</head>", 1)[0]
-
-        rendered_title = html.unescape(head.split("<title>", 1)[1].split("</title>", 1)[0])
-        rendered_description = html.unescape(
-            head.split('<meta name="description" content="', 1)[1].split('"', 1)[0]
-        )
-        for attribute, expected in (
-            ('<meta property="og:title" content="', rendered_title),
-            ('<meta property="og:description" content="', rendered_description),
-            ('<meta name="twitter:title" content="', rendered_title),
-            ('<meta name="twitter:description" content="', rendered_description),
-        ):
-            with self.subTest(attribute=attribute):
-                value = html.unescape(head.split(attribute, 1)[1].split('"', 1)[0])
-                self.assertEqual(value, expected)
-
-        self.assertEqual(head.count("application/ld+json"), 1)
-        block = head.split('<script type="application/ld+json">', 1)[1].split("</script>", 1)[0]
-        data = json.loads(block)
-        self.assertEqual(data["@context"], "https://schema.org")
-        nodes_by_type = {}
-        for node in data["@graph"]:
-            nodes_by_type.setdefault(node["@type"], []).append(node)
-        self.assertEqual(set(nodes_by_type), {"WebSite", "Person", "Article", "Claim", "FAQPage"})
-
-        site = nodes_by_type["WebSite"][0]
-        self.assertEqual(site["@id"], "https://inish.in/#website")
-        self.assertEqual(site["name"], "Nish's Daily Reads")
-        self.assertEqual(site["url"], "https://inish.in/")
-        self.assertEqual(site["description"], rendered_description)
-
-        person = nodes_by_type["Person"][0]
-        self.assertEqual(person["@id"], "https://inish.in/#nish")
-        self.assertEqual(person["name"], "Nish")
-        self.assertEqual(person["url"], "https://inish.in/")
-        self.assertEqual(person["image"], "https://avatars.githubusercontent.com/nish3451")
-        # The Person node carries its own fixed bio, never the site's dek,
-        # pinned here to repo-verifiable claims only.
-        self.assertEqual(
-            person["description"], "Founder; publishes Nish's Daily Reads."
-        )
-        self.assertNotEqual(person["description"], rendered_description)
-        # The occupation is drawn from the page's own "a daily read for a
-        # founder" language, expressed as a structured Occupation node.
-        self.assertEqual(person["hasOccupation"], {"@type": "Occupation", "name": "Founder"})
-        # The GitHub and X/Twitter URLs are verified to belong to Nish.
-        # No employer, products, or biography are claimed.
-        self.assertEqual(
-            person["sameAs"],
-            ["https://github.com/nish3451", "https://x.com/NishantRArora"],
-        )
-        self.assertNotIn("jobTitle", person)
-        # `knowsAbout` mirrors the page's own section taxonomy (the filter nav
-        # labels), minus the catch-all Wildcard bucket, so the schema can only
-        # claim topics the feed actually surfaces.
-        self.assertEqual(
-            person["knowsAbout"],
-            sorted(builder.SECTIONS - {"Wildcard"}),
-        )
-        # Nish runs no studio on this site: no Organization, affiliation or employer.
-        self.assertNotIn("Organization", nodes_by_type)
-        self.assertNotIn("affiliation", person)
-        self.assertNotIn("worksFor", person)
-
-        article = nodes_by_type["Article"][0]
-        self.assertEqual(article["@id"], "https://inish.in/#article")
-        self.assertEqual(article["headline"], rendered_title)
-        self.assertEqual(article["datePublished"], "2026-08-02")
-        self.assertEqual(article["mainEntityOfPage"], "https://inish.in/")
-        # The article's author is a node reference to the canonical Person
-        # node, so the graph holds one Person entity rather than an inline
-        # duplicate carrying the same claims.
-        self.assertEqual(article["author"], {"@id": person["@id"]})
-        # The article is part of the website: an explicit edge that lets AI
-        # engines trace the edition back to its publishing surface.
-        self.assertEqual(article["isPartOf"], {"@id": site["@id"]})
-        # The article completes its entity with the share surface's own
-        # metadata: the og:image URL, the page description, and the edition
-        # date mirrored as dateModified (no modification tracking exists).
-        self.assertEqual(article["image"], "https://inish.in/og-image.png")
-        self.assertEqual(article["description"], rendered_description)
-        self.assertEqual(article["dateModified"], article["datePublished"])
-
-        # Each story's Checked fact is a Claim node so AI engines can extract
-        # individual citable passages. The text and url match the visible page
-        # content (the fact paragraph and its evidence link).
-        claims = nodes_by_type["Claim"]
-        self.assertEqual(len(claims), len(edition()["stories"]))
-        for i, claim in enumerate(claims, 1):
-            self.assertEqual(claim["@id"], f"https://inish.in/#claim-{i}")
-            self.assertEqual(claim["@type"], "Claim")
-            self.assertIn("text", claim)
-            self.assertIn("url", claim)
-            self.assertTrue(claim["url"].startswith("https://"))
-            self.assertEqual(claim["author"], {"@id": person["@id"]})
-            self.assertEqual(claim["isPartOf"], {"@id": article["@id"]})
-        # The article's mentions array references every Claim node.
-        self.assertEqual(article["mentions"], [{"@id": c["@id"]} for c in claims])
-
-    def test_head_carries_the_canonical_url(self):
-        # The root feed is the site's single public surface and there are no
-        # archives, so the canonical is the fixed root URL for every edition,
-        # including a day with no stories.
-        for payload in (
-            edition(),
-            edition(stories=0, editor_note="Nothing today survived a second look at the source."),
-        ):
-            with self.subTest(stories=len(payload["stories"])):
-                self.write(payload)
-                self.build()
-                head = (self.public / "index.html").read_text().split("</head>", 1)[0]
-                self.assertEqual(head.count('<link rel="canonical" href="https://inish.in/">'), 1)
-
-    def test_filters_expose_selected_state_and_announce_count(self):
-        # The merged filter accessibility contract must live in the renderer,
-        # not just in a committed index.html: exactly one button is
-        # aria-pressed=true (the active All filter), every other filter is
-        # explicitly false, and a polite live region announces the initial
-        # visible count so the static markup matches app.js's runtime updates.
-        for payload in (
-            edition(stories=3),
-            edition(stories=1),
-            edition(stories=0, editor_note="Nothing today survived a second look at the source."),
-        ):
-            with self.subTest(stories=len(payload["stories"])):
-                self.write(payload)
-                self.build()
-                page = (self.public / "index.html").read_text()
-                if not payload["stories"]:
-                    self.assertNotIn("data-filter", page)
-                    self.assertNotIn("filter-status", page)
-                    continue
-                filters = page.split('<nav class="filters"', 1)[1].split("</nav>", 1)[0]
-                # Hidden until app.js runs, so no-JS readers never see dead buttons.
-                self.assertTrue(filters.startswith(' aria-label="Filter stories" hidden>'))
-                self.assertEqual(filters.count('aria-pressed="true"'), 1)
-                self.assertIn(
-                    '<button type="button" class="active" data-filter="all" aria-pressed="true">All</button>',
-                    filters,
-                )
-                pressed_false = filters.count('aria-pressed="false"')
-                self.assertGreaterEqual(pressed_false, 1)
-                # Every filter button except All carries an explicit false state.
-                self.assertEqual(filters.count("<button"), pressed_false + 1)
-                self.assertIn('id="filter-status" role="status" aria-live="polite"', page)
-                count = len(payload["stories"])
-                noun = "story" if count == 1 else "stories"
-                self.assertIn(f">Showing all {count} {noun}<", page)
-
-    def test_filter_status_is_hidden_by_a_real_css_class_not_an_inline_style(self):
-        # The live region is hidden by .visually-hidden in the stylesheet, never
-        # by an inline style the builder repeats on every page. A class that the
-        # CSS does not define would hide nothing if the inline style were ever
-        # dropped, so the renderer and the stylesheet are checked together.
-        self.write(edition(stories=3))
-        self.build()
-        page = (self.public / "index.html").read_text()
-        status = page.split('id="filter-status"', 1)[1].split(">", 1)[0]
-        self.assertIn('class="visually-hidden"', page.split('id="filter-status"', 1)[0])
-        self.assertNotIn('style="', status)
-        styles = (Path(__file__).resolve().parents[1] / "public" / "styles.css").read_text()
-        rule = styles.split(".visually-hidden {", 1)
-        self.assertEqual(len(rule), 2, "styles.css must define a .visually-hidden rule")
-        declarations = rule[1].split("}", 1)[0]
-        for required in (
-            "position: absolute",
-            "width: 1px",
-            "height: 1px",
-            "clip: rect(0 0 0 0)",
-            "white-space: nowrap",
-        ):
-            self.assertIn(required, declarations)
-
-    def test_footer_links_the_owned_studio(self):
-        # The merged outbound identity links are part of the renderer, so the
-        # next daily publish cannot silently drop them from the footer. Each
-        # link carries rel="me" to assert identity equivalence alongside the
-        # JSON-LD sameAs entry.
-        self.write(edition())
-        self.build()
-        footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
-        self.assertIn(
-            '<p class="identity">Nish on <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub ↗</a> · <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X ↗</a></p>',
-            footer,
-        )
-
-    def test_no_page_mentions_tiny_studio(self):
-        # Nish asked (2026-09-28) for every Tiny Studio mention to go. This
-        # covers the generated page and feeds plus every hand-written file
-        # that ships from public/, so neither path can bring it back.
-        self.write(edition())
-        self.build()
-        shipped = [self.public / name for name in ("index.html", "latest.json", "feed.xml", "sitemap.xml")]
-        shipped += [
-            path for path in (Path(__file__).resolve().parents[1] / "public").rglob("*")
-            if path.suffix in {".html", ".txt", ".xml", ".json", ".js", ".css", ".svg"}
-        ]
-        for path in shipped:
-            with self.subTest(path=path.name):
-                self.assertNotRegex(path.read_text().lower(), r"tiny\s*studio")
-
-    def test_footer_includes_about_link(self):
-        self.write(edition())
-        self.build()
-        footer = (self.public / "index.html").read_text().split("<footer>", 1)[1].split("</footer>", 1)[0]
-        self.assertIn('<a href="/about.html">About</a>', footer)
-
-    def test_quiet_day_publishes_a_short_edition(self):
-        self.write(edition(stories=0, editor_note="Nothing today survived a second look at the source."))
-        self.build()
-        page = (self.public / "index.html").read_text()
-        self.assertIn("Nothing cleared the bar today", page)
-        self.assertNotIn("data-filter", page)
-        self.assertEqual(json.loads((self.public / "latest.json").read_text())["stories"], [])
 
     # --- the fact gate ---------------------------------------------------
 
@@ -797,39 +596,6 @@ class BuildDailyTests(unittest.TestCase):
             with self.subTest(candidate_count=candidate_count):
                 self.assertRejects(edition(candidate_count=candidate_count), "candidate_count")
 
-    def test_committed_surface_matches_the_newest_accepted_edition(self):
-        # Deliberately NOT patched to temp dirs: the committed generated
-        # surface must equal exactly what the builder renders from the newest
-        # accepted edition. Observed 2026-08-12: the published note claimed
-        # "Four stories survived the check" while the accepted edition (and the
-        # rendered page's own "2 kept" label) said two, so the live page, RSS,
-        # and JSON promised something the edition never said. Any drift between
-        # the accepted edition and the committed surface must fail here.
-        latest = builder.load_latest()
-        self.assertEqual(
-            (builder.DAILY / "latest.json").read_text(encoding="utf-8"),
-            json.dumps(latest, indent=2, ensure_ascii=False) + "\n",
-        )
-        self.assertEqual(
-            (builder.DAILY / "feed.xml").read_text(encoding="utf-8"),
-            builder.rss(latest),
-        )
-        self.assertEqual(
-            (builder.DAILY / "index.html").read_text(encoding="utf-8"),
-            builder.page(latest),
-        )
-
-    def test_canonical_root_asset_list_is_pinned(self):
-        """Both root-asset guards below iterate builder.ASSETS, so a trimmed or
-        emptied tuple would make them pass vacuously and re-open the very drift
-        class they exist to close. Pin the canonical set: every name here is
-        referenced by the generated head and shipped by the deploy copy line.
-        """
-        self.assertEqual(
-            set(builder.ASSETS),
-            {"app.js", "styles.css", "og-image.svg", "og-image.png", "apple-touch-icon.png"},
-        )
-
     def test_keeps_committed_root_assets_untouched(self):
         """A stale daily-style mirror must never overwrite canonical root assets.
 
@@ -871,19 +637,6 @@ class BuildDailyTests(unittest.TestCase):
                         self.build()
                 finally:
                     asset.write_bytes(restore)
-
-    def test_removes_stale_archive_output(self):
-        self.write(edition())
-        stale = self.public / "archive" / "2026-07-31"
-        stale.mkdir(parents=True)
-        (stale / "index.html").write_text("stale")
-        with (
-            patch.object(builder, "EDITIONS", self.editions),
-            patch.object(builder, "DAILY", self.public),
-        ):
-            builder.main()
-        self.assertFalse(stale.exists())
-        self.assertFalse((self.public / "archive").exists())
 
 
 if __name__ == "__main__":

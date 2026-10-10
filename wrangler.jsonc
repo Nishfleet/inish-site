@@ -4,8 +4,14 @@
   "compatibility_date": "2026-08-01",
   "workers_dev": true,
   "preview_urls": false,
-  // Apex host patterns are required: "inish.in/*" alone does not match "/".
+  // nish.sh/daily and nish.sh/daily/* are more specific than the zone's
+  // nish.sh/* (worker fleet-console, not ours), so only the daily page reaches
+  // this worker. inish.in is retired: its routes stay only to answer with a 301
+  // to the daily page. Apex host patterns are required: "inish.in/*" alone does
+  // not match "/".
   "routes": [
+    { "pattern": "nish.sh/daily", "zone_name": "nish.sh" },
+    { "pattern": "nish.sh/daily/*", "zone_name": "nish.sh" },
     { "pattern": "inish.in", "zone_name": "inish.in" },
     { "pattern": "inish.in/*", "zone_name": "inish.in" },
     { "pattern": "www.inish.in", "zone_name": "inish.in" },

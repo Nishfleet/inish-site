@@ -16,7 +16,13 @@ const beasties = new Beasties({
 });
 
 const rules = [];
-for (const name of (await readdir(output)).filter((file) => file.endsWith(".html"))) {
+// The 404 page sits at the asset root; the daily page lives under /daily, so
+// its file path is its URL path.
+const pages = [
+  ...(await readdir(output)).filter((file) => file.endsWith(".html")),
+  ...(await readdir(`${output}/daily`)).filter((file) => file.endsWith(".html")).map((file) => `daily/${file}`)
+];
+for (const name of pages) {
   const file = `${output}/${name}`;
   const html = await beasties.process(await readFile(file, "utf8"));
   const blocks = [...html.matchAll(/<style(?:\s[^>]*)?>([\s\S]*?)<\/style>/g)];

@@ -343,7 +343,8 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
             "github": lambda day: [],
             "feed": lambda *args, **kwargs: [],
             "google_news": lambda *args, **kwargs: [],
-            "reddit": lambda: [],
+            "reddit": lambda *args, **kwargs: [],
+            "REDDIT_PAUSE": 0,
         }
         env = {name: value for name, value in os.environ.items() if name != "TYPESAFE_API_KEY"}
         with tempfile.TemporaryDirectory() as tmp:
@@ -375,7 +376,8 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
             "github": lambda day: [],
             "feed": lambda *args, **kwargs: [],
             "google_news": lambda *args, **kwargs: [],
-            "reddit": lambda: [],
+            "reddit": lambda *args, **kwargs: [],
+            "REDDIT_PAUSE": 0,
         }
 
     def test_a_jev_failure_keeps_fetch_order_and_says_why(self):
