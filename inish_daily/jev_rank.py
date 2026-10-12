@@ -24,7 +24,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-JEV_URL = os.environ.get("JEV_URL", "https://api.typesafe.ai/v1/systemone")
+# The fleet router's /jev: the Vercel AI Gateway evaluation API (boolean, choice and score
+# questions). TypeSafe direct (noul questions) has had no credits since 2026-10-04.
+JEV_URL = os.environ.get("JEV_URL", "http://127.0.0.1:4000/jev")
 MODEL = "jev-latest"
 WORKERS = 8
 RETRIES = 4
@@ -51,11 +53,11 @@ QUESTIONS = {
         ],
     },
     "wildcard": {
-        "type": "noul",
+        "type": "boolean",
         "instructions": "Setting usefulness aside, is `candidate` a story a curious, non-technical founder would enjoy telling a friend about: surprising, human, or strange in a way that holds up?",
     },
     "engineer_only": {
-        "type": "noul",
+        "type": "boolean",
         "instructions": "Would only an engineer reading code care about `candidate` (a library release, language feature, framework internals, a refactoring essay)?",
     },
 }
@@ -213,9 +215,11 @@ def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
     return {
         "model": response.get("model") or MODEL,  # the router's /jev may omit it
         "fit": round(answers["fit"]["score"], 3),
-        "fit_confidence": round(answers["fit"]["confidence"], 3),
-        "wildcard": round(answers["wildcard"]["noul"], 3),
-        "engineer_only": round(answers["engineer_only"]["noul"], 3),
+        # The gateway's evaluation API gives each rung's probability, not a
+        # confidence; the likeliest rung's probability stands in for it.
+        "fit_confidence": round(max(answers["fit"]["probabilities"].values(), default=0), 3),
+        "wildcard": round(answers["wildcard"]["probability"], 3),
+        "engineer_only": round(answers["engineer_only"]["probability"], 3),
     }
 
 
