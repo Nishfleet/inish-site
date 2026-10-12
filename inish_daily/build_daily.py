@@ -538,21 +538,22 @@ def item_view(item: dict) -> dict:
 def story_card(story: dict, index: int, prominence: str) -> str:
     domain = urlparse(story["url"]).netloc.removeprefix("www.")
     heading = "h2" if prominence == "lead" else "h3"
-    # The lead carries the full read (checked fact, Nish's take, the caveat).
-    # Picks stay short so the section cards and the wire sit on the first
-    # screens; the RSS item and latest.json keep every field of every story.
-    notes = ""
-    if prominence == "lead":
-        notes = f"""
-          <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
-          <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
-          <p class="note caveat"><b>But</b> {esc(story['caveat'])}</p>"""
+    # Every story carries the full read: the checked fact, Nish's take and
+    # the caveat. That is the point of the page, so picks keep it too.
     return f"""
         <article class="story story-{esc(prominence)}">
-          <p class="kicker">{esc(story['section'])} <span>{esc(story['source'])}</span></p>
-          <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
-          <p class="summary">{esc(story['summary'])}</p>{notes}
-          <a class="more" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} &#8599;</a>
+          <div class="story-number">{index:02d}</div>
+          <div class="story-body">
+            <p class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></p>
+            <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
+            <p class="summary">{esc(story['summary'])}</p>
+            <div class="story-notes">
+              <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
+              <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
+              <p class="note caveat"><b>But</b> {esc(story['caveat'])}</p>
+            </div>
+            <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} &#8599;</a>
+          </div>
         </article>"""
 
 
@@ -619,19 +620,19 @@ def page(front: dict) -> str:
         picks = ""
         if len(stories) > 1:
             cards = "".join(story_card(story, index, "pick") for index, story in enumerate(stories[1:], 2))
-            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">More picks</h2><div class="pick-grid">{cards}</div></section>'
+            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">More picks</h2>{cards}\n      </section>'
     else:
-        lead = '<section id="lead" class="lead quiet"><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></section>'
+        lead = '<section id="lead" class="lead quiet"><div class="story-number">00</div><div><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></div></section>'
         picks = ""
-    cards_html = "".join(
+    boards = [
         f'<section id="s-{esc(section["id"])}" class="card"><h2 class="label">{esc(section["label"])}</h2>'
         f'<ol>{"".join(item_row(item, True) for item in section["items"])}</ol></section>'
         for section in front["sections"]
-    )
-    cards_html = f'\n      <div class="cards">{cards_html}</div>' if cards_html else ""
-    wire = ""
+    ]
     if front["wire"]:
-        wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item, True) for item in front["wire"])}</ul></aside>'
+        boards.append(f'<section id="wire" class="card wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item, True) for item in front["wire"])}</ul></section>')
+    cards_html = f'\n    <div class="cards">{"".join(boards)}</div>' if boards else ""
+    kept = len(stories)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -644,34 +645,31 @@ def page(front: dict) -> str:
   <meta property="og:description" content="{esc(description)}">
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f1e7">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17150f">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f4efe5">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
 </head>
 <body>
-  <div class="paper">
-    <header class="masthead">
-      <h1><a href="/daily">{SITE_NAME}</a></h1>
-      <p class="dateline"><time datetime="{esc(front['date'])}">{esc(edition_date_label(date))}</time></p>
-    </header>
-    <p class="metabar">{meta_bar(front)}</p>
-    <nav class="nav" aria-label="Sections">{nav_html}</nav>
-    <div class="layout">
-    <main>
-      <p class="editor-note"><b>Editor's note</b> {esc(front['editor_note'])}</p>
-      {lead}{picks}{cards_html}
-    </main>{wire}
+  <a class="skip" href="#stories">Skip to stories</a>
+  <header class="masthead">
+    <div class="masthead-top"><a href="/daily">nish.sh/daily</a><time datetime="{esc(front['date'])}">{esc(edition_date_label(date))}</time><span>{front['candidate_count']} scanned &middot; {kept} kept</span></div>
+    <div class="title-row">
+      <div><p class="kicker">Built for one reader</p><h1><a href="/daily">{SITE_NAME}</a></h1></div>
+      <div><p class="dek">AI, dev, product and startup news, in plain words. A story runs only if it links a fact it was checked against.</p><p class="metabar">{meta_bar(front)}</p></div>
     </div>
-    <footer>
-      <a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a>
-      <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub &#8599;</a>
-      <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X &#8599;</a>
-      <span>Compiled each morning, 07:30 IST, from the sites listed in sources.json.</span>
-    </footer>
-  </div>
+    <nav class="nav" aria-label="Sections">{nav_html}</nav>
+  </header>
+  <main id="stories">
+    <section class="edition-note"><b>Editor's note</b><p>{esc(front['editor_note'])}</p></section>
+      {lead}{picks}{cards_html}
+  </main>
+  <footer>
+    <div class="footer-links"><a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a></div>
+    <p class="identity">Nish on <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub &#8599;</a> &middot; <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X &#8599;</a></p>
+    <p>Compiled each morning, 07:30 IST, from the sites listed in sources.json.</p>
+  </footer>
 </body>
 </html>
 """

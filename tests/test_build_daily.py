@@ -205,10 +205,10 @@ class BuildDailyTests(unittest.TestCase):
         # One lead, the rest as picks, each carrying the three labels.
         self.assertEqual(page.count('class="story story-lead"'), 1)
         self.assertEqual(page.count('class="story story-pick"'), 3)
-        # The lead carries the checked fact, the take and the caveat; picks are short.
-        self.assertEqual(page.count("<b>Checked</b>"), 1)
-        self.assertEqual(page.count("<b>Nish</b>"), 1)
-        self.assertEqual(page.count("<b>But</b>"), 1)
+        # Every story, lead and picks alike, carries the checked fact, the take and the caveat.
+        self.assertEqual(page.count("<b>Checked</b>"), 4)
+        self.assertEqual(page.count("<b>Nish</b>"), 4)
+        self.assertEqual(page.count("<b>But</b>"), 4)
         # Section nav, section cards by source group, and the wire.
         for anchor in ("lead", "picks", "s-ai", "s-dev", "s-product", "s-news", "s-reddit", "wire"):
             self.assertIn(f'<a href="#{anchor}">', page)
