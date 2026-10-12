@@ -333,6 +333,17 @@ class GradeRetryTests(unittest.TestCase):
         self.assertEqual(sleeps, [])
 
 
+    def test_a_400_says_what_jev_answered(self):
+        import io
+
+        def fake_post(body, key):
+            raise urllib.error.HTTPError(jev_rank.JEV_URL, 400, "Bad Request", {}, io.BytesIO(b'{"error": "unknown question type"}'))
+
+        with self.assertRaises(urllib.error.HTTPError) as caught:
+            jev_rank.grade({}, "secret", post=fake_post, sleep=lambda _: None)
+        self.assertIn("unknown question type", str(caught.exception))
+        self.assertNotIn("secret", str(caught.exception))
+
 class FetchMainWithoutKeyTests(unittest.TestCase):
     def test_writes_ranked_by_null_and_reports_the_skip(self):
         tiny = [{"source": "Test", "evidence_class": "independent", "lens": "Tools", "title": "t", "url": "https://example.com/t"}]

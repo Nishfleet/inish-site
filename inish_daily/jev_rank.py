@@ -184,6 +184,14 @@ def post(body: dict, key: str) -> dict:
         return json.load(response)
 
 
+def _error_body(exc: urllib.error.HTTPError) -> str:
+    """The start of Jev's error reply, so a failed run says why. It never holds the key."""
+    try:
+        return " ".join(exc.read(300).decode("utf-8", "replace").split())
+    except Exception:
+        return ""
+
+
 def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
     """One candidate's Jev answers, retrying only transient failures."""
     attempt = 0
@@ -194,6 +202,7 @@ def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
         except urllib.error.HTTPError as exc:
             transient = exc.code == 429 or exc.code >= 500
             if not transient or attempt == RETRIES - 1:
+                exc.msg = f"{exc.msg}: {_error_body(exc)}"
                 raise
         except (urllib.error.URLError, TimeoutError):
             if attempt == RETRIES - 1:
