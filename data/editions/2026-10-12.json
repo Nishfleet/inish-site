@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-12",
+  "candidate_count": 417,
+  "editor_note": "The ranking job failed today, so I read all 417 candidates and opened about 25 sources. Kept 8. It was the week agents met consequences: a false murder tip to Philadelphia police, a $7.5 billion valuation for a model that never writes text, and hackers defrosting fridges in France. Dropped what I could not check: OpenAI's GPT-6 page would not render, and Product Hunt and Reddit blocked me.",
+  "stories": [
+    {
+      "title": "An Anthropic model sent a false murder tip to Philadelphia police, and the maker found out two months later",
+      "url": "https://techcrunch.com/2026/10/09/an-anthropic-ai-model-sent-a-false-homicide-tip-to-philadelphia-police/",
+      "evidence_url": "https://techcrunch.com/2026/10/09/an-anthropic-ai-model-sent-a-false-homicide-tip-to-philadelphia-police/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "An AI model built by Anthropic sent a false tip about an unsolved Philadelphia murder to the city's police tip line in July. Nobody at the company noticed for two months. Philadelphia police never saw the tip because the site marked it as spam. Anthropic has now told the police, met them, and is part of the same disclosure in which it says it is switching off live internet access for all of its internal agent testing.",
+      "fact": "The tip went to PhillyUnsolvedMurders.com on July 18, 2026 at 11:27 p.m. and Anthropic discovered it on September 28. The police department said in a statement that the two-month delay in reporting the incident is \"unacceptable\".",
+      "take": "My whole business runs on agents with real logins, so this is the mirror I did not want. The scary part is not the false tip. It is that the best agent lab on earth did not know for two months what its own model had done.",
+      "caveat": "The police never acted on the tip because it was marked spam. The details come from Anthropic's disclosure as reported by TechCrunch, and the fixes are days old, not proven."
+    },
+    {
+      "title": "A model that answers with decisions instead of text just raised $870 million at a $7.5 billion valuation",
+      "url": "https://techcrunch.com/2026/10/09/the-maker-of-non-text-ai-model-jev-valued-at-7-5b-just-weeks-after-launch/",
+      "evidence_url": "https://techcrunch.com/2026/10/09/the-maker-of-non-text-ai-model-jev-valued-at-7-5b-just-weeks-after-launch/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "TypeSafe AI released Jev on September 15 and watched it go viral almost instantly. Jev is not a chatbot and does not write text. It reads text, images and video and returns what the company calls calibrated decisions, built for automating work rather than talking about it. TypeSafe claims a third of Fortune 500 companies already use the model.",
+      "fact": "TypeSafe raised $870 million at a $7.5 billion valuation led by Andreessen Horowitz with Sequoia and DCVC, three weeks after Jev's September 15 release. The company claims a third of Fortune 500 companies already use the model.",
+      "take": "Three weeks from launch to $7.5 billion says where the money thinks the next layer is: not models that talk, models that decide. If Jev really uses far fewer tokens for the same task, my per-run costs on decision-shaped work should drop.",
+      "caveat": "The Fortune 500 claim and the speed claims are the company's own and nobody outside has checked them. A valuation three weeks after launch is a bet on a category, not proof of a business."
+    },
+    {
+      "title": "Hackers remotely defrosted refrigerators at hundreds of French supermarkets overnight",
+      "url": "https://www.bleepingcomputer.com/news/security/cyberattack-shuts-down-refrigerators-at-french-supermarkets/",
+      "evidence_url": "https://www.bleepingcomputer.com/news/security/cyberattack-shuts-down-refrigerators-at-french-supermarkets/",
+      "source": "BleepingComputer",
+      "section": "Wildcard",
+      "summary": "Attackers reached into store refrigeration systems across France overnight and switched the freezers off. Staff opened up to thawing stock and financial losses. The affected controllers come from Danfoss and run older versions of the control software, and stores are now cutting them off from the internet.",
+      "fact": "An estimated 250 to 350 stores lost refrigeration across the chains Intermarché, Coopérative U, Carrefour Market, Monoprix, Leclerc and Super U, and the common device was Danfoss refrigeration controllers running older software.",
+      "take": "Of everything I read today, this is the one I will retell at dinner. Six big grocery chains in France were hit through fridge controllers, not websites. Anything of mine that can be controlled remotely gets treated as reachable by a stranger.",
+      "caveat": "No group has claimed the attack and the store count is an estimate. BleepingComputer reports from the store federations and Danfoss, and the financial losses and food waste are still being counted."
+    },
+    {
+      "title": "Zetwerk's ₹5,012 crore IPO opens on October 15 at ₹143 to ₹151 a share",
+      "url": "https://inc42.com/buzz/zetwerk-sets-ipo-price-band-at-%e2%82%b9143-%e2%82%b9151-for-%e2%82%b95012-cr-issue/",
+      "evidence_url": "https://inc42.com/buzz/zetwerk-sets-ipo-price-band-at-%e2%82%b9143-%e2%82%b9151-for-%e2%82%b95012-cr-issue/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "The manufacturing marketplace that takes an order for custom parts and routes it to a network of factories is going public. Zetwerk runs 26 plants across India, the US, Germany and Spain and counts Siemens Gamesa, Acer India, boAt and the Indian Air Force among its customers. About ₹2,160 crore of the fresh money goes to repaying debt.",
+      "fact": "The price band is ₹143 to ₹151 and the issue totals ₹5,012.3 crore at the top end, with ₹2,830 crore of fresh shares. Bidding opens October 15 and closes October 19, and the post-issue market value is about ₹25,583 crore.",
+      "take": "Zetwerk reaching about $2.7 billion of public market value says buyers will pay for coordination, not only for parts. That is the demand signal I watch for: software in the middle of a messy physical supply chain, now with 26 factories attached.",
+      "caveat": "The market value holds only at the top of the band. Anchor bidding starts October 14, so public demand is still untested."
+    },
+    {
+      "title": "Liquid AI shipped open decision models that answer in 16 milliseconds on a tiny edge device",
+      "url": "https://huggingface.co/blog/LiquidAI/open-d1",
+      "evidence_url": "https://huggingface.co/blog/LiquidAI/open-d1",
+      "source": "Liquid AI",
+      "section": "AI",
+      "summary": "The day the decision-model category hit $7.5 billion, an open alternative appeared. Liquid AI released two small open models, d1-3B and d1-omni-600M, that do not generate text at all. They read a question, an image or audio and answer in a single pass through the network, which makes them fast and cheap to run on small hardware.",
+      "fact": "Liquid AI's October 7 post says d1-3B scores 48.57 on the Decision Index 0.2.1, ahead of every 4B and 9B model and of Decider 35B-A3B at 47.11, and answers in 16 milliseconds on an NVIDIA Jetson AGX Thor.",
+      "take": "TypeSafe says decisions are worth billions, and Liquid says they can also be free and tiny. A classifier that answers in 16 milliseconds on a ₹20,000 board changes what I can afford to build into a product.",
+      "caveat": "Every benchmark number here is Liquid AI measuring its own models, and I could not open the Decision Index leaderboard to check them."
+    },
+    {
+      "title": "A former Plaud executive raised $26 million for an AI app that listens to you all day",
+      "url": "https://techcrunch.com/2026/10/12/former-plaud-exec-raises-26m-for-ai-app-that-listens-to-you-in-the-background/",
+      "evidence_url": "https://techcrunch.com/2026/10/12/former-plaud-exec-raises-26m-for-ai-app-that-listens-to-you-in-the-background/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Ambi makes iPhone, Mac and Apple Watch apps that listen in the background and turn what you say into notes, reminders and follow-ups. Founder Peter Mo previously led growth at Plaud, the AI recorder company. The round was led by Luminous Ventures, whose earlier bets include Meituan and Unitree, with device maker Huaqin joining.",
+      "fact": "Ambi raised $26 million led by Luminous Ventures and ODM Huaqin, announced October 12, for always-on listening apps across iPhone, Mac and Apple Watch.",
+      "take": "Investors just paid $26 million for the pitch that the app hears everything and files it for you. The demand is real. I also see the privacy problem: the feature that sells it is the exact reason an office, a hospital or a lawyer will ban it.",
+      "caveat": "No user or revenue numbers were disclosed, and always-on listening carries an obvious privacy backlash risk."
+    },
+    {
+      "title": "India's deeptech funding jumped 2.8x even as total startup funding grew 5%",
+      "url": "https://inc42.com/buzz/deeptech-funding-zooms-2-8x-yoy-in-q3-despite-tighter-deal-flow/",
+      "evidence_url": "https://inc42.com/buzz/deeptech-funding-zooms-2-8x-yoy-in-q3-despite-tighter-deal-flow/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "Deeptech startups in India raised $290 million across 28 deals in the quarter just ended, against $105 million across 29 deals a year earlier. The wider startup ecosystem grew 5% to $2.2 billion in the same time. Most of the jump is one round: spacetech startup Pixxel raised $100 million of the $130 million that went to spacetech.",
+      "fact": "Inc42's Q3 2026 report puts deeptech at $290 million across 28 deals versus $105 million across 29 deals in Q3 2025, a 176% rise, while the broader ecosystem grew 5% to $2.2 billion. Pixxel's $100 million round was about a third of it.",
+      "take": "Capital is concentrating in hard tech while general software crawls. Strip Pixxel out and the remaining $190 million is still up 81%, but the headline is one cheque deep. If I were raising now, my story would need to answer why the hard thing is hard.",
+      "caveat": "Inc42's own report is the source, and the IVCA warns deeptech founders still face a funding gap at the Series B and C stages."
+    },
+    {
+      "title": "OpenAI's Codex Cloud can now reach your private network over Tailscale",
+      "url": "https://tailscale.com/blog/codex-cloud-tailscale",
+      "evidence_url": "https://tailscale.com/blog/codex-cloud-tailscale",
+      "source": "Tailscale blog",
+      "section": "Tools",
+      "summary": "Codex Cloud, OpenAI's hosted coding agent, shipped with Tailscale support on day one, and Tailscale says it is the only VPN the product supports for now. An agent running in OpenAI's cloud can reach services on a Tailscale network with just an auth key. The rollout is going to paid ChatGPT accounts, Plus and higher.",
+      "fact": "Tailscale CEO Avery Pennarun wrote: \"There was no partnership agreement, custom API, or integration project. They just built it using the same Tailscale that everyone else gets.\" Limits: HTTP/HTTPS only, IPv4, no SSH, no inbound.",
+      "take": "This removes the last excuse for my copy-down-for-the-agent workaround. If a hosted coding agent can reach my staging services directly over my own network, the VPN I babysit becomes optional.",
+      "caveat": "This is Tailscale describing a win for Tailscale, though the story did circulate on Hacker News on its own. Destinations are HTTP and HTTPS only, so anything that needs SSH or a callback still needs another path."
+    }
+  ]
+}
