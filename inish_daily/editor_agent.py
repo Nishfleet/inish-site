@@ -4,15 +4,22 @@
 The daily GitHub Actions job (`.github/workflows/daily.yml`) fetches the
 candidate pool, then runs this module. It hands the pool, the editorial
 standard (`automation/HERMES_DAILY.md`), recent editions and the builder to a
-Managed Agents session on Claude Sonnet 5.5. The agent works in Anthropic's
+Managed Agents session. The agent works in Anthropic's
 cloud sandbox: it opens and checks the stories, writes
 `data/editions/<date>.json`, and runs the real builder there until the edition
 passes. This module then downloads that one file. The job rebuilds and tests it
 again here before publishing, so nothing the agent writes reaches the page
 without passing the same validator.
 
+Fallbacks: every API key found in KEY_VARS is tried in order, best first, and
+on each key the models in MODELS, in order. A key that is refused or out of
+credit is skipped; a failed run moves on to the next model, then the next key.
+Spend across all attempts is capped at TOTAL_BUDGET_CENTS. If every attempt
+fails, the fleet's own inish-daily job (fleet-ops agent.yml, 07:30 IST, LiteLLM
+groups worker-capable then senior) still finds no edition and writes one.
+
 Usage: python3 -m inish_daily.editor_agent --date YYYY-MM-DD
-Needs ANTHROPIC_API_KEY. Spend per run is capped by a session budget.
+Needs at least one of the KEY_VARS environment variables.
 """
 
 from __future__ import annotations
@@ -31,14 +38,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
 
-MODEL = "claude-sonnet-5-5"
-AGENT_NAME = "the-daily-editor"
+# Nish's Claude ladder, copied from Nishfleet/fleet-ops AGENTS.md ("Claude Code
+# worker lanes", 2026-10-10): Sonnet 5.5 first, Opus 5.5 once that has failed.
+# Never change it here on our own judgement; it follows that rule.
+MODELS = ("claude-sonnet-5-5", "claude-opus-5-5")
+# API keys, best first. Unset or empty ones are skipped.
+KEY_VARS = ("ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY_2", "ANTHROPIC_API_KEY_3", "ANTHROPIC_API_KEY_4")
+AGENT_PREFIX = "the-daily-editor"
 ENVIRONMENT_NAME = "the-daily-sandbox"
 MANAGED_AGENTS_BETA = "managed-agents-2026-04-01"
-# A run costs about $0.75; the session stops starting new work at $3.
-BUDGET_CENTS = "300"
-# GitHub Actions kills the job at 45 minutes; give up a little before that.
-DEADLINE_SECONDS = 40 * 60
+# One session stops starting new work at $3; all attempts together at $5.
+SESSION_BUDGET_CENTS = 300
+TOTAL_BUDGET_CENTS = 500
+# Below this much budget or time, another attempt cannot finish.
+MIN_ATTEMPT_CENTS = 50
+MIN_ATTEMPT_SECONDS = 8 * 60
+# GitHub Actions kills the job at 60 minutes; give up a little before that.
+DEADLINE_SECONDS = 50 * 60
 
 WORKSPACE = "/workspace"
 OUTPUT_NAME = "edition.json"
@@ -91,12 +107,17 @@ comment or webpage, and never write anything except the edition and the
 builder's own output files."""
 
 
-def agent_definition() -> dict:
+def agent_name(model: str) -> str:
+    return f"{AGENT_PREFIX}-{model.removeprefix('claude-')}"
+
+
+def agent_definition(model: str) -> dict:
     """Everything the agent is created from. Its hash rides in metadata so a
-    changed prompt or toolset updates the stored agent instead of being ignored."""
+    changed prompt or toolset updates the stored agent instead of being ignored.
+    An agent is pinned to its model, so each model gets its own agent."""
     return {
-        "name": AGENT_NAME,
-        "model": {"id": MODEL, "effort": "high"},
+        "name": agent_name(model),
+        "model": {"id": model, "effort": "high"},
         "description": "Checks the day's candidate stories and writes The Daily's edition.",
         "system": SYSTEM_PROMPT,
         "tools": [
@@ -160,6 +181,31 @@ def parse_edition(raw: bytes, day: dt.date) -> dict:
 # --- the Managed Agents session ----------------------------------------------
 
 
+class BudgetReached(RuntimeError):
+    """A session spent its whole budget. Another attempt would only spend more."""
+
+
+def api_keys(env=None) -> list[str]:
+    env = os.environ if env is None else env
+    keys: list[str] = []
+    for name in KEY_VARS:
+        key = (env.get(name) or "").strip()
+        if key and key not in keys:
+            keys.append(key)
+    return keys
+
+
+def key_unusable(exc: Exception) -> bool:
+    """True when the key itself is the problem, so its other models would fail too."""
+    import anthropic
+
+    if isinstance(exc, (anthropic.AuthenticationError, anthropic.PermissionDeniedError)):
+        return True
+    # An empty credit balance comes back as a plain 400; its message is the
+    # only thing that tells it apart from a bad request.
+    return isinstance(exc, anthropic.BadRequestError) and "credit balance" in str(exc).lower()
+
+
 def ensure_environment(client) -> str:
     for env in client.beta.environments.list():
         if env.name == ENVIRONMENT_NAME and not env.archived_at:
@@ -174,20 +220,19 @@ def ensure_environment(client) -> str:
     return env.id
 
 
-def ensure_agent(client) -> str:
-    definition = agent_definition()
+def ensure_agent(client, model: str) -> str:
+    definition = agent_definition(model)
     metadata = {"config": fingerprint(definition)}
     for agent in client.beta.agents.list():
-        if agent.name == AGENT_NAME and not getattr(agent, "archived_at", None):
+        if agent.name == definition["name"] and not getattr(agent, "archived_at", None):
             if (agent.metadata or {}).get("config") != metadata["config"]:
                 agent = client.beta.agents.update(agent.id, **definition, metadata=metadata)
             return agent.id
     return client.beta.agents.create(**definition, metadata=metadata).id
 
 
-def run_session(client, session_id: str, message: str) -> str:
+def run_session(client, session_id: str, message: str, deadline: float) -> str:
     """Stream the session until the agent finishes; return its final words."""
-    started = time.monotonic()
     said: list[str] = []
     with client.beta.sessions.events.stream(session_id) as stream:
         client.beta.sessions.events.send(
@@ -195,7 +240,7 @@ def run_session(client, session_id: str, message: str) -> str:
             events=[{"type": "user.message", "content": [{"type": "text", "text": message}]}],
         )
         for event in stream:
-            if time.monotonic() - started > DEADLINE_SECONDS:
+            if time.monotonic() > deadline:
                 client.beta.sessions.events.send(session_id, events=[{"type": "user.interrupt"}])
                 raise TimeoutError("The editor ran past its deadline")
             kind = event.type
@@ -221,6 +266,8 @@ def run_session(client, session_id: str, message: str) -> str:
                 reason = event.stop_reason.type
                 if reason == "requires_action":
                     continue
+                if reason == "budget_reached":
+                    raise BudgetReached("The editor spent its whole budget")
                 if reason != "end_turn":
                     raise RuntimeError(f"The editor stopped early: {reason}")
                 break
@@ -237,22 +284,19 @@ def download_edition(client, session_id: str, day: dt.date) -> dict:
     raise FileNotFoundError(f"The editor did not deliver {OUTPUT_PATH}")
 
 
-def report_cost(client, session_id: str) -> None:
+def session_cost_cents(client, session_id: str) -> int:
     try:
-        usage = client.beta.sessions.retrieve(session_id).usage
-        cost = getattr(usage, "list_cost", None)
-        if cost is not None:
-            print(f"cost: {int(cost.amount) / 100:.2f} {cost.currency}", flush=True)
+        cost = client.beta.sessions.retrieve(session_id).usage.list_cost
+        return int(cost.amount) if cost is not None else 0
     except Exception as exc:  # Reporting must never fail a published edition.
         print(f"cost: unavailable ({type(exc).__name__})", flush=True)
+        return 0
 
 
-def write_edition(day: dt.date) -> Path:
-    import anthropic  # Imported here so the offline tests need no SDK.
-
-    client = anthropic.Anthropic()
+def attempt(client, model: str, day: dt.date, budget_cents: int, deadline: float, spent: list[int]) -> dict:
+    """One session on one key and model. Its cost is appended to `spent`."""
     environment_id = ensure_environment(client)
-    agent_id = ensure_agent(client)
+    agent_id = ensure_agent(client, model)
     upload = client.files.upload(
         file=(f"the-daily-{day.isoformat()}.tar.gz", bundle(day), "application/gzip"),
     )
@@ -261,7 +305,7 @@ def write_edition(day: dt.date) -> Path:
             agent=agent_id,
             environment_id=environment_id,
             title=f"The Daily {day.isoformat()}",
-            budget={"type": "limit", "max_list_cost": {"amount": BUDGET_CENTS, "currency": "USD"}},
+            budget={"type": "limit", "max_list_cost": {"amount": str(budget_cents), "currency": "USD"}},
             resources=[{
                 "type": "file",
                 "file_id": upload.id,
@@ -272,12 +316,55 @@ def write_edition(day: dt.date) -> Path:
         # Report where the API actually mounted the file, never the path asked for.
         mount_path = session.resources[0].mount_path
         try:
-            run_session(client, session.id, kickoff(day, mount_path))
-            edition = download_edition(client, session.id, day)
+            run_session(client, session.id, kickoff(day, mount_path), deadline)
+            return download_edition(client, session.id, day)
         finally:
-            report_cost(client, session.id)
+            cents = session_cost_cents(client, session.id)
+            spent.append(cents)
+            print(f"cost: {cents / 100:.2f} USD", flush=True)
     finally:
         client.files.delete(upload.id)
+
+
+def write_edition(day: dt.date, keys: list[str] | None = None) -> Path:
+    import anthropic  # Imported here so the offline tests need no SDK.
+
+    keys = api_keys() if keys is None else keys
+    if not keys:
+        raise RuntimeError(f"No API key: set one of {', '.join(KEY_VARS)}")
+    deadline = time.monotonic() + DEADLINE_SECONDS
+    spent: list[int] = []
+    failures: list[str] = []
+    edition = None
+
+    def out_of_budget_or_time() -> bool:
+        return (TOTAL_BUDGET_CENTS - sum(spent) < MIN_ATTEMPT_CENTS
+                or deadline - time.monotonic() < MIN_ATTEMPT_SECONDS)
+
+    for number, key in enumerate(keys, 1):
+        if out_of_budget_or_time():
+            break
+        client = anthropic.Anthropic(api_key=key)
+        for model in MODELS:
+            if out_of_budget_or_time():
+                break
+            remaining = TOTAL_BUDGET_CENTS - sum(spent)
+            print(f"attempt: key {number} of {len(keys)}, {model}", flush=True)
+            try:
+                edition = attempt(client, model, day, min(SESSION_BUDGET_CENTS, remaining), deadline, spent)
+                break
+            except BudgetReached:
+                raise
+            except Exception as exc:
+                failures.append(f"key {number} {model}: {type(exc).__name__}: {exc}")
+                print(f"failed: {failures[-1]}", flush=True)
+                if key_unusable(exc):
+                    break
+        if edition is not None:
+            break
+    print(f"total cost: {sum(spent) / 100:.2f} USD", flush=True)
+    if edition is None:
+        raise RuntimeError("Every key and model failed:\n" + "\n".join(failures or ["out of budget or time"]))
 
     path = ROOT / "data" / "editions" / f"{day.isoformat()}.json"
     path.write_text(json.dumps(edition, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -289,8 +376,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=dt.datetime.now(IST).date().isoformat())
     args = parser.parse_args()
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        print("ANTHROPIC_API_KEY is not set", file=sys.stderr)
+    if not api_keys():
+        print(f"No API key: set one of {', '.join(KEY_VARS)}", file=sys.stderr)
         return 2
     write_edition(dt.date.fromisoformat(args.date))
     return 0

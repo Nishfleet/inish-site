@@ -54,36 +54,58 @@ class FakeStream:
         return False
 
 
-class FakeClient:
-    """Just enough of the SDK surface the editor calls."""
+class AuthenticationError(Exception):
+    pass
 
-    def __init__(self, events, outputs, existing_agent=None):
+
+class PermissionDeniedError(Exception):
+    pass
+
+
+class BadRequestError(Exception):
+    pass
+
+
+class FakeClient:
+    """Just enough of the SDK surface the editor calls. `runs` holds one event
+    list per session, in the order sessions are created."""
+
+    def __init__(self, runs, outputs=None, existing_agent=None, cost="74", broken=None):
+        self.runs = list(runs)
+        self.outputs = OUTPUTS if outputs is None else outputs
         self.sent = []
         self.created_agents = []
         self.updated_agents = []
         self.deleted_files = []
-        self.session_kwargs = None
+        self.sessions = []
         agents = [existing_agent] if existing_agent else []
+
+        def environments():
+            if broken:
+                raise broken
+            return [NS(id="env_old", name="other", archived_at=None),
+                    NS(id="env_1", name=editor_agent.ENVIRONMENT_NAME, archived_at=None)]
+
+        def create_agent(**kw):
+            self.created_agents.append(kw)
+            return NS(id=f"agent:{kw['model']['id']}")
+
         self.beta = NS(
-            environments=NS(
-                list=lambda: [NS(id="env_old", name="other", archived_at=None),
-                              NS(id="env_1", name=editor_agent.ENVIRONMENT_NAME, archived_at=None)],
-                create=lambda **kw: self.fail("environment should be reused"),
-            ),
+            environments=NS(list=environments, create=lambda **kw: self.fail("environment should be reused")),
             agents=NS(
                 list=lambda: agents,
-                create=lambda **kw: self.created_agents.append(kw) or NS(id="agent_new"),
+                create=create_agent,
                 update=lambda agent_id, **kw: self.updated_agents.append(kw) or NS(id=agent_id),
             ),
             sessions=NS(
                 create=self.create_session,
-                retrieve=lambda sid: NS(usage=NS(list_cost=NS(amount="74", currency="USD"))),
+                retrieve=lambda sid: NS(usage=NS(list_cost=NS(amount=cost, currency="USD"))),
                 events=NS(
-                    stream=lambda sid: FakeStream(events),
+                    stream=lambda sid: FakeStream(self.runs.pop(0)),
                     send=lambda sid, events: self.sent.extend(events),
                 ),
             ),
-            files=NS(list=lambda scope_id, betas: outputs),
+            files=NS(list=lambda scope_id, betas: self.outputs),
         )
         self.files = NS(
             upload=lambda file: NS(id="file_up"),
@@ -96,8 +118,12 @@ class FakeClient:
         raise AssertionError(message)
 
     def create_session(self, **kwargs):
-        self.session_kwargs = kwargs
-        return NS(id="sesn_1", resources=[NS(mount_path="/mnt/session/uploads/the-daily-2026-10-12.tar.gz")])
+        self.sessions.append(kwargs)
+        return NS(id=f"sesn_{len(self.sessions)}",
+                  resources=[NS(mount_path="/mnt/session/uploads/the-daily-2026-10-12.tar.gz")])
+
+    def models_run(self):
+        return [s["agent"].split(":", 1)[1] for s in self.sessions]
 
 
 def text_event(text):
@@ -111,7 +137,10 @@ DONE = [
     text_event("Kept 0 stories."),
     NS(type="session.status_idle", stop_reason=NS(type="end_turn")),
 ]
+FAILED = [NS(type="session.status_idle", stop_reason=NS(type="retries_exhausted"))]
+BUDGET = [NS(type="session.status_idle", stop_reason=NS(type="budget_reached"))]
 OUTPUTS = [NS(id="file_out", filename="edition.json")]
+SONNET, OPUS = editor_agent.MODELS
 
 
 class EditorAgentTests(unittest.TestCase):
@@ -124,11 +153,22 @@ class EditorAgentTests(unittest.TestCase):
         self.addCleanup(patcher.stop)
         self.addCleanup(self.tmp.cleanup)
 
-    def run_with(self, client):
+    def run_with(self, *clients):
+        """One fake client per key, in key order."""
+        by_key = {f"key-{n}": client for n, client in enumerate(clients, 1)}
+        used = []
         fake_sdk = types.ModuleType("anthropic")
-        fake_sdk.Anthropic = lambda: client
-        with mock.patch.dict(sys.modules, {"anthropic": fake_sdk}), mock.patch("builtins.print"):
-            return editor_agent.write_edition(DAY)
+        fake_sdk.Anthropic = lambda api_key: used.append(api_key) or by_key[api_key]
+        fake_sdk.AuthenticationError = AuthenticationError
+        fake_sdk.PermissionDeniedError = PermissionDeniedError
+        fake_sdk.BadRequestError = BadRequestError
+        self.keys_used = used
+        with mock.patch.dict(sys.modules, {"anthropic": fake_sdk}), mock.patch("builtins.print"), \
+                mock.patch.object(editor_agent.time, "sleep"):
+            return editor_agent.write_edition(DAY, keys=list(by_key))
+
+    def stale_draft_untouched(self):
+        return (self.root / "data/editions/2026-10-12.json").read_text() == '{"stale": true}'
 
     def test_bundle_holds_the_standard_builder_and_todays_pool_only(self):
         got = names(editor_agent.bundle(DAY))
@@ -151,23 +191,28 @@ class EditorAgentTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             editor_agent.parse_edition(b"[]", DAY)
 
-    def test_fingerprint_tracks_the_definition(self):
-        definition = editor_agent.agent_definition()
-        self.assertEqual(editor_agent.fingerprint(definition), editor_agent.fingerprint(editor_agent.agent_definition()))
-        changed = dict(definition, system=definition["system"] + " ")
-        self.assertNotEqual(editor_agent.fingerprint(definition), editor_agent.fingerprint(changed))
-        self.assertEqual(definition["model"]["id"], "claude-sonnet-5-5")
+    def test_keys_come_from_the_environment_in_order(self):
+        env = {"ANTHROPIC_API_KEY_3": "c", "ANTHROPIC_API_KEY": "a", "ANTHROPIC_API_KEY_2": " ", "ANTHROPIC_API_KEY_4": "a"}
+        self.assertEqual(editor_agent.api_keys(env), ["a", "c"])
+        self.assertEqual(editor_agent.api_keys({}), [])
+
+    def test_each_model_has_its_own_agent_and_fingerprint(self):
+        sonnet, opus = (editor_agent.agent_definition(m) for m in (SONNET, OPUS))
+        self.assertNotEqual(sonnet["name"], opus["name"])
+        self.assertEqual((sonnet["model"]["id"], opus["model"]["id"]), (SONNET, OPUS))
+        self.assertEqual(editor_agent.fingerprint(sonnet), editor_agent.fingerprint(editor_agent.agent_definition(SONNET)))
+        self.assertNotEqual(editor_agent.fingerprint(sonnet), editor_agent.fingerprint(dict(sonnet, system=sonnet["system"] + " ")))
 
     def test_a_run_writes_the_edition_and_cleans_up(self):
-        client = FakeClient(DONE, OUTPUTS)
+        client = FakeClient([DONE])
         path = self.run_with(client)
-        self.assertEqual(path, self.root / "data/editions/2026-10-12.json")
         self.assertEqual(json.loads(path.read_text())["date"], "2026-10-12")
+        self.assertEqual(client.models_run(), [SONNET])
         self.assertEqual(client.deleted_files, ["file_up"])
-        self.assertEqual(len(client.created_agents), 1)
-        kwargs = client.session_kwargs
-        self.assertEqual(kwargs["environment_id"], "env_1")
-        self.assertEqual(kwargs["budget"]["max_list_cost"], {"amount": editor_agent.BUDGET_CENTS, "currency": "USD"})
+        session = client.sessions[0]
+        self.assertEqual(session["environment_id"], "env_1")
+        self.assertEqual(session["budget"]["max_list_cost"],
+                         {"amount": str(editor_agent.SESSION_BUDGET_CENTS), "currency": "USD"})
         kickoff = client.sent[0]
         self.assertEqual(kickoff["type"], "user.message")
         self.assertIn("tar -xzf /mnt/session/uploads/the-daily-2026-10-12.tar.gz", kickoff["content"][0]["text"])
@@ -176,29 +221,68 @@ class EditorAgentTests(unittest.TestCase):
         self.assertEqual([(e["tool_use_id"], e["result"]) for e in confirmations], [("sevt_2", "deny")])
 
     def test_a_current_agent_is_reused_and_a_stale_one_updated(self):
-        current = editor_agent.fingerprint(editor_agent.agent_definition())
-        agent = NS(id="agent_1", name=editor_agent.AGENT_NAME, archived_at=None, metadata={"config": current})
-        client = FakeClient(DONE, OUTPUTS, existing_agent=agent)
+        current = editor_agent.fingerprint(editor_agent.agent_definition(SONNET))
+        agent = NS(id=f"agent:{SONNET}", name=editor_agent.agent_name(SONNET), archived_at=None, metadata={"config": current})
+        client = FakeClient([DONE], existing_agent=agent)
         self.run_with(client)
         self.assertEqual((client.created_agents, client.updated_agents), ([], []))
 
         agent.metadata = {"config": "old"}
-        client = FakeClient(DONE, OUTPUTS, existing_agent=agent)
+        client = FakeClient([DONE], existing_agent=agent)
         self.run_with(client)
         self.assertEqual(len(client.updated_agents), 1)
 
-    def test_a_run_that_stops_early_fails_and_still_cleans_up(self):
-        events = [NS(type="session.status_idle", stop_reason=NS(type="budget_reached"))]
-        client = FakeClient(events, OUTPUTS)
+    def test_a_failed_run_falls_back_to_the_next_model_on_the_same_key(self):
+        first, second = FakeClient([FAILED, DONE], cost="120"), FakeClient([])
+        self.run_with(first, second)
+        self.assertEqual(first.models_run(), [SONNET, OPUS])
+        self.assertEqual(self.keys_used, ["key-1"])
+        # The second session only gets what the first left of the total cap.
+        self.assertEqual(first.sessions[1]["budget"]["max_list_cost"]["amount"],
+                         str(min(editor_agent.SESSION_BUDGET_CENTS, editor_agent.TOTAL_BUDGET_CENTS - 120)))
+
+    def test_a_refused_key_hands_over_to_the_next_key(self):
+        for error in (AuthenticationError("bad key"), PermissionDeniedError("no"),
+                      BadRequestError("Your credit balance is too low to access the Anthropic API")):
+            refused, good = FakeClient([], broken=error), FakeClient([DONE])
+            self.run_with(refused, good)
+            self.assertEqual(self.keys_used, ["key-1", "key-2"])
+            self.assertEqual(refused.models_run(), [])  # its other model is not tried
+            self.assertEqual(good.models_run(), [SONNET])
+
+    def test_every_key_and_model_failing_is_an_error_and_writes_nothing(self):
+        first, second = FakeClient([FAILED, FAILED], cost="10"), FakeClient([FAILED, FAILED], cost="10")
+        with self.assertRaises(RuntimeError):
+            self.run_with(first, second)
+        self.assertEqual((first.models_run(), second.models_run()), ([SONNET, OPUS], [SONNET, OPUS]))
+        self.assertTrue(self.stale_draft_untouched())
+
+    def test_the_total_cap_stops_further_attempts(self):
+        first = FakeClient([FAILED, FAILED, FAILED], cost=str(editor_agent.TOTAL_BUDGET_CENTS))
+        second = FakeClient([DONE])
+        with self.assertRaises(RuntimeError):
+            self.run_with(first, second)
+        self.assertEqual(first.models_run(), [SONNET])
+        self.assertEqual(self.keys_used, ["key-1"])
+        self.assertEqual(second.models_run(), [])
+
+    def test_a_spent_budget_stops_everything(self):
+        first, second = FakeClient([BUDGET]), FakeClient([DONE])
+        with self.assertRaises(editor_agent.BudgetReached):
+            self.run_with(first, second)
+        self.assertEqual((first.models_run(), self.keys_used), ([SONNET], ["key-1"]))
+        self.assertEqual(first.deleted_files, ["file_up"])
+        self.assertTrue(self.stale_draft_untouched())
+
+    def test_a_missing_deliverable_falls_back(self):
+        client = FakeClient([DONE, DONE], outputs=[])
         with self.assertRaises(RuntimeError):
             self.run_with(client)
-        self.assertEqual(client.deleted_files, ["file_up"])
-        self.assertEqual((self.root / "data/editions/2026-10-12.json").read_text(), '{"stale": true}')
+        self.assertEqual(client.models_run(), [SONNET, OPUS])
 
-    def test_a_missing_deliverable_fails(self):
-        client = FakeClient(DONE, [])
-        with mock.patch.object(editor_agent.time, "sleep"), self.assertRaises(FileNotFoundError):
-            self.run_with(client)
+    def test_no_key_is_an_error(self):
+        with self.assertRaises(RuntimeError):
+            self.run_with()
 
 
 if __name__ == "__main__":
