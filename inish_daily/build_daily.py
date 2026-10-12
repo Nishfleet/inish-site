@@ -548,9 +548,11 @@ def story_card(story: dict, index: int, prominence: str) -> str:
             <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
             <p class="summary">{esc(story['summary'])}</p>
             <div class="story-notes">
-              <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
               <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
-              <p class="note caveat"><b>But</b> {esc(story['caveat'])}</p>
+              <div class="evidence">
+                <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
+                <p class="note caveat"><b>But</b> {esc(story['caveat'])}</p>
+              </div>
             </div>
             <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} &#8599;</a>
           </div>
@@ -632,7 +634,6 @@ def page(front: dict) -> str:
     if front["wire"]:
         boards.append(f'<section id="wire" class="card wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item, True) for item in front["wire"])}</ul></section>')
     cards_html = f'\n    <div class="cards">{"".join(boards)}</div>' if boards else ""
-    kept = len(stories)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -645,8 +646,9 @@ def page(front: dict) -> str:
   <meta property="og:description" content="{esc(description)}">
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f4efe5">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4efe5">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14181b">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
@@ -654,7 +656,7 @@ def page(front: dict) -> str:
 <body>
   <a class="skip" href="#stories">Skip to stories</a>
   <header class="masthead">
-    <div class="masthead-top"><a href="/daily">nish.sh/daily</a><time datetime="{esc(front['date'])}">{esc(edition_date_label(date))}</time><span>{front['candidate_count']} scanned &middot; {kept} kept</span></div>
+    <div class="masthead-top"><a href="/daily">nish.sh/daily</a><time datetime="{esc(front['date'])}">{esc(edition_date_label(date))}</time><span><a href="{SITE_URL}/feed.xml">RSS</a> &middot; <a href="{SITE_URL}/latest.json">JSON</a></span></div>
     <div class="title-row">
       <div><p class="kicker">Built for one reader</p><h1><a href="/daily">{SITE_NAME}</a></h1></div>
       <div><p class="dek">AI, dev, product and startup news, in plain words. A story runs only if it links a fact it was checked against.</p><p class="metabar">{meta_bar(front)}</p></div>
