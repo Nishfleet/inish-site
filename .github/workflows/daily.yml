@@ -1,0 +1,101 @@
+name: Daily edition
+
+# Writes and publishes The Daily (nish.sh/daily) every morning. The candidate
+# fetch runs here; the editing runs in a Claude Managed Agents session on
+# Claude Sonnet 5.5 (inish_daily/editor_agent.py), billed to the
+# ANTHROPIC_API_KEY secret. The result is rebuilt and tested here, committed to
+# main, and deployed by dispatching the CI workflow (a push made with
+# GITHUB_TOKEN does not start other workflows on its own).
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # 07:30 IST
+    - cron: "0 5 * * *"   # 10:30 IST catch-up; a no-op once the day is published
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: daily-edition
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: main
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24"
+
+      - name: Pick today's date (Asia/Kolkata)
+        id: day
+        run: |
+          day="$(TZ=Asia/Kolkata date +%F)"
+          echo "date=$day" >> "$GITHUB_OUTPUT"
+          if [ -f "data/editions/$day.json" ]; then
+            echo "The $day edition is already published."
+            echo "done=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch candidates
+        if: steps.day.outputs.done != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+        run: python3 -m inish_daily.fetch_candidates --date "${{ steps.day.outputs.date }}"
+
+      - name: Write the edition with Claude
+        if: steps.day.outputs.done != 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 -m pip install --quiet "anthropic==1.13.0"
+          python3 -m inish_daily.editor_agent --date "${{ steps.day.outputs.date }}"
+
+      - name: Build and test
+        if: steps.day.outputs.done != 'true'
+        run: |
+          python3 -m inish_daily.build_daily
+          npm test
+
+      - name: Commit to main
+        if: steps.day.outputs.done != 'true'
+        id: commit
+        env:
+          DAY: ${{ steps.day.outputs.date }}
+        run: |
+          git add "data/editions/$DAY.json" public/daily/index.html public/daily/latest.json public/daily/feed.xml
+          if [ -d data/pools ]; then git add data/pools; fi
+          # Only the edition and the builder's output may change.
+          unexpected="$(git status --porcelain --untracked-files=all | grep -v '^[AM]  ' || true)"
+          if [ -n "$unexpected" ]; then
+            echo "Refusing to publish: the run changed files it should not have:"
+            echo "$unexpected"
+            exit 1
+          fi
+          git config user.name "the-daily[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "daily: publish $DAY"
+          git fetch origin main
+          if git cat-file -e "origin/main:data/editions/$DAY.json" 2>/dev/null; then
+            echo "Another run published $DAY first; nothing to push."
+            exit 0
+          fi
+          git rebase origin/main
+          git push origin HEAD:main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run ci.yml --ref main --repo "${{ github.repository }}"

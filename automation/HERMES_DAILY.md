@@ -1,6 +1,6 @@
 # Hermes daily publishing contract (The Daily, nish.sh/daily)
 
-The fleet job pins its own copy of the mechanical steps in fleet-ops `prompts/inish-daily.md`; this file is the editorial standard (who it is for, the bar, how to write it, the schema).
+The `Daily edition` workflow's Managed Agents editor (`inish_daily/editor_agent.py`) reads this file and follows every section except Goal and Steps. The fleet job pins its own copy of the mechanical steps in fleet-ops `prompts/inish-daily.md`; this file is the editorial standard (who it is for, the bar, how to write it, the schema).
 
 Run this on `netcup-rs2000` in a fresh checkout of `origin/main`. The fleet's `agent` workflow (Nishfleet/fleet-ops `.github/workflows/agent.yml`, job `inish-daily`) starts it every day at 07:30 IST. Never use the product root checkout: fleet lanes check out PR branches there.
 
