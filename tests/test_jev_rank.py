@@ -22,9 +22,9 @@ def response(fit=3.0, confidence=0.8, wildcard=0.4, engineer_only=0.1) -> dict:
     return {
         "model": "jev-latest",
         "answers": {
-            "fit": {"score": fit, "confidence": confidence},
-            "wildcard": {"noul": wildcard},
-            "engineer_only": {"noul": engineer_only},
+            "fit": {"type": "score", "score": fit, "probabilities": {"0": round(1 - confidence, 3), "4": confidence}},
+            "wildcard": {"type": "boolean", "probability": wildcard},
+            "engineer_only": {"type": "boolean", "probability": engineer_only},
         },
     }
 
