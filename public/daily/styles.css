@@ -1,154 +1,49 @@
-/* Self-hosted so every visitor sees the same masthead. Archivo and Space Mono
-   are SIL Open Font License 1.1; see fonts/OFL.txt. */
-@font-face{font-family:"Archivo";font-style:normal;font-weight:400;font-display:swap;src:url("/daily/fonts/archivo-400.woff2") format("woff2")}
-@font-face{font-family:"Archivo";font-style:italic;font-weight:400;font-display:swap;src:url("/daily/fonts/archivo-400-italic.woff2") format("woff2")}
-@font-face{font-family:"Archivo";font-style:normal;font-weight:700;font-display:swap;src:url("/daily/fonts/archivo-700.woff2") format("woff2")}
-@font-face{font-family:"Space Mono";font-style:normal;font-weight:700;font-display:swap;src:url("/daily/fonts/space-mono-700.woff2") format("woff2")}
-:root{--paper:#f4efe5;--ink:#1c242b;--muted:#5c656b;--soft:#3d474e;--rule:#cfc7b8;--strong-rule:#1c242b;--red:#a33b31;--display:"Archivo","Helvetica Neue",helvetica,arial,sans-serif;--mono:"Space Mono",ui-monospace,"SFMono-Regular",consolas,monospace}
-@media (prefers-color-scheme:dark){:root{--paper:#14181b;--ink:#ece6da;--muted:#9aa1a6;--soft:#c3c8cb;--rule:#2f363b;--strong-rule:#8b9399;--red:#e2786b}}
+:root{--bg:#f6f1e7;--card:#fbf8f1;--ink:#1d1a15;--muted:#6a6356;--rule:#d9cfbc;--accent:#9a2b1f;--link:#1d1a15;--serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#17150f;--card:#1e1b14;--ink:#ece6d6;--muted:#a0988a;--rule:#3a352a;--accent:#e08a74;--link:#ece6d6}}
 *{box-sizing:border-box}
-html{background:var(--paper);color:var(--ink);-webkit-text-size-adjust:100%;scroll-padding-top:64px}
-body{max-width:1440px;margin:0 auto;padding:0 40px;background:var(--paper);font-family:var(--display);line-height:1.52;-webkit-font-smoothing:antialiased}
-p{text-wrap:pretty}
-a:focus-visible{outline:2px solid var(--red);outline-offset:3px}
-::selection{background:var(--red);color:var(--paper)}
-.skip{position:absolute;left:-9999px;z-index:3;background:var(--ink);color:var(--paper);padding:8px 12px}
-.skip:focus{left:16px;top:16px}
-
-/* Masthead: a mono strip, then the title with the dek and the day's counts beside it. */
-.masthead{padding:18px 0 0}
-.masthead-top{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;padding-bottom:11px;border-bottom:1px solid var(--rule);font:700 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase}
-.masthead-top a{color:inherit;text-decoration:none}
-.masthead-top a:hover{color:var(--red)}
-.masthead-top span{text-align:right;color:var(--muted)}
-.title-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.8fr);gap:48px;align-items:end;padding:24px 0 20px}
-.kicker{margin:0 0 12px;color:var(--red);font:700 11px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-h1{margin:0;font:700 clamp(56px,8vw,120px)/.88 var(--display);letter-spacing:-.065em}
-h1 a{color:inherit;text-decoration:none}
-.dek{max-width:40ch;margin:0 0 14px;color:var(--soft);font:italic 20px/1.34 var(--display)}
-.metabar{display:flex;flex-wrap:wrap;gap:6px 0;margin:0;padding-top:12px;border-top:1px solid var(--rule);color:var(--muted);font:700 10px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase}
-.metabar span:not(:last-child)::after{content:"\00b7";margin:0 8px;color:var(--rule)}
-.metabar b{color:var(--ink)}
-
-/* Section links: one quiet row that stays in reach while scrolling. */
-.nav{position:sticky;top:0;z-index:2;display:flex;overflow-x:auto;background:var(--paper);border-top:1px solid var(--rule);border-bottom:3px double var(--strong-rule);scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{flex:none;padding:14px 16px;color:var(--muted);font:700 11px/1.2 var(--mono);letter-spacing:.05em;text-transform:uppercase;text-decoration:none;white-space:nowrap}
-.nav a:first-child{padding-left:0}
-.nav a:hover{color:var(--red)}
-
-/* Editor's note */
-.edition-note{display:grid;grid-template-columns:34px minmax(0,1fr);gap:8px 16px;padding:20px 0 22px;border-bottom:1px solid var(--strong-rule)}
-.edition-note b,.edition-note p{grid-column:2}
-.edition-note b{color:var(--red);font:700 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.edition-note p{max-width:none;margin:0;font:italic 19px/1.45 var(--display)}
-
-/* Stories: the lead runs full width, the picks sit two to a row with a hairline between. */
-.lead{border-bottom:3px double var(--strong-rule)}
-.picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:linear-gradient(var(--rule),var(--rule)) center/1px 100% no-repeat;border-bottom:3px double var(--strong-rule)}
-.picks>.label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0;padding:0;border:0}
-.picks .story:nth-of-type(odd){padding-right:28px}
-.picks .story:nth-of-type(even){padding-left:28px}
-.story{display:grid;grid-template-columns:34px minmax(0,1fr);gap:16px;min-width:0;padding:26px 0;border-bottom:1px solid var(--rule)}
-.story-lead{padding:26px 0 30px;border-bottom:0}
-.picks .story:last-of-type,.picks .story:nth-last-of-type(2):nth-of-type(odd){border-bottom:0}
-.story-number{padding-top:2px;color:var(--red);font:700 11px/1.2 var(--mono)}
-.story-body{min-width:0}
-.story .story-meta{display:flex;flex-wrap:wrap;gap:4px 14px;max-width:none;margin:0;color:var(--muted);font:700 10px/1.25 var(--mono);letter-spacing:.06em;text-transform:uppercase}
-.story-meta span:first-child{color:var(--red)}
-.story-meta span+span::before{content:"\00b7";margin-right:14px;color:var(--rule)}
-.story h2,.story h3{margin:10px 0 10px;font:700 clamp(24px,2.2vw,31px)/1.08 var(--display);letter-spacing:-.025em;text-wrap:balance}
-.story-lead h2{max-width:none;margin-top:12px;margin-bottom:18px;font-size:clamp(32px,3.5vw,50px);line-height:1.02;letter-spacing:-.035em}
-.story h2 a,.story h3 a{color:inherit;text-decoration:none}
-.story h2 a:hover,.story h3 a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:5px}
-.story p{max-width:70ch;margin:0;font-size:15.5px}
-.story-lead .summary{font-size:18px;line-height:1.55}
-.story-notes{display:flex;flex-direction:column;gap:10px;margin-top:16px}
-.evidence{display:flex;flex-direction:column;gap:10px}
-.note{padding:2px 0 2px 14px;border-left:2px solid var(--rule);color:var(--soft);font-size:14px}
-.note b{display:block;margin-bottom:4px;color:var(--muted);font:700 9.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase}
-.story .take{border-left-color:var(--red);color:var(--ink);font:17px/1.42 var(--display)}
-.take b{color:var(--red)}
-.story .fact{border-left-color:var(--strong-rule);font:12.5px/1.55 var(--mono)}
-.fact a{color:var(--ink);text-decoration:underline;text-decoration-color:var(--rule);text-decoration-thickness:1px;text-underline-offset:3px}
-.fact a:hover{color:var(--red);text-decoration-color:currentcolor}
-.story .caveat{font-size:13.5px;font-style:italic}
-.caveat b{font-style:normal}
-.source-link{display:inline-block;margin-top:14px;color:var(--red);font:700 11px/1.2 var(--mono);letter-spacing:.03em;text-decoration:none}
-.source-link:hover{text-decoration:underline;text-underline-offset:3px}
-.quiet{display:grid;grid-template-columns:34px minmax(0,1fr);gap:16px;padding:36px 0}
-.quiet h2{margin:9px 0 10px;font:700 clamp(30px,3.6vw,48px)/1.04 var(--display);letter-spacing:-.025em}
-.quiet p{max-width:70ch;margin:0;font-size:17px}
-
-/* The rest of the day by source group, then the wire, set in newspaper columns. */
-.cards{columns:3 300px;column-gap:48px;column-rule:1px solid var(--rule);padding-top:12px}
-.card{break-inside:avoid;padding:20px 0 8px}
-.label{margin:0 0 4px;padding-bottom:10px;border-bottom:1px solid var(--strong-rule);color:var(--red);font:700 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.card ol,.card ul{list-style:none;margin:0;padding:0}
-.card li{padding:10px 0;border-bottom:1px solid var(--rule)}
-.card li:last-child{border-bottom:0}
-.t{display:block;color:var(--ink);font:700 16px/1.28 var(--display);letter-spacing:-.01em;text-decoration:none;text-wrap:pretty}
-.t:hover{color:var(--red)}
-.blurb{display:-webkit-box;margin-top:4px;overflow:hidden;color:var(--soft);font-size:13.5px;line-height:1.45;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.wire .blurb{display:none}
-.meta{display:block;margin-top:6px;color:var(--muted);font:700 9.5px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase}
-.talk{color:var(--red);text-decoration:none}
-.talk:hover{text-decoration:underline}
-
-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 30px;align-items:baseline;margin:36px 0 0;padding:20px 0 40px;border-top:3px double var(--strong-rule);font-size:13px}
-.footer-links{display:flex;flex-wrap:wrap;gap:18px}
-footer a{color:inherit}
-footer a:hover{color:var(--red)}
-.identity{margin:0;text-align:right}
-footer>p:last-child{grid-column:1/-1;margin:0;color:var(--muted);font-size:12px}
-
-@media (max-width:820px){
-  html{scroll-padding-top:52px}
-  body{padding:0 16px}
-  .masthead-top{grid-template-columns:1fr 1fr;row-gap:8px}
-  .masthead-top a:first-child{grid-column:1;grid-row:1}
-  .masthead-top time{grid-column:1/-1;grid-row:2;text-align:center;padding-top:8px;border-top:1px solid var(--rule)}
-  .masthead-top span{grid-column:2;grid-row:1}
-  .title-row{grid-template-columns:1fr;gap:20px;padding:22px 0 20px}
-  h1{font-size:clamp(56px,18vw,80px)}
-  .dek{font-size:18px}
-  .nav a{padding:13px 14px}
-  .edition-note{grid-template-columns:1fr;padding:22px 0}
-  .edition-note b,.edition-note p{grid-column:1}
-  .edition-note p{font-size:18px}
-  .picks{grid-template-columns:1fr;background:none}
-  .picks .story:nth-of-type(n){padding-left:0;padding-right:0}
-  .picks .story:nth-last-of-type(2):nth-of-type(odd){border-bottom:1px solid var(--rule)}
-  /* A hanging number column costs a sixth of a phone's width: the number
-     joins the meta line and the story takes the full width below it. */
-  .story,.quiet{grid-template-columns:auto minmax(0,1fr);gap:0 10px;padding:26px 0}
-  .story-body{display:contents}
-  .story-number{padding-top:0;font-size:10px;line-height:1.25}
-  .story-body>:not(.story-meta){grid-column:1/-1}
-  .story-lead h2{max-width:none;font-size:clamp(30px,9vw,44px)}
-  .story-lead .summary{font-size:17px}
-  .story .take{font-size:16.5px}
-  .quiet>div{grid-column:1/-1}
-  footer{grid-template-columns:1fr}
-  .identity{text-align:left}
-}
-
-/* Wide screens set the lead in three columns under a full-width headline:
-   the summary, Nish's take, then what was checked and the caveat. */
-@media (min-width:1000px){
-  .story-lead .story-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);column-gap:40px;align-items:start}
-  .story-lead .story-meta{grid-column:1/-1}
-  .story-lead h2{grid-column:1/span 2;grid-row:2}
-  .story-lead .summary{grid-column:1;grid-row:3;max-width:none}
-  .story-lead .story-notes{display:contents}
-  .story-lead .take{grid-column:2;grid-row:3/span 2;font-size:19px}
-  .story-lead .source-link{grid-column:1;grid-row:4}
-  .story-lead .evidence{grid-column:3;grid-row:2/span 3;gap:12px;margin-top:16px}
-}
-
-/* 404 */
-.error-main{padding:32px 0 64px;border-top:3px double var(--strong-rule)}
-.error-code{margin:24px 0 0;color:var(--red);font:700 clamp(128px,24vw,320px)/.82 var(--display);letter-spacing:-.05em}
-.back-link{display:inline-block;margin-top:24px;padding:13px 20px;border:1px solid var(--ink);color:var(--ink);font:700 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;text-decoration:none}
-.back-link:hover,.back-link:focus-visible{background:var(--ink);color:var(--paper)}
-@media print{.nav,.skip{display:none}}
+html{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-text-size-adjust:100%}
+body{margin:0}
+a{color:var(--link);text-decoration-color:var(--rule);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent);color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.paper{max-width:1280px;margin:0 auto;padding:20px 24px 48px}
+.masthead{text-align:center;padding:14px 0 12px;border-top:4px double var(--ink);border-bottom:1px solid var(--ink)}
+.masthead h1{font:700 clamp(2.6rem,8vw,5rem)/1 var(--serif);letter-spacing:-.02em;margin:0}
+.masthead h1 a{text-decoration:none;color:var(--ink)}
+.dateline{margin:8px 0 0;font:italic 1.05rem var(--serif);color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:32px;margin-top:20px}
+@media (min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 340px;gap:40px}.wire{border-left:1px solid var(--rule);padding-left:28px}}
+.label{margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--ink);font:700 .8rem var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.kicker{margin:0 0 6px;font:700 .75rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.kicker span{color:var(--muted);font-weight:400;margin-left:6px}
+.story h2,.story h3{font-family:var(--serif);font-weight:700;margin:0 0 8px;line-height:1.12;letter-spacing:-.01em}
+.story h2 a,.story h3 a{text-decoration:none}
+.story-lead h2{font-size:clamp(1.9rem,4vw,2.9rem)}
+.story-pick h3{font-size:1.25rem}
+.summary{margin:0 0 12px;font:1.08rem/1.55 var(--serif)}
+.note{margin:0 0 6px;font-size:.92rem}
+.note b{display:inline-block;min-width:4.4em;font:700 .72rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.lead{padding-bottom:28px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.pick-grid{display:grid;gap:24px}
+@media (min-width:720px){.pick-grid{grid-template-columns:1fr 1fr}}
+.picks{padding-bottom:24px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.cards{display:grid;gap:28px 32px}
+@media (min-width:720px){.cards{grid-template-columns:1fr 1fr}}
+.card ol,.wire ul{list-style:none;margin:0;padding:0}
+.card li,.wire li{padding:9px 0;border-bottom:1px solid var(--rule)}
+.card li:last-child,.wire li:last-child{border-bottom:0}
+.t{display:block;font:600 1rem/1.3 var(--serif);text-decoration:none}
+.t:hover{text-decoration:underline}
+.meta{display:block;margin-top:3px;font:.72rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.talk{color:var(--muted)}
+.wire .t{font-size:.95rem}
+footer{display:flex;gap:18px;margin-top:40px;padding-top:14px;border-top:1px solid var(--ink);font:.75rem var(--mono);text-transform:uppercase;letter-spacing:.06em}
+footer a{color:var(--muted);text-decoration:none}
+.error-main{max-width:34rem;margin:12vh auto;text-align:center}
+.error-main h1{font:700 3rem var(--serif);margin:0 0 8px}
+@media (max-width:719px){.paper{padding:12px 16px 40px}}
+.story-lead .summary{font-size:1.2rem}
+.story-lead .note{max-width:70ch}
+.story-pick .summary{font-size:.98rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.quiet h2{font:700 1.8rem var(--serif);margin:0 0 8px}
+.layout{margin-top:24px}

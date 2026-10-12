@@ -536,40 +536,35 @@ def item_view(item: dict) -> dict:
 # --- rendering ----------------------------------------------------------------
 
 def story_card(story: dict, index: int, prominence: str) -> str:
-    domain = urlparse(story["url"]).netloc.removeprefix("www.")
     heading = "h2" if prominence == "lead" else "h3"
-    # Every story carries the full read: the checked fact, Nish's take and
-    # the caveat. That is the point of the page, so picks keep it too.
+    # The page keeps what a reader acts on. The lead adds Nish's take and the
+    # fact it was checked against; picks stay a headline and a summary. Every
+    # field of every story stays in latest.json and the RSS item.
+    notes = ""
+    if prominence == "lead":
+        notes = f"""
+          <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
+          <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>"""
     return f"""
         <article class="story story-{esc(prominence)}">
-          <div class="story-number">{index:02d}</div>
-          <div class="story-body">
-            <p class="story-meta"><span>{esc(story['section'])}</span><span>{esc(story['source'])}</span></p>
-            <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
-            <p class="summary">{esc(story['summary'])}</p>
-            <div class="story-notes">
-              <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
-              <div class="evidence">
-                <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
-                <p class="note caveat"><b>But</b> {esc(story['caveat'])}</p>
-              </div>
-            </div>
-            <a class="source-link" href="{esc(story['url'])}" rel="noopener noreferrer">Read at {esc(domain)} &#8599;</a>
-          </div>
+          <p class="kicker">{esc(story['section'])} <span>{esc(story['source'])}</span></p>
+          <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
+          <p class="summary">{esc(story['summary'])}</p>{notes}
         </article>"""
 
 
-def item_row(item: dict, show_source: bool) -> str:
-    meta = [esc(item["source"])] if show_source else []
-    if item.get("signal"):
-        meta.append(esc(item["signal"]))
+# The lists show only their top items; the full lists stay in latest.json.
+SHOWN_LIST_ITEMS = 4
+SHOWN_WIRE_ITEMS = 8
+
+
+def item_row(item: dict) -> str:
     discussion = ""
     if item.get("discussion_url"):
-        discussion = f' <a class="talk" href="{esc(item["discussion_url"])}" rel="noopener noreferrer">discuss</a>'
-    blurb = f'<span class="blurb">{esc(item["blurb"])}</span>' if item.get("blurb") else ""
+        discussion = f' &middot; <a class="talk" href="{esc(item["discussion_url"])}" rel="noopener noreferrer">discuss</a>'
     return (
         f'<li><a class="t" href="{esc(item["url"])}" rel="noopener noreferrer">{esc(item["title"])}</a>'
-        f'{blurb}<span class="meta">{" &middot; ".join(meta)}{discussion}</span></li>'
+        f'<span class="meta">{esc(item["source"])}{discussion}</span></li>'
     )
 
 
@@ -587,53 +582,33 @@ def updated_label(generated_at: str) -> str:
     return moment.astimezone(IST).strftime("%H:%M IST")
 
 
-def meta_bar(front: dict) -> str:
-    sources = front["sources"]
-    if sources["ok"]:
-        parts = [f"Compiled from <b>{sources['ok']} of {sources['total']}</b> sources"]
-    else:
-        parts = [f"<b>{sources['total']}</b> sources"]
-    parts.append(f"{front['candidate_count']} items read")
-    kept = len(front["stories"])
-    parts.append(f"{kept} picked" if kept else "no picks today")
-    updated = updated_label(front.get("generated_at", ""))
-    if updated:
-        parts.append(f"updated {esc(updated)}")
-    return "".join(f"<span>{part}</span>" for part in parts)
-
-
 def page(front: dict) -> str:
     date = dt.date.fromisoformat(front["date"])
     title = f"{SITE_NAME} · {front['date']}"
     description = "A daily front page: AI, dev, product and startup news compiled from a fixed list of sites, with the day's best stories checked against their sources."
     stories = front["stories"]
-    nav = []
-    if stories:
-        nav.append(("lead", "Lead"))
-        if len(stories) > 1:
-            nav.append(("picks", "Picks"))
-    for section in front["sections"]:
-        nav.append((f"s-{section['id']}", section["label"]))
-    if front["wire"]:
-        nav.append(("wire", "Wire"))
-    nav_html = "".join(f'<a href="#{esc(anchor)}">{esc(label)}</a>' for anchor, label in nav)
     if stories:
         lead = f'<section id="lead" class="lead" aria-label="Lead story">{story_card(stories[0], 1, "lead")}\n      </section>'
         picks = ""
         if len(stories) > 1:
             cards = "".join(story_card(story, index, "pick") for index, story in enumerate(stories[1:], 2))
-            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">More picks</h2>{cards}\n      </section>'
+            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><div class="pick-grid">{cards}</div></section>'
     else:
-        lead = '<section id="lead" class="lead quiet"><div class="story-number">00</div><div><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></div></section>'
+        lead = '<section id="lead" class="lead quiet"><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></section>'
         picks = ""
-    boards = [
+    cards_html = "".join(
         f'<section id="s-{esc(section["id"])}" class="card"><h2 class="label">{esc(section["label"])}</h2>'
-        f'<ol>{"".join(item_row(item, True) for item in section["items"])}</ol></section>'
+        f'<ol>{"".join(item_row(item) for item in section["items"][:SHOWN_LIST_ITEMS])}</ol></section>'
         for section in front["sections"]
-    ]
+    )
+    cards_html = f'\n      <div class="cards">{cards_html}</div>' if cards_html else ""
+    wire = ""
     if front["wire"]:
-        boards.append(f'<section id="wire" class="card wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item, True) for item in front["wire"])}</ul></section>')
-    cards_html = f'\n    <div class="cards">{"".join(boards)}</div>' if boards else ""
+        wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ul></aside>'
+    updated = updated_label(front.get("generated_at", ""))
+    stamp = f'<time datetime="{esc(front["date"])}">{esc(edition_date_label(date))}</time>'
+    if updated:
+        stamp += f' &middot; updated {esc(updated)}'
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -647,31 +622,25 @@ def page(front: dict) -> str:
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4efe5">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14181b">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f1e7">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17150f">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
 </head>
 <body>
-  <a class="skip" href="#stories">Skip to stories</a>
-  <header class="masthead">
-    <div class="masthead-top"><a href="/daily">nish.sh/daily</a><time datetime="{esc(front['date'])}">{esc(edition_date_label(date))}</time><span><a href="{SITE_URL}/feed.xml">RSS</a> &middot; <a href="{SITE_URL}/latest.json">JSON</a></span></div>
-    <div class="title-row">
-      <div><p class="kicker">Built for one reader</p><h1><a href="/daily">{SITE_NAME}</a></h1></div>
-      <div><p class="dek">AI, dev, product and startup news, in plain words. A story runs only if it links a fact it was checked against.</p><p class="metabar">{meta_bar(front)}</p></div>
-    </div>
-    <nav class="nav" aria-label="Sections">{nav_html}</nav>
-  </header>
-  <main id="stories">
-    <section class="edition-note"><b>Editor's note</b><p>{esc(front['editor_note'])}</p></section>
+  <div class="paper">
+    <header class="masthead">
+      <h1><a href="/daily">{SITE_NAME}</a></h1>
+      <p class="dateline">{stamp}</p>
+    </header>
+    <div class="layout">
+    <main>
       {lead}{picks}{cards_html}
-  </main>
-  <footer>
-    <div class="footer-links"><a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a></div>
-    <p class="identity">Nish on <a href="https://github.com/nish3451" rel="me noopener noreferrer">GitHub &#8599;</a> &middot; <a href="https://x.com/NishantRArora" rel="me noopener noreferrer">X &#8599;</a></p>
-    <p>Compiled each morning, 07:30 IST, from the sites listed in sources.json.</p>
-  </footer>
+    </main>{wire}
+    </div>
+    <footer><a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a></footer>
+  </div>
 </body>
 </html>
 """

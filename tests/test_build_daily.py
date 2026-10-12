@@ -198,21 +198,21 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn("<title>The Daily \u00b7 2026-08-02</title>", page)
         self.assertIn("<h1><a href=\"/daily\">The Daily</a></h1>", page)
         self.assertIn("Sunday, 2 August 2026", page)
-        self.assertIn("Compiled from <b>12 of 13</b> sources", page)
-        self.assertIn("229 items read", page)
-        self.assertIn("4 picked", page)
         self.assertIn("updated 07:41 IST", page)
-        # One lead, the rest as picks, each carrying the three labels.
+        # One lead, the rest as picks.
         self.assertEqual(page.count('class="story story-lead"'), 1)
         self.assertEqual(page.count('class="story story-pick"'), 3)
-        # Every story, lead and picks alike, carries the checked fact, the take and the caveat.
-        self.assertEqual(page.count("<b>Checked</b>"), 4)
-        self.assertEqual(page.count("<b>Nish</b>"), 4)
-        self.assertEqual(page.count("<b>But</b>"), 4)
-        # Section nav, section cards by source group, and the wire.
+        # The lead carries Nish's take and the checked fact; picks are short and
+        # the caveat stays in latest.json and the feed.
+        self.assertEqual(page.count("<b>Checked</b>"), 1)
+        self.assertEqual(page.count("<b>Nish</b>"), 1)
+        self.assertNotIn("<b>But</b>", page)
+        # Section cards by source group, and the wire. No section nav, no
+        # editor's note, no counts bar.
         for anchor in ("lead", "picks", "s-ai", "s-dev", "s-product", "s-news", "s-reddit", "wire"):
-            self.assertIn(f'<a href="#{anchor}">', page)
             self.assertIn(f'id="{anchor}"', page)
+        self.assertNotIn('class="nav"', page)
+        self.assertNotIn("Editor's note", page)
         self.assertNotIn("<script", page)
 
     def test_every_listed_item_links_to_its_original(self):
@@ -221,7 +221,8 @@ class BuildDailyTests(unittest.TestCase):
         self.build()
         front = json.loads((self.public / "latest.json").read_text())
         page = (self.public / "index.html").read_text()
-        items = [item for section in front["sections"] for item in section["items"]] + front["wire"]
+        # The page shows the top items of each list; latest.json keeps them all.
+        items = [item for section in front["sections"] for item in section["items"][:builder.SHOWN_LIST_ITEMS]] + front["wire"][:builder.SHOWN_WIRE_ITEMS]
         self.assertGreater(len(items), 10)
         for item in items:
             self.assertIn(f'href="{html.escape(item["url"], quote=True)}"', page)
@@ -259,7 +260,6 @@ class BuildDailyTests(unittest.TestCase):
         page = (self.public / "index.html").read_text()
         self.assertIn('id="lead"', page)
         self.assertNotIn('id="wire"', page)
-        self.assertIn(f"<b>{len(builder.fetch_candidates.load_sources()['sources'])}</b> sources", page)
 
     def test_an_unranked_pool_keeps_fetch_order_and_every_item(self):
         self.write(edition(stories=1))
@@ -284,7 +284,6 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual([i["title"] for i in front["wire"]], ["Wire line"])
         page = (self.public / "index.html").read_text()
         self.assertIn("Editor-chosen item", page)
-        self.assertIn("Why it matters.", page)
 
     def test_rejects_a_bad_link_in_editor_written_sections(self):
         payload = edition(stories=1)
@@ -319,7 +318,6 @@ class BuildDailyTests(unittest.TestCase):
         self.build()
         page = (self.public / "index.html").read_text()
         self.assertIn("Nothing cleared the bar today", page)
-        self.assertIn("no picks today", page)
         self.assertIn('id="wire"', page)
         self.assertEqual(json.loads((self.public / "latest.json").read_text())["stories"], [])
 
