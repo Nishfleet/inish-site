@@ -202,7 +202,7 @@ def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
         attempt += 1
     answers = response["answers"]
     return {
-        "model": response["model"],
+        "model": response.get("model") or MODEL,  # the router's /jev may omit it
         "fit": round(answers["fit"]["score"], 3),
         "fit_confidence": round(answers["fit"]["confidence"], 3),
         "wildcard": round(answers["wildcard"]["noul"], 3),
