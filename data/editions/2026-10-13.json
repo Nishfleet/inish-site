@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-13",
+  "candidate_count": 421,
+  "editor_note": "The pool arrived ranked, and I opened all eight sources I kept before writing a line. The day's shape: Meta joins the top-tier price club, an IDC report shows Huawei taking a third of China's AI chip market, and big money keeps flowing into AI sold to one profession at a time. YourStory blocked my fetch and two candidates were five days stale, so they are dropped, not padded in.",
+  "stories": [
+    {
+      "title": "Meta shipped its first frontier model, Muse Wonder, and priced it at the same level as OpenAI and Anthropic",
+      "url": "https://research.meta.ai/blog/muse-wonder",
+      "evidence_url": "https://techcrunch.com/2026/10/12/meta-releases-its-first-frontier-model-muse-wonder/",
+      "source": "Meta, checked against TechCrunch",
+      "section": "AI",
+      "summary": "Meta's Superintelligence Lab has released Muse Wonder and Muse Wonder Full, its first models that claim the top tier, the same tier OpenAI and Anthropic sell from. The larger version is only for paying subscribers of Meta's coding tool. Prices sit at parity with the American leaders, so nobody is undercutting anyone yet.",
+      "fact": "Meta prices Muse Wonder at $4 per million input tokens and $20 per million output tokens, about the same as OpenAI's GPT-6 Sol and Anthropic's Opus 5.5.",
+      "take": "I read this as Meta confirming the price floor. The biggest labs now charge nearly the same for their mid-tier models, so I should budget $4 to $20 per million tokens for any serious AI feature.",
+      "caveat": "The benchmark scores are Meta's own tests. TechCrunch, an independent account, confirms the pricing and the subscribers-only split, but the quality claims are still the company's."
+    },
+    {
+      "title": "Nvidia's share of China's AI chip market fell to 34% as Huawei closes in",
+      "url": "https://www.livemint.com/technology/nvidias-china-ai-chip-share-falls-as-huawei-closes-gap-report-finds-11791858728043.html",
+      "evidence_url": "https://www.livemint.com/technology/nvidias-china-ai-chip-share-falls-as-huawei-closes-gap-report-finds-11791858728043.html",
+      "source": "Reuters, via Mint",
+      "section": "AI",
+      "summary": "An IDC report seen by Reuters puts Nvidia's share of China's market for data-centre AI chips at 34% for the first half of 2026. Nvidia shipped 678,000 accelerators, the specialised chips that train and run AI models, down 44% from a year earlier. Huawei shipped 572,000. Export controls and Beijing's push for domestic chips are splitting the market.",
+      "fact": "IDC data seen by Reuters: Nvidia's China shipments fell 44% to 678,000 AI chips in January-June, while Huawei shipped 572,000, taking 28% of the market to Nvidia's 34%.",
+      "take": "I treat Chinese demand as a real market, and it is closing to American sellers. If Huawei holds this share, the two AI economies price separately, which changes who can afford to build at scale.",
+      "caveat": "The numbers come from IDC, a research firm, as reported by Reuters, so the sourcing is named but secondhand. Huawei does not publish official shipment figures."
+    },
+    {
+      "title": "Legal AI company Harvey raises $550M at a $15.5B valuation, co-led by Lightspeed and Diffusion",
+      "url": "https://www.harvey.ai/blog/harvey-raises-dollar550m-at-a-dollar155b-valuation-to-help-legal-teams-own-their-intelligence/",
+      "evidence_url": "https://www.harvey.ai/blog/harvey-raises-dollar550m-at-a-dollar155b-valuation-to-help-legal-teams-own-their-intelligence/",
+      "source": "Harvey",
+      "section": "Demand signals",
+      "summary": "Harvey, a startup that sells AI to law firms, has raised $550 million at a $15.5 billion valuation. The company says 80% of the Am Law 100, the hundred highest-grossing US law firms, now use its product. AI sold into one profession at a time keeps pulling the largest cheques in this market.",
+      "fact": "The round is co-led by Diffusion and Lightspeed Venture Partners, with Sequoia, a16z and Goldman Sachs Alternatives participating. Harvey says 80% of Am Law 100 firms use it, including five of the Fortune 10.",
+      "take": "I keep asking where software still gets bought by partners who bill by the hour, and legal keeps answering. A $15.5 billion price on lawyers' workflows tells me vertical AI is still the safest bet around.",
+      "caveat": "This is Harvey's own announcement. The round size matches multiple press reports, but the 80% usage figure is the company's and has no independent check."
+    },
+    {
+      "title": "India's ₹1 lakh crore research fund names its first 19 fund managers, with ₹7,131 crore to deploy",
+      "url": "https://inc42.com/buzz/rdi-fund-announces-first-cohort-of-19-fund-managers-eyes-deploying-%e2%82%b97131-cr-to-strengthen-deeptech-startups/",
+      "evidence_url": "https://inc42.com/buzz/rdi-fund-announces-first-cohort-of-19-fund-managers-eyes-deploying-%e2%82%b97131-cr-to-strengthen-deeptech-startups/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "The government's ₹1 lakh crore Research, Development and Innovation fund has approved its first 19 fund managers, who will channel ₹7,131 crore into deep-tech startups. The money reaches companies whose technology is lab-proven but not yet a product. Each manager must also raise private money to match the government's contribution.",
+      "fact": "The Empowered Group of Secretaries approved 14 alternative investment funds and 5 focused research organisations this month, committing ₹7,131 crore under the ₹1 lakh crore scheme launched in November 2025.",
+      "take": "I build in India, and this is the deepest pool of patient capital the deep-tech side has ever had. If the matching rule holds, ₹7,131 crore of public money pulls in about as much private money again.",
+      "caveat": "Announced by the Ministry of Science and Technology, as reported by Inc42. Approval is not money in the bank; the managers still have to pick startups and raise the matching capital."
+    },
+    {
+      "title": "Blueprints AI turns a sketch or PDF into permit-ready building blueprints in minutes",
+      "url": "https://techcrunch.com/2026/10/12/this-ai-startup-says-it-can-generate-permit-ready-blueprints-in-minutes/",
+      "evidence_url": "https://techcrunch.com/2026/10/12/this-ai-startup-says-it-can-generate-permit-ready-blueprints-in-minutes/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Al Dram, an architect turned founder, has built software that drafts code-compliant construction blueprints from a 2D sketch or a PDF. Permit-ready drawings are the slow, expensive step between an idea and a building, and his startup claims to compress it to minutes. A second-generation version goes on show at TechCrunch Disrupt this week.",
+      "fact": "Founder Al Dram incorporated Blueprints AI in Santa Monica in 2025 with co-founder Coco Cao, and the startup was selected for the 2026 Startup Battlefield 200 at Disrupt, October 13 to 15.",
+      "take": "I have paid architects for drawings that were mostly careful copying, and this attacks exactly that step. Permit-ready in minutes is a price I would want to own in one city before betting on all of them.",
+      "caveat": "Permit rules differ by city, and the article does not name a place where a plan made this way has passed review. It is a demo-stage claim."
+    },
+    {
+      "title": "Honeyjar wants to give every founder a senior PR person, and 10,000 signed up in a day",
+      "url": "https://techcrunch.com/2026/10/12/honeyjar-offers-ai-tools-to-improve-pr-and-comms-at-every-company/",
+      "evidence_url": "https://techcrunch.com/2026/10/12/honeyjar-offers-ai-tools-to-improve-pr-and-comms-at-every-company/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Honeyjar automates the work of a public relations team: writing announcements, finding the right journalists to pitch, and tracking coverage. Its two founders spent decades doing comms for startups and venture firms. Beta testers include Nextdoor and Bloomberg Beta, and the tool is part of TechCrunch's Startup Battlefield 200.",
+      "fact": "CEO Michelle Masek says the waitlist drew 10,000 signups in the first 24 hours, and beta testers include Nextdoor, Coco Robotics and Bloomberg Beta.",
+      "take": "I launch things often enough that a press function I do not pay for is tempting. The waitlist number says other founders feel the same. My worry is that AI-written pitches have already burned the journalists we need.",
+      "caveat": "The signup count is the company's own. TechCrunch also flags the risk for the people receiving the pitches: they already get more AI-written ones than they can read."
+    },
+    {
+      "title": "A YC startup says it runs AI agent sandboxes at $0.37 a month, under a tenth of the usual price",
+      "url": "https://news.ycombinator.com/item?id=50059096",
+      "evidence_url": "https://news.ycombinator.com/item?id=50059096",
+      "source": "Hacker News",
+      "section": "Tools",
+      "summary": "Agent37, a YC-backed startup, sells sandboxes, the isolated computers an AI agent runs inside, at an average of $0.37 per sandbox per month, which it says is under 10% of most providers. The founder explains the cost tricks: renting servers from Hetzner and OVH instead of the big clouds, and sharing memory across sandboxes with gVisor. A free plan is now live.",
+      "fact": "The founder says customers average $0.37 per month per sandbox, and the free plan costs Agent37 $0.05 to $0.10 per user per month. The Launch HN post drew 112 points and 72 comments.",
+      "take": "I run agents all day, and sandbox rent is a real line in my costs. At a tenth of the price I would stop rationing test runs, though I would keep anything sensitive on my own hardware.",
+      "caveat": "These are the founder's own numbers, and he is selling. The top comment warns of a race to the bottom against bigger vendors, and gVisor sandboxes cannot run Docker-in-Docker or Android emulators."
+    },
+    {
+      "title": "The US Air Force will pay a balloon startup up to $49 million for weather data, no competing bids",
+      "url": "https://techcrunch.com/2026/10/12/windborne-wins-a-hefty-us-air-force-contract-for-its-balloon-data/",
+      "evidence_url": "https://techcrunch.com/2026/10/12/windborne-wins-a-hefty-us-air-force-contract-for-its-balloon-data/",
+      "source": "TechCrunch",
+      "section": "Wildcard",
+      "summary": "WindBorne flies about 700 autonomous weather balloons that circle the globe collecting atmospheric readings. The Air Force has now signed a contract worth up to $49 million for that data, awarded without competitive bidding, because the company says it was the only provider that met the need. So far the Air Force has actually ordered $1.7 million.",
+      "fact": "The contract is worth up to $49 million, and the Air Force has ordered $1.7 million of data so far. WindBorne, founded in 2015 in Redwood City, flies about 700 balloons and sells the same readings into its own AI weather model.",
+      "take": "The detail I like most is that the Air Force pays only when it wants data from a specific region at a specific time. A balloon fleet turned out to be a subscription business the Pentagon cannot buy anywhere else.",
+      "caveat": "The claim that nobody else could meet the need is the company's, told to TechCrunch. The $49 million is a ceiling, and the booked orders are $1.7 million."
+    }
+  ]
+}
