@@ -529,7 +529,7 @@ def page(front: dict) -> str:
         picks = ""
         if len(stories) > 1:
             cards = "".join(story_card(story, index, "pick") for index, story in enumerate(stories[1:], 2))
-            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><div class="pick-grid">{cards}</div></section>'
+            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">Top stories</h2><div class="pick-grid">{cards}</div></section>'
     else:
         lead = '<section id="lead" class="lead quiet"><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></section>'
         picks = ""
@@ -538,10 +538,10 @@ def page(front: dict) -> str:
         f'<ol>{"".join(item_row(item) for item in section["items"][:SHOWN_LIST_ITEMS])}</ol></section>'
         for section in front["sections"]
     )
-    cards_html = f'\n      <div class="cards">{cards_html}</div>' if cards_html else ""
+    cards_html = f'\n    <section class="cards" aria-label="From the sources"><h2 class="label">From the sources</h2><div class="card-grid">{cards_html}</div></section>' if cards_html else ""
     wire = ""
     if front["wire"]:
-        wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">Wire</h2><ul>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ul></aside>'
+        wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">The wire</h2><ol>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ol></aside>'
     updated = updated_label(front.get("generated_at", ""))
     stamp = f'<time datetime="{esc(front["date"])}">{esc(edition_date_label(date))}</time>'
     if updated:
@@ -558,25 +558,25 @@ def page(front: dict) -> str:
   <meta property="og:description" content="{esc(description)}">
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f1e7">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#17150f">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#131313">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
 </head>
 <body>
   <div class="paper">
+    <p class="topbar"><span class="dateline">{stamp}</span><span class="feeds"><a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a></span></p>
     <header class="masthead">
       <h1><a href="/daily">{SITE_NAME}</a></h1>
-      <p class="dateline">{stamp}</p>
     </header>
     <div class="layout">
     <main>
-      {lead}{picks}{cards_html}
+      {lead}{picks}
     </main>{wire}
-    </div>
-    <footer><a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a></footer>
+    </div>{cards_html}
+    <footer><a href="/daily">{SITE_NAME}</a><a href="{SITE_URL}/feed.xml">RSS</a><a href="{SITE_URL}/latest.json">JSON</a></footer>
   </div>
 </body>
 </html>
