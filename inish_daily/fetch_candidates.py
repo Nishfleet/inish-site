@@ -1,19 +1,4 @@
 #!/usr/bin/env python3
-"""Fetch a small, auditable candidate pool for The Daily (nish.sh/daily).
-
-Pool quality decides edition quality. A week-old repository with 15 stars has
-no evidence behind it except its own README, so an editor working from that
-pool can only paraphrase marketing. Every candidate here therefore carries an
-`evidence_class` saying what kind of proof exists for it, and discussion
-threads are pulled alongside links so criticism is in the pool, not just
-announcements.
-
-Discussion provenance is kept on each candidate as `discussion_url` (Hacker
-News, Show HN, Lobsters). When a fact is verified against the discussion
-rather than the linked article, the edition's `evidence_url` must be that
-`discussion_url` — the builder renders the "Checked" line as a link to it, so
-the provenance survives into the published page instead of being dropped.
-"""
 
 from __future__ import annotations
 
@@ -37,9 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 USER_AGENT = "the-daily/1.0 (+https://nish.sh/daily)"
 SOURCES_FILE = Path(__file__).with_name("sources.json")
 
-# Reddit serves its JSON API 403 to anything that looks automated, but the RSS
-# feeds still answer 200 for a browser user-agent. It rate-limits hard, so the
-# subreddits are fetched slowly and one failure never sinks the run.
+# Reddit's JSON API 403s automated clients; its RSS answers 200 to a browser user-agent and rate-limits hard.
 BROWSER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
@@ -47,12 +30,6 @@ BROWSER_AGENT = (
 REDDIT_PAUSE = 4.0
 REDDIT_RETRIES = 3
 
-# What kind of proof exists for a candidate:
-#   independent   - surfaced by a third party rather than its own author. Check
-#                   signals.comments before treating it as actually discussed;
-#                   a zero-comment submission has been seen, not argued about.
-#   self-reported - the only account of it is the author's own
-#   preprint      - unreviewed research
 INDEPENDENT = "independent"
 SELF_REPORTED = "self-reported"
 PREPRINT = "preprint"
@@ -61,21 +38,18 @@ DISCUSSION_DEPTH = 8
 COMMENTS_PER_STORY = 3
 COMMENT_CHARS = 500
 
-# A repository has to have survived contact with people who did not write it.
 GITHUB_MIN_STARS = 200
 GITHUB_MAX_AGE_DAYS = 90
 
 
 def get_json(url: str, timeout: int = 20) -> object:
-    """Returns whatever the endpoint sends; Lobsters answers with a list."""
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=timeout) as response:
         return json.load(response)
 
 
 def strip_tags(text: str) -> str:
-    # Hacker News returns HTML with real angle brackets escaped as entities, so
-    # every bare '<' here is markup. Entities are unescaped after stripping.
+    # Hacker News escapes real angle brackets as entities, so every bare '<' is markup.
     out, depth = [], 0
     for character in text:
         if character == "<":
@@ -88,13 +62,11 @@ def strip_tags(text: str) -> str:
 
 
 def top_comments(object_id: str) -> list[str]:
-    """The argument under a link is usually worth more than the link."""
-    # The id comes from a third party and is about to become part of a URL path.
     if not str(object_id).isalnum():
         return []
     try:
         item = get_json(f"https://hn.algolia.com/api/v1/items/{object_id}", timeout=15)
-    except (OSError, ValueError):  # network or bad JSON; comments are optional context
+    except (OSError, ValueError):
         return []
     comments = []
     for child in (item.get("children") or [])[:12]:
@@ -154,7 +126,6 @@ def lobsters() -> list[dict]:
 
 
 def github(day: dt.date) -> list[dict]:
-    """Repositories with outside validation, not this week's launch posts."""
     since = day - dt.timedelta(days=GITHUB_MAX_AGE_DAYS)
     query = urllib.parse.quote(f"created:>={since.isoformat()} stars:>={GITHUB_MIN_STARS}")
     command = ["gh", "api", f"search/repositories?q={query}&sort=stars&order=desc&per_page=30"]
@@ -181,7 +152,6 @@ def github(day: dt.date) -> list[dict]:
 
 
 def feed(url: str, source: str, lens: str, evidence: str, limit: int = 20, agent: str = USER_AGENT) -> list[dict]:
-    """Parse an RSS or Atom feed into candidates."""
     request = urllib.request.Request(url, headers={"User-Agent": agent})
     with urllib.request.urlopen(request, timeout=25) as response:
         root = ET.fromstring(response.read())
@@ -225,18 +195,12 @@ def feed(url: str, source: str, lens: str, evidence: str, limit: int = 20, agent
 
 
 def google_news(query: str, lens: str) -> list[dict]:
-    """Google News is the only broad, key-free way to reach non-developer press."""
     encoded = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
     return feed(url, "Google News", lens, INDEPENDENT, limit=15)
 
 
 def reddit(sub: str, source: str, lens: str) -> list[dict]:
-    """Where people say out loud what they want and what they will pay for.
-
-    One subreddit per call. Reddit rate-limits hard, so a 429 is retried with a
-    growing pause and, in the end, reported as this source's error only.
-    """
     url = f"https://www.reddit.com/r/{sub}/top/.rss?t=day"
     for attempt in range(REDDIT_RETRIES):
         try:
@@ -249,7 +213,6 @@ def reddit(sub: str, source: str, lens: str) -> list[dict]:
 
 
 def show_hn() -> list[dict]:
-    """People launching things: the cleanest read on what someone thinks is wanted."""
     payload = get_json("https://hn.algolia.com/api/v1/search?tags=show_hn&hitsPerPage=25")
     items = []
     for hit in payload.get("hits", []) if isinstance(payload, dict) else []:
@@ -272,7 +235,6 @@ SOURCE_TYPES = ("hacker_news", "show_hn", "lobsters", "github", "rss", "google_n
 
 
 def load_sources(path: Path = SOURCES_FILE) -> dict:
-    """Read and check sources.json, the one place a site is added or removed."""
     data = json.loads(path.read_text(encoding="utf-8"))
     groups = {group["id"] for group in data["groups"]}
     seen: set[str] = set()
@@ -302,7 +264,6 @@ def skipped_title(title: str, patterns: list[str]) -> bool:
 
 
 def load_source(source: dict, day: dt.date, skip: list[str] | None = None) -> list[dict]:
-    """Fetch one configured source and tag every candidate with where it came from."""
     kind = source["type"]
     if kind == "hacker_news":
         items = hacker_news()
@@ -324,8 +285,6 @@ def load_source(source: dict, day: dt.date, skip: list[str] | None = None) -> li
         items = google_news(source["query"], source["lens"])
     else:
         items = reddit(source["sub"], source["name"], source["lens"])
-    # Hype, listicles and "X now matches Y" parity news are dropped before
-    # ranking, so Jev never spends a grade on them.
     items = [item for item in items if not skipped_title(item["title"], skip or [])]
     for item in items:
         item["source"] = source["name"]
@@ -358,7 +317,7 @@ def main() -> int:
             seen_urls.update(item["url"] for item in fresh)
             candidates.extend(fresh)
             report.append({"id": source["id"], "name": source["name"], "group": source["group"], "count": len(items), "error": None})
-        except Exception as exc:  # Keep the other independent sources useful.
+        except Exception as exc:
             errors.append(f"{source['id']}: {type(exc).__name__}: {exc}")
             report.append({"id": source["id"], "name": source["name"], "group": source["group"], "count": 0, "error": type(exc).__name__})
 
@@ -376,7 +335,7 @@ def main() -> int:
             )
             ranked_by = ranked[0]["jev"]["model"]
             candidates = ranked
-        except Exception as exc:  # A ranking failure must never block the edition.
+        except Exception as exc:
             errors.append(f"jev: {type(exc).__name__}: {exc}; candidates are in fetch order")
 
     by_class: dict[str, int] = {}
@@ -403,7 +362,6 @@ def main() -> int:
     print(f"candidates={len(candidates)} by_class={by_class}")
     print(f"by_lens={by_lens} source_errors={len(errors)}")
     print(f"ranked_by={ranked_by}")
-    # Last, so the fleet job's short log tail shows why ranking failed.
     print(next((error[:300] for error in errors if error.startswith("jev:")), "jev: ok"))
     return 0 if candidates else 1
 

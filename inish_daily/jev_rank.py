@@ -1,15 +1,3 @@
-"""Grade fetched candidates with Jev and put the strongest first.
-
-Jev answers three questions per candidate: how well it fits today's edition,
-whether it is a story worth telling someone, and whether only an engineer
-reading code would care. Jev grades each candidate against the runbook's
-reader and bar, the linked page's text, and the last 7 editions; the pool is
-ordered by fit, never dropped.
-
-Jev is a first opinion only. It changes the order and never drops a candidate;
-nothing here removes an item from the pool.
-"""
-
 from __future__ import annotations
 
 import json
@@ -24,17 +12,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# The fleet router's /jev: the Vercel AI Gateway evaluation API (boolean, choice and score
-# questions). TypeSafe direct (noul questions) has had no credits since 2026-10-04.
+# TypeSafe direct has had no credits since 2026-10-04; the fleet router's /jev is used instead.
 JEV_URL = os.environ.get("JEV_URL", "http://127.0.0.1:4000/jev")
 MODEL = "jev-latest"
 WORKERS = 8
 RETRIES = 4
 ENGINEER_ONLY_DROP = 0.9
 
-# Jev reads the linked page so it judges what happened, not just the headline.
-# A page fetch is best-effort: an unreadable page is missing context, never a
-# failed ranking, so every error below becomes None.
 PAGE_CHARS = 12000
 MIN_PAGE_CHARS = 200
 PAGE_TIMEOUT = 20
@@ -66,10 +50,7 @@ _SECTION = re.compile(r"^## (.+)$", re.MULTILINE)
 
 
 class _TextExtractor(HTMLParser):
-    """Page text without code. html.parser reads script and style bodies as raw
-    text up to their own closing tag, so only those are dropped; menus and
-    footers stay in, because a page that leaves one unclosed would otherwise
-    lose its story."""
+    """html.parser reads script and style bodies as raw text up to their own closing tag."""
 
     SKIP = frozenset({"script", "style"})
 
@@ -93,12 +74,6 @@ class _TextExtractor(HTMLParser):
 
 
 def page_text(url: str, *, agent: str, fetch=urllib.request.urlopen) -> str | None:
-    """The linked page's visible text, or None when it cannot be read.
-
-    Google News redirect pages and other thin interstitials yield a handful of
-    words with no story in them, so they are treated as absent rather than fed
-    to Jev as if they were the page.
-    """
     try:
         request = urllib.request.Request(url, headers={"User-Agent": agent})
         with fetch(request, timeout=PAGE_TIMEOUT) as response:
@@ -110,13 +85,12 @@ def page_text(url: str, *, agent: str, fetch=urllib.request.urlopen) -> str | No
         extractor = _TextExtractor()
         extractor.feed(body.decode(charset, errors="replace"))
         text = extractor.text()[:PAGE_CHARS]
-    except Exception:  # a missing page is a missing input, not a failure
+    except Exception:
         return None
     return text if len(text) >= MIN_PAGE_CHARS else None
 
 
 def recent_editions(day: str, limit: int = 7) -> list[dict]:
-    """The stories published in the latest editions strictly before `day`."""
     directory = ROOT / "data" / "editions"
     stems = sorted(
         (path.stem for path in directory.glob("*.json") if path.stem < day),
@@ -124,8 +98,6 @@ def recent_editions(day: str, limit: int = 7) -> list[dict]:
     )[:limit]
     recent: list[dict] = []
     for stem in stems:
-        # build_daily validates every edition on each test run and deploy, so a
-        # malformed file cannot reach main; if one appears anyway, fail loud.
         payload = json.loads((directory / f"{stem}.json").read_text())
         for story in payload.get("stories") or []:
             recent.append({"date": stem, "title": story.get("title"), "section": story.get("section")})
@@ -133,7 +105,6 @@ def recent_editions(day: str, limit: int = 7) -> list[dict]:
 
 
 def runbook_section(text: str, name: str) -> str:
-    """The body of the `## <name>` section, up to the next `## ` heading."""
     headings = list(_SECTION.finditer(text))
     for index, heading in enumerate(headings):
         if heading.group(1).strip() != name:
@@ -145,7 +116,6 @@ def runbook_section(text: str, name: str) -> str:
 
 
 def load_context() -> tuple[str, str]:
-    """The two runbook sections that form the full context Jev grades against."""
     text = (ROOT / "automation" / "HERMES_DAILY.md").read_text()
     return runbook_section(text, "Who this is for"), runbook_section(text, "The bar")
 
@@ -176,7 +146,6 @@ _NO_REDIRECT = urllib.request.build_opener(_RefuseRedirect)
 
 
 def post(body: dict, key: str) -> dict:
-    """One POST to Jev. The key is used and never logged."""
     request = urllib.request.Request(
         JEV_URL,
         json.dumps(body).encode(),
@@ -187,7 +156,6 @@ def post(body: dict, key: str) -> dict:
 
 
 def _error_body(exc: urllib.error.HTTPError) -> str:
-    """The start of Jev's error reply, so a failed run says why. It never holds the key."""
     try:
         return " ".join(exc.read(300).decode("utf-8", "replace").split())
     except Exception:
@@ -195,7 +163,6 @@ def _error_body(exc: urllib.error.HTTPError) -> str:
 
 
 def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
-    """One candidate's Jev answers, retrying only transient failures."""
     attempt = 0
     while True:
         try:
@@ -215,8 +182,7 @@ def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
     return {
         "model": response.get("model") or MODEL,  # the router's /jev may omit it
         "fit": round(answers["fit"]["score"], 3),
-        # The gateway's evaluation API gives each rung's probability, not a
-        # confidence; the likeliest rung's probability stands in for it.
+        # The gateway's evaluation API gives each rung's probability, not a confidence.
         "fit_confidence": round(max(answers["fit"]["probabilities"].values(), default=0), 3),
         "wildcard": round(answers["wildcard"]["probability"], 3),
         "engineer_only": round(answers["engineer_only"]["probability"], 3),
@@ -224,11 +190,6 @@ def grade(body: dict, key: str, post=post, sleep=time.sleep) -> dict:
 
 
 def priority(jev: dict) -> float:
-    """Engineer-only stories sink; otherwise fit alone decides the order.
-
-    A high wildcard score is not evidence a story belongs in the edition, only
-    that it is fun to repeat, so it no longer lifts a low-fit candidate.
-    """
     if jev["engineer_only"] >= ENGINEER_ONLY_DROP:
         return 0.0
     return jev["fit"] / 4
@@ -237,14 +198,6 @@ def priority(jev: dict) -> float:
 def rank(
     candidates: list[dict], day: str, key: str, *, fetch_page, post=post, sleep=time.sleep
 ) -> list[dict]:
-    """Return a NEW best-first list; the input and its dicts are left untouched.
-
-    Each candidate is graded with the linked page's text and the recent
-    editions, so the order reflects what actually happened rather than the
-    headline. The page text is only an input to Jev; it never reaches the
-    returned candidates. One failure raises and the caller falls back to fetch
-    order.
-    """
     reader, bar = load_context()
     recent = recent_editions(day)
     total = len(candidates)

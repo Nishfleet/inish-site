@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""Validate editions and render the latest edition of The Daily (nish.sh/daily).
-
-The validator is the editorial gate. An edition that reads like generic AI copy
-should fail here rather than reach nish.sh, so most of the top of this file is
-refusal logic: every story must carry a checkable detail, every take must be
-first person and anchored to that story, and nothing may repeat itself or a
-recent edition.
-
-The page itself is rendered from one "front" document (see compose_front):
-the validated edition plus the section cards and the wire. The cards and the
-wire come from the day's ranked candidate pool unless the edition carries its
-own `sections` and `wire`, so a later editor step can write them directly.
-"""
 
 from __future__ import annotations
 
@@ -27,25 +14,16 @@ from inish_daily import fetch_candidates
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITIONS = ROOT / "data" / "editions"
-# Everything the site serves lives under /daily, so the file path is the URL path.
 DAILY = ROOT / "public" / "daily"
 CANDIDATES = ROOT / "data" / "candidates"
 POOLS = ROOT / "data" / "pools"
 SITE_URL = "https://nish.sh/daily"
 SITE_NAME = "The Daily"
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
-# Committed assets the generated page references. The build never writes them;
-# it only fails loudly if one goes missing.
 ASSETS = ("styles.css", "favicon.svg")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
 REQUIRED_EDITION_FIELDS = {"date", "candidate_count", "editor_note", "stories"}
-# An editor step may write the cards and the wire itself; otherwise they are
-# derived from the day's candidate pool.
 OPTIONAL_EDITION_FIELDS = {"sections", "wire"}
-# evidence_url is the exact source the fact was verified against. It may equal
-# url (the primary source carries the claim) or be a separate HTTPS URL — a
-# discussion thread, a data page, a primary document — when the fact's evidence
-# lives elsewhere. Without it a "Checked" fact is a bare assertion.
 STORY_FIELDS = {"title", "url", "evidence_url", "source", "section", "summary", "fact", "take", "caveat"}
 
 MAX_STORIES = 8
@@ -55,13 +33,9 @@ REPEAT_WINDOW_DAYS = 30
 SHARED_PHRASE_LENGTH = 6
 
 FIRST_PERSON = re.compile(r"\b(I|I'm|I'd|I've|I'll|my|me|mine)\b")
-# Deliberately excludes the bare apostrophe: "the project's approach" is a
-# contraction, not a quotation, and must not satisfy the fact gate on its own.
 QUOTED = re.compile(r"[\"“”]")
 WORD = re.compile(r"[a-z0-9][a-z0-9'+.-]*")
 
-# Openers that produce an aphorism true of any story. Cheap to check, and every
-# one of these was published before the gate existed.
 APHORISM_OPENERS = (
     "the point is",
     "the real question",
@@ -74,7 +48,6 @@ APHORISM_OPENERS = (
     "it turns out",
 )
 
-# Ordinary words carry no evidence that a take is about its own story.
 ANCHOR_STOPWORDS = {
     "about", "after", "again", "against", "agent", "agents", "already", "also", "another",
     "anything", "around", "because", "been", "before", "being", "better", "between", "both",
@@ -98,20 +71,17 @@ def esc(value: object) -> str:
 
 
 def words(text: str) -> list[str]:
-    # Inner dots and hyphens are kept on purpose so "1.8s", "v2.1", and
-    # "six-week" survive; trailing ones are punctuation, not part of the word.
     cleaned = []
     for match in WORD.findall(text.lower()):
         word = match.strip(".-'")
         if word.endswith("'s"):
-            word = word[:-2]  # so "postmark's" still anchors to "postmark"
+            word = word[:-2]
         if word:
             cleaned.append(word)
     return cleaned
 
 
 def singular(word: str) -> str:
-    """Enough stemming that a plural in the take still matches a singular headline."""
     if len(word) >= 5 and word.endswith("s") and not word.endswith(("ss", "us", "is")):
         return word[:-1]
     return word
@@ -166,8 +136,6 @@ def validate_text(value: object, field: str, minimum: int, maximum: int) -> str:
     text = value.strip()
     if not minimum <= len(text) <= maximum:
         raise ValueError(f"{field} must contain {minimum}-{maximum} characters; found {len(text)}")
-    # The two loudest machine-writing tells. A comma or a full stop does the
-    # em dash's job; "not just X, but Y" is said directly as Y.
     if "\u2014" in text:
         raise ValueError(f"{field} uses an em dash; use a comma or a full stop: {text!r}")
     if NOT_JUST.search(text):
@@ -176,7 +144,6 @@ def validate_text(value: object, field: str, minimum: int, maximum: int) -> str:
 
 
 def validate_fact(value: object) -> str:
-    """A story earns its place with one detail a reader could go and check."""
     text = validate_text(value, "fact", 15, 240)
     if not any(character.isdigit() for character in text) and not QUOTED.search(text):
         raise ValueError(
@@ -187,7 +154,6 @@ def validate_fact(value: object) -> str:
 
 
 def validate_take(value: object, anchor_pool: set[str]) -> str:
-    """First person, and demonstrably about this story rather than any story."""
     text = validate_text(value, "take", 25, 260)
     if not FIRST_PERSON.search(text):
         raise ValueError(f"take must be written in the first person: {text!r}")
@@ -203,7 +169,6 @@ def validate_take(value: object, anchor_pool: set[str]) -> str:
 
 
 def check_edition_repetition(stories: list[dict]) -> None:
-    """Catch the tell of generated copy: the same sentence shape, eight times."""
     seen_phrases: dict[str, int] = {}
     seen_openers: dict[str, int] = {}
     seen_facts: dict[str, int] = {}
@@ -246,7 +211,6 @@ def check_edition_balance(stories: list[dict]) -> None:
 
 
 def load_history(latest_date: dt.date) -> dict[str, str]:
-    """Recent URLs, so the feed cannot rediscover what it ran days ago."""
     published: dict[str, str] = {}
     cutoff = latest_date - dt.timedelta(days=REPEAT_WINDOW_DAYS)
     for path in sorted(EDITIONS.glob("*.json")):
@@ -265,16 +229,9 @@ def load_history(latest_date: dt.date) -> dict[str, str]:
 
 
 def validate_story(story: object, path: Path, published: dict[str, str], seen: set[str]) -> dict:
-    """Normalize one story and gate it against history and its own fields.
-
-    Returns the cleaned story; raises on a story that must not run.
-    """
     if not isinstance(story, dict) or set(story) != STORY_FIELDS:
         raise ValueError(f"{path}: story fields must be exactly {sorted(STORY_FIELDS)}")
     url = validate_url(story["url"])
-    # The fact's evidence may be the story itself or a separate source (a
-    # discussion thread, a data page). It must exist and be a public HTTPS URL
-    # either way: a "Checked" claim with no reachable evidence is rejected.
     evidence_url = validate_url(story["evidence_url"], label="evidence")
     key = canonical_url(url)
     if key in seen:
@@ -349,8 +306,6 @@ def load_latest() -> dict:
     return clean
 
 
-# --- the front page: cards and wire ------------------------------------------
-
 CARD_ITEMS = 5
 WIRE_ITEMS = 14
 WIRE_PER_SOURCE = 3
@@ -360,7 +315,6 @@ FEED_ITEM_FIELDS = {"title", "url", "source", "blurb", "signal", "discussion_url
 
 
 def clean_line(value: object, limit: int) -> str:
-    """Source text is untrusted: one plain line, bounded, never markup."""
     text = " ".join(str(value or "").split())
     if len(text) > limit:
         text = text[: limit - 1].rstrip() + "…"
@@ -368,7 +322,6 @@ def clean_line(value: object, limit: int) -> str:
 
 
 def feed_item(raw: object, label: str) -> dict:
-    """Normalize one linked item (a card row or a wire line)."""
     if not isinstance(raw, dict) or not {"title", "url", "source"} <= set(raw) or set(raw) - FEED_ITEM_FIELDS:
         raise ValueError(f"{label}: item fields must be title, url, source plus optionally blurb, signal, discussion_url")
     title = clean_line(raw["title"], 200)
@@ -421,12 +374,6 @@ def signal_text(candidate: dict) -> str:
 
 
 def compact_pool(payload: dict, config: dict) -> dict:
-    """Shrink a day's candidate file to what the page shows.
-
-    The candidate file is large (page text, discussions) and not committed. The
-    pool keeps only the linked items, best-first as Jev ordered them, so the
-    page can be rebuilt from committed data alone.
-    """
     reported = payload.get("sources")
     if isinstance(reported, list) and reported:
         total = len(reported)
@@ -452,7 +399,6 @@ def compact_pool(payload: dict, config: dict) -> dict:
                 "discussion_url": discussion,
             }, "pool")
         except ValueError:
-            # A candidate with a bad link is dropped from the page, never the build.
             continue
         item["blurb"] = clean_line(item["blurb"], BLURB_CHARS)
         item["group"] = group
@@ -471,7 +417,6 @@ def compact_pool(payload: dict, config: dict) -> dict:
 
 
 def load_pool(day: dt.date, config: dict) -> tuple[dict | None, bool]:
-    """The day's pool, and whether it was just derived from a candidate file."""
     candidates = CANDIDATES / f"{day.isoformat()}.json"
     if candidates.is_file():
         return compact_pool(json.loads(candidates.read_text(encoding="utf-8")), config), True
@@ -482,7 +427,6 @@ def load_pool(day: dt.date, config: dict) -> tuple[dict | None, bool]:
 
 
 def compose_front(edition: dict, pool: dict | None, config: dict) -> dict:
-    """The one document the page renders: edition + cards + wire + source count."""
     front = dict(edition)
     front["sources"] = {"ok": 0, "total": len(config["sources"])}
     front["generated_at"] = ""
@@ -500,7 +444,6 @@ def compose_front(edition: dict, pool: dict | None, config: dict) -> dict:
         for item in pool["items"]:
             if canonical_url(item["url"]) in taken:
                 continue
-            # Jev gives a priority of 0 to a skip; a skip is not worth a card.
             if ranked and not item.get("priority"):
                 continue
             shown.append(item)
@@ -533,13 +476,8 @@ def item_view(item: dict) -> dict:
     return {key: item.get(key, "") for key in ("title", "url", "source", "blurb", "signal", "discussion_url")}
 
 
-# --- rendering ----------------------------------------------------------------
-
 def story_card(story: dict, index: int, prominence: str) -> str:
     heading = "h2" if prominence == "lead" else "h3"
-    # The page keeps what a reader acts on. The lead adds Nish's take and the
-    # fact it was checked against; picks stay a headline and a summary. Every
-    # field of every story stays in latest.json and the RSS item.
     notes = ""
     if prominence == "lead":
         notes = f"""
@@ -553,7 +491,6 @@ def story_card(story: dict, index: int, prominence: str) -> str:
         </article>"""
 
 
-# The lists show only their top items; the full lists stay in latest.json.
 SHOWN_LIST_ITEMS = 4
 SHOWN_WIRE_ITEMS = 8
 
@@ -647,12 +584,6 @@ def page(front: dict) -> str:
 
 
 def rss_item_description(edition: dict) -> str:
-    """The item body: the editor's note plus every story, so a subscriber who
-    reads the feed in a reader still sees the edition after the page has
-    rolled over to a newer day. The assembled HTML is escaped once as a whole,
-    so the description is character data (per RSS practice) and one story's
-    ampersand or angle bracket cannot corrupt another's markup.
-    """
     parts = [f"<p>{edition['editor_note']}</p>"]
     for story in edition["stories"]:
         parts.append(f"<h3><a href=\"{story['url']}\">{story['title']}</a></h3>")
@@ -666,7 +597,6 @@ def rss_item_description(edition: dict) -> str:
 def rss(edition: dict) -> str:
     day = dt.date.fromisoformat(edition["date"])
     description = rss_item_description(edition)
-    # The daily run starts at 07:30 IST (02:00 UTC).
     published = dt.datetime.combine(day, dt.time(2), tzinfo=dt.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")
     guid = f"the-daily-{day.isoformat()}"
     item = f"<item><title>{SITE_NAME} · {day.isoformat()}</title><link>{SITE_URL}</link><guid isPermaLink=\"false\">{guid}</guid><pubDate>{published}</pubDate><description>{description}</description></item>"
@@ -682,7 +612,6 @@ def rss(edition: dict) -> str:
 
 
 def check_assets() -> None:
-    """Fail loudly if a committed asset the generated page references is missing."""
     for name in ASSETS:
         asset = DAILY / name
         if not asset.is_file():
