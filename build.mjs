@@ -16,8 +16,6 @@ const beasties = new Beasties({
 });
 
 const rules = [];
-// The 404 page sits at the asset root; the daily page lives under /daily, so
-// its file path is its URL path.
 const pages = [
   ...(await readdir(output)).filter((file) => file.endsWith(".html")),
   ...(await readdir(`${output}/daily`)).filter((file) => file.endsWith(".html")).map((file) => `daily/${file}`)
