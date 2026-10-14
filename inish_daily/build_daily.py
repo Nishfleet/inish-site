@@ -18,7 +18,7 @@ DAILY = ROOT / "public" / "daily"
 CANDIDATES = ROOT / "data" / "candidates"
 POOLS = ROOT / "data" / "pools"
 SITE_URL = "https://nish.sh/daily"
-SITE_NAME = "The Daily"
+SITE_NAME = "Nish’s Daily"
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
 ASSETS = ("styles.css", "favicon.svg")
 SECTIONS = {"AI", "Product ideas", "Demand signals", "Tools", "Wildcard"}
