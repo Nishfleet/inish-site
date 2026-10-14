@@ -481,8 +481,10 @@ def story_card(story: dict, index: int, prominence: str) -> str:
     notes = ""
     if prominence == "lead":
         notes = f"""
-          <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
-          <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>"""
+          <div class="notes">
+            <p class="note take"><b>Nish</b> {esc(story['take'])}</p>
+            <p class="note fact"><b>Checked</b> <a href="{esc(story['evidence_url'])}" rel="noopener noreferrer">{esc(story['fact'])}</a></p>
+          </div>"""
     return f"""
         <article class="story story-{esc(prominence)}">
           <p class="kicker">{esc(story['section'])} <span>{esc(story['source'])}</span></p>
@@ -529,7 +531,7 @@ def page(front: dict) -> str:
         picks = ""
         if len(stories) > 1:
             cards = "".join(story_card(story, index, "pick") for index, story in enumerate(stories[1:], 2))
-            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">Top stories</h2>{cards}</section>'
+            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">More stories</h2>{cards}</section>'
     else:
         lead = '<section id="lead" class="lead quiet"><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></section>'
         picks = ""
@@ -539,13 +541,17 @@ def page(front: dict) -> str:
         for section in front["sections"]
     )
     cards_html = f'\n    <section class="cards" aria-label="From the sources"><h2 class="label">From the sources</h2><div class="card-grid">{cards_html}</div></section>' if cards_html else ""
+    strip = ""
+    if front["sections"]:
+        links = "".join(f'<a href="#s-{esc(section["id"])}">{esc(section["label"])}</a>' for section in front["sections"])
+        strip = f'\n    <nav class="strip" aria-label="Sections">{links}</nav>'
     wire = ""
     if front["wire"]:
         wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">Most talked about</h2><ol>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ol></aside>'
     updated = updated_label(front.get("generated_at", ""))
     stamp = f'<time datetime="{esc(front["date"])}">{esc(edition_date_label(date))}</time>'
     if updated:
-        stamp += f' &middot; updated {esc(updated)}'
+        stamp += f' <span class="updated">updated {esc(updated)}</span>'
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -558,8 +564,8 @@ def page(front: dict) -> str:
   <meta property="og:description" content="{esc(description)}">
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#131313">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f6f2ea">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
@@ -570,7 +576,7 @@ def page(front: dict) -> str:
     <header class="masthead">
       <h1><a href="/daily">{SITE_NAME}</a></h1>
       <p class="tagline">AI, dev, product and startup news, checked against the sources.</p>
-    </header>
+    </header>{strip}
     <main class="layout">
       {lead}{picks}{wire}
     </main>{cards_html}
