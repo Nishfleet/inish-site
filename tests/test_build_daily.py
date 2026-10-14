@@ -10,8 +10,6 @@ import inish_daily.build_daily as builder
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
-# Deliberately varied: the validator rejects editions whose stories share
-# phrasing, so the fixture cannot be a single template repeated N times.
 SAMPLE_STORIES = [
     {
         "title": "Ratchet ships deterministic replays",
@@ -105,7 +103,6 @@ SAMPLE_STORIES = [
 
 
 def story(index: int) -> dict:
-    """A unique, valid story. Indexes past the sample set are for count checks only."""
     base = dict(SAMPLE_STORIES[index % len(SAMPLE_STORIES)])
     if index >= len(SAMPLE_STORIES):
         base["url"] = f"{base['url']}-{index}"
@@ -134,8 +131,6 @@ class BuildDailyTests(unittest.TestCase):
         self.editions.mkdir(parents=True)
         self.candidates.mkdir(parents=True)
         self.public.mkdir(parents=True)
-        # The committed assets the generated head references. The build must
-        # never overwrite them, only check they exist.
         (self.public / "styles.css").write_text("styles")
         (self.public / "favicon.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"></svg>')
 
@@ -164,10 +159,6 @@ class BuildDailyTests(unittest.TestCase):
         with patch.object(builder, "EDITIONS", self.editions):
             with self.assertRaisesRegex(ValueError, message):
                 builder.load_latest()
-
-    # --- rendering -------------------------------------------------------
-
-    # --- rendering -------------------------------------------------------
 
     def write_candidates(self, day="2026-08-02", ranked=True):
         payload = json.loads((FIXTURES / "candidates.json").read_text())
@@ -199,16 +190,11 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn("<h1><a href=\"/daily\">The Daily</a></h1>", page)
         self.assertIn("Sunday, 2 August 2026", page)
         self.assertIn("updated 07:41 IST", page)
-        # One lead, the rest as picks.
         self.assertEqual(page.count('class="story story-lead"'), 1)
         self.assertEqual(page.count('class="story story-pick"'), 3)
-        # The lead carries Nish's take and the checked fact; picks are short and
-        # the caveat stays in latest.json and the feed.
         self.assertEqual(page.count("<b>Checked</b>"), 1)
         self.assertEqual(page.count("<b>Nish</b>"), 1)
         self.assertNotIn("<b>But</b>", page)
-        # Section cards by source group, and the wire. No section nav, no
-        # editor's note, no counts bar.
         for anchor in ("lead", "picks", "s-ai", "s-dev", "s-product", "s-news", "s-reddit", "wire"):
             self.assertIn(f'id="{anchor}"', page)
         self.assertNotIn('class="nav"', page)
@@ -221,7 +207,6 @@ class BuildDailyTests(unittest.TestCase):
         self.build()
         front = json.loads((self.public / "latest.json").read_text())
         page = (self.public / "index.html").read_text()
-        # The page shows the top items of each list; latest.json keeps them all.
         items = [item for section in front["sections"] for item in section["items"][:builder.SHOWN_LIST_ITEMS]] + front["wire"][:builder.SHOWN_WIRE_ITEMS]
         self.assertGreater(len(items), 10)
         for item in items:
@@ -270,8 +255,6 @@ class BuildDailyTests(unittest.TestCase):
         self.assertIn("https://skipped.example/offtopic", urls)
 
     def test_an_edition_may_carry_its_own_sections_and_wire(self):
-        # The later editor step writes these directly; the pool is then ignored
-        # for them and the page renders exactly what the edition says.
         payload = edition(stories=1)
         payload["sections"] = [{"id": "ai", "label": "AI", "items": [
             {"title": "Editor-chosen item", "url": "https://editor.example/a", "source": "Editor", "blurb": "Why it matters."}]}]
@@ -337,10 +320,6 @@ class BuildDailyTests(unittest.TestCase):
                 self.assertNotRegex(text, r"tiny\s*studio")
 
     def test_committed_surface_matches_the_newest_accepted_edition(self):
-        # Deliberately NOT patched to temp dirs: the committed generated
-        # surface must equal exactly what the builder renders from the newest
-        # accepted edition and its stored pool, so a hand edit or a stale build
-        # fails here.
         config = builder.fetch_candidates.load_sources()
         latest = builder.load_latest()
         pool, _ = builder.load_pool(__import__("datetime").date.fromisoformat(latest["date"]), config)
@@ -353,16 +332,9 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual((builder.DAILY / "index.html").read_text(encoding="utf-8"), builder.page(front))
 
     def test_asset_list_is_pinned(self):
-        # The guards below iterate builder.ASSETS; an emptied tuple would make
-        # them pass vacuously.
         self.assertEqual(set(builder.ASSETS), {"styles.css", "favicon.svg"})
 
     def test_rss_item_carries_every_story_of_its_edition(self):
-        # The root page rolls over every day, so the RSS item must keep the
-        # whole edition readable after the link target has changed. The
-        # description renders the editor's note and every story — title with
-        # its source link, summary, Checked fact linked to its evidence, take,
-        # and caveat — as one HTML string escaped into the XML character data.
         self.write(edition(stories=3))
         self.build()
         feed = (self.public / "feed.xml").read_text()
@@ -391,10 +363,6 @@ class BuildDailyTests(unittest.TestCase):
             self.assertIn(f"<p><strong>But</strong> {story['caveat']}</p>", html.unescape(description))
 
     def test_rss_item_description_is_well_formed_when_copy_has_special_characters(self):
-        # A story whose copy contains an ampersand, a quote, or angle brackets
-        # must not corrupt the XML or another story's markup: the whole
-        # description is escaped into character data, so the feed still parses
-        # and the round-tripped HTML is exactly the intended markup.
         payload = edition(stories=1)
         story = payload["stories"][0]
         story["title"] = 'R&D <launch> & "results"'
@@ -420,12 +388,6 @@ class BuildDailyTests(unittest.TestCase):
         )
 
     def cross_source_story(self):
-        """A story whose Checked fact is only supported by a separate source.
-
-        The fact (Hacker News engagement) is not on the story page at all; the
-        HN item is the exact evidence, so the renderer must link the fact to
-        the HN item while the story keeps its own primary-source links.
-        """
         return {
             "title": "Claude Code messages cross sessions now",
             "url": "https://code.claude.com/docs/en/cross-session-messaging",
@@ -439,15 +401,10 @@ class BuildDailyTests(unittest.TestCase):
         }
 
     def test_rejects_cross_source_fact_without_evidence_url(self):
-        # A story whose fact is only supported by a separate source must carry
-        # that evidence URL, or the whole edition is rejected. "Checked" with
-        # no reachable evidence is a bare assertion.
         payload = edition(stories=1, date="2026-08-02")
         payload["stories"][0] = self.cross_source_story()
         del payload["stories"][0]["evidence_url"]
         self.assertRejects(payload, "story fields must be exactly")
-
-    # --- the fact gate ---------------------------------------------------
 
     def test_rejects_a_fact_with_nothing_checkable_in_it(self):
         payload = edition()
@@ -466,8 +423,6 @@ class BuildDailyTests(unittest.TestCase):
         payload["stories"][1]["take"] = "Nobody replays a 240-step trace twice unless it earns me something."
         self.assertRejects(payload, "repeat the same fact")
 
-    # --- the take gate ---------------------------------------------------
-
     def test_rejects_a_third_person_take(self):
         payload = edition()
         payload["stories"][0]["take"] = "Ratchet is worth watching for anyone running unattended agent lanes."
@@ -484,8 +439,6 @@ class BuildDailyTests(unittest.TestCase):
         self.assertRejects(payload, "aphorism pattern")
 
     def test_rejects_em_dashes_in_any_story_text(self):
-        # Em dashes are the loudest AI tell in the copy (12 in the 2026-09-28
-        # edition). Every reader-facing field goes through the same check.
         for field in ("title", "summary", "fact", "take", "caveat"):
             with self.subTest(field=field):
                 payload = edition()
@@ -504,8 +457,6 @@ class BuildDailyTests(unittest.TestCase):
         payload = edition()
         payload["stories"][1]["take"] = "I want Postmark's raw numbers before I believe a 0.42% floor."
         self.assertRejects(payload, "open their take")
-
-    # --- repetition and balance ------------------------------------------
 
     def test_rejects_a_phrase_reused_across_stories(self):
         payload = edition()
@@ -527,7 +478,6 @@ class BuildDailyTests(unittest.TestCase):
         self.assertRejects(payload, "more than 4 stories in section")
 
     def fresh_urls(self, payload):
-        """Isolate one URL as the only overlap with an earlier edition."""
         for index, item in enumerate(payload["stories"]):
             item["url"] = f"https://fresh-{index}.example/story"
         return payload
@@ -553,8 +503,6 @@ class BuildDailyTests(unittest.TestCase):
         payload = self.fresh_urls(edition(stories=3, date="2026-08-02"))
         payload["stories"][0]["url"] = "https://WWW.Ratchet.example/launch/"
         self.assertRejects(payload, "already ran on 2026-08-01")
-
-    # --- structural safety -----------------------------------------------
 
     def test_rejects_more_than_eight_stories(self):
         self.assertRejects(edition(stories=9), "at most 8 stories")
@@ -595,20 +543,6 @@ class BuildDailyTests(unittest.TestCase):
                 self.assertRejects(edition(candidate_count=candidate_count), "candidate_count")
 
     def test_keeps_committed_root_assets_untouched(self):
-        """A stale daily-style mirror must never overwrite canonical root assets.
-
-        This is the regression test for the drift class that #27, #33/#45, and
-        #41 each fixed by hand-syncing the builder's daily/ mirror with merged
-        root assets: the old build silently reverted the merged fix on the next
-        publish until the mirror was re-synced by hand.
-
-        Every name in builder.ASSETS is compared byte for byte. The earlier
-        hand-spelled version asserted only app.js, styles.css and og-image.svg,
-        which left og-image.png and apple-touch-icon.png completely unguarded:
-        a build that copied valid-but-stale images over exactly those two kept
-        the whole CI gate green. Stale mirror copies are real files, not
-        corrupt ones, so the head's PNG-magic check does not catch them either.
-        """
         self.write(edition())
         canonical = {name: (self.public / name).read_bytes() for name in builder.ASSETS}
         self.build()
@@ -617,13 +551,6 @@ class BuildDailyTests(unittest.TestCase):
                 self.assertEqual((self.public / name).read_bytes(), canonical[name])
 
     def test_build_fails_loudly_when_a_root_asset_is_missing(self):
-        """Checked for every canonical asset, not just one.
-
-        Deleting only styles.css let the presence gate silently stop covering
-        og-image.svg and both PNGs while the suite stayed green, so a missing
-        share card or touch icon would have shipped to the live site instead of
-        failing the build loudly.
-        """
         for name in builder.ASSETS:
             with self.subTest(asset=name):
                 self.write(edition())

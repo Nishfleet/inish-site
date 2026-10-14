@@ -1,6 +1,3 @@
-// Behavioral tests for the edge: nish.sh/daily is served from the static assets
-// and every URL on the retired inish.in answers with one permanent redirect.
-
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -13,10 +10,8 @@ import { assetFor, redirectFor } from "../policy.js";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CONTRACT = JSON.parse(readFileSync(join(ROOT, "public-paths.json"), "utf8"));
 const DAILY = "https://nish.sh/daily";
-// No includeSubDomains: this worker owns only /daily on nish.sh, not the whole zone.
 const HSTS = "max-age=31536000";
 
-// The files the binding can serve under html_handling "none": real paths only.
 const SERVED = new Set(["/daily/index.html", ...CONTRACT.publicPaths, "/404.html"]);
 
 function makeAssets() {
@@ -38,8 +33,6 @@ async function call(url, { method = "GET" } = {}) {
   const response = await worker.fetch(new Request(url, { method, redirect: "manual" }), { ASSETS: assets });
   return { response, assets };
 }
-
-// --- route / redirect behavior -------------------------------------------------
 
 test("inish.in: every request is a 301 to https://nish.sh/daily", async () => {
   const samples = [
@@ -128,8 +121,6 @@ test("assetFor maps only the page paths and the listed assets", () => {
   assert.equal(assetFor("/daily/other"), null);
 });
 
-// --- security headers -----------------------------------------------------------
-
 test("every response class carries the full security header set", async () => {
   const urls = ["https://nish.sh/daily", "https://nish.sh/daily/styles.css", "https://nish.sh/daily/nope", "https://inish.in/"];
   for (const url of urls) {
@@ -156,8 +147,6 @@ test("inline-style hashes published by the build widen style-src, nothing else",
   }
   assert.ok(!CONTRACT.securityHeaders["Content-Security-Policy"].includes("unsafe-inline"));
 });
-
-// --- deployment contract ----------------------------------------------------------
 
 function wranglerConfig() {
   const text = readFileSync(join(ROOT, "wrangler.jsonc"), "utf8")

@@ -1,5 +1,3 @@
-"""Jev ranking of the candidate pool, exercising canned answers offline."""
-
 import json
 import os
 import sys
@@ -43,8 +41,6 @@ class FakeHeaders(dict):
 
 
 class FakeResponse:
-    """Just enough of an http.client.HTTPResponse for page_text."""
-
     def __init__(self, body, content_type="text/html; charset=utf-8"):
         self.body = body if isinstance(body, bytes) else body.encode()
         self.headers = FakeHeaders({"Content-Type": content_type})
@@ -191,12 +187,11 @@ class RequestBodyTests(unittest.TestCase):
 
 
 class RankTests(unittest.TestCase):
-    # (fit, confidence, wildcard, engineer_only)
     ANSWERS = {
-        "must": (4.0, 0.9, 0.2, 0.05),  # priority 1.0
-        "wild": (0.0, 0.5, 0.8, 0.1),  # priority 0.0: the wildcard no longer lifts it
-        "mid": (2.0, 0.7, 0.1, 0.1),  # priority 0.5
-        "engineer": (4.0, 0.9, 0.9, 0.95),  # engineer-only, dropped to 0.0
+        "must": (4.0, 0.9, 0.2, 0.05),
+        "wild": (0.0, 0.5, 0.8, 0.1),
+        "mid": (2.0, 0.7, 0.1, 0.1),
+        "engineer": (4.0, 0.9, 0.9, 0.95),
     }
     CANDIDATES = [
         {"title": "must", "url": "https://example.com/must"},
@@ -304,7 +299,7 @@ class GradeRetryTests(unittest.TestCase):
         sleeps = []
         result = jev_rank.grade({}, "secret", post=fake_post, sleep=sleeps.append)
         self.assertEqual(len(calls), 2)
-        self.assertEqual(sleeps, [1])  # 2 ** 0 between the two attempts
+        self.assertEqual(sleeps, [1])
         self.assertEqual(result["fit"], 3.25)
         self.assertEqual(result["fit_confidence"], 0.75)
         self.assertEqual(result["wildcard"], 0.5)
