@@ -1,120 +1,120 @@
 {
-  "date": "2026-10-13",
-  "candidate_count": 421,
-  "editor_note": "The pool arrived ranked, and I opened all eight sources I kept before writing a line. The day's shape: Meta joins the top-tier price club, an IDC report shows Huawei taking a third of China's AI chip market, and big money keeps flowing into AI sold to one profession at a time. YourStory blocked my fetch and two candidates were five days stale, so they are dropped, not padded in.",
+  "date": "2026-10-14",
+  "candidate_count": 428,
+  "editor_note": "The day's biggest story is a fall. Character.AI, once one of the largest consumer AI apps, filed for bankruptcy. Google put its frontier model Gemini 4 Argon on sale to everyone, but a company announcement cannot lead, so it runs second. I opened every source I kept. A few aggregator and wire links would not render, so I used the outlets that did.",
   "stories": [
     {
-      "title": "Meta shipped its first frontier model, Muse Wonder, and priced it at the same level as OpenAI and Anthropic",
-      "url": "https://research.meta.ai/blog/muse-wonder",
-      "evidence_url": "https://techcrunch.com/2026/10/12/meta-releases-its-first-frontier-model-muse-wonder/",
-      "source": "Meta, checked against TechCrunch",
+      "title": "Character.AI files for Chapter 11, and Disney will buy some of its assets for $20 million",
+      "url": "https://techcrunch.com/2026/10/13/just-5-years-in-interactive-chatbot-platform-character-ai-files-for-bankruptcy/",
+      "evidence_url": "https://techcrunch.com/2026/10/13/just-5-years-in-interactive-chatbot-platform-character-ai-files-for-bankruptcy/",
+      "source": "TechCrunch",
       "section": "AI",
-      "summary": "Meta's Superintelligence Lab has released Muse Wonder and Muse Wonder Full, its first models that claim the top tier, the same tier OpenAI and Anthropic sell from. The larger version is only for paying subscribers of Meta's coding tool. Prices sit at parity with the American leaders, so nobody is undercutting anyone yet.",
-      "fact": "Meta prices Muse Wonder at $4 per million input tokens and $20 per million output tokens, about the same as OpenAI's GPT-6 Sol and Anthropic's Opus 5.5.",
-      "take": "I read this as Meta confirming the price floor. The biggest labs now charge nearly the same for their mid-tier models, so I should budget $4 to $20 per million tokens for any serious AI feature.",
-      "caveat": "The benchmark scores are Meta's own tests. TechCrunch, an independent account, confirms the pricing and the subscribers-only split, but the quality claims are still the company's."
+      "summary": "Character.AI, the app where people build AI characters and chat with them, has filed for Chapter 11 bankruptcy. It agreed to sell some assets to Disney for $20 million and to license its technology to Disney permanently and non-exclusively. The company has no bidder for itself yet, and says that if none appears the platform will be wound down.",
+      "fact": "The court filing lists assets and liabilities between $50 million and $100 million, and the company has raised over $193 million from investors including a16z and Lightspeed.",
+      "take": "I have watched consumer AI apps burn cash with every active user. Disney paying $20 million for parts of this one tells me the bill has arrived, so I would not build a business whose costs rise with engagement.",
+      "caveat": "No buyer has bid yet, and the process may end with the platform shut down. The $20 million Disney deal covers some assets and a license, not the company."
     },
     {
-      "title": "Nvidia's share of China's AI chip market fell to 34% as Huawei closes in",
-      "url": "https://www.livemint.com/technology/nvidias-china-ai-chip-share-falls-as-huawei-closes-gap-report-finds-11791858728043.html",
-      "evidence_url": "https://www.livemint.com/technology/nvidias-china-ai-chip-share-falls-as-huawei-closes-gap-report-finds-11791858728043.html",
+      "title": "Google puts Gemini 4 Argon on sale to everyone at $2 per million input tokens",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "evidence_url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "source": "Google DeepMind",
+      "section": "AI",
+      "summary": "Google's newest frontier model, Gemini 4 Argon, is now open to all developers, enterprises, and consumers. It handles a million tokens of context, tokens being the chunks of text a model charges by, which is about the length of several books. Google says it leads the Vals Index, a benchmark built from finance, legal, coding, and tax work. It is reachable through the Gemini app, AI Studio, and Google's agent tool Antigravity.",
+      "fact": "Argon launches at an introductory price of $2 per million input tokens and $10 per million output tokens, with cached input tokens at 95% off.",
+      "take": "I now price every model against this one. At $2 and $10 per million tokens, a serious coding or research workload I would have rationed a month ago is affordable, so I would move that work onto it.",
+      "caveat": "The benchmark ranking and the price are Google's own, and the price is introductory. Google showed Argon to trusted testers in September, so today's news is general availability."
+    },
+    {
+      "title": "An OpenAI engineer is charged with hiding a recorder in an executive conference room",
+      "url": "https://sfstandard.com/2026/10/13/openai-engineer-arrested-alleged-bugging-executive-conference-room/",
+      "evidence_url": "https://sfstandard.com/2026/10/13/openai-engineer-arrested-alleged-bugging-executive-conference-room/",
+      "source": "The San Francisco Standard",
+      "section": "AI",
+      "summary": "Federal prosecutors say Abdulrahman Alfozan, a 35-year-old OpenAI engineer, hid an audio recorder behind a television in an executive conference room and left a second one in an unattended bag. The recorder was found on September 30, wrapped in toilet paper and plugged into a USB port, with its contents encrypted. Prosecutors describe the case as a matter of national security.",
+      "fact": "Alfozan, a Saudi national who joined OpenAI in July 2025, faces up to five years in prison and a $250,000 fine if convicted of intercepting oral communications.",
+      "take": "I would treat any AI lab's meeting rooms as a counterintelligence problem now. The complaint says the room hosted product plans and government work, so I would assume an engineer with that access is a target.",
+      "caveat": "These are allegations in a federal complaint, and the case is at its first court appearance. Alfozan has not been convicted, and the device's contents have not been described publicly."
+    },
+    {
+      "title": "Anthropic warns small AI models may soon copy themselves onto smart home devices",
+      "url": "https://www.bleepingcomputer.com/news/security/anthropic-warns-self-replicating-ai-could-spread-to-your-smart-devices/",
+      "evidence_url": "https://www.bleepingcomputer.com/news/security/anthropic-warns-self-replicating-ai-could-spread-to-your-smart-devices/",
+      "source": "BleepingComputer",
+      "section": "AI",
+      "summary": "Anthropic ran experiments where AI models found unfamiliar devices, joined them into a network, and set them up to run another AI model. It spread the Gemma4-26B-A4B model across 15 cheap Android TV boxes. Anthropic says models of 30 billion parameters or fewer, parameters being the internal settings that set a model's size, could be capable enough to copy themselves onto consumer devices such as smart ovens by the end of the year.",
+      "fact": "One model, Qwen3.5-9B, installed and configured the software needed to run another model on eight of nine hardware types, and its success rate rose from 45% to 84% across generations.",
+      "take": "I care because a botnet that runs AI models has no single switch to turn off. My smart home gear is old and cheap, so I would rather the industry fix this before the doubling time gets short.",
+      "caveat": "The experiment used devices with an unprotected debugging channel open, which real products would normally block. Anthropic did not show a worm that spreads on its own."
+    },
+    {
+      "title": "Pluto Security raises $42 million to fix the AI risks hiding in vibe-coded tools",
+      "url": "https://techcrunch.com/2026/10/13/pluto-security-raises-42m-as-ai-gives-enterprise-security-teams-a-new-headache/",
+      "evidence_url": "https://techcrunch.com/2026/10/13/pluto-security-raises-42m-as-ai-gives-enterprise-security-teams-a-new-headache/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "Pluto Security has raised $42 million for software that finds security holes in AI-built tools. It says about 60% of the risks it finds sit in apps written by people who are not developers, the kind produced by vibe coding, where a person describes an app and a model writes it. The company has $2 million in yearly recurring revenue and 30 enterprise customers.",
+      "fact": "The company says 30 enterprise customers pay it $2 million a year, and that roughly 60% of the vulnerabilities it finds come from tools built by non-developers.",
+      "take": "I let agents write a lot of code, and I have no real way to audit it. If a security vendor can charge enterprises to scan that output, then scanning AI-written code is a budget line, and I should expect one in my own stack.",
+      "caveat": "The $42 million and the 60% figure are the company's own numbers, told to TechCrunch. The article names no customer and shows no audit that another firm repeated."
+    },
+    {
+      "title": "Germany would lose €155 billion a year if AI training data gets harder to use, ifo says",
+      "url": "https://www.livemint.com/technology/tighter-ai-data-access-could-cost-germany-155-billion-a-year-ifo-says-11791917667848.html",
+      "evidence_url": "https://www.livemint.com/technology/tighter-ai-data-access-could-cost-germany-155-billion-a-year-ifo-says-11791917667848.html",
       "source": "Reuters, via Mint",
-      "section": "AI",
-      "summary": "An IDC report seen by Reuters puts Nvidia's share of China's market for data-centre AI chips at 34% for the first half of 2026. Nvidia shipped 678,000 accelerators, the specialised chips that train and run AI models, down 44% from a year earlier. Huawei shipped 572,000. Export controls and Beijing's push for domestic chips are splitting the market.",
-      "fact": "IDC data seen by Reuters: Nvidia's China shipments fell 44% to 678,000 AI chips in January-June, while Huawei shipped 572,000, taking 28% of the market to Nvidia's 34%.",
-      "take": "I treat Chinese demand as a real market, and it is closing to American sellers. If Huawei holds this share, the two AI economies price separately, which changes who can afford to build at scale.",
-      "caveat": "The numbers come from IDC, a research firm, as reported by Reuters, so the sourcing is named but secondhand. Huawei does not publish official shipment figures."
-    },
-    {
-      "title": "Legal AI company Harvey raises $550M at a $15.5B valuation, co-led by Lightspeed and Diffusion",
-      "url": "https://www.harvey.ai/blog/harvey-raises-dollar550m-at-a-dollar155b-valuation-to-help-legal-teams-own-their-intelligence/",
-      "evidence_url": "https://www.harvey.ai/blog/harvey-raises-dollar550m-at-a-dollar155b-valuation-to-help-legal-teams-own-their-intelligence/",
-      "source": "Harvey",
       "section": "Demand signals",
-      "summary": "Harvey, a startup that sells AI to law firms, has raised $550 million at a $15.5 billion valuation. The company says 80% of the Am Law 100, the hundred highest-grossing US law firms, now use its product. AI sold into one profession at a time keeps pulling the largest cheques in this market.",
-      "fact": "The round is co-led by Diffusion and Lightspeed Venture Partners, with Sequoia, a16z and Goldman Sachs Alternatives participating. Harvey says 80% of Am Law 100 firms use it, including five of the Fortune 10.",
-      "take": "I keep asking where software still gets bought by partners who bill by the hour, and legal keeps answering. A $15.5 billion price on lawyers' workflows tells me vertical AI is still the safest bet around.",
-      "caveat": "This is Harvey's own announcement. The round size matches multiple press reports, but the 80% usage figure is the company's and has no independent check."
+      "summary": "The ifo institute, a German economic research group, estimates Germany would lose €155 billion of yearly output if access to AI training data is tightened. It breaks the loss into slower adoption, weaker models, less research, and less AI development inside Europe. The authors ask lawmakers to keep the EU rule that lets companies mine text and data for commercial use.",
+      "fact": "ifo puts the yearly loss at €155 billion ($173.43 billion), and says generative AI could otherwise add €440 billion a year to Germany's economy by 2034.",
+      "take": "I read this as Europe pricing its own caution. Rules that make training data harder to reach do not stop AI, they move the models somewhere else, so I would expect European buyers to end up renting American or Chinese models.",
+      "caveat": "This is a model calculation from one institute, not a measured loss, and it assumes a tightening of the rules that has not happened. The figure is an estimate of what could be lost."
     },
     {
-      "title": "India's ₹1 lakh crore research fund names its first 19 fund managers, with ₹7,131 crore to deploy",
-      "url": "https://inc42.com/buzz/rdi-fund-announces-first-cohort-of-19-fund-managers-eyes-deploying-%e2%82%b97131-cr-to-strengthen-deeptech-startups/",
-      "evidence_url": "https://inc42.com/buzz/rdi-fund-announces-first-cohort-of-19-fund-managers-eyes-deploying-%e2%82%b97131-cr-to-strengthen-deeptech-startups/",
-      "source": "Inc42",
-      "section": "Demand signals",
-      "summary": "The government's ₹1 lakh crore Research, Development and Innovation fund has approved its first 19 fund managers, who will channel ₹7,131 crore into deep-tech startups. The money reaches companies whose technology is lab-proven but not yet a product. Each manager must also raise private money to match the government's contribution.",
-      "fact": "The Empowered Group of Secretaries approved 14 alternative investment funds and 5 focused research organisations this month, committing ₹7,131 crore under the ₹1 lakh crore scheme launched in November 2025.",
-      "take": "I build in India, and this is the deepest pool of patient capital the deep-tech side has ever had. If the matching rule holds, ₹7,131 crore of public money pulls in about as much private money again.",
-      "caveat": "Announced by the Ministry of Science and Technology, as reported by Inc42. Approval is not money in the bank; the managers still have to pick startups and raise the matching capital."
-    },
-    {
-      "title": "Blueprints AI turns a sketch or PDF into permit-ready building blueprints in minutes",
-      "url": "https://techcrunch.com/2026/10/12/this-ai-startup-says-it-can-generate-permit-ready-blueprints-in-minutes/",
-      "evidence_url": "https://techcrunch.com/2026/10/12/this-ai-startup-says-it-can-generate-permit-ready-blueprints-in-minutes/",
-      "source": "TechCrunch",
+      "title": "Apple's HomeView smart display costs $299, and it will not be sold in the EU",
+      "url": "https://www.apple.com/newsroom/2026/10/meet-apple-homeview-a-new-way-to-enjoy-entertainment-and-manage-the-home/",
+      "evidence_url": "https://www.apple.com/newsroom/2026/10/meet-apple-homeview-a-new-way-to-enjoy-entertainment-and-manage-the-home/",
+      "source": "Apple",
       "section": "Product ideas",
-      "summary": "Al Dram, an architect turned founder, has built software that drafts code-compliant construction blueprints from a 2D sketch or a PDF. Permit-ready drawings are the slow, expensive step between an idea and a building, and his startup claims to compress it to minutes. A second-generation version goes on show at TechCrunch Disrupt this week.",
-      "fact": "Founder Al Dram incorporated Blueprints AI in Santa Monica in 2025 with co-founder Coco Cao, and the startup was selected for the 2026 Startup Battlefield 200 at Disrupt, October 13 to 15.",
-      "take": "I have paid architects for drawings that were mostly careful copying, and this attacks exactly that step. Permit-ready in minutes is a price I would want to own in one city before betting on all of them.",
-      "caveat": "Permit rules differ by city, and the article does not name a place where a plan made this way has passed review. It is a demo-stage claim."
+      "summary": "Apple has announced HomeView, a 7-inch touchscreen on a speaker base for the kitchen or hallway. It recognizes each person's face and shows their messages, calendar, and music, and it runs the new Siri AI. Pre-orders opened on October 13 and it ships on November 13. Apple will not sell it in the European Union because Siri AI is not available there.",
+      "fact": "HomeView costs $299 in the US and the wall-mounted version also starts at $299, with Schneider Home mounts from $59.95, and Apple says it will not sell the device in the European Union.",
+      "take": "I want the personalization and I would buy one for my kitchen. The part I will watch is Apple shipping a hardware product without its largest regulated market, which tells me EU rules now shape what a device can even be sold with.",
+      "caveat": "The face recognition and Siri AI claims are Apple's own. It is a first-generation device, and no independent reviewer has tested it yet."
     },
     {
-      "title": "Honeyjar wants to give every founder a senior PR person, and 10,000 signed up in a day",
-      "url": "https://techcrunch.com/2026/10/12/honeyjar-offers-ai-tools-to-improve-pr-and-comms-at-every-company/",
-      "evidence_url": "https://techcrunch.com/2026/10/12/honeyjar-offers-ai-tools-to-improve-pr-and-comms-at-every-company/",
-      "source": "TechCrunch",
-      "section": "Product ideas",
-      "summary": "Honeyjar automates the work of a public relations team: writing announcements, finding the right journalists to pitch, and tracking coverage. Its two founders spent decades doing comms for startups and venture firms. Beta testers include Nextdoor and Bloomberg Beta, and the tool is part of TechCrunch's Startup Battlefield 200.",
-      "fact": "CEO Michelle Masek says the waitlist drew 10,000 signups in the first 24 hours, and beta testers include Nextdoor, Coco Robotics and Bloomberg Beta.",
-      "take": "I launch things often enough that a press function I do not pay for is tempting. The waitlist number says other founders feel the same. My worry is that AI-written pitches have already burned the journalists we need.",
-      "caveat": "The signup count is the company's own. TechCrunch also flags the risk for the people receiving the pitches: they already get more AI-written ones than they can read."
-    },
-    {
-      "title": "A YC startup says it runs AI agent sandboxes at $0.37 a month, under a tenth of the usual price",
-      "url": "https://news.ycombinator.com/item?id=50059096",
-      "evidence_url": "https://news.ycombinator.com/item?id=50059096",
-      "source": "Hacker News",
-      "section": "Tools",
-      "summary": "Agent37, a YC-backed startup, sells sandboxes, the isolated computers an AI agent runs inside, at an average of $0.37 per sandbox per month, which it says is under 10% of most providers. The founder explains the cost tricks: renting servers from Hetzner and OVH instead of the big clouds, and sharing memory across sandboxes with gVisor. A free plan is now live.",
-      "fact": "The founder says customers average $0.37 per month per sandbox, and the free plan costs Agent37 $0.05 to $0.10 per user per month. The Launch HN post drew 112 points and 72 comments.",
-      "take": "I run agents all day, and sandbox rent is a real line in my costs. At a tenth of the price I would stop rationing test runs, though I would keep anything sensitive on my own hardware.",
-      "caveat": "These are the founder's own numbers, and he is selling. The top comment warns of a race to the bottom against bigger vendors, and gVisor sandboxes cannot run Docker-in-Docker or Android emulators."
-    },
-    {
-      "title": "The US Air Force will pay a balloon startup up to $49 million for weather data, no competing bids",
-      "url": "https://techcrunch.com/2026/10/12/windborne-wins-a-hefty-us-air-force-contract-for-its-balloon-data/",
-      "evidence_url": "https://techcrunch.com/2026/10/12/windborne-wins-a-hefty-us-air-force-contract-for-its-balloon-data/",
+      "title": "A startup has a benchtop fusion device and plans to sell the rare fuel it makes",
+      "url": "https://techcrunch.com/2026/10/13/cambridge-heavy-industries-has-been-quietly-building-a-desktop-fusion-device/",
+      "evidence_url": "https://techcrunch.com/2026/10/13/cambridge-heavy-industries-has-been-quietly-building-a-desktop-fusion-device/",
       "source": "TechCrunch",
       "section": "Wildcard",
-      "summary": "WindBorne flies about 700 autonomous weather balloons that circle the globe collecting atmospheric readings. The Air Force has now signed a contract worth up to $49 million for that data, awarded without competitive bidding, because the company says it was the only provider that met the need. So far the Air Force has actually ordered $1.7 million.",
-      "fact": "The contract is worth up to $49 million, and the Air Force has ordered $1.7 million of data so far. WindBorne, founded in 2015 in Redwood City, flies about 700 balloons and sells the same readings into its own AI weather model.",
-      "take": "The detail I like most is that the Air Force pays only when it wants data from a specific region at a specific time. A balloon fleet turned out to be a subscription business the Pentagon cannot buy anywhere else.",
-      "caveat": "The claim that nobody else could meet the need is the company's, told to TechCrunch. The $49 million is a ceiling, and the booked orders are $1.7 million."
+      "summary": "Cambridge Heavy Industries, working from a small lab near MIT, showed TechCrunch a fusion device that fits on a tabletop. It uses two lasers to compress a fuel pellet and can fire 50 to 80 shots a day, which lets it test designs fast. The company plans to make tritium, a rare hydrogen fuel, while it works toward a power plant about a decade away.",
+      "fact": "The startup raised a $6.2 million seed round led by Azolla Ventures. Tritium sells for about $30,000 a gram, only about 40 kilograms exist, and one study predicts a 28-kilogram shortfall by 2054.",
+      "take": "I like businesses that sell the pickaxes. Every fusion design needs tritium and almost nobody can make it, so I would rather own the fuel supply than bet on one reactor winning.",
+      "caveat": "The device has not produced net energy, and a power plant is roughly ten years out. TechCrunch had the only look, and no independent measurement of the reactor was published."
     }
   ],
   "sources": {
     "ok": 40,
     "total": 44
   },
-  "generated_at": "2026-10-13T02:54:40.904684+00:00",
+  "generated_at": "2026-10-14T07:05:28.622951+00:00",
   "sections": [
     {
       "id": "ai",
       "label": "AI",
       "items": [
         {
-          "title": "Meta releases its first frontier model, Muse Wonder",
-          "url": "https://techcrunch.com/2026/10/12/meta-releases-its-first-frontier-model-muse-wonder/",
-          "source": "TechCrunch",
-          "blurb": "Where Muse Spark aimed to be a lightweight model that could perform at low latency, the Wonder models are larger and said to be more capabl…",
+          "title": "Higgsfield takes AI video from 1 minute to over 10",
+          "url": "https://openai.com/index/higgsfield-longer-videos-voice",
+          "source": "OpenAI",
+          "blurb": "Higgsfield brings creators longer videos with GPT-6 Astra, precise visuals with GPT-Image-2.5, and a path to voice filmmaking with GPT-Live.",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "[AINews] Claude Haiku 5.5 — better than GPT-6 Luna at the same pricing",
-          "url": "https://www.latent.space/p/ainews-claude-haiku-55-better-than",
-          "source": "Latent Space",
-          "blurb": "yay small models",
+          "title": "Flox Intelligence is building AI to keep wildlife away from trains, airports, and roads",
+          "url": "https://techcrunch.com/2026/10/13/flox-intelligence-is-building-ai-to-keep-wildlife-away-from-trains-airports-and-roads/",
+          "source": "TechCrunch",
+          "blurb": "Flox's edge devices can identify animals and use species-specific sounds to drive them away from critical infrastructure.",
           "signal": "",
           "discussion_url": ""
         },
@@ -127,18 +127,18 @@
           "discussion_url": ""
         },
         {
-          "title": "Apple discloses deal to hire team and license tech from personalized podcast startup Huxe",
-          "url": "https://techcrunch.com/2026/10/10/apple-discloses-deal-to-hire-team-and-license-tech-from-personalized-podcast-startup-huxe/",
+          "title": "SpaceX and Google both said no. Now his software is riding a SpaceX rocket next to Google’s",
+          "url": "https://techcrunch.com/2026/10/13/satlyt-founded-by-a-former-google-and-spacex-product-manager-raises-8m-to-run-ai-on-satellites/",
           "source": "TechCrunch",
-          "blurb": "Is Apple hoping to get into the AI-generated podcast business?",
+          "blurb": "Satlyt wants to be the Android of orbital computing, offering open software that works on many companies' satellites, versus SpaceX's close…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Holo4: powering generalist computer-use agents",
-          "url": "https://huggingface.co/blog/Hcompany/holo4",
-          "source": "Hugging Face",
-          "blurb": "",
+          "title": "Industrial Next wants factory robots to switch tasks in minutes, not weeks",
+          "url": "https://techcrunch.com/2026/10/13/industrial-next-wants-factory-robots-to-switch-tasks-in-minutes-not-weeks/",
+          "source": "TechCrunch",
+          "blurb": "Industrial Next helps manufacturers automate complex, delicate tasks that have traditionally required human labor.",
           "signal": "",
           "discussion_url": ""
         }
@@ -149,26 +149,26 @@
       "label": "Agent tools",
       "items": [
         {
+          "title": "ollama/ollama: v0.40.4",
+          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.4",
+          "source": "ollama releases",
+          "blurb": "Decision models in the CLI Decision models can now be used directly from the terminal with ollama run — ask yes/no questions, classify text…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "ollama/ollama: v0.40.4-rc2",
+          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.4-rc2",
+          "source": "ollama releases",
+          "blurb": "launch: allow usage credits without upgrading (#18985)",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
           "title": "anthropics/claude-code: v2.1.296",
           "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.296",
           "source": "claude-code releases",
           "blurb": "What's changed Added a code key to the Claude apps gateway's managed.policies[]: the same settings as cli, also applied in Claude Desktop's…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "ollama/ollama: v0.40.3",
-          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.3",
-          "source": "ollama releases",
-          "blurb": "What's Changed ollama launch claude no longer shows a warning about Claude connectors by @hoyyeva in #18878 ollama launch codex no longer w…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "anthropics/claude-code: v2.1.294",
-          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.294",
-          "source": "claude-code releases",
-          "blurb": "What's changed Fixed prompt and agent hooks written as instructions (such as \"Block commands that...\") allowing what they should block Impr…",
           "signal": "",
           "discussion_url": ""
         },
@@ -181,10 +181,10 @@
           "discussion_url": ""
         },
         {
-          "title": "ollama/ollama: v0.40.4",
-          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.4-rc0",
-          "source": "ollama releases",
-          "blurb": "What's Changed llama: update llama.cpp to b11521 for decision models and EmbeddingGemma 2 by @jmorganca in #18917 server: reuse verified ma…",
+          "title": "anthropics/claude-code: v2.1.299",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.299",
+          "source": "claude-code releases",
+          "blurb": "What's changed Added CLAUDE_CODE_DISABLE_FILE_MENTIONS environment variable: Claude gets the paths of @ file mentions to read with its file…",
           "signal": "",
           "discussion_url": ""
         }
@@ -195,44 +195,44 @@
       "label": "Dev",
       "items": [
         {
-          "title": "Hackers activate automatic defrosting in supermarket fridges across Europe",
-          "url": "https://www.tomshardware.com/tech-industry/cyber-security/unprecedented-cyberattack-cripples-supermarket-fridges-across-europe-as-hackers-activate-automatic-defrosting-delivery-and-store-prices-also-impacted-by-incident",
+          "title": "Gemini 4 Argon",
+          "url": "https://deepmind.google/models/gemini/",
           "source": "Hacker News",
           "blurb": "",
-          "signal": "474 pts · 680 comments",
-          "discussion_url": "https://news.ycombinator.com/item?id=50055304"
+          "signal": "1,208 pts · 852 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50073879"
+        },
+        {
+          "title": "Apple HomeView",
+          "url": "https://www.apple.com/apple-homeview/",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "714 pts · 842 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50071017"
+        },
+        {
+          "title": "Show HN: Pulse Local, a Mac budgeting app whose AI models run on your machine",
+          "url": "https://pulseos.finance",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "100 pts · 54 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50080275"
+        },
+        {
+          "title": "MIT class project turns into an FDA-cleared treatment for tremors",
+          "url": "https://news.mit.edu/2026/mit-class-project-turns-into-fda-cleared-treatment-for-tremors-1002",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "194 pts · 35 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50061659"
         },
         {
           "title": "andrewyng/openworker",
           "url": "https://github.com/andrewyng/openworker",
           "source": "GitHub",
           "blurb": "",
-          "signal": "18,505 stars",
+          "signal": "18,520 stars",
           "discussion_url": ""
-        },
-        {
-          "title": "French supermarket chains say cyberattack forced refrigerator shutdown",
-          "url": "https://www.afp.com/en/french-supermarket-chains-say-cyberattack-forced-refrigerator-shutdown",
-          "source": "Lobsters",
-          "blurb": "security",
-          "signal": "19 pts · 12 comments",
-          "discussion_url": "https://lobste.rs/s/u4vlin/french_supermarket_chains_say"
-        },
-        {
-          "title": "hypit-ai/hypit",
-          "url": "https://github.com/hypit-ai/hypit",
-          "source": "GitHub",
-          "blurb": "Clone any viral video with AI agents. Not just a script, the whole workflow: swap the face, the words, the B-roll, ship 100 variants in one…",
-          "signal": "21,637 stars",
-          "discussion_url": ""
-        },
-        {
-          "title": "GLM-Legal",
-          "url": "https://z.ai/blog/glm-legal",
-          "source": "Hacker News",
-          "blurb": "",
-          "signal": "457 pts · 257 comments",
-          "discussion_url": "https://news.ycombinator.com/item?id=50058507"
         }
       ]
     },
@@ -249,14 +249,6 @@
           "discussion_url": ""
         },
         {
-          "title": "Muse Wonder now available on AI Gateway",
-          "url": "https://vercel.com/changelog/muse-wonder-now-available-on-ai-gateway",
-          "source": "Vercel",
-          "blurb": "",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "Codex Cloud shipped with Tailscale support. Nobody told us.",
           "url": "https://tailscale.com/blog/codex-cloud-tailscale",
           "source": "Tailscale",
@@ -265,16 +257,24 @@
           "discussion_url": ""
         },
         {
-          "title": "Your agent, your network: How Meta’s Muse agent works with Tailscale",
-          "url": "https://tailscale.com/blog/meta-muse-ai-agent-tailscale",
-          "source": "Tailscale",
-          "blurb": "Meta's Muse connects to Tailscale. You decide what it can reach.",
+          "title": "Drama 3 now available on AI Gateway",
+          "url": "https://vercel.com/changelog/drama-3-now-available-on-ai-gateway",
+          "source": "Vercel",
+          "blurb": "",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "How Rillet ships 3× faster with AI agents on Vercel",
-          "url": "https://vercel.com/blog/how-rillet-ships-3-faster-with-ai-agents-on-vercel",
+          "title": "Muse Wonder now available on AI Gateway",
+          "url": "https://vercel.com/changelog/muse-wonder-now-available-on-ai-gateway",
+          "source": "Vercel",
+          "blurb": "",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Agents can now buy domains with the Vercel CLI",
+          "url": "https://vercel.com/changelog/agents-can-now-buy-domains-with-the-vercel-cli",
           "source": "Vercel",
           "blurb": "",
           "signal": "",
@@ -287,42 +287,42 @@
       "label": "Product",
       "items": [
         {
-          "title": "SalesRep.com",
-          "url": "https://www.producthunt.com/products/salesrep-com",
+          "title": "Elocuenti",
+          "url": "https://www.producthunt.com/products/elocuenti",
           "source": "Product Hunt",
-          "blurb": "Your AI sales rep: live prices, quotes & follow-ups 24/7 Discussion | Link",
+          "blurb": "Agentic commerce: sell on WhatsApp and AI assistants Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Scrape Anything by Context.dev",
-          "url": "https://www.producthunt.com/products/context-dev",
+          "title": "Gemini 4 Argon",
+          "url": "https://www.producthunt.com/products/gemini-4-argon-2",
           "source": "Product Hunt",
-          "blurb": "Turn any website into clean data with one API call. Discussion | Link",
+          "blurb": "Google's frontier model for long, complex agentic work Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Manifold MCP",
-          "url": "https://www.producthunt.com/products/manifold-mcp",
+          "title": "Inferock",
+          "url": "https://www.producthunt.com/products/inferock",
           "source": "Product Hunt",
-          "blurb": "SEO, AI answers, social, ads and leads data for your agent Discussion | Link",
+          "blurb": "Serverless inference, with credits back for failed calls. Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Ancher 2.0",
-          "url": "https://www.producthunt.com/products/ancher-ai",
+          "title": "Diagramly",
+          "url": "https://www.producthunt.com/products/diagramly-2",
           "source": "Product Hunt",
-          "blurb": "Turn everything you read and save into work you can ship Discussion | Link",
+          "blurb": "Sketch systems at the speed you think Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Cube Forms",
-          "url": "https://www.producthunt.com/products/cube-forms",
+          "title": "Dashrendr",
+          "url": "https://www.producthunt.com/products/dashrendr",
           "source": "Product Hunt",
-          "blurb": "Forms that can be filled by agents Discussion | Link",
+          "blurb": "Build dashboards visually, embed them anywhere Discussion | Link",
           "signal": "",
           "discussion_url": ""
         }
@@ -333,42 +333,42 @@
       "label": "Startups",
       "items": [
         {
-          "title": "Smart ring maker Ultrahuman to roll out biological-age model across UAE",
-          "url": "https://techcrunch.com/2026/10/12/smart-ring-maker-ultrahuman-to-roll-out-biological-age-model-across-uae/",
+          "title": "Rivian’s startup Mind Robotics hires former Ford EV chief Doug Field",
+          "url": "https://techcrunch.com/2026/10/13/rivians-startup-mind-robotics-hires-former-ford-ev-chief-doug-field/",
           "source": "TechCrunch",
-          "blurb": "Ultrahuman and Abu Dhabi will spend the next two years working on research and clinical validation of the model.",
+          "blurb": "Field also worked on Apple's secretive car project and oversaw development of the Tesla Model 3.",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Fitbit Edge is Google’s middle ground between Fitbit Air and Pixel Watch",
-          "url": "https://techcrunch.com/2026/10/12/fitbit-edge-is-googles-middle-ground-between-fitbit-air-and-pixel-watch/",
+          "title": "Niobia takes the guesswork out of some of tech’s most expensive mistakes",
+          "url": "https://techcrunch.com/2026/10/13/niobia-takes-the-guesswork-out-of-some-of-techs-most-expensive-mistakes/",
           "source": "TechCrunch",
-          "blurb": "Google’s newest wearable costs $179.99 and has a sleek feel like the Fitbit Air but with an OLED display.",
+          "blurb": "The San Francisco startup aims to help battery and chip manufacturers identify defects on production lines, reducing downtime and costly mi…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "The founder’s guide to TechCrunch Disrupt 2026: Everything you need to know",
-          "url": "https://techcrunch.com/2026/10/11/the-founders-guide-to-techcrunch-disrupt-2026-everything-you-need-to-know/",
+          "title": "FBI arrests OpenAI employee accused of planting hidden recording device in conference room",
+          "url": "https://techcrunch.com/2026/10/13/fbi-arrests-openai-employee-accused-of-planting-hidden-recording-device-in-conference-room/",
           "source": "TechCrunch",
-          "blurb": "TechCrunch Disrupt 2026 is built around one question: How do you build an enduring company in the AI era? Our programming and speaker lineu…",
+          "blurb": "It's not clear exactly for what purpose the recording device was used, but FBI director Kash Patel said the scheme was to \"capture sensitiv…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Vivian Midha Shen and Raphael Schaad Join YC as General Partners",
-          "url": "https://www.ycombinator.com/blog/welcome-vivian-and-raphael/",
-          "source": "Y Combinator",
-          "blurb": "We’re thrilled to announce that Vivian Midha Shen and Raphael Schaad are joining Y Combinator as our newest General Partners.",
+          "title": "Forget rockets — Longshot wants to fire cargo into space from a gun. See it at TechCrunch Disrupt 2026",
+          "url": "https://techcrunch.com/2026/10/13/forget-rockets-longshot-wants-to-fire-cargo-into-space-from-a-gun-see-it-at-techcrunch-disrupt-2026/",
+          "source": "TechCrunch",
+          "blurb": "Longshot is trying to build a gun big enough to make space data centers a reality.",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "The investor’s guide to TechCrunch Disrupt 2026: Everything you need to know",
-          "url": "https://techcrunch.com/2026/10/11/the-investors-guide-to-techcrunch-disrupt-2026-everything-you-need-to-know/",
+          "title": "Helix Carbon says it can make iron cheaper by recycling blast furnace pollution",
+          "url": "https://techcrunch.com/2026/10/13/helix-carbon-makes-iron-cheaper-by-upcycling-blast-furnace-pollution-see-how-at-techcrunch-disrupt/",
           "source": "TechCrunch",
-          "blurb": "Year after year, investors who've explored the Expo Halls, met founders, and learned from peers have proven why you need to be on the groun…",
+          "blurb": "The steel industry is a big polluter, but Helix Carbon can upcycle pollution from blast furnaces to drive down emissions and improve margin…",
           "signal": "",
           "discussion_url": ""
         }
@@ -379,42 +379,42 @@
       "label": "News",
       "items": [
         {
-          "title": "US-Based Legal AI Startup Harvey Raises $550 Million at $15.5 Billion Valuation - بوابة التكنولوجيا المالية",
-          "url": "https://news.google.com/rss/articles/CBMiREFVX3lxTE1oeGh3RjNjY3lBT19GbFhiMmYzb1RPUUVZQVA2OEtDVG1rYTJMRmo3Y012cmp2R2UzaXZqU1RPeUpxVlli?oc=5",
+          "title": "Startup Causa Prima raises $20 million to tackle billing disputes with AI agents - Fortune",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxONms3WE94ejlPZGFmQ3JpaE1kZ1JOdGRpRmJEdFh2UTRreENHM2hnY1lGajh6WEVYdmxLbzVQZTJBTEh2QjdkbnBaOFQ1elctRzlmUm05YWx2MnUyWkZSbUFuLTNkY3BjTWpyNW96eVJhV19OdEVheXVQQWJ6THhOWXVFczlHdWRGX1RLR3dqSDd0ZVk?oc=5",
           "source": "Google News",
-          "blurb": "US-Based Legal AI Startup Harvey Raises $550 Million at $15.5 Billion Valuation بوابة التكنولوجيا المالية",
+          "blurb": "Startup Causa Prima raises $20 million to tackle billing disputes with AI agents Fortune",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "DeepSeek leads $400 million seed round for robotics AI startup - Yahoo Finance",
-          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxOa2Q1Mkl4ZkZmX3phS0MzUllDS21fZ1BsS2Vxd0puQmFERER2ZlZPU1VRSTE5dDJZQU1PR2hFa2xURTd1T1FfaDR6S2U5MElxd1lkT3FRVmJQRE41cTdYclNOS2o3WmY4blJlTlJva1l6VE5yMmpsUGNFd29qNUhQaTNpUUprOTJkNjdHcEtvNFZscUZranA0ZEdwRQ?oc=5",
+          "title": "Pluto Security raises $42M as AI gives enterprise security teams a new headache - TechCrunch",
+          "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPREdOY3NfSDlxR0VKUUNaX0RmVjgwNldkZXNnei1lc3JoMEJYeDljU3VBZkQtYWw3NXZSY2FNSU5nbUlvM25ZZUtiSFpVUEZtaC1YLW9DSzl2Z3JJbld3WnBWbUNtQzJTV3ZhbE9YbkJqeFE5c09MTnpPTTNkN1RUdlZDSmpLdG9rU2gtWkxXaWVzalplQm56QWQtdDROQWZKSVdjWUx2d3RkNFBRcDRPU2JzTQ?oc=5",
           "source": "Google News",
-          "blurb": "DeepSeek leads $400 million seed round for robotics AI startup Yahoo Finance",
+          "blurb": "Pluto Security raises $42M as AI gives enterprise security teams a new headache TechCrunch",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "DeepSeek leads $400 million funding round for ex-Tencent scientist's robot AI startup - Startup Fortune",
-          "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNT2ozanV4bE5iRXh3TFR6eE5KOFFqd1RZSmlGSWZWZXlyeE12WTdvRUZjMXZIUUJFOVhyM0lUUVI4aFNSX1NNUmlKTXFvLVNWR1NFUjRvVGtlX2wxMzUtYlBGWGpjOVZKNEFFOGVETDRVTUZxU0tMNWtWVHMxLWJMbFc0MGZFR2RmU3pjaDBMTmFpSUtLSlg4djM1cEFTVVN1VUhQNTZWTFFLR0VsRUNoUQ?oc=5",
+          "title": "AI Tracker: Suki lands $90M - Modern Healthcare",
+          "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQb0Zsbm5XcmxTU0JuTzczTC1fUF9FVzB3LTJ3X2hLYVRJUFl3ZXB6TEZoMldEOXlkTXBTOVp2amNpLXFVeWlBUUd4X2dZNzlvUnB2LUoybW9LRThOY2pjN18tbnB3S2NieGMwSm9fVVBuZHprWUFrTU50Wk91ZVREV3NDZ1hvQ3RxcW9zeEMxMGs?oc=5",
           "source": "Google News",
-          "blurb": "DeepSeek leads $400 million funding round for ex-Tencent scientist's robot AI startup Startup Fortune",
+          "blurb": "AI Tracker: Suki lands $90M Modern Healthcare",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Mistlabs Raises $26M Pre-A as Ambi Launches AI-to-AI Communication - Unite.AI",
-          "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQa0VjTTdWUWZaRkVWZGtlZnBIZzdtUkxjaVBqdEM4eTJOVXJsOXpyOWd2N3lKZWdVS004ME1IVmVPeVI1UVdtcU4yNy1oNUVjZFhodzZyUVpYbXN3MUIwUXVMT3N5Nm5iaVhQSTdEbU4zOEduQkRmbWpkZjlXN3lFTVU5Q0tLcHdtQTV1X0daS2Q?oc=5",
+          "title": "London’s Obsero raises €1 million to help brands improve visibility in AI-powered search - EU-Startups",
+          "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxQV2JrSjlzN05rZGFXZ1dxYTFMTEVSTG1LdloyTndTbXFrVUxkNUh1aS1rSzRval9sb3lNNnZpamxJTmFBRUNrUkM4a3Z4NEExUkpEM1pGVVNtQkxzMzJfeDBEQ1h1VVYwQm50ZWROVTFrbmhzTzQ2cmdhbzFhdGZFVDZYeW1xc1VkWlRVcFpVWUNQNDhocmhGMWJmSmtVWk85a0loZ3dEWktHVnU5Z3JNQ0g4RTlkWGhuUUxJQjdRbTZGUQ?oc=5",
           "source": "Google News",
-          "blurb": "Mistlabs Raises $26M Pre-A as Ambi Launches AI-to-AI Communication Unite.AI",
+          "blurb": "London’s Obsero raises €1 million to help brands improve visibility in AI-powered search EU-Startups",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Romanian-Founded VoicePatrol Raises €3M in GapMinder-Led Funding Round - The Recursive",
-          "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNdVdwSlNmYm1aMFBVVTRJWFVqUUVVQzZvU0FBN1ROVDl2aDRKLVhKSkxzT3FCUHM4R2lPZW1pTDVSWG1mXzRnbmg3dEpSU1dYdGtEZTFWa0ZDNVNEMG4zTG43bjFYMlh4TjJYWTZ1c3l1SWJ1eWtYRkF0ZXp2anBwUlhMQ3NWTW03WkdkQWVQcXhGeE10TEJyaHFwSXlGcFdPY0VoZg?oc=5",
+          "title": "One-year-old Israeli AI startup with six employees acquired for estimated $100 million - CTech",
+          "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE85bGxacVJpMExaYmpWVXlkTW1GUXlTM2RrWXJnZjRDR3RHZnhMUWE1YnRJUm1uRzFKOHpwXzZrNHJJMGd0VzY0el9TUnZHWEc3MUpkdFRQdmhibjJObXFDZmpaQ0s0ZlE?oc=5",
           "source": "Google News",
-          "blurb": "Romanian-Founded VoicePatrol Raises €3M in GapMinder-Led Funding Round The Recursive",
+          "blurb": "One-year-old Israeli AI startup with six employees acquired for estimated $100 million CTech",
           "signal": "",
           "discussion_url": ""
         }
@@ -425,26 +425,18 @@
       "label": "Security",
       "items": [
         {
-          "title": "Anthropic takes risky AI tests offline after models breach govt sites",
-          "url": "https://www.bleepingcomputer.com/news/security/anthropic-takes-risky-ai-tests-offline-after-models-breach-govt-sites/",
-          "source": "BleepingComputer",
-          "blurb": "Anthropic announced that its internal AI models undergoing \"high-risk and cybersecurity evaluations\" no longer have internet access followi…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Two Alleged ‘TeamPCP’ Hackers Arrested in Australia",
-          "url": "https://krebsonsecurity.com/2026/08/two-alleged-teampcp-hackers-arrested-in-australia/",
-          "source": "Krebs on Security",
-          "blurb": "Authorities in Australia have arrested two men believed to be members of TeamPCP, a prolific cybercrime and data extortion group blamed for…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "FBI Probes Service Selling 153M+ Drivers Licenses",
           "url": "https://krebsonsecurity.com/2026/09/fbi-probes-service-selling-153m-drivers-licenses/",
           "source": "Krebs on Security",
           "blurb": "A new identity theft service launched on the dark web this week is selling digital scans of more than 153 million drivers licenses from peo…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "OpenAI engineer arrested for allegedly planting spy device in office",
+          "url": "https://www.bleepingcomputer.com/news/artificial-intelligence/openai-engineer-arrested-for-allegedly-planting-spy-device-in-office/",
+          "source": "BleepingComputer",
+          "blurb": "A Saudi OpenAI engineer has been arrested for allegedly planting a hidden recording device in an executive conference room at the company's…",
           "signal": "",
           "discussion_url": ""
         },
@@ -457,10 +449,18 @@
           "discussion_url": ""
         },
         {
-          "title": "Cyberattack shuts down refrigerators at French supermarkets",
-          "url": "https://www.bleepingcomputer.com/news/security/cyberattack-shuts-down-refrigerators-at-french-supermarkets/",
-          "source": "BleepingComputer",
-          "blurb": "Attackers remotely defrosted refrigerators at multiple French supermarket chains overnight in a cyberattack that reportedly targeted Danfos…",
+          "title": "Dutch Police Arrest ‘Reformed’ Hacker in Shiny Hunters Investigation",
+          "url": "https://krebsonsecurity.com/2026/09/dutch-police-arrest-reformed-hacker-in-shiny-hunters-investigation/",
+          "source": "Krebs on Security",
+          "blurb": "Authorities in the Netherlands have arrested a 23-year-old convicted cybercriminal on suspicion of aiding in data thefts and extortions by…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "FBI Arrests Executive at Ransomware Negotiation Firm",
+          "url": "https://krebsonsecurity.com/2026/10/fbi-arrests-founder-of-ransomware-negotiation-firm/",
+          "source": "Krebs on Security",
+          "blurb": "Agents with the Federal Bureau of Investigation (FBI) on Thursday arrested the co-founder of a Canadian cybersecurity firm in connection wi…",
           "signal": "",
           "discussion_url": ""
         }
@@ -471,42 +471,42 @@
       "label": "India",
       "items": [
         {
-          "title": "Agentic video startup Clueso raises $10M in Series A funding round",
-          "url": "https://yourstory.com/2026/10/agentic-video-startup-clueso-raises-series-a-funding",
-          "source": "YourStory",
-          "blurb": "The startup founded by IIT Madras alumni plans to use the funding to scale its enterprise go-to-market reach, deepen its agentic layer, and…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "NYT, Economist among publishers joining coalition to curb unpaid AI use",
-          "url": "https://www.livemint.com/technology/nyt-economist-among-publishers-joining-coalition-to-curb-unpaid-ai-use-11791846088141.html",
-          "source": "Mint",
-          "blurb": "NEWS PUBLISHERS-AI/:NYT, Economist among publishers joining coalition to curb unpaid AI use",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Deeptech Funding Zooms 2.8X YoY In Q3 Despite Tighter Deal Flow",
-          "url": "https://inc42.com/buzz/deeptech-funding-zooms-2-8x-yoy-in-q3-despite-tighter-deal-flow/",
+          "title": "Agentic AI Startup RevRag.AI Nets $2.5 Mn To Build AI Relationship Managers For Lenders And Insurers",
+          "url": "https://inc42.com/buzz/fintech-saas-startup-revrag-ai-nets-2-5-mn-to-build-ai-relationship-managers-for-lenders-and-insurers/",
           "source": "Inc42",
-          "blurb": "India’s deeptech startups raised substantially more capital in Q3 2026, even as the number of deals edged lower. As per…",
+          "blurb": "Agentic AI startup RevRag.AI has raised $2.5 Mn (about ₹24 Cr) in a seed funding round led by Accion Ventures…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "TechSparks 2026 is here; Zetwerk targets Rs 5,012 Cr IPO",
-          "url": "https://yourstory.com/2026/10/techsparks-2026-is-here-zetwerks-ipo",
-          "source": "YourStory",
-          "blurb": "Under this year’s rallying cry, ‘The New Tech Order,’ YourStory’s 17th edition is bringing together 10,000+ visionaries, 500 speakers, 1,00…",
+          "title": "Freshworks To Acquire Torii To Expand AI Spend Governance Offerings",
+          "url": "https://inc42.com/buzz/freshworks-to-acquire-torii-to-expand-ai-spend-governance-offerings/",
+          "source": "Inc42",
+          "blurb": "Nasdaq-listed SaaS major Freshworks has signed a definitive agreement to acquire Torii, a SaaS management platform, to extend its IT…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Zetwerk sets IPO price band at Rs 143-151, aims to raise Rs 5,012 Cr",
-          "url": "https://yourstory.com/2026/10/zetwer-sets-ipo-price-band-rs-143-151-to-raise-rs-5012-cr",
+          "title": "Kubo Care uses radar technology to keep elders safe at home",
+          "url": "https://yourstory.com/2026/10/tech30-kubo-care-mmwave-radar-senior-fall-detection-bengaluru",
           "source": "YourStory",
-          "blurb": "Zetwerk has expanded the size of its IPO and is seeking a valuation of Rs 25,583 crore.",
+          "blurb": "Bengaluru startup Kubo Care uses mmWave radar to detect falls in seniors at home in under a second, with no video or audio recorded.",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "[Update] Adani Enterprises, Jabil Sign MoU To Set Up AI-Focused Joint Venture",
+          "url": "https://inc42.com/buzz/adani-group-partners-with-jabil-to-build-ai-data-infrastructure/",
+          "source": "Inc42",
+          "blurb": "Update | October 13, 20:00 IST Adani Group’s flagship business Adani Enterprises and US-based manufacturing company Jabil Inc have signed…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Lawmakers ask FAA to pause use of new AI tool in DC-area flight management",
+          "url": "https://www.livemint.com/technology/lawmakers-ask-faa-to-pause-use-of-new-ai-tool-in-dc-area-flight-management-11791920909814.html",
+          "source": "Mint",
+          "blurb": "USA-AVIATION:Lawmakers ask FAA to pause use of new AI tool in DC-area flight management",
           "signal": "",
           "discussion_url": ""
         }
@@ -517,42 +517,42 @@
       "label": "Reddit",
       "items": [
         {
-          "title": "If you dont have Distribution, Invest in SEO and AEO. 3 month old tool hitting 500+ visitors from google alone, Ask me Anything",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x3rx0s/if_you_dont_have_distribution_invest_in_seo_and/",
+          "title": "2 weeks after launch: 11.7k sessions, 1.2k signups, 60 paying users, €415. Good start or am I fooling myself?",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x4rmtv/2_weeks_after_launch_117k_sessions_12k_signups_60/",
           "source": "r/SaaS",
-          "blurb": "i've been into the Online world for 3 years now and Marketing is the hardest part when it comes to selling your product, i have more than 3…",
+          "blurb": "Solo founder here. I launched a niche B2C tool in Greece on Oct 1: you paste a used-car ad from a German marketplace and it calculates the…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "I used Codex and Devin to build an alternative to Gamma after running into a frustrating problem at work.",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x3vosm/i_used_codex_and_devin_to_build_an_alternative_to/",
+          "title": "Update 27 Signups (4 Paying Users) 26 Days Later (since initially posting in here)",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x5e8me/update_27_signups_4_paying_users_26_days_later/",
           "source": "r/SaaS",
-          "blurb": "I used Codex and Devin to build an alternative to Gamma after running into a frustrating problem at work. The layouts Gamma generated often…",
+          "blurb": "Ive posted in here a couple times my platform gained 4 paying users over the past week. User 1 paid out right for an annual plan this morni…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "I'm building an open-source AI marketing platform",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x4d2dy/im_building_an_opensource_ai_marketing_platform/",
+          "title": "2 months after launch, 185 signups a month, 2.7% pay, still losing 117 bucks a month. weak product or just low conversion? real numbers in the pic",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x568mp/2_months_after_launch_185_signups_a_month_27_pay/",
           "source": "r/SaaS",
-          "blurb": "I've been programming for years and love building in public. I'm currently building Falbor, an open-source AI marketing platform that helps…",
+          "blurb": "solo founder, public since august. ai tool for indie musicians, you upload a song and it tells you which part works and cuts short videos o…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Eight AI models, the same media-buying task, 12 attempts each: two finished every time, two never finished.",
-          "url": "https://www.reddit.com/r/AI_Agents/comments/1x3yoyk/eight_ai_models_the_same_mediabuying_task_12/",
-          "source": "r/AI_Agents",
-          "blurb": "So, what makes an agent reliable on multi-step tasks? These numbers are taken from a public benchmark where AI agents run a simulated media…",
+          "title": "spent 2 years vibe coding apps. Here's the workflow I wish I had from day one.",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x4u7tp/spent_2_years_vibe_coding_apps_heres_the_workflow/",
+          "source": "r/SaaS",
+          "blurb": "I've been vibe coding for about two years, with a background in AI development. I've built and shipped apps. I recently open-sourced Pinefl…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "I Launched my first vscode extension 2 days back, and it got 30 installs.",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x3u4f5/i_launched_my_first_vscode_extension_2_days_back/",
+          "title": "Opus 5.5 + Blender won in motion design. Three.js didn't match the quality needed",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x4vndw/opus_55_blender_won_in_motion_design_threejs/",
           "source": "r/SaaS",
-          "blurb": "It has already got 30 installs from vs code marketplace and 190+ downloads from open-vsx Honestly, I wasn't expecting to see people checkin…",
+          "blurb": "We don't pay for motion designers anymore The cinematic hook is done with seedance 2.5 in the spirit of those quirky AI influencers trend T…",
           "signal": "",
           "discussion_url": ""
         }
@@ -561,10 +561,74 @@
   ],
   "wire": [
     {
-      "title": "Anthropic can’t reliably control its AI agents — it’s cutting off its internal evals from the live internet instead",
-      "url": "https://techcrunch.com/2026/10/09/anthropic-cant-reliably-control-its-ai-agents-its-cutting-off-its-internal-evals-from-the-live-internet-instead/",
+      "title": "Amex introduces a framework to prevent AI agents from making unauthorized purchases",
+      "url": "https://techcrunch.com/2026/10/13/amex-introduces-a-framework-to-prevent-ai-agents-from-making-unauthorized-purchases/",
       "source": "TechCrunch",
-      "blurb": "The incidents involved AI agents tasked to solve problems seeking resources on the internet. In the process, they exploited software flaws,…",
+      "blurb": "American Express is introducing a new framework designed to ensure AI agents only make purchases their users have authorized, potentially p…",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Google releases Gemini 4 Argon, its new frontier model: Benchmarks, how to try it, and pricing - Mashable",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE02ZGlQM0xOMUw2NkM5ZVBUb0UzeXVFZV9BcEp4cGY4RzdyVjNDRXVPM3pQdUp2UnladkZmeDRYZGVsdDF1VG9qekhNaU5xeXVYVkRQSjVZdnhvTjZmWUtYVi1tUzhwZTQ?oc=5",
+      "source": "Google News",
+      "blurb": "Google releases Gemini 4 Argon, its new frontier model: Benchmarks, how to try it, and pricing Mashable",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Google Play now lets anyone build private, vibe-coded apps that run on Android",
+      "url": "https://techcrunch.com/2026/10/13/google-play-now-supports-private-vibe-coded-apps-built-just-for-you/",
+      "source": "TechCrunch",
+      "blurb": "Google is making it easier to build and use personal Android apps created with AI, without having to make them available to everyone on the…",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "SpaceXSI bundles X Premium, Grok, and Cursor into one subscription",
+      "url": "https://techcrunch.com/2026/10/13/spacexsi-bundles-x-premium-grok-and-cursor-into-one-subscription/",
+      "source": "TechCrunch",
+      "blurb": "The new X Subscription combines X's paid features with AI tools like Grok and Cursor, offering plans ranging from $8 to $200 per month.",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Google launches flagship AI model Gemini 4 Argon for developers, businesses - Reuters",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQclhsaXp4NUtqeVJDQTNIUjVXQVdJcnNXYnpYZUFTZm4wY3UxcTM1SzJvdzRBNE9HaURlNG1obzFGQ0o3R0pWNVJfNGFDOUdFZnhfdEJxSkszQ2hZQlowMjdCbVliRE9uX3A5ak1CYkJHOEV1elBYRWgtUHBwdF9lcWEyUGdjbmhQb2JONkpNeWhLTHgzQzRhRFRnZTEwcDRCa3k3RkpxY0c5Z1RsSlFCSmQwNmRmQQ?oc=5",
+      "source": "Google News",
+      "blurb": "Google launches flagship AI model Gemini 4 Argon for developers, businesses Reuters",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "[AINews] AI Engineer NYC: Gemini 4 Argon, Vals AI Benchmarks",
+      "url": "https://www.latent.space/p/ainews-ai-engineer-nyc-gemini-4-argon",
+      "source": "Latent Space",
+      "blurb": "Gemini 4 Argon went GA today, but we already gave it title story 2 weeks ago and most benchmarks, like CursorBench, simply independently co…",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Holo4: powering generalist computer-use agents",
+      "url": "https://huggingface.co/blog/Hcompany/holo4",
+      "source": "Hugging Face",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "llm-gemini 0.35",
+      "url": "https://simonwillison.net/2026/Oct/13/llm-gemini/",
+      "source": "Simon Willison",
+      "blurb": "Release: llm-gemini 0.35 I added support to llm-gemini for the new Gemini 4 Argon model, made available today via the Gemini API and for cu…",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Clueso Raises $10M Series A to Automate Business Video Creation and Updates - Unite.AI",
+      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE42N0g5c3NvYmhFV0luOUM3MXE5d3pSYjItVXB2V0Z1OFgxaHJCZWhDbDNQVHkwTFhBekpwekRMM05XQnlVV21sZGE1TWZzdThnV3FNQ0FTeXRzeXY1VTJTWHVVVkI3WDVPSFJzTnN2VWEwUQ?oc=5",
+      "source": "Google News",
+      "blurb": "Clueso Raises $10M Series A to Automate Business Video Creation and Updates Unite.AI",
       "signal": "",
       "discussion_url": ""
     },
@@ -577,30 +641,6 @@
       "discussion_url": ""
     },
     {
-      "title": "[AINews] not much happened today",
-      "url": "https://www.latent.space/p/ainews-not-much-happened-today-60f",
-      "source": "Latent Space",
-      "blurb": "a quiet day.",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "The latest AI news we announced in September 2026",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-september-2026/",
-      "source": "Google AI",
-      "blurb": "Here are Google’s latest AI updates from September 2026",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "The maker of non-text AI model Jev valued at $7.5B just weeks after launch",
-      "url": "https://techcrunch.com/2026/10/09/the-maker-of-non-text-ai-model-jev-valued-at-7-5b-just-weeks-after-launch/",
-      "source": "TechCrunch",
-      "blurb": "What has users and large corporations so excited about Jev is TypeSafe’s claim that it works significantly faster and uses far fewer tokens…",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
       "title": "Asana cuts model costs 76x in browser tests with GPT-6.1 Sol",
       "url": "https://openai.com/index/asana-browser-agent",
       "source": "OpenAI",
@@ -609,66 +649,26 @@
       "discussion_url": ""
     },
     {
-      "title": "Meta releases its first frontier model, Muse Wonder - TechCrunch",
-      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPRkdnR0wyZkdNUGRYU2hGTDdfWTRncjBxeThHRUVhWXRndW5OYU1Ya3FJWEtCdWwwY2d0c1FEd29KWExNN2N1VkRCU01hVW9NYjE5UWFFV3MzNDRpREQ3ZWJVaEhZbXJkN2JEdlV0QXpYcWtETVNXYXFfU1NrWXN6RzI2VjhpcjNtdmhpdnBB?oc=5",
-      "source": "Google News",
-      "blurb": "Meta releases its first frontier model, Muse Wonder TechCrunch",
+      "title": "Circle Raises ₹25 Cr To Expand Its Pre-Owned Goods Marketplace Beyond Bengaluru",
+      "url": "https://inc42.com/buzz/circle-raises-%e2%82%b925-cr-to-expand-its-pre-owned-goods-marketplace-beyond-bengaluru/",
+      "source": "Inc42",
+      "blurb": "Pre-owned goods marketplace Circle has raised ₹25 Cr (about $2.6 Mn) in a seed funding round led by Nexus Venture…",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Amazon drops data center NDAs, and AI agents want your credit card",
-      "url": "https://techcrunch.com/podcast/amazon-drops-data-center-ndas-and-ai-agents-want-your-credit-card/",
-      "source": "TechCrunch",
-      "blurb": "Amazon says it will stop using NDAs when negotiating data center deals with local governments, following a similar move from Microsoft earl…",
+      "title": "Apple Welcome Home Event 2026: HomeView Smart display, HomePod Mini 2, Apple TV 4K and more launched",
+      "url": "https://www.livemint.com/technology/apple-welcome-home-event-2026-homeview-smart-display-homepod-mini-2-apple-tv-4k-and-more-launched-11791898504781.html",
+      "source": "Mint",
+      "blurb": "Apple unveiled its HomeView smart home hub, updated HomePod Mini 2, new Apple TV 4K and Apple Home Collection at its ‘Welcome Home’ event o…",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Defense Tech Startup Gallatin AI Raises $50 Million in Series A Round - Israel Defense",
-      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE00WHV1OWVEWVFrczhSSkJJaWlZREVoM2tQY0J5d3JOVXhXUUZGeDRCbEhPbDVEN3I2aXNsS0xONjFtcmtKc1FPb1BkZFZOY1lkYTk4QTNxMUw?oc=5",
-      "source": "Google News",
-      "blurb": "Defense Tech Startup Gallatin AI Raises $50 Million in Series A Round Israel Defense",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "E-commerce AI startup Loops raises $3.5M to create smoother online shopping experiences - SiliconANGLE",
-      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxOaG1kZFZBQUNBX1F1US1RMEZWWWdZRW9taGNja3d1SFRjTUJGWXNsajQ0YnNHYmE5b0F6dWd3YXA1bnNPUHlzWTJRMS1CMGxrVnQ5MEtoY1A5ODlDS3BhRVhPcUhNa29Bbk12ZWhTR21oRjBfT3VOME5TbUhPajN6ODlDT0RzblkwZ181OERyNTJuWHN1SjZkZm5aSm1PYmJVb2V2RWVQVC1nLXJ1OHVMQlFpREM4OFpmWGhkWGlXRWc?oc=5",
-      "source": "Google News",
-      "blurb": "E-commerce AI startup Loops raises $3.5M to create smoother online shopping experiences SiliconANGLE",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "[AINews] TypeSafe/Jev at $100M ARR, $7.5B valuation 3 weeks after launch",
-      "url": "https://www.latent.space/p/ainews-typesafejev-at-100m-arr-75b",
-      "source": "Latent Space",
-      "blurb": "Wow.",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Making global data easier to explore",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/google-un-data-commons-platform/",
-      "source": "Google AI",
-      "blurb": "Google and the UN system have launched the UN System Data Commons, a new open platform making global statistics accessible and easy to sear…",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Building AI to accelerate science and improve lives",
-      "url": "https://blog.google/innovation-and-ai/technology/ai/ai-applications-science-people/",
-      "source": "Google AI",
-      "blurb": "The true measure of AI is who it helps. Here’s how it’s impacting lives today. We're focused on key areas where advanced technology can hel…",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Kudos 3.0",
-      "url": "https://www.producthunt.com/products/kudos-smart-wallet",
-      "source": "Product Hunt",
-      "blurb": "The AI that finds money you're missing and gets it back Discussion | Link",
+      "title": "UC Hungry For Funds Again, DailyObjects’ D2C Playbook & More",
+      "url": "https://inc42.com/buzz/uc-hungry-for-funds-again-dailyobjects-d2c-playbook-more/",
+      "source": "Inc42",
+      "blurb": "UC Taps Public Markets Again for Funds Urban Company is hungry for more cash. Despite sitting on over hundreds of…",
       "signal": "",
       "discussion_url": ""
     }

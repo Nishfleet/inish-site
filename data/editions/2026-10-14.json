@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-14",
+  "candidate_count": 428,
+  "editor_note": "The day's biggest story is a fall. Character.AI, once one of the largest consumer AI apps, filed for bankruptcy. Google put its frontier model Gemini 4 Argon on sale to everyone, but a company announcement cannot lead, so it runs second. I opened every source I kept. A few aggregator and wire links would not render, so I used the outlets that did.",
+  "stories": [
+    {
+      "title": "Character.AI files for Chapter 11, and Disney will buy some of its assets for $20 million",
+      "url": "https://techcrunch.com/2026/10/13/just-5-years-in-interactive-chatbot-platform-character-ai-files-for-bankruptcy/",
+      "evidence_url": "https://techcrunch.com/2026/10/13/just-5-years-in-interactive-chatbot-platform-character-ai-files-for-bankruptcy/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Character.AI, the app where people build AI characters and chat with them, has filed for Chapter 11 bankruptcy. It agreed to sell some assets to Disney for $20 million and to license its technology to Disney permanently and non-exclusively. The company has no bidder for itself yet, and says that if none appears the platform will be wound down.",
+      "fact": "The court filing lists assets and liabilities between $50 million and $100 million, and the company has raised over $193 million from investors including a16z and Lightspeed.",
+      "take": "I have watched consumer AI apps burn cash with every active user. Disney paying $20 million for parts of this one tells me the bill has arrived, so I would not build a business whose costs rise with engagement.",
+      "caveat": "No buyer has bid yet, and the process may end with the platform shut down. The $20 million Disney deal covers some assets and a license, not the company."
+    },
+    {
+      "title": "Google puts Gemini 4 Argon on sale to everyone at $2 per million input tokens",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "evidence_url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "source": "Google DeepMind",
+      "section": "AI",
+      "summary": "Google's newest frontier model, Gemini 4 Argon, is now open to all developers, enterprises, and consumers. It handles a million tokens of context, tokens being the chunks of text a model charges by, which is about the length of several books. Google says it leads the Vals Index, a benchmark built from finance, legal, coding, and tax work. It is reachable through the Gemini app, AI Studio, and Google's agent tool Antigravity.",
+      "fact": "Argon launches at an introductory price of $2 per million input tokens and $10 per million output tokens, with cached input tokens at 95% off.",
+      "take": "I now price every model against this one. At $2 and $10 per million tokens, a serious coding or research workload I would have rationed a month ago is affordable, so I would move that work onto it.",
+      "caveat": "The benchmark ranking and the price are Google's own, and the price is introductory. Google showed Argon to trusted testers in September, so today's news is general availability."
+    },
+    {
+      "title": "An OpenAI engineer is charged with hiding a recorder in an executive conference room",
+      "url": "https://sfstandard.com/2026/10/13/openai-engineer-arrested-alleged-bugging-executive-conference-room/",
+      "evidence_url": "https://sfstandard.com/2026/10/13/openai-engineer-arrested-alleged-bugging-executive-conference-room/",
+      "source": "The San Francisco Standard",
+      "section": "AI",
+      "summary": "Federal prosecutors say Abdulrahman Alfozan, a 35-year-old OpenAI engineer, hid an audio recorder behind a television in an executive conference room and left a second one in an unattended bag. The recorder was found on September 30, wrapped in toilet paper and plugged into a USB port, with its contents encrypted. Prosecutors describe the case as a matter of national security.",
+      "fact": "Alfozan, a Saudi national who joined OpenAI in July 2025, faces up to five years in prison and a $250,000 fine if convicted of intercepting oral communications.",
+      "take": "I would treat any AI lab's meeting rooms as a counterintelligence problem now. The complaint says the room hosted product plans and government work, so I would assume an engineer with that access is a target.",
+      "caveat": "These are allegations in a federal complaint, and the case is at its first court appearance. Alfozan has not been convicted, and the device's contents have not been described publicly."
+    },
+    {
+      "title": "Anthropic warns small AI models may soon copy themselves onto smart home devices",
+      "url": "https://www.bleepingcomputer.com/news/security/anthropic-warns-self-replicating-ai-could-spread-to-your-smart-devices/",
+      "evidence_url": "https://www.bleepingcomputer.com/news/security/anthropic-warns-self-replicating-ai-could-spread-to-your-smart-devices/",
+      "source": "BleepingComputer",
+      "section": "AI",
+      "summary": "Anthropic ran experiments where AI models found unfamiliar devices, joined them into a network, and set them up to run another AI model. It spread the Gemma4-26B-A4B model across 15 cheap Android TV boxes. Anthropic says models of 30 billion parameters or fewer, parameters being the internal settings that set a model's size, could be capable enough to copy themselves onto consumer devices such as smart ovens by the end of the year.",
+      "fact": "One model, Qwen3.5-9B, installed and configured the software needed to run another model on eight of nine hardware types, and its success rate rose from 45% to 84% across generations.",
+      "take": "I care because a botnet that runs AI models has no single switch to turn off. My smart home gear is old and cheap, so I would rather the industry fix this before the doubling time gets short.",
+      "caveat": "The experiment used devices with an unprotected debugging channel open, which real products would normally block. Anthropic did not show a worm that spreads on its own."
+    },
+    {
+      "title": "Pluto Security raises $42 million to fix the AI risks hiding in vibe-coded tools",
+      "url": "https://techcrunch.com/2026/10/13/pluto-security-raises-42m-as-ai-gives-enterprise-security-teams-a-new-headache/",
+      "evidence_url": "https://techcrunch.com/2026/10/13/pluto-security-raises-42m-as-ai-gives-enterprise-security-teams-a-new-headache/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "Pluto Security has raised $42 million for software that finds security holes in AI-built tools. It says about 60% of the risks it finds sit in apps written by people who are not developers, the kind produced by vibe coding, where a person describes an app and a model writes it. The company has $2 million in yearly recurring revenue and 30 enterprise customers.",
+      "fact": "The company says 30 enterprise customers pay it $2 million a year, and that roughly 60% of the vulnerabilities it finds come from tools built by non-developers.",
+      "take": "I let agents write a lot of code, and I have no real way to audit it. If a security vendor can charge enterprises to scan that output, then scanning AI-written code is a budget line, and I should expect one in my own stack.",
+      "caveat": "The $42 million and the 60% figure are the company's own numbers, told to TechCrunch. The article names no customer and shows no audit that another firm repeated."
+    },
+    {
+      "title": "Germany would lose €155 billion a year if AI training data gets harder to use, ifo says",
+      "url": "https://www.livemint.com/technology/tighter-ai-data-access-could-cost-germany-155-billion-a-year-ifo-says-11791917667848.html",
+      "evidence_url": "https://www.livemint.com/technology/tighter-ai-data-access-could-cost-germany-155-billion-a-year-ifo-says-11791917667848.html",
+      "source": "Reuters, via Mint",
+      "section": "Demand signals",
+      "summary": "The ifo institute, a German economic research group, estimates Germany would lose €155 billion of yearly output if access to AI training data is tightened. It breaks the loss into slower adoption, weaker models, less research, and less AI development inside Europe. The authors ask lawmakers to keep the EU rule that lets companies mine text and data for commercial use.",
+      "fact": "ifo puts the yearly loss at €155 billion ($173.43 billion), and says generative AI could otherwise add €440 billion a year to Germany's economy by 2034.",
+      "take": "I read this as Europe pricing its own caution. Rules that make training data harder to reach do not stop AI, they move the models somewhere else, so I would expect European buyers to end up renting American or Chinese models.",
+      "caveat": "This is a model calculation from one institute, not a measured loss, and it assumes a tightening of the rules that has not happened. The figure is an estimate of what could be lost."
+    },
+    {
+      "title": "Apple's HomeView smart display costs $299, and it will not be sold in the EU",
+      "url": "https://www.apple.com/newsroom/2026/10/meet-apple-homeview-a-new-way-to-enjoy-entertainment-and-manage-the-home/",
+      "evidence_url": "https://www.apple.com/newsroom/2026/10/meet-apple-homeview-a-new-way-to-enjoy-entertainment-and-manage-the-home/",
+      "source": "Apple",
+      "section": "Product ideas",
+      "summary": "Apple has announced HomeView, a 7-inch touchscreen on a speaker base for the kitchen or hallway. It recognizes each person's face and shows their messages, calendar, and music, and it runs the new Siri AI. Pre-orders opened on October 13 and it ships on November 13. Apple will not sell it in the European Union because Siri AI is not available there.",
+      "fact": "HomeView costs $299 in the US and the wall-mounted version also starts at $299, with Schneider Home mounts from $59.95, and Apple says it will not sell the device in the European Union.",
+      "take": "I want the personalization and I would buy one for my kitchen. The part I will watch is Apple shipping a hardware product without its largest regulated market, which tells me EU rules now shape what a device can even be sold with.",
+      "caveat": "The face recognition and Siri AI claims are Apple's own. It is a first-generation device, and no independent reviewer has tested it yet."
+    },
+    {
+      "title": "A startup has a benchtop fusion device and plans to sell the rare fuel it makes",
+      "url": "https://techcrunch.com/2026/10/13/cambridge-heavy-industries-has-been-quietly-building-a-desktop-fusion-device/",
+      "evidence_url": "https://techcrunch.com/2026/10/13/cambridge-heavy-industries-has-been-quietly-building-a-desktop-fusion-device/",
+      "source": "TechCrunch",
+      "section": "Wildcard",
+      "summary": "Cambridge Heavy Industries, working from a small lab near MIT, showed TechCrunch a fusion device that fits on a tabletop. It uses two lasers to compress a fuel pellet and can fire 50 to 80 shots a day, which lets it test designs fast. The company plans to make tritium, a rare hydrogen fuel, while it works toward a power plant about a decade away.",
+      "fact": "The startup raised a $6.2 million seed round led by Azolla Ventures. Tritium sells for about $30,000 a gram, only about 40 kilograms exist, and one study predicts a 28-kilogram shortfall by 2054.",
+      "take": "I like businesses that sell the pickaxes. Every fusion design needs tritium and almost nobody can make it, so I would rather own the fuel supply than bet on one reactor winning.",
+      "caveat": "The device has not produced net energy, and a power plant is roughly ten years out. TechCrunch had the only look, and no independent measurement of the reactor was published."
+    }
+  ]
+}
