@@ -1,5 +1,3 @@
-"""sources.json is the one place a site is added; it must load and be consistent."""
-
 import json
 import tempfile
 import unittest

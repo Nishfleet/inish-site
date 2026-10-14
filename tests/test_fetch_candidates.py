@@ -1,5 +1,3 @@
-"""Feed parsing for the candidate fetcher, fed real-shaped payloads offline."""
-
 import io
 import sys
 import unittest
@@ -10,7 +8,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from inish_daily import fetch_candidates  # noqa: E402
 
-# Shape of https://www.reddit.com/r/<sub>/top/.rss: Atom, body in <content>, no <summary>.
 REDDIT_ATOM = b"""<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <entry>
@@ -22,7 +19,6 @@ REDDIT_ATOM = b"""<?xml version="1.0" encoding="UTF-8"?>
 </feed>
 """
 
-# Plain Atom with <summary> must keep working.
 SUMMARY_ATOM = b"""<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <entry>
