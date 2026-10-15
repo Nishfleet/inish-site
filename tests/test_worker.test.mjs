@@ -182,3 +182,12 @@ test("the committed site has every file the worker serves", () => {
   assert.ok(existsSync(join(ROOT, "public", "daily", "index.html")));
   assert.ok(existsSync(join(ROOT, "public", "404.html")));
 });
+
+test("HTML is marked no-transform so the edge injects no third-party script into the page", async () => {
+  for (const url of [DAILY, "https://nish.sh/daily/", "https://nish.sh/daily/missing"]) {
+    const { response } = await call(url);
+    assert.match(response.headers.get("Cache-Control"), /(^|, )no-transform$/, url);
+  }
+  const { response } = await call("https://nish.sh/daily/styles.css");
+  assert.doesNotMatch(response.headers.get("Cache-Control") ?? "", /no-transform/);
+});
