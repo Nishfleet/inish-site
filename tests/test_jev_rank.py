@@ -420,7 +420,7 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
         loaders = {**self.loaders(pool), "collect_interests": lambda: (
             ["owner/repo: a tool"],
             [{"id": "github-stars", "name": "GitHub stars", "count": 1, "error": None}],
-            ["interests: x-likes skipped, X_BEARER_TOKEN is not set"],
+            ["interests: x-posts: RuntimeError: no public X reader answered (empty)"],
         )}
         env = {**os.environ, "TYPESAFE_API_KEY": "test-key"}
         with mock.patch.object(jev_rank, "rank", side_effect=rank):
@@ -428,7 +428,7 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(seen["interests"], ["owner/repo: a tool"])
         self.assertEqual(payload["interests"]["lines"], ["owner/repo: a tool"])
-        self.assertIn("interests: x-likes skipped, X_BEARER_TOKEN is not set", payload["source_errors"])
+        self.assertIn("interests: x-posts: RuntimeError: no public X reader answered (empty)", payload["source_errors"])
 
     def test_an_empty_pool_with_a_key_says_why_ranked_by_is_null(self):
         env = {**os.environ, "TYPESAFE_API_KEY": "test-key"}
