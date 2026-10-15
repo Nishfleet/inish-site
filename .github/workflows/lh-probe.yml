@@ -9,30 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Fetch the config
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          repository: Nishfleet/fleet-ops
-          ref: main
-          path: fleet-ops
-          sparse-checkout: config/lighthouserc.json
-          persist-credentials: false
-      - uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
-        continue-on-error: true
-        with:
-          urls: https://nish.sh/daily
-          runs: 5
-          configPath: ./fleet-ops/config/lighthouserc.json
-          uploadArtifacts: false
-          temporaryPublicStorage: false
-      - name: Dump
+          node-version: "24"
+      - name: Gather
         run: |
-          python3 - <<'PY'
-          import json,glob
-          for f in sorted(glob.glob('.lighthouseci/lhr-*.json')):
-              d=json.load(open(f)); a=d['audits']
-              m=a['metrics']['details']['items'][0]
-              print(f, 'LH',d['lighthouseVersion'],'LCP',round(a['largest-contentful-paint']['numericValue']),'FCP',round(a['first-contentful-paint']['numericValue']),'TTFB',m.get('timeToFirstByte'),'obsLCP',m.get('observedLargestContentfulPaint'),'obsFCP',m.get('observedFirstContentfulPaint'),'srv',round(a['server-response-time']['numericValue']),'bench',d['environment'].get('benchmarkIndex'), d['environment'].get('hostUserAgent'))
-              for it in a['network-requests']['details']['items']:
-                  print('   ',it['url'][-45:],it['protocol'],it['transferSize'],round(it['networkRequestTime']),round(it['networkEndTime']),it.get('priority'))
-          PY
+          for i in 1 2 3; do
+            npx --yes lighthouse@12.6.1 https://nish.sh/daily --chrome-flags="--headless=new --no-sandbox" --only-categories=performance -G -A=./art$i --output=json --output-path=./out$i.json --quiet || true
+          done
+          ls -la
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: probe
+          path: |
+            art*/
+            out*.json
