@@ -16,7 +16,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from inish_daily import jev_rank
+from inish_daily import interests, jev_rank
 
 ROOT = Path(__file__).resolve().parents[1]
 USER_AGENT = "the-daily/1.0 (+https://nish.sh/daily)"
@@ -293,6 +293,10 @@ def load_source(source: dict, day: dt.date, skip: list[str] | None = None) -> li
     return items
 
 
+def collect_interests() -> tuple[list[str], list[dict], list[str]]:
+    return interests.collect()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=dt.date.today().isoformat())
@@ -321,6 +325,9 @@ def main() -> int:
             errors.append(f"{source['id']}: {type(exc).__name__}: {exc}")
             report.append({"id": source["id"], "name": source["name"], "group": source["group"], "count": 0, "error": type(exc).__name__})
 
+    taste, taste_report, taste_errors = collect_interests()
+    errors.extend(taste_errors)
+
     ranked_by = None
     jev_key = os.environ.get("TYPESAFE_API_KEY")
     if not jev_key:
@@ -332,6 +339,7 @@ def main() -> int:
             ranked = jev_rank.rank(
                 candidates, day.isoformat(), jev_key,
                 fetch_page=functools.partial(jev_rank.page_text, agent=BROWSER_AGENT),
+                interests=taste,
             )
             ranked_by = ranked[0]["jev"]["model"]
             candidates = ranked
@@ -355,6 +363,7 @@ def main() -> int:
         "source_errors": errors,
         "sources": report,
         "ranked_by": ranked_by,
+        "interests": {"signals": taste_report, "lines": taste},
         "candidates": candidates,
     }
     output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
@@ -362,6 +371,7 @@ def main() -> int:
     print(f"candidates={len(candidates)} by_class={by_class}")
     print(f"by_lens={by_lens} source_errors={len(errors)}")
     print(f"ranked_by={ranked_by}")
+    print(f"interests={len(taste)}")
     print(next((error[:300] for error in errors if error.startswith("jev:")), "jev: ok"))
     return 0 if candidates else 1
 

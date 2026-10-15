@@ -84,6 +84,7 @@ class SourcesFileTests(unittest.TestCase):
         with mock.patch.dict(os.environ, env, clear=True), \
                 mock.patch.object(fc, "load_sources", lambda: json.loads(path.read_text())), \
                 mock.patch.object(fc, "ROOT", tmp), \
+                mock.patch.object(fc, "collect_interests", lambda: ([], [], [])), \
                 mock.patch.object(sys, "argv", ["fetch_candidates", "--date", "2026-10-10"]), \
                 mock.patch.object(fc, "feed", return_value=[{"title": "t", "url": "https://a.example/t", "evidence_class": "independent", "lens": "AI", "source": "A"}]):
             self.assertEqual(fc.main(), 0)

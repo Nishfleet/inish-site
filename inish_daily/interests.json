@@ -1,0 +1,7 @@
+{
+  "_comment": "Where Nish's own taste is read from: things he recently starred, liked or saved. Jev ranks stories on these topics higher. types: github_stars (user), x_likes (user; needs X_BEARER_TOKEN in the environment). An empty user switches a signal off.",
+  "signals": [
+    {"id": "github-stars", "name": "GitHub stars", "type": "github_stars", "user": "nish3451", "limit": 15},
+    {"id": "x-likes", "name": "X likes", "type": "x_likes", "user": "", "limit": 25}
+  ]
+}
