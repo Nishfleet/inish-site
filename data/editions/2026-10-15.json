@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-15",
+  "candidate_count": 428,
+  "editor_note": "I opened 12 of the 428 candidate pages and kept 7. OpenAI's newsroom blocked two stories I could not verify anywhere else, Higgsfield's longer AI videos and Asana's cheaper browser agent, so both sit out. Meta's Muse Wonder ran on Monday. Modal's Axios exclusive was unreadable, so it runs on SiliconANGLE's report. CTech put Zenzap's round at $33 million against TechCrunch's $44 million.",
+  "stories": [
+    {
+      "title": "Modal raises $750 million at $15.75 billion as its revenue more than triples in five months",
+      "url": "https://siliconangle.com/2026/10/14/ai-cloud-startup-modal-raises-750m-at-15-75b-valuation/",
+      "evidence_url": "https://siliconangle.com/2026/10/14/ai-cloud-startup-modal-raises-750m-at-15-75b-valuation/",
+      "source": "SiliconANGLE",
+      "section": "Demand signals",
+      "summary": "Modal sells the computing layer under AI products: it rents out GPU clusters, the chips that train and run models, and hosted containers, isolated bundles that run the code AI agents write. It has raised $750 million in a Series D led by Accel, with Kleiner Perkins joining. The company is now valued at $15.75 billion, more than triple its May price, and says annualized revenue has more than tripled since May to over $1 billion, with nearly a third coming from Sandboxes, its service for hosting agents.",
+      "fact": "Accel led Modal's $750 million Series D at a $15.75 billion valuation, and Modal says annualized revenue more than tripled since May to over $1 billion, with nearly a third coming from its Sandboxes service.",
+      "take": "Modal's revenue tripling in five months tells me companies are past experimenting and are paying real money to run agents. I would keep building for the teams spending that money, and I would not bet against infrastructure this year.",
+      "caveat": "The revenue and valuation figures are the company's own, reported by SiliconANGLE. A tripling valuation on a $1 billion run rate prices in years of growth going right."
+    },
+    {
+      "title": "Google's cheap Gemini 4 Argon price doubles on December 1",
+      "url": "https://simonwillison.net/2026/Oct/13/llm-gemini/",
+      "evidence_url": "https://simonwillison.net/2026/Oct/13/llm-gemini/",
+      "source": "Simon Willison's Weblog",
+      "section": "AI",
+      "summary": "Yesterday's edition covered Google putting its frontier model Gemini 4 Argon on general sale. Developer Simon Willison read the launch terms closely and found the catch: the $2 and $10 launch price per million tokens, the chunks of text a model charges by, doubles on December 1. He also cites Artificial Analysis, which measured $2,407 to run its full benchmark suite on Argon, close to GLM-5.3 and well under what OpenAI, Anthropic, and Meta's latest models cost.",
+      "fact": "At launch Argon costs $2 per million input tokens and $10 per million output tokens, the same as GPT-6 Sol, half of Claude Opus 5.5, and one fifth of GPT-6 Astra, and the price doubles on December 1, 2026.",
+      "take": "I would point new AI workloads at Argon now and enjoy the cheap months while they last. A seller doubling the price six weeks after launch is telling me the demand is real, which is worth as much as the benchmark charts.",
+      "caveat": "The doubling is a launch term one independent developer highlighted, and benchmark running costs measure his test suite, not your workload. Yesterday's edition covered the launch itself."
+    },
+    {
+      "title": "Scimplify raises $25 million to move chemical production out of China's grip with AI",
+      "url": "https://techcrunch.com/2026/10/14/scimplify-raises-25m-to-challenge-chinas-grip-on-critical-materials-with-ai/",
+      "evidence_url": "https://techcrunch.com/2026/10/14/scimplify-raises-25m-to-challenge-chinas-grip-on-critical-materials-with-ai/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "Specialty chemicals, the refined ingredients behind chips, defense gear, and energy equipment, are mostly made in China, and Western buyers want other options. Bengaluru startup Scimplify, founded in 2023, uses AI to plan production routes and coordinate more than 500 partner factories, 90 percent of them in India. It raised $25 million led by Hitachi Ventures at a $250 million valuation, with customers Henkel and Teknor Apex joining the round.",
+      "fact": "Scimplify says its annualized revenue run rate tripled to about $200 million, its US revenue grew sixfold to $60 million, and in some cases it delivers finished chemicals in two months where the typical wait is 12 to 18 months.",
+      "take": "Scimplify is the pattern I look for: AI selling into a physical industry where one country controls supply and buyers are frightened. If chemistry coordination works here, the same play exists in other supplier-concentrated categories.",
+      "caveat": "The revenue and timeline figures are the founder's own, given in a TechCrunch interview. The round is strategic, with two customers investing, which flatters the valuation."
+    },
+    {
+      "title": "An AI called 848 San Francisco businesses: 1 in 3 kept talking, 1 in 25 had an AI answering",
+      "url": "https://voygr.tech/blog/does-sf-talk-to-ai/",
+      "evidence_url": "https://voygr.tech/blog/does-sf-talk-to-ai/",
+      "source": "VOYGR",
+      "section": "Demand signals",
+      "summary": "During San Francisco Tech Week, startup VOYGR gave an AI a phone and had it call local businesses during working hours: vets, dentists, bars, cafes, salons. The caller said it was an AI, then asked one sensible question, like whether a dentist is taking new patients. It reached 848 businesses. Two thirds hung up, usually within about five seconds and without arguing. One business in 25 already had an AI answering the phone, and two of those asked the caller to say zebra to prove it was human.",
+      "fact": "Of 848 businesses called, 1 in 3 kept talking after hearing it was an AI, vets at 79 percent and dentists at 61 percent were most receptive, bars and dry cleaners at 20 percent least, and 1 in 25 already had an AI answering.",
+      "take": "Two thirds of businesses hanging up tells me voice agents still fail the trust test on a random phone line. The 1 in 25 with AI receptionists is the number I would watch, and vets answering at 79 percent shows front desks adapt first.",
+      "caveat": "This is VOYGR's own experiment and it sells calling tools, so read it as marketing with a public map. One city and one week, and the businesses reached all have front desks."
+    },
+    {
+      "title": "Zenzap raises $44 million to replace WhatsApp at work, with Starbucks and Taco Bell on board",
+      "url": "https://techcrunch.com/2026/10/14/zenzap-raises-44m-for-its-ai-chat-app-that-aims-to-replace-whatsapp-in-the-workplace/",
+      "evidence_url": "https://techcrunch.com/2026/10/14/zenzap-raises-44m-for-its-ai-chat-app-that-aims-to-replace-whatsapp-in-the-workplace/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Restaurants, retail chains, and clinics run their daily coordination on WhatsApp, which breaks IT and security rules in any workplace. Zenzap is a work messenger built for those frontline staff, with AI search across the workspace, messages that turn into tasks, voice notes, and agents for workflow automation. It raised $44 million from Bessemer, Lightspeed, and The Garage, the founder's first outside funding. Paid plans start at $51 per month for up to 20 users, with AI extras sold on a credit system.",
+      "fact": "Zenzap raised $44 million from Bessemer, Lightspeed, and The Garage, charges from $51 per month for up to 20 users, and lists FedEx, Taco Bell, and Starbucks among its customers.",
+      "take": "Zenzap is a reminder that plain compliance features sell when the alternative is staff swapping customer details in a group chat. I would price simple tools for frontline teams higher than instinct suggests, and sell them without a sales team.",
+      "caveat": "The customer list is the company's claim, and CTech reported the same round as $33 million against TechCrunch's $44 million. Slack and Teams still own the desk."
+    },
+    {
+      "title": "NVIDIA's Nemotron 3.5 Lightning is free on Vercel's AI Gateway, with a 1 million token context",
+      "url": "https://vercel.com/changelog/nemotron-3-5-lightning-now-available-on-ai-gateway-for-free",
+      "evidence_url": "https://vercel.com/changelog/nemotron-3-5-lightning-now-available-on-ai-gateway-for-free",
+      "source": "Vercel",
+      "section": "Tools",
+      "summary": "Vercel's AI Gateway, a service that routes AI requests for apps and coding agents, now offers NVIDIA's Nemotron 3.5 Lightning at no cost. The model is open-weight, meaning anyone can inspect and run it, with 30 billion parameters of which 3 billion activate per token, a design that keeps responses fast and cheap. It reads a 1 million token context window and handles tool calling and structured outputs, and coding agents like Claude Code and Cursor can use it after a one-line setup.",
+      "fact": "nvidia/nemotron-3.5-lightning-free runs on Vercel's AI Gateway at no cost, served by NVIDIA, with 30 billion parameters, 3 billion active per token, and a 1 million token context window.",
+      "take": "Free is the right price for the draft work my agents do, summarizing and classifying, so I would route those calls to Nemotron before paying per token. I would keep client data away, because NVIDIA may retain prompts.",
+      "caveat": "Free models carry rate limits and can be withdrawn, and NVIDIA may retain prompts for improvement, which rules out private code. The changelog is Vercel selling its gateway."
+    },
+    {
+      "title": "Apate's AI agents get scammed on purpose, and have wasted 17 years of fraudsters' time",
+      "url": "https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/",
+      "evidence_url": "https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/",
+      "source": "TechCrunch",
+      "section": "Wildcard",
+      "summary": "Apate, an Australian startup founded in 2024 out of Macquarie University research, fights fraud by getting scammed. It runs thousands of AI agents posing as likely victims: they answer scam calls, reply to phishing messages, follow links, and join fraudsters' groups, speaking in different accents, ages, and languages. The goal is to keep scammers busy and to collect what banks and phone companies usually learn only after a real victim pays: bank accounts, crypto wallets, numbers, and the websites the scams run on.",
+      "fact": "Apate says its agents have held 2.5 million conversations with scammers and wasted 17 years of their time, and the FBI logged more than 22,000 AI-related crime complaints with about $893 million in losses in 2025.",
+      "take": "I like Apate's inversion: fight automation with automation instead of warning people harder. If scammers must talk to machines all day, the cost of running a scam operation stops being near zero, and that changes the maths.",
+      "caveat": "The 17 years figure is the company's own, and how often its intelligence actually blocks a scam is not published. Apate is pitching judges at TechCrunch Disrupt this week, so the coverage is friendly."
+    }
+  ]
+}
