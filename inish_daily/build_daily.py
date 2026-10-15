@@ -575,9 +575,10 @@ def page(front: dict) -> str:
         wire = f'\n      <aside id="wire" class="wire" aria-label="Most talked about"><h2 class="label">Most talked about</h2><ol>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ol></aside>'
     strip = ""
     if front["sections"]:
-        links = ['<a href="#picks">Top stories</a>'] if picks else []
+        anchors = ['<a href="#picks">Top stories</a>'] if picks else []
         if wire:
-            links.append('<a href="#wire">Talked about</a>')
+            anchors.append('<a href="#wire">Talked about</a>')
+        links = [f'<span>{"".join(anchors)}</span>'] if anchors else []
         links += [f'<a href="#s-{esc(section["id"])}">{esc(section["label"])}</a>' for section in front["sections"]]
         strip = f'\n    <nav class="strip" aria-label="Sections"><div>{"".join(links)}</div></nav>'
     updated = updated_label(front.get("generated_at", ""))
