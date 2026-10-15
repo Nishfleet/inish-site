@@ -476,9 +476,38 @@ def item_view(item: dict) -> dict:
     return {key: item.get(key, "") for key in ("title", "url", "source", "blurb", "signal", "discussion_url")}
 
 
+SENTENCE_BREAK = re.compile(r"(?<=[.!?])[\"”’)]?\s+(?=[A-Z0-9“\"(])")
+ABBREVIATIONS = {"inc", "ltd", "co", "corp", "dr", "mr", "mrs", "ms", "st", "vs", "no", "fig", "jr", "sr", "e.g", "i.e", "u.s", "u.k"}
+PICK_SUMMARY_CHARS = 170
+SHORT_SENTENCE_CHARS = 80
+
+
+def sentences(text: str) -> list[str]:
+    parts: list[str] = []
+    start = 0
+    for match in SENTENCE_BREAK.finditer(text):
+        head = text[start:match.start()]
+        last = head.rstrip(".!?\"”’)").rsplit(" ", 1)[-1].lower()
+        if len(last) == 1 or last in ABBREVIATIONS or re.fullmatch(r"(?:[a-z]\.)+[a-z]?", last):
+            continue
+        parts.append(head)
+        start = match.end()
+    parts.append(text[start:])
+    return [part for part in parts if part]
+
+
+def pick_summary(text: str) -> str:
+    parts = sentences(text)
+    first = parts[0]
+    if len(first) < SHORT_SENTENCE_CHARS and len(parts) > 1 and len(first) + 1 + len(parts[1]) <= PICK_SUMMARY_CHARS:
+        return f"{first} {parts[1]}"
+    return first
+
+
 def story_card(story: dict, index: int, prominence: str) -> str:
     heading = "h2" if prominence == "lead" else "h3"
     notes = ""
+    summary = story["summary"] if prominence == "lead" or index == 2 else pick_summary(story["summary"])
     if prominence == "lead":
         notes = f"""
           <div class="notes">
@@ -489,7 +518,7 @@ def story_card(story: dict, index: int, prominence: str) -> str:
         <article class="story story-{esc(prominence)}">
           <p class="kicker">{esc(story['section'])} <span>{esc(story['source'])}</span></p>
           <{heading}><a href="{esc(story['url'])}" rel="noopener noreferrer">{esc(story['title'])}</a></{heading}>
-          <p class="summary">{esc(story['summary'])}</p>{notes}
+          <p class="summary">{esc(summary)}</p>{notes}
         </article>"""
 
 
@@ -531,7 +560,7 @@ def page(front: dict) -> str:
         picks = ""
         if len(stories) > 1:
             cards = "".join(story_card(story, index, "pick") for index, story in enumerate(stories[1:], 2))
-            picks = f'\n      <section id="picks" class="picks" aria-label="More picks"><h2 class="label">More stories</h2>{cards}</section>'
+            picks = f'\n      <section id="picks" class="picks" aria-label="Top stories"><h2 class="label">Top stories</h2><div class="pick-grid">{cards}\n      </div></section>'
     else:
         lead = '<section id="lead" class="lead quiet"><h2>Nothing cleared the bar today</h2><p>Every candidate was a launch post, a repost, or something I could not check. The lists below are still worth a look.</p></section>'
         picks = ""
@@ -547,7 +576,7 @@ def page(front: dict) -> str:
         strip = f'\n    <nav class="strip" aria-label="Sections">{links}</nav>'
     wire = ""
     if front["wire"]:
-        wire = f'\n    <aside id="wire" class="wire" aria-label="Wire"><h2 class="label">Most talked about</h2><ol>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ol></aside>'
+        wire = f'\n      <aside id="wire" class="wire" aria-label="Most talked about"><h2 class="label">Most talked about</h2><ol>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ol></aside>'
     updated = updated_label(front.get("generated_at", ""))
     stamp = f'<time datetime="{esc(front["date"])}">{esc(edition_date_label(date))}</time>'
     if updated:
@@ -565,7 +594,7 @@ def page(front: dict) -> str:
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
   <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f6f2ea">
+  <meta name="theme-color" content="#f5f0e7">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
@@ -578,7 +607,9 @@ def page(front: dict) -> str:
       <p class="tagline">AI, dev, product and startup news, checked against the sources.</p>
     </header>{strip}
     <main class="layout">
-      {lead}{picks}{wire}
+      <div class="front">
+      {lead}{wire}
+      </div>{picks}
     </main>{cards_html}
     <footer><a class="footmark" href="/daily">{SITE_NAME}</a><span class="feeds"><a href="{SITE_URL}/latest.json">JSON</a><a class="pill" href="{SITE_URL}/feed.xml">Subscribe</a></span></footer>
   </div>
