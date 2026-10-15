@@ -11,6 +11,10 @@ import {
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
   headers.set("Strict-Transport-Security", hstsHeader);
+  if ((headers.get("Content-Type") ?? "").startsWith("text/html")) {
+    const control = headers.get("Cache-Control") ?? "public, max-age=0, must-revalidate";
+    if (!/\bno-transform\b/i.test(control)) headers.set("Cache-Control", `${control}, no-transform`);
+  }
   const styleHashes = headers.get(styleHashesHeader);
   headers.delete(styleHashesHeader);
   for (const [name, value] of securityHeaders) {
