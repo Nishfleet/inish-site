@@ -12,7 +12,7 @@ class LoadTests(unittest.TestCase):
     def test_the_committed_file_is_valid(self):
         ids = [signal["id"] for signal in interests.load()]
         self.assertIn("github-stars", ids)
-        self.assertIn("x-likes", ids)
+        self.assertIn("x-posts", ids)
 
     def test_rejects_an_unknown_type(self):
         with mock.patch.object(Path, "read_text", return_value='{"signals": [{"id": "a", "name": "A", "type": "myspace", "user": "x"}]}'):
@@ -22,7 +22,7 @@ class LoadTests(unittest.TestCase):
 
 class CollectTests(unittest.TestCase):
     STARS = {"id": "github-stars", "name": "GitHub stars", "type": "github_stars", "user": "nish3451", "limit": 2}
-    LIKES = {"id": "x-likes", "name": "X likes", "type": "x_likes", "user": "nish", "limit": 2}
+    LIKES = {"id": "x-posts", "name": "X posts", "type": "x_posts", "user": "nish", "limit": 2}
 
     def test_an_empty_user_is_switched_off(self):
         lines, report, errors = interests.collect([{**self.LIKES, "user": ""}], env={})
@@ -36,9 +36,9 @@ class CollectTests(unittest.TestCase):
 
     def test_a_failing_signal_does_not_stop_the_others(self):
         with mock.patch.object(interests, "github_stars", side_effect=OSError("down")), \
-                mock.patch.object(interests, "x_likes", return_value=["a liked post"]):
+                mock.patch.object(interests, "x_posts", return_value=["a post"]):
             lines, report, errors = interests.collect([self.STARS, self.LIKES], env={"X_BEARER_TOKEN": "t"})
-        self.assertEqual(lines, ["a liked post"])
+        self.assertEqual(lines, ["a post"])
         self.assertEqual([r["error"] for r in report], ["OSError", None])
         self.assertEqual(errors, ["interests: github-stars: OSError"])
 
@@ -49,8 +49,8 @@ class CollectTests(unittest.TestCase):
         self.assertEqual(len(lines), interests.MAX_LINES)
 
 
-class XLikesTests(unittest.TestCase):
-    def test_reads_liked_posts_with_their_link_titles(self):
+class XPostsTests(unittest.TestCase):
+    def test_reads_his_posts_with_their_link_titles(self):
         calls = []
 
         def get(path, token):
@@ -63,10 +63,10 @@ class XLikesTests(unittest.TestCase):
                 {"text": "dropped by the limit"},
             ]}
 
-        lines = interests.x_likes("nish", 2, "t", get=get)
+        lines = interests.x_posts("nish", 2, "t", get=get)
         self.assertEqual(lines, ["this is wild A launch", "plain post"])
         self.assertEqual(calls[0], ("users/by/username/nish", "t"))
-        self.assertTrue(calls[1][0].startswith("users/42/liked_tweets?max_results=5"))
+        self.assertTrue(calls[1][0].startswith("users/42/tweets?max_results=5"))
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ import urllib.request
 from pathlib import Path
 
 INTERESTS_FILE = Path(__file__).with_name("interests.json")
-SIGNAL_TYPES = ("github_stars", "x_likes")
+SIGNAL_TYPES = ("github_stars", "x_posts")
 X_API = "https://api.x.com/2"
 LINE_CHARS = 160
 MAX_LINES = 40
@@ -51,10 +51,10 @@ def x_get(path: str, token: str) -> dict:
         return json.load(response)
 
 
-def x_likes(user: str, limit: int, token: str, get=x_get) -> list[str]:
+def x_posts(user: str, limit: int, token: str, get=x_get) -> list[str]:
     account = get(f"users/by/username/{urllib.parse.quote(user)}", token)["data"]["id"]
     count = max(5, min(limit, 100))
-    payload = get(f"users/{account}/liked_tweets?max_results={count}&tweet.fields=entities", token)
+    payload = get(f"users/{account}/tweets?max_results={count}&tweet.fields=entities", token)
     lines = []
     for post in payload.get("data") or []:
         links = [u.get("title") or u.get("expanded_url") or "" for u in (post.get("entities") or {}).get("urls") or []]
@@ -78,7 +78,7 @@ def collect(signals: list[dict] | None = None, env=os.environ) -> tuple[list[str
                 report.append({"id": signal["id"], "name": signal["name"], "count": 0, "error": "no key"})
                 continue
             else:
-                found = x_likes(user, limit, env["X_BEARER_TOKEN"])
+                found = x_posts(user, limit, env["X_BEARER_TOKEN"])
         except Exception as exc:
             errors.append(f"interests: {signal['id']}: {type(exc).__name__}")
             report.append({"id": signal["id"], "name": signal["name"], "count": 0, "error": type(exc).__name__})
