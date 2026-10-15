@@ -61,7 +61,7 @@ Prefer a named, checkable source for a claim: "Bessemer, tracking 200+ AI vendor
 - **Product ideas** — Product Hunt, Show HN, and r/SaaS. What people are launching, and what founders say they will pay for.
 - **Tools** — Hacker News, Lobsters, GitHub. This lane is deliberately last: it produces the engineer-facing stories that made earlier editions useless, so hold it to the "would this change what Nish does next week" test.
 
-Nish's own taste is read from `inish_daily/interests.json`: what he recently starred on GitHub and, once `X_BEARER_TOKEN` is in the environment, what he posts and reposts on X (@NishantRArora; X keeps likes private). Those lines go to Jev as `reader_interests`, so stories on his current topics rank higher; they never lift a story the bar would skip. A signal that fails or has no key is reported in `source_errors` and the run goes on.
+Nish's own taste is read from `inish_daily/interests.json`: what he recently starred on GitHub and what he posts and reposts on X (@NishantRArora), read free from X's public embed timeline or a Nitter RSS mirror (no paid key; X keeps likes private). Those lines go to Jev as `reader_interests`, so stories on his current topics rank higher; they never lift a story the bar would skip. A signal that fails or has no key is reported in `source_errors` and the run goes on.
 
 The `lens` is a hint from the fetcher, not a verdict. Put a story in the section that fits it after you have read it.
 

@@ -1,5 +1,5 @@
 {
-  "_comment": "Where Nish's own taste is read from: things he recently starred, posted or shared. Jev ranks stories on these topics higher. types: github_stars (user), x_posts (user: his own posts, reposts and quotes, since X keeps likes private; needs X_BEARER_TOKEN in the environment). An empty user switches a signal off.",
+  "_comment": "Where Nish's own taste is read from: things he recently starred, posted or shared. Jev ranks stories on these topics higher. types: github_stars (user), x_posts (user: his own public posts and reposts, read free through X's embed timeline or a Nitter RSS mirror, no key; X keeps likes private). An empty user switches a signal off.",
   "signals": [
     {"id": "github-stars", "name": "GitHub stars", "type": "github_stars", "user": "nish3451", "limit": 15},
     {"id": "x-posts", "name": "X posts", "type": "x_posts", "user": "NishantRArora", "limit": 25}

@@ -22,51 +22,63 @@ class LoadTests(unittest.TestCase):
 
 class CollectTests(unittest.TestCase):
     STARS = {"id": "github-stars", "name": "GitHub stars", "type": "github_stars", "user": "nish3451", "limit": 2}
-    LIKES = {"id": "x-posts", "name": "X posts", "type": "x_posts", "user": "nish", "limit": 2}
+    POSTS = {"id": "x-posts", "name": "X posts", "type": "x_posts", "user": "nish", "limit": 2}
 
     def test_an_empty_user_is_switched_off(self):
-        lines, report, errors = interests.collect([{**self.LIKES, "user": ""}], env={})
-        self.assertEqual((lines, report, errors), ([], [], []))
-
-    def test_x_without_a_key_is_skipped_and_said(self):
-        lines, report, errors = interests.collect([self.LIKES], env={})
-        self.assertEqual(lines, [])
-        self.assertEqual(report[0]["error"], "no key")
-        self.assertIn("X_BEARER_TOKEN is not set", errors[0])
+        self.assertEqual(interests.collect([{**self.POSTS, "user": ""}]), ([], [], []))
 
     def test_a_failing_signal_does_not_stop_the_others(self):
         with mock.patch.object(interests, "github_stars", side_effect=OSError("down")), \
                 mock.patch.object(interests, "x_posts", return_value=["a post"]):
-            lines, report, errors = interests.collect([self.STARS, self.LIKES], env={"X_BEARER_TOKEN": "t"})
+            lines, report, errors = interests.collect([self.STARS, self.POSTS])
         self.assertEqual(lines, ["a post"])
         self.assertEqual([r["error"] for r in report], ["OSError", None])
-        self.assertEqual(errors, ["interests: github-stars: OSError"])
+        self.assertEqual(errors, ["interests: github-stars: OSError: down"])
 
     def test_lines_are_capped(self):
         many = [f"repo{i}" for i in range(interests.MAX_LINES + 5)]
         with mock.patch.object(interests, "github_stars", return_value=many):
-            lines, _report, _errors = interests.collect([self.STARS], env={})
+            lines, _report, _errors = interests.collect([self.STARS])
         self.assertEqual(len(lines), interests.MAX_LINES)
 
 
+SYNDICATION = """<html><script id="__NEXT_DATA__" type="application/json">{"props": {"pageProps": {"timeline": {"entries": [
+{"content": {"tweet": {"full_text": "this is  wild", "entities": {"urls": [{"expanded_url": "https://e.com/a"}]}}}},
+{"content": {"tweet": {"text": "plain post"}}},
+{"content": {"tweet": {"full_text": "dropped by the limit"}}}
+]}}}}</script></html>"""
+
+RSS = """<?xml version="1.0"?><rss><channel>
+<item><title>RT by @nish: agents that run overnight</title></item>
+<item><title>a &amp;quot;quoted&amp;quot; take</title></item>
+</channel></rss>"""
+
+
 class XPostsTests(unittest.TestCase):
-    def test_reads_his_posts_with_their_link_titles(self):
-        calls = []
+    def test_reads_the_embed_timeline_first(self):
+        seen = []
 
-        def get(path, token):
-            calls.append((path, token))
-            if path.startswith("users/by/username/"):
-                return {"data": {"id": "42"}}
-            return {"data": [
-                {"text": "this is  wild", "entities": {"urls": [{"expanded_url": "https://e.com/a", "title": "A launch"}]}},
-                {"text": "plain post"},
-                {"text": "dropped by the limit"},
-            ]}
+        def fetch(url):
+            seen.append(url)
+            return SYNDICATION
 
-        lines = interests.x_posts("nish", 2, "t", get=get)
-        self.assertEqual(lines, ["this is wild A launch", "plain post"])
-        self.assertEqual(calls[0], ("users/by/username/nish", "t"))
-        self.assertTrue(calls[1][0].startswith("users/42/tweets?max_results=5"))
+        self.assertEqual(interests.x_posts("nish", 2, fetch=fetch), ["this is wild https://e.com/a", "plain post"])
+        self.assertEqual(seen, ["https://syndication.twitter.com/srv/timeline-profile/screen-name/nish"])
+
+    def test_falls_back_to_a_mirror_when_x_says_nothing(self):
+        def fetch(url):
+            if "syndication" in url:
+                return "<html>rate limited</html>"
+            if "nitter.net" in url:
+                raise OSError("down")
+            return RSS
+
+        self.assertEqual(interests.x_posts("nish", 5, fetch=fetch), ["RT by @nish: agents that run overnight", 'a "quoted" take'])
+
+    def test_says_why_when_every_reader_fails(self):
+        with self.assertRaises(RuntimeError) as caught:
+            interests.x_posts("nish", 5, fetch=lambda url: "<html></html>")
+        self.assertIn("empty", str(caught.exception))
 
 
 if __name__ == "__main__":
