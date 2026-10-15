@@ -180,6 +180,14 @@ class RequestBodyTests(unittest.TestCase):
         self.assertEqual(candidate, before)
         self.assertIsNot(body["state"]["candidate"], candidate)
 
+    def test_interests_are_sent_only_when_there_are_some(self):
+        candidate = {"title": "A launch"}
+        body = jev_rank.request_body("2026-09-28", candidate, "reader", "bar", [], None, ["owner/repo: a tool"])
+        self.assertEqual(body["state"]["reader_interests"], ["owner/repo: a tool"])
+        empty = jev_rank.request_body("2026-09-28", candidate, "reader", "bar", [], None, [])
+        self.assertNotIn("reader_interests", empty["state"])
+        self.assertIn("reader_interests", jev_rank.QUESTIONS["fit"]["instructions"])
+
     def test_fit_instructions_sentence_survived(self):
         self.assertIn("Read `candidate.page_text`", jev_rank.QUESTIONS["fit"]["instructions"])
         self.assertIn("recent_editions", jev_rank.QUESTIONS["fit"]["instructions"])
@@ -350,6 +358,7 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
             "feed": lambda *args, **kwargs: [],
             "google_news": lambda *args, **kwargs: [],
             "reddit": lambda *args, **kwargs: [],
+            "collect_interests": lambda: ([], [], []),
             "REDDIT_PAUSE": 0,
         }
         env = {name: value for name, value in os.environ.items() if name != "TYPESAFE_API_KEY"}
@@ -383,6 +392,7 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
             "feed": lambda *args, **kwargs: [],
             "google_news": lambda *args, **kwargs: [],
             "reddit": lambda *args, **kwargs: [],
+            "collect_interests": lambda: ([], [], []),
             "REDDIT_PAUSE": 0,
         }
 
@@ -398,6 +408,27 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
         self.assertIsNone(payload["ranked_by"])
         self.assertEqual([c["title"] for c in payload["candidates"]], ["a", "b"])
         self.assertTrue(any(e.startswith("jev: RuntimeError: 2 of 2") for e in payload["source_errors"]))
+
+    def test_interests_reach_jev_and_the_candidate_file(self):
+        pool = [{"source": "Test", "evidence_class": "independent", "lens": "AI", "title": "a", "url": "https://example.com/a"}]
+        seen = {}
+
+        def rank(candidates, day, key, **kwargs):
+            seen["interests"] = kwargs["interests"]
+            return [{**c, "jev": {"model": "jev-latest", "priority": 1}} for c in candidates]
+
+        loaders = {**self.loaders(pool), "collect_interests": lambda: (
+            ["owner/repo: a tool"],
+            [{"id": "github-stars", "name": "GitHub stars", "count": 1, "error": None}],
+            ["interests: x-likes skipped, X_BEARER_TOKEN is not set"],
+        )}
+        env = {**os.environ, "TYPESAFE_API_KEY": "test-key"}
+        with mock.patch.object(jev_rank, "rank", side_effect=rank):
+            code, payload = self.run_main(env, loaders)
+        self.assertEqual(code, 0)
+        self.assertEqual(seen["interests"], ["owner/repo: a tool"])
+        self.assertEqual(payload["interests"]["lines"], ["owner/repo: a tool"])
+        self.assertIn("interests: x-likes skipped, X_BEARER_TOKEN is not set", payload["source_errors"])
 
     def test_an_empty_pool_with_a_key_says_why_ranked_by_is_null(self):
         env = {**os.environ, "TYPESAFE_API_KEY": "test-key"}
