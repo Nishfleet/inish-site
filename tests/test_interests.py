@@ -1,5 +1,6 @@
 import sys
 import unittest
+import urllib.parse
 from pathlib import Path
 from unittest import mock
 
@@ -67,9 +68,10 @@ class XPostsTests(unittest.TestCase):
 
     def test_falls_back_to_a_mirror_when_x_says_nothing(self):
         def fetch(url):
-            if "syndication" in url:
+            host = urllib.parse.urlsplit(url).hostname
+            if host == "syndication.twitter.com":
                 return "<html>rate limited</html>"
-            if "nitter.net" in url:
+            if host == "nitter.net":
                 raise OSError("down")
             return RSS
 
