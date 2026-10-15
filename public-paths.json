@@ -8,11 +8,11 @@
     "/daily/favicon.svg",
     "/daily/latest.json",
     "/daily/feed.xml",
-    "/daily/fonts/fraunces.woff2",
+    "/daily/fonts/fraunces-500.woff2",
+    "/daily/fonts/fraunces-600.woff2",
     "/daily/fonts/newsreader.woff2",
     "/daily/fonts/newsreader-italic.woff2",
     "/daily/fonts/plex-mono-400.woff2",
-    "/daily/fonts/plex-mono-500.woff2",
     "/daily/fonts/OFL.txt"
   ],
   "hstsHeader": "max-age=31536000",

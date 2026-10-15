@@ -1,8 +1,8 @@
-@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;src:url("/daily/fonts/fraunces.woff2") format("woff2-variations")}
-@font-face{font-family:"Newsreader";font-style:normal;font-weight:200 800;font-display:swap;src:url("/daily/fonts/newsreader.woff2") format("woff2-variations")}
-@font-face{font-family:"Newsreader";font-style:italic;font-weight:200 800;font-display:swap;src:url("/daily/fonts/newsreader-italic.woff2") format("woff2-variations")}
-@font-face{font-family:"Plex Mono";font-style:normal;font-weight:400;font-display:swap;src:url("/daily/fonts/plex-mono-400.woff2") format("woff2")}
-@font-face{font-family:"Plex Mono";font-style:normal;font-weight:500;font-display:swap;src:url("/daily/fonts/plex-mono-500.woff2") format("woff2")}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:500;font-display:swap;src:url("/daily/fonts/fraunces-500.woff2") format("woff2")}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:600;font-display:swap;src:url("/daily/fonts/fraunces-600.woff2") format("woff2")}
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:400 500;font-display:swap;src:url("/daily/fonts/newsreader.woff2") format("woff2")}
+@font-face{font-family:"Newsreader";font-style:italic;font-weight:400;font-display:swap;src:url("/daily/fonts/newsreader-italic.woff2") format("woff2")}
+@font-face{font-family:"Plex Mono";font-style:normal;font-weight:400 500;font-display:swap;src:url("/daily/fonts/plex-mono-400.woff2") format("woff2")}
 :root{color-scheme:light dark;--paper:#f5f0e7;--panel:#ede5d6;--ink:#2b2724;--soft:#3f3933;--body:#4a443d;--muted:#655e56;--rule:#e2dbcf;--rule-dark:#cfc6b6;--rule-ink:#a89d8e;--accent:#a04e30;--accent-rule:#b65a3a;--select:#e4cdb9;--display:"Fraunces",Georgia,"Times New Roman",serif;--serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
 @media (prefers-color-scheme:dark){:root{--paper:#1f1d1a;--panel:#2a2622;--ink:#e8e2d8;--soft:#d9d2c7;--body:#cdc5b9;--muted:#a39a8e;--rule:#36322d;--rule-dark:#4b4640;--rule-ink:#6f685f;--accent:#d4825f;--accent-rule:#c77a57;--select:#4e3c31}}
 *{box-sizing:border-box}
