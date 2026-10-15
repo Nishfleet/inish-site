@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import ipaddress
 import json
 import os
 import re
+import socket
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from html.parser import HTMLParser
@@ -23,6 +26,8 @@ PAGE_CHARS = 12000
 MIN_PAGE_CHARS = 200
 PAGE_TIMEOUT = 20
 PAGE_BYTES = 2_000_000
+PAGE_REDIRECTS = 5
+_REDIRECT_CODES = frozenset({301, 302, 303, 307, 308})
 
 QUESTIONS = {
     "fit": {
@@ -73,10 +78,52 @@ class _TextExtractor(HTMLParser):
         return " ".join(" ".join(self._data).split())
 
 
-def page_text(url: str, *, agent: str, fetch=urllib.request.urlopen) -> str | None:
+def _blocked_address(address: str) -> bool:
+    ip = ipaddress.ip_address(address.split("%", 1)[0])
+    if isinstance(ip, ipaddress.IPv6Address):
+        embedded = ip.ipv4_mapped or ip.sixtofour or (ip.teredo[1] if ip.teredo else None)
+        if embedded is not None and _blocked_address(str(embedded)):
+            return True
+    return (
+        ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved
+        or ip.is_multicast or ip.is_unspecified or not ip.is_global
+    )
+
+
+def public_url(url: str, resolve=socket.getaddrinfo) -> bool:
+    """Feed links are untrusted: only http(s) to hosts that resolve to public addresses only."""
     try:
-        request = urllib.request.Request(url, headers={"User-Agent": agent})
-        with fetch(request, timeout=PAGE_TIMEOUT) as response:
+        parts = urllib.parse.urlsplit(url)
+        if parts.scheme not in ("http", "https") or not parts.hostname:
+            return False
+        port = parts.port or (443 if parts.scheme == "https" else 80)
+        addresses = {info[4][0] for info in resolve(parts.hostname, port, type=socket.SOCK_STREAM)}
+        return bool(addresses) and not any(_blocked_address(address) for address in addresses)
+    except (OSError, ValueError, UnicodeError):
+        return False
+
+
+def page_text(url: str, *, agent: str, fetch=None, resolve=socket.getaddrinfo) -> str | None:
+    # Redirects are followed here, not by urllib, so every hop is checked before it is fetched.
+    fetch = fetch or _NO_REDIRECT.open
+    try:
+        for _hop in range(PAGE_REDIRECTS + 1):
+            if not public_url(url, resolve):
+                return None
+            request = urllib.request.Request(url, headers={"User-Agent": agent})
+            try:
+                response = fetch(request, timeout=PAGE_TIMEOUT)
+            except urllib.error.HTTPError as exc:
+                location = exc.headers.get("Location") if exc.headers else None
+                exc.close()
+                if exc.code not in _REDIRECT_CODES or not location:
+                    return None
+                url = urllib.parse.urljoin(url, location)
+                continue
+            break
+        else:
+            return None
+        with response:
             content_type = response.headers.get("Content-Type") or ""
             if "html" not in content_type.lower():
                 return None

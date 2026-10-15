@@ -27,6 +27,20 @@ def response(fit=3.0, confidence=0.8, wildcard=0.4, engineer_only=0.1) -> dict:
     }
 
 
+def resolver(table: dict[str, list[str]]):
+    """A stand-in for socket.getaddrinfo: hostname -> addresses, unknown names fail like DNS."""
+
+    def resolve(host, port, type=0):
+        if host not in table:
+            raise OSError(f"no such host: {host}")
+        return [(None, type, 6, "", (address, port)) for address in table[host]]
+
+    return resolve
+
+
+PUBLIC = resolver({"example.com": ["93.184.215.14"], "news.example": ["2606:2800:21f:cb07:6820:80da:af6b:8b2c"]})
+
+
 def http_error(code: int) -> urllib.error.HTTPError:
     return urllib.error.HTTPError("https://api.typesafe.ai/v1/systemone", code, "boom", {}, None)
 
@@ -82,7 +96,9 @@ class PageTextTests(unittest.TestCase):
                 raise error
             return FakeResponse(body, content_type)
 
-        return jev_rank.page_text("https://example.com/a", agent=fetch_candidates.BROWSER_AGENT, fetch=fetch)
+        return jev_rank.page_text(
+            "https://example.com/a", agent=fetch_candidates.BROWSER_AGENT, fetch=fetch, resolve=PUBLIC,
+        )
 
     def test_keeps_visible_text_and_drops_code_and_whitespace(self):
         body = (
@@ -102,7 +118,9 @@ class PageTextTests(unittest.TestCase):
             self.response = response
             return response
 
-        text = jev_rank.page_text("https://example.com/a", agent=fetch_candidates.BROWSER_AGENT, fetch=fetch)
+        text = jev_rank.page_text(
+            "https://example.com/a", agent=fetch_candidates.BROWSER_AGENT, fetch=fetch, resolve=PUBLIC,
+        )
         self.assertEqual(len(text), jev_rank.PAGE_CHARS)
         self.assertEqual(self.response.read_size, jev_rank.PAGE_BYTES)
 
@@ -127,8 +145,113 @@ class PageTextTests(unittest.TestCase):
             "https://example.com/a",
             agent=fetch_candidates.BROWSER_AGENT,
             fetch=lambda request, timeout=20: FakeResponse(body, "text/html; charset=iso-8859-1"),
+            resolve=PUBLIC,
         )
         self.assertIn("café", text)
+
+
+def redirect(url: str, location: str, code: int = 302) -> urllib.error.HTTPError:
+    return urllib.error.HTTPError(url, code, "Found", {"Location": location}, None)
+
+
+class PageTextAddressGuardTests(unittest.TestCase):
+    PAGE = f"<html><body><p>{'story ' * 60}</p></body></html>"
+    TABLE = {
+        "example.com": ["93.184.215.14"],
+        "localhost": ["127.0.0.1", "::1"],
+        "127.0.0.1": ["127.0.0.1"],
+        "10.1.2.3": ["10.1.2.3"],
+        "169.254.169.254": ["169.254.169.254"],
+        "::1": ["::1"],
+        "::ffff:127.0.0.1": ["::ffff:127.0.0.1"],
+        "fd00::5": ["fd00::5"],
+        "0.0.0.0": ["0.0.0.0"],
+        "224.0.0.1": ["224.0.0.1"],
+        "100.100.1.1": ["100.100.1.1"],
+        "internal.example": ["192.168.1.10"],
+        "split.example": ["93.184.215.14", "10.0.0.7"],
+    }
+
+    def fetch_log(self, routes):
+        """A fake opener that never follows redirects: each URL maps to a response or an HTTPError."""
+        fetched = []
+
+        def fetch(request, timeout=20):
+            fetched.append(request.full_url)
+            outcome = routes[request.full_url]
+            if isinstance(outcome, Exception):
+                raise outcome
+            return outcome
+
+        return fetch, fetched
+
+    def page(self, url, routes):
+        fetch, fetched = self.fetch_log(routes)
+        text = jev_rank.page_text(
+            url, agent=fetch_candidates.BROWSER_AGENT, fetch=fetch, resolve=resolver(self.TABLE),
+        )
+        return text, fetched
+
+    def test_internal_hosts_are_never_fetched(self):
+        for url in (
+            "http://localhost/",
+            "http://127.0.0.1:8080/admin",
+            "http://10.1.2.3/",
+            "http://169.254.169.254/latest/",
+            "http://[::1]/",
+            "http://[::ffff:127.0.0.1]/",
+            "http://[fd00::5]/",
+            "http://0.0.0.0/",
+            "http://224.0.0.1/",
+            "http://100.100.1.1/",
+            "https://internal.example/",
+            "https://split.example/",
+        ):
+            text, fetched = self.page(url, {url: FakeResponse(self.PAGE)})
+            self.assertIsNone(text, url)
+            self.assertEqual(fetched, [], url)
+
+    def test_non_http_schemes_and_unresolvable_hosts_are_refused(self):
+        for url in ("file:///etc/hosts", "ftp://example.com/a", "gopher://example.com/", "https://nowhere.invalid/", "https:///a"):
+            text, fetched = self.page(url, {url: FakeResponse(self.PAGE)})
+            self.assertIsNone(text, url)
+            self.assertEqual(fetched, [], url)
+
+    def test_a_redirect_to_an_internal_host_is_not_followed(self):
+        for target in ("http://169.254.169.254/latest/", "http://localhost/", "http://[::1]/", "file:///etc/hosts"):
+            start = "https://example.com/a"
+            text, fetched = self.page(start, {start: redirect(start, target), target: FakeResponse(self.PAGE)})
+            self.assertIsNone(text, target)
+            self.assertEqual(fetched, [start], target)
+
+    def test_a_public_redirect_chain_is_followed_and_relative_locations_resolve(self):
+        start, middle, end = "https://example.com/a", "https://example.com/b", "https://example.com/c"
+        text, fetched = self.page(start, {
+            start: redirect(start, "/b", 301),
+            middle: redirect(middle, end, 307),
+            end: FakeResponse(self.PAGE),
+        })
+        self.assertTrue(text.startswith("story story"))
+        self.assertEqual(fetched, [start, middle, end])
+
+    def test_redirects_stop_after_the_hop_cap(self):
+        routes = {f"https://example.com/{n}": redirect(f"https://example.com/{n}", f"/{n + 1}") for n in range(20)}
+        text, fetched = self.page("https://example.com/0", routes)
+        self.assertIsNone(text)
+        self.assertEqual(len(fetched), jev_rank.PAGE_REDIRECTS + 1)
+
+    def test_a_normal_public_url_still_reads(self):
+        url = "https://example.com/story"
+        text, fetched = self.page(url, {url: FakeResponse(self.PAGE)})
+        self.assertTrue(text.startswith("story story"))
+        self.assertEqual(fetched, [url])
+
+    def test_public_ipv6_host_is_allowed(self):
+        self.assertTrue(jev_rank.public_url("https://news.example/x", PUBLIC))
+
+    def test_the_default_opener_does_not_follow_redirects_itself(self):
+        handlers = [type(handler) for handler in jev_rank._NO_REDIRECT.handlers]
+        self.assertIn(jev_rank._RefuseRedirect, handlers)
 
 
 class RecentEditionsTests(unittest.TestCase):
