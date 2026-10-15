@@ -570,13 +570,16 @@ def page(front: dict) -> str:
         for section in front["sections"]
     )
     cards_html = f'\n    <section class="cards" aria-label="From the sources"><h2 class="label">From the sources</h2><div class="card-grid">{cards_html}</div></section>' if cards_html else ""
-    strip = ""
-    if front["sections"]:
-        links = "".join(f'<a href="#s-{esc(section["id"])}">{esc(section["label"])}</a>' for section in front["sections"])
-        strip = f'\n    <nav class="strip" aria-label="Sections">{links}</nav>'
     wire = ""
     if front["wire"]:
         wire = f'\n      <aside id="wire" class="wire" aria-label="Most talked about"><h2 class="label">Most talked about</h2><ol>{"".join(item_row(item) for item in front["wire"][:SHOWN_WIRE_ITEMS])}</ol></aside>'
+    strip = ""
+    if front["sections"]:
+        links = ['<a href="#picks">Top stories</a>'] if picks else []
+        if wire:
+            links.append('<a href="#wire">Talked about</a>')
+        links += [f'<a href="#s-{esc(section["id"])}">{esc(section["label"])}</a>' for section in front["sections"]]
+        strip = f'\n    <nav class="strip" aria-label="Sections"><div>{"".join(links)}</div></nav>'
     updated = updated_label(front.get("generated_at", ""))
     stamp = f'<time datetime="{esc(front["date"])}">{esc(edition_date_label(date))}</time>'
     if updated:
@@ -593,8 +596,9 @@ def page(front: dict) -> str:
   <meta property="og:description" content="{esc(description)}">
   <meta property="og:url" content="{SITE_URL}">
   <meta property="og:site_name" content="{SITE_NAME}">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#f5f0e7">
+  <meta name="theme-color" content="#1f1d1a" media="(prefers-color-scheme: dark)">
   <link rel="icon" type="image/svg+xml" href="/daily/favicon.svg">
   <link rel="alternate" type="application/rss+xml" title="{SITE_NAME}" href="{SITE_URL}/feed.xml">
   <link rel="stylesheet" href="/daily/styles.css">
