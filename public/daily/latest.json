@@ -1,104 +1,96 @@
 {
-  "date": "2026-10-15",
-  "candidate_count": 428,
-  "editor_note": "I opened 12 of the 428 candidate pages and kept 7. OpenAI's newsroom blocked two stories I could not verify anywhere else, Higgsfield's longer AI videos and Asana's cheaper browser agent, so both sit out. Meta's Muse Wonder ran on Monday. Modal's Axios exclusive was unreadable, so it runs on SiliconANGLE's report. CTech put Zenzap's round at $33 million against TechCrunch's $44 million.",
+  "date": "2026-10-16",
+  "candidate_count": 435,
+  "editor_note": "I opened 11 of the 435 candidate pages and kept 7. Meta's Muse Spark Open runs on Meta's own blog rather than a rewrite, and Anthropic's investor numbers come from Simon Willison reading the Financial Times. OpenAI's newsroom blocked three stories and Reddit rate-limited three subreddits, so those lanes are thin. Nothing beat yesterday's Modal round on evidence, so demand signals is one item.",
   "stories": [
     {
-      "title": "Modal raises $750 million at $15.75 billion as its revenue more than triples in five months",
-      "url": "https://siliconangle.com/2026/10/14/ai-cloud-startup-modal-raises-750m-at-15-75b-valuation/",
-      "evidence_url": "https://siliconangle.com/2026/10/14/ai-cloud-startup-modal-raises-750m-at-15-75b-valuation/",
-      "source": "SiliconANGLE",
-      "section": "Demand signals",
-      "summary": "Modal sells the computing layer under AI products: it rents out GPU clusters, the chips that train and run models, and hosted containers, isolated bundles that run the code AI agents write. It has raised $750 million in a Series D led by Accel, with Kleiner Perkins joining. The company is now valued at $15.75 billion, more than triple its May price, and says annualized revenue has more than tripled since May to over $1 billion, with nearly a third coming from Sandboxes, its service for hosting agents.",
-      "fact": "Accel led Modal's $750 million Series D at a $15.75 billion valuation, and Modal says annualized revenue more than tripled since May to over $1 billion, with nearly a third coming from its Sandboxes service.",
-      "take": "Modal's revenue tripling in five months tells me companies are past experimenting and are paying real money to run agents. I would keep building for the teams spending that money, and I would not bet against infrastructure this year.",
-      "caveat": "The revenue and valuation figures are the company's own, reported by SiliconANGLE. A tripling valuation on a $1 billion run rate prices in years of growth going right."
-    },
-    {
-      "title": "Google's cheap Gemini 4 Argon price doubles on December 1",
-      "url": "https://simonwillison.net/2026/Oct/13/llm-gemini/",
-      "evidence_url": "https://simonwillison.net/2026/Oct/13/llm-gemini/",
-      "source": "Simon Willison's Weblog",
+      "title": "Anthropic told investors its quarterly revenue hit $16.8 billion, up nearly 50 percent, ahead of an IPO",
+      "url": "https://simonwillison.net/2026/Oct/15/anthropic-tells-investors/",
+      "evidence_url": "https://simonwillison.net/2026/Oct/15/anthropic-tells-investors/",
+      "source": "Simon Willison's Weblog, reading the Financial Times",
       "section": "AI",
-      "summary": "Yesterday's edition covered Google putting its frontier model Gemini 4 Argon on general sale. Developer Simon Willison read the launch terms closely and found the catch: the $2 and $10 launch price per million tokens, the chunks of text a model charges by, doubles on December 1. He also cites Artificial Analysis, which measured $2,407 to run its full benchmark suite on Argon, close to GLM-5.3 and well under what OpenAI, Anthropic, and Meta's latest models cost.",
-      "fact": "At launch Argon costs $2 per million input tokens and $10 per million output tokens, the same as GPT-6 Sol, half of Claude Opus 5.5, and one fifth of GPT-6 Astra, and the price doubles on December 1, 2026.",
-      "take": "I would point new AI workloads at Argon now and enjoy the cheap months while they last. A seller doubling the price six weeks after launch is telling me the demand is real, which is worth as much as the benchmark charts.",
-      "caveat": "The doubling is a launch term one independent developer highlighted, and benchmark running costs measure his test suite, not your workload. Yesterday's edition covered the launch itself."
+      "summary": "Anthropic, the maker of the Claude family of AI models, held an investor day on Wednesday and gave three quarters of revenue numbers for the first time. Revenue went from about $4.8 billion in the first quarter to $11.5 billion in the second and $16.8 billion in the third. That is the clearest public picture yet of how fast money is moving into AI models. The company also stopped quoting a flattering yearly figure and started quoting the actual quarter, which is a harder number to spin.",
+      "fact": "Anthropic told investors quarterly revenue was about $4.8 billion in Q1, $11.5 billion in Q2 and $16.8 billion in Q3 2026, with adjusted operating margins of 11 percent.",
+      "take": "Three quarters, revenue up more than three times. This is the number I keep coming back to when someone tells me AI is a bubble. At this size the question is which lab keeps that spend, so I would build assuming the model suppliers get squeezed.",
+      "caveat": "These are figures Anthropic told investors, reported by people with knowledge of the matter, and the full accounts are not public. A third quarter figure of $16.8 billion also assumes the growth held, and it did not tell us profit."
     },
     {
-      "title": "Scimplify raises $25 million to move chemical production out of China's grip with AI",
-      "url": "https://techcrunch.com/2026/10/14/scimplify-raises-25m-to-challenge-chinas-grip-on-critical-materials-with-ai/",
-      "evidence_url": "https://techcrunch.com/2026/10/14/scimplify-raises-25m-to-challenge-chinas-grip-on-critical-materials-with-ai/",
+      "title": "Amazon's Bee launched two personal AI devices, a $74.99 wrist band and a $99.99 phone magnet",
+      "url": "https://techcrunch.com/2026/10/15/amazons-bee-launches-two-new-personal-ai-devices-starting-at-75/",
+      "evidence_url": "https://techcrunch.com/2026/10/15/amazons-bee-launches-two-new-personal-ai-devices-starting-at-75/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Bee, the note-taking hardware Amazon bought last year, put out its first new gadgets. The Frontier is a band you can wear on your wrist or pin to a shirt for $74.99, and the Eclipse is a credit-card-sized slab that sticks to the back of your phone for $99.99. Both listen to the conversations around you and turn them into notes, reminders and to-do lists. That puts Amazon directly against the Plaud Note at $159 and the Pocket at $129, at roughly half the price.",
+      "fact": "The Bee Frontier costs $74.99 and the Bee Eclipse $99.99, against $159 for the Plaud Note and $129 for the Pocket, and Bee Pro costs $11.99 a month.",
+      "take": "Amazon entering at half the price of everyone else tells me this category is about to get crowded and cheap. The $11.99 a month for unlimited summaries is the part I would copy, because the subscription is where the business lives.",
+      "caveat": "Amazon is selling these devices, so the privacy description is the company's own: it says the raw audio is deleted after processing and transcripts are locked with a key the device makes. I did not test that."
+    },
+    {
+      "title": "Meta released Muse Spark Open, an open-weight model that runs on two Mac Studios",
+      "url": "https://research.meta.ai/blog/muse-spark-open",
+      "evidence_url": "https://research.meta.ai/blog/muse-spark-open",
+      "source": "Meta AI Research",
+      "section": "AI",
+      "summary": "Meta, which makes Facebook and Instagram, published the weights inside a new model it calls the most capable open-weight one built in the United States. Open-weight means the model's inner numbers are published, so anyone can inspect, host or adapt it, unlike a closed model you can only reach through an API. This one handles images and text, is built for coding work and for acting as an agent that carries out tasks, and it runs on your own desk using two Apple M5 Ultra Mac Studios.",
+      "fact": "Meta's Muse Spark Open has 816 billion total parameters with 42 billion active, a 1 million token context window, and runs locally on two M5 Ultra Mac Studios that share about 1 terabyte of memory.",
+      "take": "Meta calling this the best open model is a claim from the company that built it, so I would wait for an outside test. What I care about is that a serious lab put the weights out. That squeezes the labs charging by the token, and that is good for me.",
+      "caveat": "The benchmark claims are Meta's own. Running it locally needs a machine most people do not own, so \"runs on a Mac\" is not the same as cheap or easy."
+    },
+    {
+      "title": "Ramp raised $1.85 billion at a $60 billion valuation four months after a $44 billion round",
+      "url": "https://techcrunch.com/2026/10/15/ramp-reaches-60b-valuation-as-it-pushes-deeper-into-ai/",
+      "evidence_url": "https://techcrunch.com/2026/10/15/ramp-reaches-60b-valuation-as-it-pushes-deeper-into-ai/",
       "source": "TechCrunch",
       "section": "Demand signals",
-      "summary": "Specialty chemicals, the refined ingredients behind chips, defense gear, and energy equipment, are mostly made in China, and Western buyers want other options. Bengaluru startup Scimplify, founded in 2023, uses AI to plan production routes and coordinate more than 500 partner factories, 90 percent of them in India. It raised $25 million led by Hitachi Ventures at a $250 million valuation, with customers Henkel and Teknor Apex joining the round.",
-      "fact": "Scimplify says its annualized revenue run rate tripled to about $200 million, its US revenue grew sixfold to $60 million, and in some cases it delivers finished chemicals in two months where the typical wait is 12 to 18 months.",
-      "take": "Scimplify is the pattern I look for: AI selling into a physical industry where one country controls supply and buyers are frightened. If chemistry coordination works here, the same play exists in other supplier-concentrated categories.",
-      "caveat": "The revenue and timeline figures are the founder's own, given in a TechCrunch interview. The round is strategic, with two customers investing, which flatters the valuation."
+      "summary": "Ramp sells software that companies use to pay for things and to track the money: expense reports, company cards, buying approvals. It raised $1.85 billion, co-led by Dragoneer, Thrive, Founders Fund and others, at a $60 billion valuation, against $44 billion four months ago. Ramp says its annualized revenue has passed $2 billion and it now has 85,000 customers, including Visa, Uber, Shopify and Notion. The interesting part is where it is heading: AI agents that spend money, and tools that watch what those agents spend.",
+      "fact": "Ramp raised $1.85 billion at a $60 billion valuation four months after a $750 million round at $44 billion, and says annualized revenue has crossed $2 billion, up from a reported $1.5 billion in June, with 85,000 customers up from 70,000.",
+      "take": "Ramp went from spending controls to the place companies manage what their AI agents spend. That is a real budget line appearing, and budgets fund products. I would sell into the finance team that already signs off on every purchase.",
+      "caveat": "The revenue and customer counts are Ramp's own, and Ramp now competes with Rippling for the same finance-team money. An investor said Ramp is going after Anthropic's business, which is a plan, not a result."
     },
     {
-      "title": "An AI called 848 San Francisco businesses: 1 in 3 kept talking, 1 in 25 had an AI answering",
-      "url": "https://voygr.tech/blog/does-sf-talk-to-ai/",
-      "evidence_url": "https://voygr.tech/blog/does-sf-talk-to-ai/",
-      "source": "VOYGR",
-      "section": "Demand signals",
-      "summary": "During San Francisco Tech Week, startup VOYGR gave an AI a phone and had it call local businesses during working hours: vets, dentists, bars, cafes, salons. The caller said it was an AI, then asked one sensible question, like whether a dentist is taking new patients. It reached 848 businesses. Two thirds hung up, usually within about five seconds and without arguing. One business in 25 already had an AI answering the phone, and two of those asked the caller to say zebra to prove it was human.",
-      "fact": "Of 848 businesses called, 1 in 3 kept talking after hearing it was an AI, vets at 79 percent and dentists at 61 percent were most receptive, bars and dry cleaners at 20 percent least, and 1 in 25 already had an AI answering.",
-      "take": "Two thirds of businesses hanging up tells me voice agents still fail the trust test on a random phone line. The 1 in 25 with AI receptionists is the number I would watch, and vets answering at 79 percent shows front desks adapt first.",
-      "caveat": "This is VOYGR's own experiment and it sells calling tools, so read it as marketing with a public map. One city and one week, and the businesses reached all have front desks."
-    },
-    {
-      "title": "Zenzap raises $44 million to replace WhatsApp at work, with Starbucks and Taco Bell on board",
-      "url": "https://techcrunch.com/2026/10/14/zenzap-raises-44m-for-its-ai-chat-app-that-aims-to-replace-whatsapp-in-the-workplace/",
-      "evidence_url": "https://techcrunch.com/2026/10/14/zenzap-raises-44m-for-its-ai-chat-app-that-aims-to-replace-whatsapp-in-the-workplace/",
+      "title": "Floqer's AI agents do the sales prospecting, and it says customers cut the time by up to 70 percent",
+      "url": "https://techcrunch.com/2026/10/14/floqers-ai-agents-help-b2b-revenue-teams-research-customers/",
+      "evidence_url": "https://techcrunch.com/2026/10/14/floqers-ai-agents-help-b2b-revenue-teams-research-customers/",
       "source": "TechCrunch",
       "section": "Product ideas",
-      "summary": "Restaurants, retail chains, and clinics run their daily coordination on WhatsApp, which breaks IT and security rules in any workplace. Zenzap is a work messenger built for those frontline staff, with AI search across the workspace, messages that turn into tasks, voice notes, and agents for workflow automation. It raised $44 million from Bessemer, Lightspeed, and The Garage, the founder's first outside funding. Paid plans start at $51 per month for up to 20 users, with AI extras sold on a credit system.",
-      "fact": "Zenzap raised $44 million from Bessemer, Lightspeed, and The Garage, charges from $51 per month for up to 20 users, and lists FedEx, Taco Bell, and Starbucks among its customers.",
-      "take": "Zenzap is a reminder that plain compliance features sell when the alternative is staff swapping customer details in a group chat. I would price simple tools for frontline teams higher than instinct suggests, and sell them without a sales team.",
-      "caveat": "The customer list is the company's claim, and CTech reported the same round as $33 million against TechCrunch's $44 million. Slack and Teams still own the desk."
+      "summary": "Floqer, founded in 2024, sells software that keeps a company's list of prospects up to date by itself. You describe the kind of company you want to sell to, and its AI agents search the web, pull in more than 100 data sources, and build a list with contact details, checking provider after provider until they find a verified email or phone number. It keeps watching, so when someone changes jobs or their company raises money, your records update. The team says revenue grew about tenfold over the past year and it will open-source the underlying technology in early 2027.",
+      "fact": "Floqer says it has passed $1.2 million in annual recurring revenue, growing roughly tenfold over the past year, with more than 1,000 customers including Perplexity, Wise and AngelList, on $2 million raised.",
+      "take": "Eight employees, over a thousand customers. I would copy this shape. It is what selling a boring job to a hated department looks like now, and that job is customer research. Watch the open-sourcing in early 2027.",
+      "caveat": "Every number is Floqer's own, given to TechCrunch ahead of its pitch on the Startup Battlefield stage, so the growth figures are pitched to investors. The 70 percent saving is a customer report, not a measured study."
     },
     {
-      "title": "NVIDIA's Nemotron 3.5 Lightning is free on Vercel's AI Gateway, with a 1 million token context",
-      "url": "https://vercel.com/changelog/nemotron-3-5-lightning-now-available-on-ai-gateway-for-free",
-      "evidence_url": "https://vercel.com/changelog/nemotron-3-5-lightning-now-available-on-ai-gateway-for-free",
+      "title": "Vercel sells a $30 a month pass that gives coding agents $80 of model credit",
+      "url": "https://vercel.com/changelog/introducing-token-pass",
+      "evidence_url": "https://vercel.com/changelog/introducing-token-pass",
       "source": "Vercel",
       "section": "Tools",
-      "summary": "Vercel's AI Gateway, a service that routes AI requests for apps and coding agents, now offers NVIDIA's Nemotron 3.5 Lightning at no cost. The model is open-weight, meaning anyone can inspect and run it, with 30 billion parameters of which 3 billion activate per token, a design that keeps responses fast and cheap. It reads a 1 million token context window and handles tool calling and structured outputs, and coding agents like Claude Code and Cursor can use it after a one-line setup.",
-      "fact": "nvidia/nemotron-3.5-lightning-free runs on Vercel's AI Gateway at no cost, served by NVIDIA, with 30 billion parameters, 3 billion active per token, and a 1 million token context window.",
-      "take": "Free is the right price for the draft work my agents do, summarizing and classifying, so I would route those calls to Nemotron before paying per token. I would keep client data away, because NVIDIA may retain prompts.",
-      "caveat": "Free models carry rate limits and can be withdrawn, and NVIDIA may retain prompts for improvement, which rules out private code. The changelog is Vercel selling its gateway."
+      "summary": "Tokens are the chunks of text a model charges you for, roughly a slice of a word. Vercel, the hosting company, has put a Token Pass into early access for its paid teams: $30 a month buys $80 of credit to spend on the GLM 5.3 and Kimi K3 models. It runs through Vercel's AI Gateway, the service that passes requests from an app to whichever model you pick, so a coding agent can switch between them on the same credit. When the credit runs out the requests stop, with no surprise overage bill.",
+      "fact": "Vercel's Token Pass costs $30 per month for Pro teams and includes $80 in monthly credit for GLM 5.3 and Kimi K3, with Zero Data Retention on by default and no automatic overage charges when the credit runs out.",
+      "take": "I would buy this. My agents burn through draft work, summarizing and classifying, and a flat $30 with a hard stop beats per-token metering I have to watch. The hard stop with no overage wins, because a runaway agent cannot bill me at 3am.",
+      "caveat": "It is early access, limited to GLM 5.3 and Kimi K3 for now, and the credit does not roll over month to month. Vercel is selling its own gateway, so it has every reason to make the flat rate look generous."
     },
     {
-      "title": "Apate's AI agents get scammed on purpose, and have wasted 17 years of fraudsters' time",
-      "url": "https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/",
-      "evidence_url": "https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/",
-      "source": "TechCrunch",
+      "title": "Citizen Lab caught the first confirmed zero-click spyware attack delivered through targeted ads",
+      "url": "https://citizenlab.ca/research/how-discover-tech-turned-targeted-ads-into-a-pipeline-for-spyware/",
+      "evidence_url": "https://citizenlab.ca/research/how-discover-tech-turned-targeted-ads-into-a-pipeline-for-spyware/",
+      "source": "Citizen Lab at the University of Toronto",
       "section": "Wildcard",
-      "summary": "Apate, an Australian startup founded in 2024 out of Macquarie University research, fights fraud by getting scammed. It runs thousands of AI agents posing as likely victims: they answer scam calls, reply to phishing messages, follow links, and join fraudsters' groups, speaking in different accents, ages, and languages. The goal is to keep scammers busy and to collect what banks and phone companies usually learn only after a real victim pays: bank accounts, crypto wallets, numbers, and the websites the scams run on.",
-      "fact": "Apate says its agents have held 2.5 million conversations with scammers and wasted 17 years of their time, and the FBI logged more than 22,000 AI-related crime complaints with about $893 million in losses in 2025.",
-      "take": "I like Apate's inversion: fight automation with automation instead of warning people harder. If scammers must talk to machines all day, the cost of running a scam operation stops being near zero, and that changes the maths.",
-      "caveat": "The 17 years figure is the company's own, and how often its intelligence actually blocks a scam is not published. Apate is pitching judges at TechCrunch Disrupt this week, so the coverage is friendly."
+      "summary": "Normally you get spyware by clicking something. Citizen Lab, the surveillance researchers at the University of Toronto, have documented an attack that needs no click at all. Disguised as an advertising company called Discover-Tech, they bought ads that reached devices belonging to journalists at Al Jazeera, and the ad infected those devices with spyware from a vendor called Candiru the moment the ad appeared. The ad networks now carry bad ads on top of the ordinary kind, and this one was the delivery system for spying.",
+      "fact": "Citizen Lab analyzed four billion Discover-Tech bidding records and found its ads were served on nearly 200,000 unique websites and apps over four months, and Google, IAB Europe and Beeswax all disconnected Discover-Tech.",
+      "take": "The lesson reaches past spyware. If an ad network can deliver an infection with zero clicks, then an ad network is an attack surface with a legal department. I would ask any ad-dependent vendor about their network, and not love the answer.",
+      "caveat": "This is one research group's disclosure, published the same day, and it is co-timed with a separate investigation by Confiant. Named parties have not responded in print yet, and legal action usually takes years."
     }
   ],
   "sources": {
-    "ok": 40,
+    "ok": 41,
     "total": 44
   },
-  "generated_at": "2026-10-15T08:35:27.136651+00:00",
+  "generated_at": "2026-10-16T04:19:44.637994+00:00",
   "sections": [
     {
       "id": "ai",
       "label": "AI",
       "items": [
-        {
-          "title": "Floqer’s AI agents research sales prospects so teams don’t have to",
-          "url": "https://techcrunch.com/2026/10/14/floqers-ai-agents-help-b2b-revenue-teams-research-customers/",
-          "source": "TechCrunch",
-          "blurb": "The problem Floqer is trying to solve is familiar to anyone who has worked in sales or revenue operations.",
-          "signal": "",
-          "discussion_url": ""
-        },
         {
           "title": "Higgsfield takes AI video from 1 minute to over 10",
           "url": "https://openai.com/index/higgsfield-longer-videos-voice",
@@ -108,26 +100,34 @@
           "discussion_url": ""
         },
         {
-          "title": "Flox Intelligence is building AI to keep wildlife away from trains, airports, and roads",
-          "url": "https://techcrunch.com/2026/10/13/flox-intelligence-is-building-ai-to-keep-wildlife-away-from-trains-airports-and-roads/",
+          "title": "Meta launches an open-weight AI model that runs on Macs",
+          "url": "https://techcrunch.com/2026/10/15/meta-launches-an-open-weight-model-that-runs-on-macs/",
           "source": "TechCrunch",
-          "blurb": "Flox's edge devices can identify animals and use species-specific sounds to drive them away from critical infrastructure.",
+          "blurb": "Meta and Apple have teamed up for the launch of the social media giant's newest model, Muse Spark Open, which will run locally on Apple sil…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Industrial Next wants factory robots to switch tasks in minutes, not weeks",
-          "url": "https://techcrunch.com/2026/10/13/industrial-next-wants-factory-robots-to-switch-tasks-in-minutes-not-weeks/",
+          "title": "Anthropic is letting METR researchers look under the hood with employee-level access",
+          "url": "https://techcrunch.com/2026/10/15/anthropic-is-letting-metr-researchers-look-under-the-hood-with-employee-level-access/",
           "source": "TechCrunch",
-          "blurb": "Industrial Next helps manufacturers automate complex, delicate tasks that have traditionally required human labor.",
+          "blurb": "METR will publish its own assessments of Anthropic’s risks, incidents, and practices, and the frontier AI model maker has given up the righ…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Gemini 4 Argon: Built to solve your hardest problems",
-          "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
-          "source": "Google AI",
-          "blurb": "We’re giving developers, enterprises, scientists, and consumers access to Gemini 4 Argon, our latest frontier model.",
+          "title": "Google’s Universal Cart shopping tool launches in the US",
+          "url": "https://techcrunch.com/2026/10/15/googles-universal-cart-shopping-tool-launches-in-the-us/",
+          "source": "TechCrunch",
+          "blurb": "The new shopping tool is available in the U.S. across Google Search and the Gemini app.",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Bluesky expands its AI-powered Attie app to let anyone build websites, games, and more",
+          "url": "https://techcrunch.com/2026/10/15/bluesky-expands-its-ai-powered-attie-app-to-let-anyone-build-websites-games-and-more/",
+          "source": "TechCrunch",
+          "blurb": "Bluesky is bringing “social vibe coding” to its experimental Attie platform, allowing users to create interactive experiences like games, q…",
           "signal": "",
           "discussion_url": ""
         }
@@ -138,26 +138,34 @@
       "label": "Agent tools",
       "items": [
         {
-          "title": "ollama/ollama: v0.40.4",
-          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.4",
+          "title": "ollama/ollama: v0.40.5",
+          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.5",
           "source": "ollama releases",
-          "blurb": "Decision models in the CLI Decision models can now be used directly from the terminal with ollama run — ask yes/no questions, classify text…",
+          "blurb": "NVIDIA Nemotron 3.5 Super NVIDIA Nemotron 3.5 Super is a vision-language model for coding, reasoning, tool use, and document understanding.…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "ollama/ollama: v0.40.4-rc2",
-          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.4-rc2",
-          "source": "ollama releases",
-          "blurb": "launch: allow usage credits without upgrading (#18985)",
+          "title": "browser-use/browser-use: 0.13.12: OpenAI browser tools",
+          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.12",
+          "source": "browser-use releases",
+          "blurb": "Add OpenAI browser tools backed by Browser Use Actor. Import BrowserUse from browser_use.integrations.openai. Install browser-use[openai-to…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "anthropics/claude-code: v2.1.296",
-          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.296",
-          "source": "claude-code releases",
-          "blurb": "What's changed Added a code key to the Claude apps gateway's managed.policies[]: the same settings as cli, also applied in Claude Desktop's…",
+          "title": "browser-use/browser-use: 0.13.11",
+          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.11",
+          "source": "browser-use releases",
+          "blurb": "This release includes Browser Use toolsets for Claude, available at browser_use.integrations.toolsets_for_claude. The integration requires…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "anomalyco/opencode: v1.19.1",
+          "url": "https://github.com/anomalyco/opencode/releases/tag/v1.19.1",
+          "source": "opencode releases",
+          "blurb": "Core Bugfixes Session sharing has been discontinued. Existing share links and session-sharing commands are no longer available, and importi…",
           "signal": "",
           "discussion_url": ""
         },
@@ -168,14 +176,6 @@
           "blurb": "What's changed Added CLAUDE_CODE_DISABLE_FILE_MENTIONS environment variable: Claude gets the paths of @ file mentions to read with its file…",
           "signal": "",
           "discussion_url": ""
-        },
-        {
-          "title": "ollama/ollama: v0.40.5",
-          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.5-rc0",
-          "source": "ollama releases",
-          "blurb": "What's Changed mlx: port the Metal custom kernels to CUDA by @dhiltgen in #18657 docs: model recs and language standardization by @anra8571…",
-          "signal": "",
-          "discussion_url": ""
         }
       ]
     },
@@ -184,43 +184,43 @@
       "label": "Dev",
       "items": [
         {
-          "title": "We found a Tencent agent fleet",
-          "url": "https://swarmcha.se/posts/chinese-agent-fleet-full-report",
-          "source": "Lobsters",
-          "blurb": "security, vibecoding",
-          "signal": "8 pts",
-          "discussion_url": "https://lobste.rs/s/wcoes4/we_found_tencent_agent_fleet"
+          "title": "Krea 3 – An image model built for editing at scale",
+          "url": "https://www.krea.ai/krea-3",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "275 pts · 86 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50105648"
+        },
+        {
+          "title": "Business accounts will consent to Meta scraping their websites Starting Oct. 30",
+          "url": "https://www.niemanlab.org/2026/10/metas-new-commercial-terms-will-allow-the-scraping-of-news-sites-legal-experts-say/",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "97 pts · 35 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50111852"
         },
         {
           "title": "andrewyng/openworker",
           "url": "https://github.com/andrewyng/openworker",
           "source": "GitHub",
           "blurb": "",
-          "signal": "18,530 stars",
+          "signal": "18,538 stars",
           "discussion_url": ""
         },
         {
-          "title": "LFM2.5-24B-A2B: Built for fast on-device agents",
-          "url": "https://www.liquid.ai/blog/lfm2-5-24b-a2b",
-          "source": "Hacker News",
-          "blurb": "",
-          "signal": "194 pts · 44 comments",
-          "discussion_url": "https://news.ycombinator.com/item?id=50097369"
-        },
-        {
-          "title": "Show HN: Petal, open-source CoScreen/ScreenHero finally free",
-          "url": "https://petal.live/",
-          "source": "Hacker News",
-          "blurb": "",
-          "signal": "161 pts · 38 comments",
-          "discussion_url": "https://news.ycombinator.com/item?id=50092470"
-        },
-        {
-          "title": "hypit-ai/hypit",
-          "url": "https://github.com/hypit-ai/hypit",
+          "title": "browser-use/jev-ultrafast",
+          "url": "https://github.com/browser-use/jev-ultrafast",
           "source": "GitHub",
-          "blurb": "Clone any viral video with AI agents. Not just a script, the whole workflow: swap the face, the words, the B-roll, ship 100 variants in one…",
-          "signal": "22,334 stars",
+          "blurb": "Fastest and cheapest web agent",
+          "signal": "23,030 stars",
+          "discussion_url": ""
+        },
+        {
+          "title": "yetone/magpie",
+          "url": "https://github.com/yetone/magpie",
+          "source": "GitHub",
+          "blurb": "Every agent's model. One place. Codex on DeepSeek, Claude Code on Kimi, from the menu bar.",
+          "signal": "13,636 stars",
           "discussion_url": ""
         }
       ]
@@ -230,10 +230,18 @@
       "label": "Infra",
       "items": [
         {
-          "title": "Introducing Clef-omni with full multimodality, plus a faster Clef and a cheaper Clef-flash",
-          "url": "https://blog.cloudflare.com/clef-faster-cheaper-multimodal/",
-          "source": "Cloudflare",
-          "blurb": "We are expanding the Clef decision model family with Clef-omni, natively processing audio, video, images, and text in a single pipeline. We…",
+          "title": "Open weight takes 71.5% of tokens and 23% of spend",
+          "url": "https://vercel.com/blog/ai-gateway-production-index-october-2026",
+          "source": "Vercel",
+          "blurb": "",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Vercel for Enterprise",
+          "url": "https://vercel.com/blog/vercel-for-enterprise",
+          "source": "Vercel",
+          "blurb": "",
           "signal": "",
           "discussion_url": ""
         },
@@ -246,26 +254,18 @@
           "discussion_url": ""
         },
         {
-          "title": "Drama 3 now available on AI Gateway",
-          "url": "https://vercel.com/changelog/drama-3-now-available-on-ai-gateway",
-          "source": "Vercel",
-          "blurb": "",
+          "title": "A fully programmable secure web gateway",
+          "url": "https://blog.cloudflare.com/programmable-gateway-dlp/",
+          "source": "Cloudflare",
+          "blurb": "Cloudflare Gateway and Data Loss Prevention have inherited the flexibility and power of Cloudflare Workers through our full-stack integrati…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Muse Wonder now available on AI Gateway",
-          "url": "https://vercel.com/changelog/muse-wonder-now-available-on-ai-gateway",
+          "title": "Vercel Ship 2026 recap",
+          "url": "https://vercel.com/blog/vercel-ship-2026-recap",
           "source": "Vercel",
           "blurb": "",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Your agent, your network: How Meta’s Muse agent works with Tailscale",
-          "url": "https://tailscale.com/blog/meta-muse-ai-agent-tailscale",
-          "source": "Tailscale",
-          "blurb": "Meta's Muse connects to Tailscale. You decide what it can reach.",
           "signal": "",
           "discussion_url": ""
         }
@@ -276,18 +276,18 @@
       "label": "Product",
       "items": [
         {
-          "title": "Superdraft",
-          "url": "https://www.producthunt.com/products/superdraft",
+          "title": "Fwrd",
+          "url": "https://www.producthunt.com/products/fwrd",
           "source": "Product Hunt",
-          "blurb": "Automatically identify opportunities to email your customers Discussion | Link",
+          "blurb": "Forward iPhone texts to Slack, Discord, or Telegram Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Lleverage",
-          "url": "https://www.producthunt.com/products/lleverage",
+          "title": "GLM-Legal",
+          "url": "https://www.producthunt.com/products/z-ai",
           "source": "Product Hunt",
-          "blurb": "The autonomous back office for the physical economy Discussion | Link",
+          "blurb": "Z.ai’s legal AI model for contract review and compliance Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
@@ -300,10 +300,10 @@
           "discussion_url": ""
         },
         {
-          "title": "withHuman",
-          "url": "https://www.producthunt.com/products/withhuman",
+          "title": "Afterparty",
+          "url": "https://www.producthunt.com/products/afterparty",
           "source": "Product Hunt",
-          "blurb": "A human approval layer for AI Agents Discussion | Link",
+          "blurb": "Automated actions for meeting deliverables Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
@@ -322,42 +322,42 @@
       "label": "Startups",
       "items": [
         {
-          "title": "Ambrosia Energy will build a 10 GWh factory in Texas to make batteries for off-grid data centers",
-          "url": "https://techcrunch.com/2026/10/14/ambrosia-energy-will-build-a-10-gwh-factory-in-texas-to-make-batteries-for-off-grid-data-centers/",
+          "title": "Tesla reveals SpaceX-powered Roadster that flies and falls with style",
+          "url": "https://techcrunch.com/2026/10/15/tesla-reveals-spacex-powered-roadster-that-flies-and-falls-with-style/",
           "source": "TechCrunch",
-          "blurb": "Startup Ambrosia Energy will build a massive factory to crank out batteries to augment solar panels, creating a round-the-clock clean power…",
+          "blurb": "The new car used thrusters to leap over a Cybercab, Cybertruck, Tesla Semi, Model Y, and Model 3 at a demo in Texas.",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Hiyd is a health tracker that attaches to the watch you already wear",
-          "url": "https://techcrunch.com/2026/10/14/hiyd-is-a-health-tracker-that-attaches-to-the-watch-you-already-wear/",
+          "title": "Volvo makes a bigger bet on Nvidia for hands-free automated driving",
+          "url": "https://techcrunch.com/2026/10/15/volvo-makes-a-bigger-bet-on-nvidia/",
           "source": "TechCrunch",
-          "blurb": "Former Apple engineers figured out how to get a biometric sensor to attach to your watch without any magnets or adhesives.",
+          "blurb": "Volvo is leveling up its automated driving system through an expansion of its nearly decade-long partnership with Nvidia that will extend b…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Colossal Biosciences announces new AI platform to help accelerate de-extinction efforts",
-          "url": "https://techcrunch.com/2026/10/14/colossal-biosciences-announces-new-ai-platform-to-help-accelerate-de-extinction-efforts/",
+          "title": "Bluesky wants to make it easier to buy, sell, and fundraise on the network",
+          "url": "https://techcrunch.com/2026/10/15/bluesky-wants-to-make-it-easier-to-buy-sell-and-fundraise-on-the-network/",
           "source": "TechCrunch",
-          "blurb": "Colossal announced a new AI platform to help accelerate its de-extinction efforts and Peter Diamandis has launched a new fund to back start…",
+          "blurb": "The executives argued that advertising isn’t the only path to monetization, and that there are alternative models that are feasible when it…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "CedarDB wants one database to handle both transactions and analytics, as AI agents raise the stakes",
-          "url": "https://techcrunch.com/2026/10/14/cedardb-wants-one-database-to-handle-both-transactions-and-analytics-as-ai-agents-raise-the-stakes/",
+          "title": "SK Hynix bargains for chip equipment exports to its China facility in return for building a factory in US",
+          "url": "https://techcrunch.com/2026/10/15/sk-hynix-bargains-for-chip-equipment-exports-to-its-china-facility-in-return-for-building-a-factory-in-us/",
           "source": "TechCrunch",
-          "blurb": "Databases have traditionally been designed either for analytical data or for operational data. But database engine CedarDB supports both, a…",
+          "blurb": "SK Hynix’s Solidigm is reportedly seeking U.S. approval to send more chipmaking equipment to China as it weighs building a new NAND chip fa…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Intero Biosystems wants drugmakers to test on mini human intestines, not animals",
-          "url": "https://techcrunch.com/2026/10/14/intero-biosystems-wants-drugmakers-to-test-on-mini-human-intestines-not-animals/",
+          "title": "And the winner of Startup Battlefield at Disrupt 2026 is: Intero Biosystems",
+          "url": "https://techcrunch.com/2026/10/15/and-the-winner-of-startup-battlefield-at-disrupt-2026-is-intero-biosystems/",
           "source": "TechCrunch",
-          "blurb": "Intero Biosystems is selling lab-grown human intestines to drugmakers as regulators push for alternatives to animal testing, while the star…",
+          "blurb": "Intero Biosystems beat out 199 other Startup Battlefield companies to take home the $100,000 grand prize at TechCrunch Disrupt 2026.",
           "signal": "",
           "discussion_url": ""
         }
@@ -368,26 +368,10 @@
       "label": "News",
       "items": [
         {
-          "title": "Exclusive: Modal raised $750M and tops $1B in annualized run rate - Axios",
-          "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQcFlDZE94bHk1U0xyMXJyaG1FZWlPUmxsX3E0aENrX2JwWnVZVHMtZ0ZDN2kweEJzLWlNSE0yaFdYc2ZicjdFQkxpcENoblZCUG5TSWJ2S1hCSjlHMWhVQURBWl95a2NhMmxMdFRvb0c0blBOaVNENC1EdzMtXy1CQnlWOUNFSU4xUGJVNjQyNmgxZlk0Z2NZ?oc=5",
+          "title": "Ramp reaches $60B valuation as it pushes deeper into AI - TechCrunch",
+          "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQN3djZ09tWnlvSlg5cVNMV2UzanVMQ0VEcmNHLThlT0c4aTJKeTdmZjd6Z0Y3Z1JxeEo0RnRyaFRGQ2FySmwxSTB0SzBFclVuV0JhS3RUc05landudElrS0JwR2JzNXFJQzdhTG5YYzVVZHRZdm02aEVma00yNDlaS016bmgwd3YwYkNvbTg4Z3ZtWlk?oc=5",
           "source": "Google News",
-          "blurb": "Exclusive: Modal raised $750M and tops $1B in annualized run rate Axios",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "AI cloud startup Modal raises $750M at $15.75B valuation - SiliconANGLE",
-          "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxNZmF0ZHk0WGI4b2ZSYTcyQ1ctalFMMW9IQTZFQU12emY0dWNhWFU5WVA5MEZLTjRkaWE5eUZKSjFyYU1FSzAtWmZBc29PQVA3UkYzRmNVbFNfTVZPVHZUWDJFMHdNeExwZjlaVlhKN21Cc2lhU0NUU3pqZ0hOOERvcUYtbUQwZUsyenRqMVBVdjhGTXdKVVE?oc=5",
-          "source": "Google News",
-          "blurb": "AI cloud startup Modal raises $750M at $15.75B valuation SiliconANGLE",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Harmonic Security Raises $50 Million for Workforce AI Protection - SecurityWeek",
-          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxObG16VEJPVUkxM1RxQktzeEFIdEZCd3BYTkRwZ3FiN0ZRdnNHbUVuMG1uM01SUnZPVVNIaFphcWVITkxzMGxPQnhwSWRueDFLd2pPdTdMd1h2WFJxSzJzUGI4T1Z2TXhFcVZsWjVXRjRUeGVNblhoaVFscElTUE83ZFNzQ2x2b3loQnN6WlFhbTJRMFkyMEgtUA?oc=5",
-          "source": "Google News",
-          "blurb": "Harmonic Security Raises $50 Million for Workforce AI Protection SecurityWeek",
+          "blurb": "Ramp reaches $60B valuation as it pushes deeper into AI TechCrunch",
           "signal": "",
           "discussion_url": ""
         },
@@ -400,10 +384,26 @@
           "discussion_url": ""
         },
         {
-          "title": "AI Tracker: Suki lands $90M - Modern Healthcare",
-          "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQb0Zsbm5XcmxTU0JuTzczTC1fUF9FVzB3LTJ3X2hLYVRJUFl3ZXB6TEZoMldEOXlkTXBTOVp2amNpLXFVeWlBUUd4X2dZNzlvUnB2LUoybW9LRThOY2pjN18tbnB3S2NieGMwSm9fVVBuZHprWUFrTU50Wk91ZVREV3NDZ1hvQ3RxcW9zeEMxMGs?oc=5",
+          "title": "Scottsdale AI startup raises $6M to scale sales agents for small businesses - The Business Journals",
+          "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPemRPM2gzdjAtcEJ4d3ZWSzhNUlJOMmtUYTd4UVhJSkNDVV9EUlpaQ0lsTlpsdENPRHJfcVJablM4ZldiY0xRdFRmSGZhUHZlUENWSWJ2Q1BFcnhSU1htQ3o5Y1BVVFRqeUhRN0ZJZHd2aUFDZDFQSzRzVjdOLWE5dU1POU13cTZnQzR6cnBnNHVuOG9SMXF0YVp3?oc=5",
           "source": "Google News",
-          "blurb": "AI Tracker: Suki lands $90M Modern Healthcare",
+          "blurb": "Scottsdale AI startup raises $6M to scale sales agents for small businesses The Business Journals",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Indian banking AI startup RevRag raises $2.5m seed round - Tech in Asia",
+          "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOVHB1SThKOXZ5aElPSHdnQXhadFBQVVcxWEZCMkFsVDd4Z3luWmFfMlMzT0JBeDRzQkpXZzctVExYTDdrVEZKZ3hwZ3lEcDRFcDNOTngtcGNGMDF2SjJQQXhkS0ItbGxQekhFZDA0Z2RGd21Kb0R0MkVhUVlxbDhZNFMtY1E2b0U?oc=5",
+          "source": "Google News",
+          "blurb": "Indian banking AI startup RevRag raises $2.5m seed round Tech in Asia",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "New G2 Research: AI Agents Have Moved From Pilot to Production, But Oversight Comes at a Cost - Yahoo Finance",
+          "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOYVhqZml3WmxMZ0hzdWEwanAyXzJERWExYzVydXphWnA2bFRkci1aWER1UVlhSjdaNUprbU1DQjRucXozNlYzSG9oRDFnbkY5WGhqNzBqOGUzU01zU1dXNjI2QnRET1hiM3BtOS1WVV92ZGViaEt1cmgwb2JVYWtBQllBUDY2TnJ5TTNQNHZPSURXWTNOQWc?oc=5",
+          "source": "Google News",
+          "blurb": "New G2 Research: AI Agents Have Moved From Pilot to Production, But Oversight Comes at a Cost Yahoo Finance",
           "signal": "",
           "discussion_url": ""
         }
@@ -422,18 +422,26 @@
           "discussion_url": ""
         },
         {
-          "title": "Dutch Police Arrest ‘Reformed’ Hacker in Shiny Hunters Investigation",
-          "url": "https://krebsonsecurity.com/2026/09/dutch-police-arrest-reformed-hacker-in-shiny-hunters-investigation/",
-          "source": "Krebs on Security",
-          "blurb": "Authorities in the Netherlands have arrested a 23-year-old convicted cybercriminal on suspicion of aiding in data thefts and extortions by…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "U.S. Soldier Gets 70 Months in Prison for AT&T, Verizon Extortions",
           "url": "https://krebsonsecurity.com/2026/09/u-s-soldier-gets-70-months-in-prison-for-att-verizon-extortions/",
           "source": "Krebs on Security",
           "blurb": "A U.S. Army soldier who pleaded guilty to hacking into multiple telecommunications companies and stealing mobile call and text metadata for…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Android gets AI defenses against messaging scams, fake calls",
+          "url": "https://www.bleepingcomputer.com/news/security/android-gets-ai-defenses-against-messaging-scams-fake-calls/",
+          "source": "BleepingComputer",
+          "blurb": "Google announced new AI-powered defenses against scam messages and call-forwarding abuse on Android, currently rolling out to eligible devi…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Dutch Police Arrest ‘Reformed’ Hacker in Shiny Hunters Investigation",
+          "url": "https://krebsonsecurity.com/2026/09/dutch-police-arrest-reformed-hacker-in-shiny-hunters-investigation/",
+          "source": "Krebs on Security",
+          "blurb": "Authorities in the Netherlands have arrested a 23-year-old convicted cybercriminal on suspicion of aiding in data thefts and extortions by…",
           "signal": "",
           "discussion_url": ""
         },
@@ -444,14 +452,6 @@
           "blurb": "A teenager from Amman, Jordan suspected of leading the prolific data theft and extortion group ShinyHunters has been detained and is report…",
           "signal": "",
           "discussion_url": ""
-        },
-        {
-          "title": "Global takedown hits network behind 1 billion phishing messages",
-          "url": "https://www.bleepingcomputer.com/news/security/global-takedown-hits-network-behind-1-billion-phishing-messages/",
-          "source": "BleepingComputer",
-          "blurb": "A massive cybercriminal ecosystem facilitating more than a billion malicious messages targeting over 75,000 organizations across 150 countr…",
-          "signal": "",
-          "discussion_url": ""
         }
       ]
     },
@@ -460,42 +460,42 @@
       "label": "India",
       "items": [
         {
-          "title": "Confido Health Raises $12.5 Mn To Automate Healthcare Administration With AI",
-          "url": "https://inc42.com/buzz/confido-health-raises-12-5-mn-to-automate-healthcare-administration-with-ai/",
+          "title": "Origin Bags $20 Mn To Build Autonomous Construction Robots",
+          "url": "https://inc42.com/buzz/origin-bags-20-mn-to-build-autonomous-construction-robots/",
           "source": "Inc42",
-          "blurb": "US-based AI healthtech startup Confido Health has raised $12.5 Mn (about ₹119 Cr) in a Series A extension led by…",
+          "blurb": "Emerging out of stealth mode, robotics startup Origin has raised $20 Mn (around ₹189 Cr) in a funding round co-led…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Parallel Loop Raises $6.6 Mn To Integrate AI Into Enterprise Workflows",
-          "url": "https://inc42.com/buzz/parallel-loop-raises-6-6-mn-to-integrate-ai-into-enterprise-workflows/",
-          "source": "Inc42",
-          "blurb": "Enterprise AI startup Parallel Loop has raised $6.6 Mn (about ₹63.1 Cr) in a seed funding round led by 3one4…",
+          "title": "Why CoreWeaves troubles are rattling the AI boom",
+          "url": "https://www.livemint.com/technology/why-coreweaves-troubles-are-rattling-the-ai-boom-11792091910736.html",
+          "source": "Mint",
+          "blurb": "COREWEAVE-STOCKS/ (EXPLAINER, PIX):EXPLAINER-Why CoreWeave's troubles are rattling the AI boom",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Shamrock AI Bags $5 Mn To Help Enterprises Deploy AI Agents Reliably",
-          "url": "https://inc42.com/buzz/shamrock-ai-bags-5-mn-to-help-enterprises-deploy-ai-agents-reliably/",
-          "source": "Inc42",
-          "blurb": "Enterprise AI startup Shamrock AI has raised $5 Mn (about ₹47.4 Cr) in a seed funding round led by Endiya…",
+          "title": "Global financial watchdog calls for more human oversight of agentic AI",
+          "url": "https://www.livemint.com/technology/global-financial-watchdog-calls-for-more-human-oversight-of-agentic-ai-11792036879056.html",
+          "source": "Mint",
+          "blurb": "GLOBAL-REGULATION/AI",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Stripe India MD on why Indian startups should build for the world from day one",
-          "url": "https://yourstory.com/2026/10/indian-founders-can-think-global-and-go-global-on-day-one-says-stripe-india-chief",
+          "title": "Shop Pay’s India Debut, Zetwerk IPO Day 1 & More",
+          "url": "https://inc42.com/buzz/shop-pays-india-debut-zetwerk-ipo-day-1-more/",
+          "source": "Inc42",
+          "blurb": "Shopify’s India Checkout Bet Shopify is preparing to bring Shop Pay to India. Setting up a direct clash with domestic…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "This 11-year-old built an AI smart cane for ₹10,000 and took it to the UN",
+          "url": "https://yourstory.com/2026/10/aaradhya-jain-11-year-old-ai-smart-cane-stambha-un",
           "source": "YourStory",
-          "blurb": "At TechSparks 2026, Manish Maheshwari, Managing Director of Stripe India, says AI is making it faster and cheaper to build a world-facing c…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "TechSparks 2026 Day 2: From Krishna Byre Gowda’s Bengaluru blueprint to Stripe’s global playbook, and more",
-          "url": "https://yourstory.com/2026/10/techsparks-2026-day-2-krishna-byre-gowda-stripe-deeptech",
-          "source": "YourStory",
-          "blurb": "TechSparks 2026 Day 2: Krishna Byre Gowda on tech-led governance and metro plans, Stripe on going global, VCs on deeptech bets.",
+          "blurb": "11-year-old Aaradhya Jain built STAMBHA, a ₹10,000 AI cane for elderly and blind users, and presented it at the UN in Bangkok.",
           "signal": "",
           "discussion_url": ""
         }
@@ -506,42 +506,42 @@
       "label": "Reddit",
       "items": [
         {
-          "title": "This guy had an AI cold-call 1000+ SF businesses to see how many would talk to it. Only about 1 in 3 did.",
-          "url": "https://www.reddit.com/r/AI_Agents/comments/1x5xx6v/this_guy_had_an_ai_coldcall_1000_sf_businesses_to/",
-          "source": "r/AI_Agents",
-          "blurb": "I’ve been reading up on AI calling agents this week and found this experiment from SF Tech Week. It’s the most useful real-world data I’ve…",
+          "title": "Crossed $100k processed on my ticketing SaaS. The customers I planned for aren't the ones who showed up.",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x6xrsl/crossed_100k_processed_on_my_ticketing_saas_the/",
+          "source": "r/SaaS",
+          "blurb": "I built a ticketing app for one customer: my kid's high school afterprom. The parent committee needed online tickets, signed waivers, and a…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Launched my first SaaS today: PaperTool 🚀",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x5xhyf/launched_my_first_saas_today_papertool/",
-          "source": "r/SaaS",
-          "blurb": "PaperTool is a PDF template builder. You design a template once on a drag-and-drop canvas (or let AI generate it), then create PDFs from it…",
+          "title": "Anthropic's third-quarter revenue is said to hit $16.8 billion ahead of IPO",
+          "url": "https://www.reddit.com/r/ClaudeAI/comments/1x6idx1/anthropics_thirdquarter_revenue_is_said_to_hit/",
+          "source": "r/ClaudeAI",
+          "blurb": "The company also told investors it was cash-flow positive, generating $1.70 in revenue for every dollar spent on computing power during the…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "6 months building an AI tool, $2k+ in ads, almost no paying users. We turned off ads and things finally started working.",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x642m0/6_months_building_an_ai_tool_2k_in_ads_almost_no/",
+          "title": "Almost pathetic how long it took, but I finally passed 10 $ MRR",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x6vm44/almost_pathetic_how_long_it_took_but_i_finally/",
           "source": "r/SaaS",
-          "blurb": "I run a small AI tool that redesigns existing PowerPoints to look professionally made. After six months of building, testing, and trying pr…",
+          "blurb": "If have been building an app since November 2025, and just like many people, I had zero revenue for a long long time. It was of course frus…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "A failed launch took me from €0 to €16,000 total (No Promotion)",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x66iwp/a_failed_launch_took_me_from_0_to_16000_total_no/",
+          "title": "I’m turning my 7-year-old website into something useful for SaaS founders",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x6i1km/im_turning_my_7yearold_website_into_something/",
           "source": "r/SaaS",
-          "blurb": "Launched on Product Hunt a few months ago. Built the whole thing solo for about €1,000. Assumed if I just shipped it and posted everywhere,…",
+          "blurb": "I've spent the last 7 years building my site around seo and digital marketing. Now I'm rebuilding it to help SaaS founders get their produc…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "10x lower the cost of inference for your saas or startup",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x5pk5n/10x_lower_the_cost_of_inference_for_your_saas_or/",
+          "title": "Ramp hits $60B valuation. What does this say about the future of B2B SaaS?",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x6x8w7/ramp_hits_60b_valuation_what_does_this_say_about/",
           "source": "r/SaaS",
-          "blurb": "hello guys, founder here!the idea behind our product is simple. everyone is spending too much on ai bills, and when subscriptions expire, u…",
+          "blurb": "submitted by /u/TheStudiousIndicator [link] [comments]",
           "signal": "",
           "discussion_url": ""
         }
@@ -550,58 +550,10 @@
   ],
   "wire": [
     {
-      "title": "Zenzap raises $33 million Series A to bring AI agents into everyday workplace chats - CTech",
-      "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1wa0tYTFBhVVBHOG1VTlFkaXZtcF80a3pOYmV4R0gwam0zRVpMMnpoQkZib0RiVzJqS2J1d3lKajBRRm9jT3hqNE8zQWVJRXBEMzBHbjNKdDdYX0JLRk9ELWJiakJwSk1B?oc=5",
-      "source": "Google News",
-      "blurb": "Zenzap raises $33 million Series A to bring AI agents into everyday workplace chats CTech",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Labelbox Raises $100M+ Series E at $1.25B Valuation to Advance RL and AI Agents - Unite.AI",
-      "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNT1Mwbm5Ec1o1aDhKZjkxNEpRUzB1UG44X2QwTUNDY3BDeDR2UkRuYWpTTFBnZnJON3lEVTNaeFJ1VVV0RDNBMGcxajM0Njh5blFLUGZxX1pMWVBab0FncEhNYVg0dTNwdVhKUmpzOUVDcWR2bExaY1kwTDVkc3RwOW9od2hLbzY2VjljT2p5LXl6WFBGa18tVHhmSEQwSTRaZTUtQVRn?oc=5",
-      "source": "Google News",
-      "blurb": "Labelbox Raises $100M+ Series E at $1.25B Valuation to Advance RL and AI Agents Unite.AI",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Othello uses AI to tell salespeople what to say during calls. See the pitch deck that helped it raise $8 million. - Business Insider",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOSThpdlZuSHBYVHllTmpYdk1SVVFNQTZPQjBBem9ldGExVFJIVkxuOWVobkIwOG1ReGFmNnJVQmIydjdxOEdWek02NHFCRFRmQ3RtYlhSUmtIV09Bd1oxM0dmZmJNTUlFa21qT2h0WXNwSmhqMWNmUk80amE5T2lLQ2xnWDhWREtsUUpQekg3eU92M0JQYnIxWkJrcWhwZVJSZG54SlpmeWMzQ3REUjlYU3dnQQ?oc=5",
-      "source": "Google News",
-      "blurb": "Othello uses AI to tell salespeople what to say during calls. See the pitch deck that helped it raise $8 million. Business Insider",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "YouTube Music launches new labels as AI-generated music floods streaming platforms",
-      "url": "https://techcrunch.com/2026/10/14/youtube-music-launches-new-labels-as-ai-generated-music-floods-streaming-platforms/",
-      "source": "TechCrunch",
-      "blurb": "The label will appear on the player page and include songs entirely generated by AI or partially, such as AI involved in composition and vo…",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
       "title": "Gudea leverages AI to help organizations prevent social media crises before they erupt",
       "url": "https://techcrunch.com/2026/10/14/gudea-leverages-ai-to-help-organizations-prevent-social-media-crises-before-they-erupt/",
       "source": "TechCrunch",
-      "blurb": "Every day, conversations unfold across social media and websites around the world. A seemingly insignificant post—whether it involves AI-ge…",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "The Agent Said It Was Done. The Database Disagreed.",
-      "url": "https://huggingface.co/blog/microsoft/thinkingbox",
-      "source": "Hugging Face",
-      "blurb": "",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Laplace Intelligence red-teams robots and self-driving cars before they hit the real world",
-      "url": "https://techcrunch.com/2026/10/13/laplace-intelligence-red-teams-robots-and-self-driving-cars-before-they-hit-the-real-world/",
-      "source": "TechCrunch",
-      "blurb": "University of Michigan spinout Laplace Intelligence uses AI agents and interactive simulation to stress-test robots and self-driving vehicl…",
+      "blurb": "Gudea, a company that tracks how stories and rumors spread online that describes itself as the “storm tracker for the internet,” is using A…",
       "signal": "",
       "discussion_url": ""
     },
@@ -614,34 +566,50 @@
       "discussion_url": ""
     },
     {
-      "title": "Holo4: powering generalist computer-use agents",
-      "url": "https://huggingface.co/blog/Hcompany/holo4",
+      "title": "Welcome Muse Spark Open: open-weight frontier multimodal mixture-of-experts model from Meta",
+      "url": "https://huggingface.co/blog/meta-muse-spark-open",
       "source": "Hugging Face",
       "blurb": "",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Global financial watchdog calls for more human oversight of agentic AI",
-      "url": "https://www.livemint.com/technology/global-financial-watchdog-calls-for-more-human-oversight-of-agentic-ai-11792036879056.html",
-      "source": "Mint",
-      "blurb": "GLOBAL-REGULATION/AI",
+      "title": "YouTube Music launches new labels as AI-generated music floods streaming platforms",
+      "url": "https://techcrunch.com/2026/10/14/youtube-music-launches-new-labels-as-ai-generated-music-floods-streaming-platforms/",
+      "source": "TechCrunch",
+      "blurb": "The label will appear on the player page and include songs entirely generated by AI or partially, such as AI involved in composition and vo…",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Scimplify Bags $25 Mn To Scale Its Semiconductor Chemicals Business",
-      "url": "https://inc42.com/buzz/scimplify-bags-25-mn-to-scale-its-semiconductor-chemicals-business/",
-      "source": "Inc42",
-      "blurb": "Speciality chemical manufacturing startup Scimplify has raised $25 Mn (around ₹238 Cr) in a fresh funding round led by Hitachi…",
+      "title": "Gemini 4 Argon: Built to solve your hardest problems",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "source": "Google AI",
+      "blurb": "We’re giving developers, enterprises, scientists, and consumers access to Gemini 4 Argon, our latest frontier model.",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Infotech Acquires Lightspeed-Backed SaaS Startup Zluri",
-      "url": "https://inc42.com/buzz/infotech-acquires-lightspeed-backed-saas-startup-zluri/",
-      "source": "Inc42",
-      "blurb": "IT advisory firm Infotech has acquired Bengaluru-based SaaS startup Zluri to add the latter’s application discovery, identity governance an…",
+      "title": "Introducing Muse Spark Open, The Most Capable US Open‑Weight Model to Date - Meta AI",
+      "url": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBxQTR0N0dqcHl2SFlORVRDWlZ2MFg3c1l3czJ5ZF9pQVJMd1FFcTBzTjdfQ00ydURKSVpESEloR2hhVzNJTkIyNU9XalpybnFmdWlJYjhHV0k?oc=5",
+      "source": "Google News",
+      "blurb": "Introducing Muse Spark Open, The Most Capable US Open‑Weight Model to Date Meta AI",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "The Agent Said It Was Done. The Database Disagreed.",
+      "url": "https://huggingface.co/blog/microsoft/thinkingbox",
+      "source": "Hugging Face",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "When it came to Cal AI’s viral success, a small army of influencers paid off",
+      "url": "https://techcrunch.com/2026/10/15/when-it-came-to-cal-ais-viral-success-a-small-army-of-influencers-paid-off/",
+      "source": "TechCrunch",
+      "blurb": "The company generated over $30 million in revenue in two years and was acquired by MyFitnessPal for an undisclosed amount of money in March.",
       "signal": "",
       "discussion_url": ""
     },
@@ -654,10 +622,42 @@
       "discussion_url": ""
     },
     {
-      "title": "Google.org Commits $15 Mn To The/Nudge To Expand Credit Access For Indian MSMEs",
-      "url": "https://inc42.com/buzz/google-org-commits-15-mn-to-the-nudge-to-expand-credit-access-for-indian-msmes/",
+      "title": "Mueon Raises $65M Series A to Move Cubelets Toward Production Readiness - Unite.AI",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQaF9pNnJIc0E0X0tTMlNvNEhmVldON0c4cUx0dW4xbEk0X1pIVDZTcTh6RzM4czlzaGF1Q0hOR1J2Q0tlazNIcUYyLU84RXN5c3ZDdXdCLWRiblE5ZkZJeElkRURuOFM3emZBeFhfM0h2a0tSR3RxMmdjbHVXdmtldVhEcENDdDhBWENoODBkSnA3Wk43ZkU4?oc=5",
+      "source": "Google News",
+      "blurb": "Mueon Raises $65M Series A to Move Cubelets Toward Production Readiness Unite.AI",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "How Third Moment Research runs 10,000 agents for 36+ hours",
+      "url": "https://openai.com/index/third-moment-research",
+      "source": "OpenAI",
+      "blurb": "With GPT-6 Astra and GPT-6.1 Sol, Codex, and Daybreak for cybersecurity, this AI lab builds agents that focus for days and improve with use.",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "RevRag AI raises $2.5 mn seed funding led by Accion Ventures, Cedar Hill Capital - ET Entrepreneur",
+      "url": "https://news.google.com/rss/articles/CBMi5gFBVV95cUxQYTlpWkhOX3FHcXl3c09fbmJxTEtvUlRLbk1ONE5rb05Ib3JtUkRPRjFTQkZodFl0dW93cHZhNW9vdzJSb0xDT2RLdUhBSHpISXZ6NEQ5LXZmczhKSC00TkxaanRtaDlEd2ZnczhYdHA0bWs5NWNHbWlhblJaUmhLdl9jNTd1TWN5UFNhQlU2d0JKTTNuZ1FJZTg5TlcwQ3lGNEp6ZXMyT2Z4Nks3dVoxQkU4VVRTY3piTDZwVm81U3pjeGVVYlhaMnlQUnBRaGRaSkh2OHVyYmRJVmZrSW1kOTNZdkg2Z9IB6wFBVV95cUxNbzltQUpzWHdvYnlBVWZwOEtuVHZ2bG0xRjFvOThyTGhET0d6M0pDelNEc0ctY3FMMVBrUndzWlFhUTRqdDNndzVZR1V2dnMxVFR6QTM1OVVRV0YzYUo4Y3p1ODlBaHhpbmNrbXJScThtLWt3YTM0R2xzYTY0NUNNeng5dnF5eVAzeUhJTkl0OTNrYjJTbmliTTUxY1NWVWM4VTVVaFFIdEhwd1BQWHk1cFZKSHlScElBRlZHeHNub2s1dXpZNWtpdTFYeUNYSkdZSUxOUEdwWXBSd1doVjNMcTlLd0ZQYno0RWs4?oc=5",
+      "source": "Google News",
+      "blurb": "RevRag AI raises $2.5 mn seed funding led by Accion Ventures, Cedar Hill Capital ET Entrepreneur",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "‘We cannot wait 75 years’: ANRF CEO Shivkumar Kalyanaraman on scaling India’s research multiplier",
+      "url": "https://yourstory.com/2026/10/anrf-ceo-shivkumar-kalyanaraman-scaling-india-research-multiplier",
+      "source": "YourStory",
+      "blurb": "To boost India’s R&D spend toward 3% of GDP, ANRF CEO Shivkumar Kalyanaraman revealed a patient-capital architecture combining private inve…",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Exclusive: Shopify To Bring Accelerated Checkout Service ‘Shop Pay’ To India",
+      "url": "https://inc42.com/buzz/shopify-to-bring-accelerated-checkout-service-shop-pay-to-india/",
       "source": "Inc42",
-      "blurb": "Google’s philanthropic arm Google.org has committed $15 Mn in funding to nonprofit organisation The/Nudge (formerly The/Nudge Institute) to…",
+      "blurb": "Commerce technology company Shopify is preparing to bring its accelerated checkout product, Shop Pay, to India by the first quarter…",
       "signal": "",
       "discussion_url": ""
     }
