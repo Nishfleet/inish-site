@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-18",
+  "candidate_count": 425,
+  "editor_note": "Opened 8 of today's 425 candidates and kept 7. OpenAI's Stack Overflow for Agents post died because the page blocks fetching, and every Google News funding story stayed unverifiable behind redirect links. Meta's Muse Spark Open, Ramp and the Vercel gateway index already ran this week. Four Reddit feeds and the X interests feed were down, so those lanes were empty today.",
+  "stories": [
+    {
+      "title": "Replit makes OpenAI its default over Anthropic, CEO says",
+      "url": "https://techcrunch.com/2026/10/17/replit-is-no-longer-working-with-anthropic-ceo-says/",
+      "evidence_url": "https://techcrunch.com/2026/10/17/replit-is-no-longer-working-with-anthropic-ceo-says/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Replit, the browser platform where people build software by describing what they want, has stopped working with Anthropic, CEO Amjad Masad said on stage at TechCrunch Disrupt on Thursday. OpenAI's models now power Replit's agent by default, and customers can still pick Claude if they want. Masad cited cost, partnership terms and his company's benchmark, where OpenAI's Sol and Astra models consistently built apps better. Replit had been one of Anthropic's five biggest customers until recently.",
+      "fact": "Masad said onstage that Replit had been, until recently, a top-five customer of Anthropic's, and that on his benchmark OpenAI's Sol and Astra models consistently \"perform better on building vibe-coded applications from scratch.\"",
+      "take": "I read this as the default doing the deciding, because most customers never change the model picker, so one business deal flips who gets the volume. Where my product sits in someone else's default list is now a line in my risk register.",
+      "caveat": "People familiar with the deal told TechCrunch the Anthropic partnership is still in place, and Masad's benchmark is internal, so the performance claim cannot be checked from outside."
+    },
+    {
+      "title": "Anthropic gives METR researchers employee-level access to check its work",
+      "url": "https://techcrunch.com/2026/10/15/anthropic-is-letting-metr-researchers-look-under-the-hood-with-employee-level-access/",
+      "evidence_url": "https://techcrunch.com/2026/10/15/anthropic-is-letting-metr-researchers-look-under-the-hood-with-employee-level-access/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Anthropic has given six researchers from METR, a nonprofit that tests AI models, the same access its own staff have: company laptops, office space and internal tools, so they can independently judge how safe the company's systems are. METR will publish what it finds and Anthropic cannot veto it, though it can demand narrow redactions such as customer data. Anthropic compares the setup to bank regulators living inside the biggest banks.",
+      "fact": "6 METR researchers get Anthropic-issued laptops and internal access on par with its own risk teams, and Anthropic has given up the right to block METR's publications.",
+      "take": "I want this to become boring. My agents run on models whose safety claims I take on faith, and an evaluator free to publish without the lab's approval is the first independent check on Anthropic I would actually trust.",
+      "caveat": "The arrangement covers one lab and one evaluator so far, and Anthropic still defines the narrow categories it can force METR to redact."
+    },
+    {
+      "title": "Morgan Stanley: the AI race may be decided by electricity before chips",
+      "url": "https://www.livemint.com/technology/ai-race-may-depend-more-on-access-to-power-infrastructure-than-chip-supply-morgan-stanley-11792231459245.html",
+      "evidence_url": "https://www.livemint.com/technology/ai-race-may-depend-more-on-access-to-power-infrastructure-than-chip-supply-morgan-stanley-11792231459245.html",
+      "source": "Mint",
+      "section": "Demand signals",
+      "summary": "A Morgan Stanley research report argues the constraint on AI growth is shifting from getting chips to getting electricity, land and money for data centres. It estimates US data-centre developers face a 32 gigawatt power shortfall through 2028, about 34 percent of what they will need, and that big tech companies plus specialist clouds will take roughly 94 percent of the world's data-centre capacity added in 2026. The report warns chip orders could slip or be cancelled if data centres cannot be powered.",
+      "fact": "Morgan Stanley's report estimates a 32 gigawatt US power shortfall through 2028, about 34 percent of projected requirements, and quotes Nvidia confirming \"there is not enough power to meet demand.\"",
+      "take": "Electricity is becoming the gate that decides which AI businesses get to exist, because a 32 gigawatt gap cannot be solved by ordering more chips. I would treat cheap, reliable power as a moat when I pick where my own workloads run.",
+      "caveat": "The figures come from one bank's equity research, carried by the ANI wire through Mint, and forecasts of this kind have been wrong before."
+    },
+    {
+      "title": "Reflection's Beam is a 501B-parameter model anyone can download and own",
+      "url": "https://huggingface.co/blog/reflection-beam",
+      "evidence_url": "https://huggingface.co/blog/reflection-beam",
+      "source": "Hugging Face",
+      "section": "AI",
+      "summary": "Reflection, a new American AI lab, has released its first model, Beam, with open weights under the Apache 2.0 license, meaning anyone can download it and run it on their own machines. It is a mixture-of-experts model, so only 23 billion of its 501 billion parameters wake up for any given request, which lets it answer at the speed of a much smaller model. It reads a context of 1 million tokens (tokens are the chunks of text a model reads and charges by) and is aimed at coding and agent work.",
+      "fact": "Beam ships under the Apache 2.0 license with 501B parameters, 23B active per token, and a 1M-token context window, with day-one support in transformers, vLLM and SGLang.",
+      "take": "Free to own beats cheap to rent once the model is good enough, because weights on my own machine mean no price hikes and no account cutoffs. I would benchmark Beam against the paid models my agents use before my next renewal.",
+      "caveat": "The capability claims come from Reflection and Hugging Face's launch posts, and no independent benchmark of Beam has been published yet."
+    },
+    {
+      "title": "Google's Universal Cart launches in the US across Search and Gemini",
+      "url": "https://techcrunch.com/2026/10/15/googles-universal-cart-shopping-tool-launches-in-the-us/",
+      "evidence_url": "https://techcrunch.com/2026/10/15/googles-universal-cart-shopping-tool-launches-in-the-us/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Google launched Universal Cart for US users: one cart that follows you across Google Search and the Gemini app and collects items from different shops in a single place. It tracks prices and restocks for saved products, surfaces promo codes, and weighs your credit card perks when choosing how to pay. Checkout runs on the Universal Commerce Protocol, an open standard Google introduced this year so AI agents and shops can transact together.",
+      "fact": "Universal Cart reached US users on 15 October, with checkout tied to Google's Universal Commerce Protocol (UCP), an open standard for agents and retailers introduced earlier in 2026.",
+      "take": "The checkout layer is the prize, because whoever owns it takes a cut of everything an agent buys. I would build for UCP early, the way shops once built for Google Shopping feeds.",
+      "caveat": "Google previewed this at its I/O conference in May and adoption is unproven, so the open standard only matters if other shops and agents adopt it."
+    },
+    {
+      "title": "magpie: one menu bar app to point any coding agent at any model",
+      "url": "https://github.com/yetone/magpie",
+      "evidence_url": "https://github.com/yetone/magpie",
+      "source": "GitHub",
+      "section": "Tools",
+      "summary": "A free, open-source Mac menu bar app called magpie is taking off on GitHub. It lets any AI coding tool, like Claude Code or Codex, run on whichever model you choose, including models from other companies or the subscriptions you already pay for, and it quietly moves to a backup account when a usage quota runs out. A local gateway, a small service on your own machine, serves all the tools at once. It has collected over 15,000 stars in under four weeks.",
+      "fact": "The repo shows 15,334 stars, created on 23 September 2026, and the README bills it as \"Claude Code on Kimi. Codex on DeepSeek. Gemini CLI on GLM.\"",
+      "take": "magpie attacks a bill I actually have, because each of my agents keeps its own model settings and my paid quotas sit stranded per tool. One local gateway with automatic failover is how I would want to pay every AI bill.",
+      "caveat": "The app is under four weeks old with one main maintainer, and routing paid subscriptions through a side gateway may conflict with the providers' terms."
+    },
+    {
+      "title": "Bleached corals bounced back after touching a healthy neighbour",
+      "url": "https://www.nature.com/articles/d41586-026-03266-x",
+      "evidence_url": "https://www.nature.com/articles/d41586-026-03266-x",
+      "source": "Nature",
+      "section": "Wildcard",
+      "summary": "Marine biologists at Stanford found that a bleached coral fragment, one that has expelled the algae that feed it and turned ghost white, can recover after touching a healthy fragment from the same original animal. The two grow into one shared tissue and pass the algae across. In the lab, colour began returning within days, full recovery took eight weeks, and matching fragments kept a few millimetres apart died after 20 weeks.",
+      "fact": "In the study, published in Science Advances on 14 October, symbiont numbers in touching pairs doubled every 4 days, and bleached fragments separated from healthy ones died within 20 weeks.",
+      "take": "This is my dinner-party story of the week, because the discovery started when a researcher noticed two neglected tank fragments touching and doing better. The cures nobody plans for are still my favourite kind.",
+      "caveat": "The result is a laboratory study on one coral species and only worked between fragments of the same genetic individual, so reef-scale rescue remains distant. Divers on Hacker News noted bleached reefs often lack a healthy neighbour."
+    }
+  ]
+}
