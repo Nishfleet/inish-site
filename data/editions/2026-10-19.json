@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-19",
+  "candidate_count": 420,
+  "editor_note": "I opened 9 of today's 420 candidates and kept 7. OpenAI's newsroom, four Reddit feeds and the X interests feed were unreachable, and every Google News funding link stayed behind a redirect, so those lanes are thin. The Vercel gateway index and the Replit switch already ran this week. A TechCrunch story on Jev carried an adoption number the index did not, and it leads.",
+  "stories": [
+    {
+      "title": "Jev reached 35% of Vercel's paying teams in its first two weeks",
+      "url": "https://techcrunch.com/2026/10/16/jev-is-vercels-fastest-adopted-ai-model-ever/",
+      "evidence_url": "https://techcrunch.com/2026/10/16/jev-is-vercels-fastest-adopted-ai-model-ever/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Jev is the model that answers a question with one of a few fixed choices instead of writing a paragraph. That makes it cheap and quick to run, which is why it is good for sorting large amounts of material. Vercel, which sells the tool many companies use to put their websites online, published data on Thursday showing Jev was used by 35% of its paying teams within two weeks of its 15 September launch. That is close to double the reach of the next most used model, Anthropic's Sonnet 5.5, and Vercel says no model has ever been picked up that fast.",
+      "fact": "Vercel says 35% of its paying teams were using Jev within two weeks of the 15 September launch, nearly double the reach of Sonnet 5.5.",
+      "take": "Vercel says the paying teams picked Jev up faster than any model before it, and Jev is the one I ask for a verdict. That is the first number telling me the habit is not unusual.",
+      "caveat": "Vercel sells access to Jev through its own gateway, so the count leans towards teams already using Vercel and undercounts labs such as OpenAI and Anthropic that sell their own access."
+    },
+    {
+      "title": "Only 8% of fund managers say AI has lifted their investment returns",
+      "url": "https://www.livemint.com/technology/only-8-of-fund-managers-report-improved-investment-returns-from-ai-adoption-morgan-stanley-oliver-wyman-11792328833383.html",
+      "evidence_url": "https://www.livemint.com/technology/only-8-of-fund-managers-report-improved-investment-returns-from-ai-adoption-morgan-stanley-oliver-wyman-11792328833383.html",
+      "source": "Mint",
+      "section": "Demand signals",
+      "summary": "Morgan Stanley and the consultancy Oliver Wyman published a joint report on how asset managers use artificial intelligence. It found 55% had put AI into at least one part of their investment process and another 27% were still testing it. Only 8% said they could measure a better return because of it. The same survey found 69% reporting smoother operations and 55% reporting sharper insight, while just 24% said their costs had fallen.",
+      "fact": "The report cites the Mercer 2026 AI in Asset Management Survey, which found 55% of asset managers had integrated AI into at least one part of the investment process and 8% reported measurable benefits.",
+      "take": "This is the chart I would want on the wall before anyone in the company asks for another AI budget. Efficiency is not the same thing as a better return, and the survey says so plainly.",
+      "caveat": "Mint is reporting the report rather than the survey itself, and every number here is what the managers said about their own performance rather than something measured."
+    },
+    {
+      "title": "Workday wants customers to pay for its AI out of the staffing budget",
+      "url": "https://www.theregister.com/saas/2026/10/15/workday-wants-a-slice-of-customers-labour-budget-that-its-ai-agents-could-replace/5303281",
+      "evidence_url": "https://www.theregister.com/saas/2026/10/15/workday-wants-a-slice-of-customers-labour-budget-that-its-ai-agents-could-replace/5303281",
+      "source": "The Register",
+      "section": "Demand signals",
+      "summary": "Workday sells the software that runs payroll and other back-office work. At its yearly conference in Las Vegas it told investors it wants customers to pay for its AI assistants out of the money they now spend on staffing and outside contractors, not out of the IT budget. Its chief AI officer said that spending is where customers put tens of millions of dollars. Workday expects the bill to grow with how much the assistants are used rather than with how many staff hold a licence.",
+      "fact": "Workday's chief AI officer Joel Hellermark told analysts the aim is to expand beyond software budgets into the labour and services spend, and claimed self-service agents had lifted task resolution rates by 25%.",
+      "take": "Every software company I buy from will try this move eventually, so I want the contract before the demo. A price that rises with usage pays the vendor for every hour the assistant is busy, and I would rather pay for the thing it finished.",
+      "caveat": "Workday is pitching this to its own investors, so the budget language is a sales frame. It has not said what any of it will cost."
+    },
+    {
+      "title": "Western open-weight models still lose to the Chinese ones",
+      "url": "https://restofworld.org/2026/china-open-weight-models/",
+      "evidence_url": "https://restofworld.org/2026/china-open-weight-models/",
+      "source": "Rest of World",
+      "section": "AI",
+      "summary": "Three Western labs, Reflection, Aleph Alpha and Mistral, released open-weight models last week, and all three are aimed at the people who currently use Chinese ones. Experts speaking at a Rest of World event in San Francisco said the American and European models still fall behind on performance even with more money behind them. A Stanford researcher said that if you need close to the best capability available, right now that only comes from Chinese open models. Those models can run some tasks 50% to 90% cheaper than the leading American ones, though their makers are short of computing power and still working out how to earn money.",
+      "fact": "Graham Webster of Stanford's DigiChina Project said: \"If you need relatively frontier capability, right now that's Chinese open models only.\"",
+      "take": "Right now the cheapest way to run a pile of agent work is a Chinese model I cannot inspect, from a company I have no relationship with. I want a second read on the export risk before anything moves onto it.",
+      "caveat": "These are expert opinions from a panel, not a benchmark run, and Rest of World hosted the event. The 50% to 90% cheaper figure comes from the same panel."
+    },
+    {
+      "title": "Anthropic is hiring fewer juniors and spending more time in meetings",
+      "url": "https://techcrunch.com/2026/10/17/anthropic-says-its-workforce-has-become-less-junior-and-is-spending-more-time-in-meetings/",
+      "evidence_url": "https://techcrunch.com/2026/10/17/anthropic-says-its-workforce-has-become-less-junior-and-is-spending-more-time-in-meetings/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Anthropic published a report on how its own workplace has changed over the past year. The share of junior technical hires fell from 27% to 9% since early 2025, and the share of junior-level staff in technical departments fell from 21% to 14%. Technical teams are now 56% of the workforce, down from 61%. In an April survey, 20% of employees said their job had shifted from actually doing work to managing Claude, the company's AI assistant. Calendar data shows meeting time per person up 20% on the year.",
+      "fact": "The share of junior technical hires fell from 27% to 9% since early 2025, and 20% of employees told an April 2026 survey their job had shifted from actually doing work to managing Claudes.",
+      "take": "I hire one or two people a year, so the junior number is the one that tells me whether the bottom rung is being taken away. Managing the assistants instead of doing the work is already most of my day.",
+      "caveat": "This is Anthropic describing itself, and it sells the tool the report says changed the company. No other firm has been measured the same way."
+    },
+    {
+      "title": "Bluesky's Attie lets anyone build a website, a quiz or a game",
+      "url": "https://techcrunch.com/2026/10/15/bluesky-expands-its-ai-powered-attie-app-to-let-anyone-build-websites-games-and-more/",
+      "evidence_url": "https://techcrunch.com/2026/10/15/bluesky-expands-its-ai-powered-attie-app-to-let-anyone-build-websites-games-and-more/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Bluesky, the smaller social network, showed a new version of its experimental Attie product at TechCrunch Disrupt. People can now build websites, quizzes, games, polls and other interactive things, and they can bring their own AI model or use a free open-weight one. Whatever they make lives on the same network that powers Bluesky, so it arrives with that network's 47 million registered users attached. The chief executive, Toni Schneider, called it social vibe coding.",
+      "fact": "Bluesky chief operating officer Rose Wang said what makes Attie interesting is that it comes with the Bluesky distribution, so it does not stand alone, on a network of 47 million registered users.",
+      "take": "The distribution is the real product here, and that is the part no amount of building hands me. If I made something for a group of 47 million people I would want the audience to come with it.",
+      "caveat": "Bluesky has 47 million registered accounts, but engagement has been falling as some users went back to X. The number counts accounts, not people who show up."
+    },
+    {
+      "title": "Dogs seem to agree that bouba is round and kiki is spiky",
+      "url": "https://www.sciencealert.com/dogs-seem-to-agree-with-humans-that-bouba-is-round-and-kiki-is-spiky",
+      "evidence_url": "https://www.sciencealert.com/dogs-seem-to-agree-with-humans-that-bouba-is-round-and-kiki-is-spiky",
+      "source": "ScienceAlert",
+      "section": "Wildcard",
+      "summary": "Most people, whatever language they speak, say the made-up word bouba belongs to a rounded shape and kiki belongs to a spiky one. Animal behaviourist Eleonora Biffi at the University of Parma in Italy wanted to know whether dogs do the same, so she and her team ran two experiments on 70 dogs. In the first, 51 dogs sat with their owners while a speaker played one of the two words and two screens showed the two shapes. In the second, 19 dogs did the same while their owners wore headphones playing rock music, so no accidental hint from the owner could reach them. In both, the dogs looked longer at the shape that matched the word.",
+      "fact": "Biffi and team report: \"dogs looked significantly more at the rounded shape while 'Bouba' was played, and they looked at and explored the spiky shape when 'Kiki' was played.\"",
+      "take": "I have never once wondered whether dogs hear the same shape in a nonsense word that I do. Now I will think about it every time I say one.",
+      "caveat": "Seventy dogs is a good sample for this kind of test, but the finding is a starting point. It says nothing about animal language."
+    }
+  ]
+}
