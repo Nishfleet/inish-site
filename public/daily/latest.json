@@ -1,91 +1,91 @@
 {
-  "date": "2026-10-18",
-  "candidate_count": 425,
-  "editor_note": "Opened 8 of today's 425 candidates and kept 7. OpenAI's Stack Overflow for Agents post died because the page blocks fetching, and every Google News funding story stayed unverifiable behind redirect links. Meta's Muse Spark Open, Ramp and the Vercel gateway index already ran this week. Four Reddit feeds and the X interests feed were down, so those lanes were empty today.",
+  "date": "2026-10-19",
+  "candidate_count": 420,
+  "editor_note": "I opened 9 of today's 420 candidates and kept 7. OpenAI's newsroom, four Reddit feeds and the X interests feed were unreachable, and every Google News funding link stayed behind a redirect, so those lanes are thin. The Vercel gateway index and the Replit switch already ran this week. A TechCrunch story on Jev carried an adoption number the index did not, and it leads.",
   "stories": [
     {
-      "title": "Replit makes OpenAI its default over Anthropic, CEO says",
-      "url": "https://techcrunch.com/2026/10/17/replit-is-no-longer-working-with-anthropic-ceo-says/",
-      "evidence_url": "https://techcrunch.com/2026/10/17/replit-is-no-longer-working-with-anthropic-ceo-says/",
+      "title": "Jev reached 35% of Vercel's paying teams in its first two weeks",
+      "url": "https://techcrunch.com/2026/10/16/jev-is-vercels-fastest-adopted-ai-model-ever/",
+      "evidence_url": "https://techcrunch.com/2026/10/16/jev-is-vercels-fastest-adopted-ai-model-ever/",
       "source": "TechCrunch",
       "section": "AI",
-      "summary": "Replit, the browser platform where people build software by describing what they want, has stopped working with Anthropic, CEO Amjad Masad said on stage at TechCrunch Disrupt on Thursday. OpenAI's models now power Replit's agent by default, and customers can still pick Claude if they want. Masad cited cost, partnership terms and his company's benchmark, where OpenAI's Sol and Astra models consistently built apps better. Replit had been one of Anthropic's five biggest customers until recently.",
-      "fact": "Masad said onstage that Replit had been, until recently, a top-five customer of Anthropic's, and that on his benchmark OpenAI's Sol and Astra models consistently \"perform better on building vibe-coded applications from scratch.\"",
-      "take": "I read this as the default doing the deciding, because most customers never change the model picker, so one business deal flips who gets the volume. Where my product sits in someone else's default list is now a line in my risk register.",
-      "caveat": "People familiar with the deal told TechCrunch the Anthropic partnership is still in place, and Masad's benchmark is internal, so the performance claim cannot be checked from outside."
+      "summary": "Jev is the model that answers a question with one of a few fixed choices instead of writing a paragraph. That makes it cheap and quick to run, which is why it is good for sorting large amounts of material. Vercel, which sells the tool many companies use to put their websites online, published data on Thursday showing Jev was used by 35% of its paying teams within two weeks of its 15 September launch. That is close to double the reach of the next most used model, Anthropic's Sonnet 5.5, and Vercel says no model has ever been picked up that fast.",
+      "fact": "Vercel says 35% of its paying teams were using Jev within two weeks of the 15 September launch, nearly double the reach of Sonnet 5.5.",
+      "take": "Vercel says the paying teams picked Jev up faster than any model before it, and Jev is the one I ask for a verdict. That is the first number telling me the habit is not unusual.",
+      "caveat": "Vercel sells access to Jev through its own gateway, so the count leans towards teams already using Vercel and undercounts labs such as OpenAI and Anthropic that sell their own access."
     },
     {
-      "title": "Anthropic gives METR researchers employee-level access to check its work",
-      "url": "https://techcrunch.com/2026/10/15/anthropic-is-letting-metr-researchers-look-under-the-hood-with-employee-level-access/",
-      "evidence_url": "https://techcrunch.com/2026/10/15/anthropic-is-letting-metr-researchers-look-under-the-hood-with-employee-level-access/",
-      "source": "TechCrunch",
-      "section": "AI",
-      "summary": "Anthropic has given six researchers from METR, a nonprofit that tests AI models, the same access its own staff have: company laptops, office space and internal tools, so they can independently judge how safe the company's systems are. METR will publish what it finds and Anthropic cannot veto it, though it can demand narrow redactions such as customer data. Anthropic compares the setup to bank regulators living inside the biggest banks.",
-      "fact": "6 METR researchers get Anthropic-issued laptops and internal access on par with its own risk teams, and Anthropic has given up the right to block METR's publications.",
-      "take": "I want this to become boring. My agents run on models whose safety claims I take on faith, and an evaluator free to publish without the lab's approval is the first independent check on Anthropic I would actually trust.",
-      "caveat": "The arrangement covers one lab and one evaluator so far, and Anthropic still defines the narrow categories it can force METR to redact."
-    },
-    {
-      "title": "Morgan Stanley: the AI race may be decided by electricity before chips",
-      "url": "https://www.livemint.com/technology/ai-race-may-depend-more-on-access-to-power-infrastructure-than-chip-supply-morgan-stanley-11792231459245.html",
-      "evidence_url": "https://www.livemint.com/technology/ai-race-may-depend-more-on-access-to-power-infrastructure-than-chip-supply-morgan-stanley-11792231459245.html",
+      "title": "Only 8% of fund managers say AI has lifted their investment returns",
+      "url": "https://www.livemint.com/technology/only-8-of-fund-managers-report-improved-investment-returns-from-ai-adoption-morgan-stanley-oliver-wyman-11792328833383.html",
+      "evidence_url": "https://www.livemint.com/technology/only-8-of-fund-managers-report-improved-investment-returns-from-ai-adoption-morgan-stanley-oliver-wyman-11792328833383.html",
       "source": "Mint",
       "section": "Demand signals",
-      "summary": "A Morgan Stanley research report argues the constraint on AI growth is shifting from getting chips to getting electricity, land and money for data centres. It estimates US data-centre developers face a 32 gigawatt power shortfall through 2028, about 34 percent of what they will need, and that big tech companies plus specialist clouds will take roughly 94 percent of the world's data-centre capacity added in 2026. The report warns chip orders could slip or be cancelled if data centres cannot be powered.",
-      "fact": "Morgan Stanley's report estimates a 32 gigawatt US power shortfall through 2028, about 34 percent of projected requirements, and quotes Nvidia confirming \"there is not enough power to meet demand.\"",
-      "take": "Electricity is becoming the gate that decides which AI businesses get to exist, because a 32 gigawatt gap cannot be solved by ordering more chips. I would treat cheap, reliable power as a moat when I pick where my own workloads run.",
-      "caveat": "The figures come from one bank's equity research, carried by the ANI wire through Mint, and forecasts of this kind have been wrong before."
+      "summary": "Morgan Stanley and the consultancy Oliver Wyman published a joint report on how asset managers use artificial intelligence. It found 55% had put AI into at least one part of their investment process and another 27% were still testing it. Only 8% said they could measure a better return because of it. The same survey found 69% reporting smoother operations and 55% reporting sharper insight, while just 24% said their costs had fallen.",
+      "fact": "The report cites the Mercer 2026 AI in Asset Management Survey, which found 55% of asset managers had integrated AI into at least one part of the investment process and 8% reported measurable benefits.",
+      "take": "This is the chart I would want on the wall before anyone in the company asks for another AI budget. Efficiency is not the same thing as a better return, and the survey says so plainly.",
+      "caveat": "Mint is reporting the report rather than the survey itself, and every number here is what the managers said about their own performance rather than something measured."
     },
     {
-      "title": "Reflection's Beam is a 501B-parameter model anyone can download and own",
-      "url": "https://huggingface.co/blog/reflection-beam",
-      "evidence_url": "https://huggingface.co/blog/reflection-beam",
-      "source": "Hugging Face",
+      "title": "Workday wants customers to pay for its AI out of the staffing budget",
+      "url": "https://www.theregister.com/saas/2026/10/15/workday-wants-a-slice-of-customers-labour-budget-that-its-ai-agents-could-replace/5303281",
+      "evidence_url": "https://www.theregister.com/saas/2026/10/15/workday-wants-a-slice-of-customers-labour-budget-that-its-ai-agents-could-replace/5303281",
+      "source": "The Register",
+      "section": "Demand signals",
+      "summary": "Workday sells the software that runs payroll and other back-office work. At its yearly conference in Las Vegas it told investors it wants customers to pay for its AI assistants out of the money they now spend on staffing and outside contractors, not out of the IT budget. Its chief AI officer said that spending is where customers put tens of millions of dollars. Workday expects the bill to grow with how much the assistants are used rather than with how many staff hold a licence.",
+      "fact": "Workday's chief AI officer Joel Hellermark told analysts the aim is to expand beyond software budgets into the labour and services spend, and claimed self-service agents had lifted task resolution rates by 25%.",
+      "take": "Every software company I buy from will try this move eventually, so I want the contract before the demo. A price that rises with usage pays the vendor for every hour the assistant is busy, and I would rather pay for the thing it finished.",
+      "caveat": "Workday is pitching this to its own investors, so the budget language is a sales frame. It has not said what any of it will cost."
+    },
+    {
+      "title": "Western open-weight models still lose to the Chinese ones",
+      "url": "https://restofworld.org/2026/china-open-weight-models/",
+      "evidence_url": "https://restofworld.org/2026/china-open-weight-models/",
+      "source": "Rest of World",
       "section": "AI",
-      "summary": "Reflection, a new American AI lab, has released its first model, Beam, with open weights under the Apache 2.0 license, meaning anyone can download it and run it on their own machines. It is a mixture-of-experts model, so only 23 billion of its 501 billion parameters wake up for any given request, which lets it answer at the speed of a much smaller model. It reads a context of 1 million tokens (tokens are the chunks of text a model reads and charges by) and is aimed at coding and agent work.",
-      "fact": "Beam ships under the Apache 2.0 license with 501B parameters, 23B active per token, and a 1M-token context window, with day-one support in transformers, vLLM and SGLang.",
-      "take": "Free to own beats cheap to rent once the model is good enough, because weights on my own machine mean no price hikes and no account cutoffs. I would benchmark Beam against the paid models my agents use before my next renewal.",
-      "caveat": "The capability claims come from Reflection and Hugging Face's launch posts, and no independent benchmark of Beam has been published yet."
+      "summary": "Three Western labs, Reflection, Aleph Alpha and Mistral, released open-weight models last week, and all three are aimed at the people who currently use Chinese ones. Experts speaking at a Rest of World event in San Francisco said the American and European models still fall behind on performance even with more money behind them. A Stanford researcher said that if you need close to the best capability available, right now that only comes from Chinese open models. Those models can run some tasks 50% to 90% cheaper than the leading American ones, though their makers are short of computing power and still working out how to earn money.",
+      "fact": "Graham Webster of Stanford's DigiChina Project said: \"If you need relatively frontier capability, right now that's Chinese open models only.\"",
+      "take": "Right now the cheapest way to run a pile of agent work is a Chinese model I cannot inspect, from a company I have no relationship with. I want a second read on the export risk before anything moves onto it.",
+      "caveat": "These are expert opinions from a panel, not a benchmark run, and Rest of World hosted the event. The 50% to 90% cheaper figure comes from the same panel."
     },
     {
-      "title": "Google's Universal Cart launches in the US across Search and Gemini",
-      "url": "https://techcrunch.com/2026/10/15/googles-universal-cart-shopping-tool-launches-in-the-us/",
-      "evidence_url": "https://techcrunch.com/2026/10/15/googles-universal-cart-shopping-tool-launches-in-the-us/",
+      "title": "Anthropic is hiring fewer juniors and spending more time in meetings",
+      "url": "https://techcrunch.com/2026/10/17/anthropic-says-its-workforce-has-become-less-junior-and-is-spending-more-time-in-meetings/",
+      "evidence_url": "https://techcrunch.com/2026/10/17/anthropic-says-its-workforce-has-become-less-junior-and-is-spending-more-time-in-meetings/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Anthropic published a report on how its own workplace has changed over the past year. The share of junior technical hires fell from 27% to 9% since early 2025, and the share of junior-level staff in technical departments fell from 21% to 14%. Technical teams are now 56% of the workforce, down from 61%. In an April survey, 20% of employees said their job had shifted from actually doing work to managing Claude, the company's AI assistant. Calendar data shows meeting time per person up 20% on the year.",
+      "fact": "The share of junior technical hires fell from 27% to 9% since early 2025, and 20% of employees told an April 2026 survey their job had shifted from actually doing work to managing Claudes.",
+      "take": "I hire one or two people a year, so the junior number is the one that tells me whether the bottom rung is being taken away. Managing the assistants instead of doing the work is already most of my day.",
+      "caveat": "This is Anthropic describing itself, and it sells the tool the report says changed the company. No other firm has been measured the same way."
+    },
+    {
+      "title": "Bluesky's Attie lets anyone build a website, a quiz or a game",
+      "url": "https://techcrunch.com/2026/10/15/bluesky-expands-its-ai-powered-attie-app-to-let-anyone-build-websites-games-and-more/",
+      "evidence_url": "https://techcrunch.com/2026/10/15/bluesky-expands-its-ai-powered-attie-app-to-let-anyone-build-websites-games-and-more/",
       "source": "TechCrunch",
       "section": "Product ideas",
-      "summary": "Google launched Universal Cart for US users: one cart that follows you across Google Search and the Gemini app and collects items from different shops in a single place. It tracks prices and restocks for saved products, surfaces promo codes, and weighs your credit card perks when choosing how to pay. Checkout runs on the Universal Commerce Protocol, an open standard Google introduced this year so AI agents and shops can transact together.",
-      "fact": "Universal Cart reached US users on 15 October, with checkout tied to Google's Universal Commerce Protocol (UCP), an open standard for agents and retailers introduced earlier in 2026.",
-      "take": "The checkout layer is the prize, because whoever owns it takes a cut of everything an agent buys. I would build for UCP early, the way shops once built for Google Shopping feeds.",
-      "caveat": "Google previewed this at its I/O conference in May and adoption is unproven, so the open standard only matters if other shops and agents adopt it."
+      "summary": "Bluesky, the smaller social network, showed a new version of its experimental Attie product at TechCrunch Disrupt. People can now build websites, quizzes, games, polls and other interactive things, and they can bring their own AI model or use a free open-weight one. Whatever they make lives on the same network that powers Bluesky, so it arrives with that network's 47 million registered users attached. The chief executive, Toni Schneider, called it social vibe coding.",
+      "fact": "Bluesky chief operating officer Rose Wang said what makes Attie interesting is that it comes with the Bluesky distribution, so it does not stand alone, on a network of 47 million registered users.",
+      "take": "The distribution is the real product here, and that is the part no amount of building hands me. If I made something for a group of 47 million people I would want the audience to come with it.",
+      "caveat": "Bluesky has 47 million registered accounts, but engagement has been falling as some users went back to X. The number counts accounts, not people who show up."
     },
     {
-      "title": "magpie: one menu bar app to point any coding agent at any model",
-      "url": "https://github.com/yetone/magpie",
-      "evidence_url": "https://github.com/yetone/magpie",
-      "source": "GitHub",
-      "section": "Tools",
-      "summary": "A free, open-source Mac menu bar app called magpie is taking off on GitHub. It lets any AI coding tool, like Claude Code or Codex, run on whichever model you choose, including models from other companies or the subscriptions you already pay for, and it quietly moves to a backup account when a usage quota runs out. A local gateway, a small service on your own machine, serves all the tools at once. It has collected over 15,000 stars in under four weeks.",
-      "fact": "The repo shows 15,334 stars, created on 23 September 2026, and the README bills it as \"Claude Code on Kimi. Codex on DeepSeek. Gemini CLI on GLM.\"",
-      "take": "magpie attacks a bill I actually have, because each of my agents keeps its own model settings and my paid quotas sit stranded per tool. One local gateway with automatic failover is how I would want to pay every AI bill.",
-      "caveat": "The app is under four weeks old with one main maintainer, and routing paid subscriptions through a side gateway may conflict with the providers' terms."
-    },
-    {
-      "title": "Bleached corals bounced back after touching a healthy neighbour",
-      "url": "https://www.nature.com/articles/d41586-026-03266-x",
-      "evidence_url": "https://www.nature.com/articles/d41586-026-03266-x",
-      "source": "Nature",
+      "title": "Dogs seem to agree that bouba is round and kiki is spiky",
+      "url": "https://www.sciencealert.com/dogs-seem-to-agree-with-humans-that-bouba-is-round-and-kiki-is-spiky",
+      "evidence_url": "https://www.sciencealert.com/dogs-seem-to-agree-with-humans-that-bouba-is-round-and-kiki-is-spiky",
+      "source": "ScienceAlert",
       "section": "Wildcard",
-      "summary": "Marine biologists at Stanford found that a bleached coral fragment, one that has expelled the algae that feed it and turned ghost white, can recover after touching a healthy fragment from the same original animal. The two grow into one shared tissue and pass the algae across. In the lab, colour began returning within days, full recovery took eight weeks, and matching fragments kept a few millimetres apart died after 20 weeks.",
-      "fact": "In the study, published in Science Advances on 14 October, symbiont numbers in touching pairs doubled every 4 days, and bleached fragments separated from healthy ones died within 20 weeks.",
-      "take": "This is my dinner-party story of the week, because the discovery started when a researcher noticed two neglected tank fragments touching and doing better. The cures nobody plans for are still my favourite kind.",
-      "caveat": "The result is a laboratory study on one coral species and only worked between fragments of the same genetic individual, so reef-scale rescue remains distant. Divers on Hacker News noted bleached reefs often lack a healthy neighbour."
+      "summary": "Most people, whatever language they speak, say the made-up word bouba belongs to a rounded shape and kiki belongs to a spiky one. Animal behaviourist Eleonora Biffi at the University of Parma in Italy wanted to know whether dogs do the same, so she and her team ran two experiments on 70 dogs. In the first, 51 dogs sat with their owners while a speaker played one of the two words and two screens showed the two shapes. In the second, 19 dogs did the same while their owners wore headphones playing rock music, so no accidental hint from the owner could reach them. In both, the dogs looked longer at the shape that matched the word.",
+      "fact": "Biffi and team report: \"dogs looked significantly more at the rounded shape while 'Bouba' was played, and they looked at and explored the spiky shape when 'Kiki' was played.\"",
+      "take": "I have never once wondered whether dogs hear the same shape in a nonsense word that I do. Now I will think about it every time I say one.",
+      "caveat": "Seventy dogs is a good sample for this kind of test, but the finding is a starting point. It says nothing about animal language."
     }
   ],
   "sources": {
     "ok": 40,
     "total": 44
   },
-  "generated_at": "2026-10-18T06:57:30.814644+00:00",
+  "generated_at": "2026-10-19T07:17:04.717014+00:00",
   "sections": [
     {
       "id": "ai",
@@ -100,26 +100,26 @@
           "discussion_url": ""
         },
         {
-          "title": "Jev is Vercel’s fastest-adopted AI model ever",
-          "url": "https://techcrunch.com/2026/10/16/jev-is-vercels-fastest-adopted-ai-model-ever/",
-          "source": "TechCrunch",
-          "blurb": "The data comes from Vercel's AI gateway, a unified API service similar to OpenRouter.",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Bluesky expands its AI-powered Attie app to let anyone build websites, games, and more",
-          "url": "https://techcrunch.com/2026/10/15/bluesky-expands-its-ai-powered-attie-app-to-let-anyone-build-websites-games-and-more/",
-          "source": "TechCrunch",
-          "blurb": "Bluesky is bringing “social vibe coding” to its experimental Attie platform, allowing users to create interactive experiences like games, q…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "Gemini 4 Argon: Built to solve your hardest problems",
           "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
           "source": "Google AI",
           "blurb": "We’re giving developers, enterprises, scientists, and consumers access to Gemini 4 Argon, our latest frontier model.",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "[AINews] Meta Muse Wonder & Wonder Full: MSL’s Claude 5.5-tier Frontier Model",
+          "url": "https://www.latent.space/p/ainews-meta-muse-wonder-and-wonder",
+          "source": "Latent Space",
+          "blurb": "MSL’s emergence as a frontier lab is finally complete.",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Disney agrees to hire the majority of Character.AI’s workforce",
+          "url": "https://techcrunch.com/2026/10/18/disney-agrees-to-hire-the-majority-of-character-ais-workforce/",
+          "source": "TechCrunch",
+          "blurb": "The filing also says that the “vast majority” of Character.AI employees who were offered jobs at Disney accepted them. However, this is a s…",
           "signal": "",
           "discussion_url": ""
         },
@@ -146,18 +146,18 @@
           "discussion_url": ""
         },
         {
-          "title": "browser-use/browser-use: 0.13.11",
-          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.11",
-          "source": "browser-use releases",
-          "blurb": "This release includes Browser Use toolsets for Claude, available at browser_use.integrations.toolsets_for_claude. The integration requires…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "anthropics/claude-code: v2.1.302",
           "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.302",
           "source": "claude-code releases",
           "blurb": "What's changed Added CLAUDE_CODE_AUTO_MODE_MODEL to choose the model the client-side auto mode classifier uses; it does not change the mode…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "browser-use/browser-use: 0.13.11",
+          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.11",
+          "source": "browser-use releases",
+          "blurb": "This release includes Browser Use toolsets for Claude, available at browser_use.integrations.toolsets_for_claude. The integration requires…",
           "signal": "",
           "discussion_url": ""
         },
@@ -170,10 +170,10 @@
           "discussion_url": ""
         },
         {
-          "title": "ollama/ollama: v0.40.7",
-          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.7-rc0",
+          "title": "ollama/ollama: v0.40.6",
+          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.6",
           "source": "ollama releases",
-          "blurb": "What's Changed openai: allow Responses effort on non-thinking models by @hoyyeva in #19010 llama-server: let llama-server infer the draft s…",
+          "blurb": "What's Changed win: prevent orphaned runners by @dhiltgen in #18500 gguf: add the q2_0 tensor and file types by @jmorganca in #18967 Launch…",
           "signal": "",
           "discussion_url": ""
         }
@@ -184,43 +184,43 @@
       "label": "Dev",
       "items": [
         {
-          "title": "andrewyng/openworker",
-          "url": "https://github.com/andrewyng/openworker",
-          "source": "GitHub",
+          "title": "DeepSeek V4.1 Flash 1017 (Max)",
+          "url": "https://artificialanalysis.ai/models/deepseek-v4-1-flash-1017",
+          "source": "Hacker News",
           "blurb": "",
-          "signal": "18,559 stars",
+          "signal": "102 pts · 32 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50148452"
+        },
+        {
+          "title": "How Discover-Tech turned targeted ads into a pipeline for zero-click spywares",
+          "url": "https://citizenlab.ca/research/how-discover-tech-turned-targeted-ads-into-a-pipeline-for-spyware/",
+          "source": "Lobsters",
+          "blurb": "privacy, security",
+          "signal": "12 pts · 1 comments",
+          "discussion_url": "https://lobste.rs/s/zytoux/how_discover_tech_turned_targeted_ads"
+        },
+        {
+          "title": "yetone/magpie",
+          "url": "https://github.com/yetone/magpie",
+          "source": "GitHub",
+          "blurb": "Every agent's model. One place. Codex on DeepSeek, Claude Code on Kimi, from the menu bar.",
+          "signal": "16,405 stars",
           "discussion_url": ""
         },
         {
-          "title": "DeepSeek-v4.1-Flash-1017",
-          "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017",
+          "title": "Superlite: A Faster Alternatie to Superpowers",
+          "url": "https://contextfirst.blog/superlite-hand-an-agent-a-spec/",
           "source": "Hacker News",
           "blurb": "",
-          "signal": "805 pts · 631 comments",
-          "discussion_url": "https://news.ycombinator.com/item?id=50129045"
+          "signal": "60 pts · 28 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50147492"
         },
         {
           "title": "hypit-ai/hypit",
           "url": "https://github.com/hypit-ai/hypit",
           "source": "GitHub",
           "blurb": "Clone any viral video with AI agents. Not just a script, the whole workflow: swap the face, the words, the B-roll, ship 100 variants in one…",
-          "signal": "23,202 stars",
-          "discussion_url": ""
-        },
-        {
-          "title": "Southern ground hornbill gets 3D printed beak prostheses at Artis Zoo",
-          "url": "https://nltimes.nl/2026/10/15/world-first-southern-ground-hornbill-gets-3d-printed-beak-prostheses-artis-zoo",
-          "source": "Hacker News",
-          "blurb": "",
-          "signal": "16 pts",
-          "discussion_url": "https://news.ycombinator.com/item?id=50110081"
-        },
-        {
-          "title": "browser-use/jev-ultrafast",
-          "url": "https://github.com/browser-use/jev-ultrafast",
-          "source": "GitHub",
-          "blurb": "Fastest and cheapest web agent",
-          "signal": "23,187 stars",
+          "signal": "23,683 stars",
           "discussion_url": ""
         }
       ]
@@ -246,6 +246,14 @@
           "discussion_url": ""
         },
         {
+          "title": "DeepSeek V4.1 Flash 1017 now available on AI Gateway",
+          "url": "https://vercel.com/changelog/deepseek-v4-1-flash-1017-now-available-on-ai-gateway",
+          "source": "Vercel",
+          "blurb": "",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
           "title": "Codex Cloud shipped with Tailscale support. Nobody told us.",
           "url": "https://tailscale.com/blog/codex-cloud-tailscale",
           "source": "Tailscale",
@@ -260,14 +268,6 @@
           "blurb": "",
           "signal": "",
           "discussion_url": ""
-        },
-        {
-          "title": "DeepSeek V4.1 Flash 1017 now available on AI Gateway",
-          "url": "https://vercel.com/changelog/deepseek-v4-1-flash-1017-now-available-on-ai-gateway",
-          "source": "Vercel",
-          "blurb": "",
-          "signal": "",
-          "discussion_url": ""
         }
       ]
     },
@@ -276,42 +276,42 @@
       "label": "Product",
       "items": [
         {
-          "title": "Step 5 Preview",
-          "url": "https://www.producthunt.com/products/step-3-5-flash",
+          "title": "Beam",
+          "url": "https://www.producthunt.com/products/beam-13",
           "source": "Product Hunt",
-          "blurb": "600B open weights, trained for long-running agents Discussion | Link",
+          "blurb": "Highly efficient agentic 501B parameter open model Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Earnote",
-          "url": "https://www.producthunt.com/products/earnote",
+          "title": "Tori",
+          "url": "https://www.producthunt.com/products/tori-3",
           "source": "Product Hunt",
-          "blurb": "Lecture & meeting notes, written on your device Discussion | Link",
+          "blurb": "The smartest AI support agent for customer success Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "GPU Terminal by Context.dev",
-          "url": "https://www.producthunt.com/products/context-dev",
+          "title": "Wally by Willow",
+          "url": "https://www.producthunt.com/products/willow-voice",
           "source": "Product Hunt",
-          "blurb": "Compare GPU rental prices across cloud providers Discussion | Link",
+          "blurb": "Your Scribe agent that learns how you write Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Parrot",
-          "url": "https://www.producthunt.com/products/parrot-10",
+          "title": "Kai Resolve by Gleap",
+          "url": "https://www.producthunt.com/products/gleap",
           "source": "Product Hunt",
-          "blurb": "Smart Meeting Assistant for Mac that helps during the call Discussion | Link",
+          "blurb": "Support that does the digging for you. Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Notion: Context for your agents",
-          "url": "https://www.producthunt.com/products/notion",
+          "title": "CrawlForge MCP",
+          "url": "https://www.producthunt.com/products/crawlforge-mcp",
           "source": "Product Hunt",
-          "blurb": "Switch AI agents without re-explaining your work Discussion | Link",
+          "blurb": "Give your AI agent 31 web tools in one MCP server Discussion | Link",
           "signal": "",
           "discussion_url": ""
         }
@@ -330,18 +330,18 @@
           "discussion_url": ""
         },
         {
-          "title": "Tressfecta wants to make hair braiding a less arduous task for hairstylists",
-          "url": "https://techcrunch.com/2026/10/16/tressfecta-wants-to-make-hair-braiding-a-less-arduous-task-for-hairstylists/",
+          "title": "TechCrunch Mobility: Rivian’s next act",
+          "url": "https://techcrunch.com/2026/10/18/techcrunch-mobility-rivians-next-act/",
           "source": "TechCrunch",
-          "blurb": "Tressfecta builds products for textured hair. Its first project is a tool called Plait Pilot that helps braiders with the initial process o…",
+          "blurb": "Welcome back to TechCrunch Mobility, your hub for the future of transportation and now, more than ever, the role AI is playing in it.",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Adding Canada Back to Our List of Accepted Countries of Incorporation",
-          "url": "https://www.ycombinator.com/blog/adding-canada-back/",
-          "source": "Y Combinator",
-          "blurb": "After hearing feedback from Canadian founders in our network, we are adding Canada back to our list of accepted countries of incorporation.",
+          "title": "No agenda, no rush, no leaving San Francisco: Benchmark’s partners on investing in a frenzied market",
+          "url": "https://techcrunch.com/2026/10/18/no-agenda-no-rush-no-leaving-san-francisco-benchmarks-partners-on-investing-in-a-frenzied-market/",
+          "source": "TechCrunch",
+          "blurb": "Benchmark may have grown its funds and swapped out some partners, but onstage the five who are left sounded like friends who just happen to…",
           "signal": "",
           "discussion_url": ""
         },
@@ -354,10 +354,10 @@
           "discussion_url": ""
         },
         {
-          "title": "Announcing the YC AI Stack",
-          "url": "https://www.ycombinator.com/blog/the-yc-ai-student-starter-pack/",
+          "title": "Adding Canada Back to Our List of Accepted Countries of Incorporation",
+          "url": "https://www.ycombinator.com/blog/adding-canada-back/",
           "source": "Y Combinator",
-          "blurb": "We've partnered with nearly two dozen companies to offer students who attend YC events a suite of over $25,000 in free credits for AI devto…",
+          "blurb": "After hearing feedback from Canadian founders in our network, we are adding Canada back to our list of accepted countries of incorporation.",
           "signal": "",
           "discussion_url": ""
         }
@@ -368,18 +368,18 @@
       "label": "News",
       "items": [
         {
-          "title": "Strasbourg-founded Goodweek raises €10.69 million to become the AI Manager for SMBs - EU-Startups",
-          "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPbHBQWXZRMGE3NWRuT1Q3UHpwMVgxdk95RGRhMXdrUHF2MklzNlM3aUJDT09tUV9iS08wejdBUjFjSWJMSENERHNydkdKMGcwSmZBNTd3UDVIdzRBVzVMMmFfaHpUQ1BaM25vaGpmRHhCUERwV24xOTRhbVZNdlJvMkpYLXdJdnZWblByckdZNmFKdjMtOVBHUXFzSmxZbXJFV2N2OE5ZLWc2dTZTeURRc1QxSjNRemp5ektpbQ?oc=5",
+          "title": "Former Huawei engineer’s robot AI startup Gewu Tongzhi raises nearly RMB 100 million - TechNode",
+          "url": "https://news.google.com/rss/articles/CBMitwFBVV95cUxNYndCWmlvRXNodGpMZUgtck0zRVpBeEJ1dUljeGhUdDZQcnVTYlE5bndDV2hHN0stSXVwRU1BWU5nMTMyVDQtRG02eE42ajJaN1FBb0pvNVltd1ZYSnUxV1Bubmh6RlUyekhSa0w5ek5KdXpNaEIxYURZckI4RF9QZEdwSHY4aUxCQTljTkp4MFBHWWpKVTF3UnhyLVI2VWNvVU5EMmlFMFJkV0ZNci0xT05wVFpaZ1k?oc=5",
           "source": "Google News",
-          "blurb": "Strasbourg-founded Goodweek raises €10.69 million to become the AI Manager for SMBs EU-Startups",
+          "blurb": "Former Huawei engineer’s robot AI startup Gewu Tongzhi raises nearly RMB 100 million TechNode",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "AI Tracker: Sirona Medical secures $40M - Modern Healthcare",
-          "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQb0Zsbm5XcmxTU0JuTzczTC1fUF9FVzB3LTJ3X2hLYVRJUFl3ZXB6TEZoMldEOXlkTXBTOVp2amNpLXFVeWlBUUd4X2dZNzlvUnB2LUoybW9LRThOY2pjN18tbnB3S2NieGMwSm9fVVBuZHprWUFrTU50Wk91ZVREV3NDZ1hvQ3RxcW9zeEMxMGs?oc=5",
+          "title": "Enterprise AI Startup RapidCanvas Nets $29 Mn To Expand GTM Teams - Inc42",
+          "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxQZDZwUC1aajJHdkx2NXF6eWtoVmh4UGhIeGhDUnIyeUpUajNIU2NMS3B6TkZxRlZETmVIRUZ2Sy0zbXZEMmxOUk9ndzVwZXpQYUdXbHh3Yk5sSG9Qa0hDU092ZVJadUVxYWwyQ01HeE1Od2xkWmZzeEY2Mzg2TjRYX19LWDFtSFZ1X1ZSNlNYdUJvdw?oc=5",
           "source": "Google News",
-          "blurb": "AI Tracker: Sirona Medical secures $40M Modern Healthcare",
+          "blurb": "Enterprise AI Startup RapidCanvas Nets $29 Mn To Expand GTM Teams Inc42",
           "signal": "",
           "discussion_url": ""
         },
@@ -392,18 +392,18 @@
           "discussion_url": ""
         },
         {
-          "title": "AI startup RapidCanvas snags $29M series B - The Business Journals",
-          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPaDktU2VYMENHOEtPc1NFaVZyb1BIcUY1N2tYSVViY3ZubjdEN0JGeDVuTk5FeXQ2X0NQRzh4Y0F3Uzhxc01VeU1wbkdXRk9CRFdUWVE5RHhsLWdKR0Jma3Fxd2tOU0V1QnpVb0VHY2J1OEYzSzBGZFBpR3RqUFVWblN3azlVZ2x3RFZfTk5UcUlVY2V3bzlyYTB3ZFl3WEtU?oc=5",
+          "title": "Managed AI execution startup RapidCanvas raises $29 million led by Vertex Ventures SEA & India - Indian Startup News",
+          "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNM3BId3NLUm9hY29senhGV1NRYVNVLUdWd1JIellBTV9HRUtJel9zMU4yanBUa3hjSGl1cnY5Q2xQX05lS1VLX2NRaEVzM1h3V05CUlNHVjUyeWZ4TUJhRFRlcmtaNUM4eHFrcVhhb2hxb2JXby05RVczSEdRMDdDTWFycmNXcEM5QVJ0Q0JHQUxBRWdyMHA3V3FkYVNqZzJiTTZ4Ul96WUVvV19hUjZQaDlIM1Fmck5Bcjl5VWZsUDJWeE8wd2xDMUxuS0dwOG45UkhvMNIB1AFBVV95cUxNM3BId3NLUm9hY29senhGV1NRYVNVLUdWd1JIellBTV9HRUtJel9zMU4yanBUa3hjSGl1cnY5Q2xQX05lS1VLX2NRaEVzM1h3V05CUlNHVjUyeWZ4TUJhRFRlcmtaNUM4eHFrcVhhb2hxb2JXby05RVczSEdRMDdDTWFycmNXcEM5QVJ0Q0JHQUxBRWdyMHA3V3FkYVNqZzJiTTZ4Ul96WUVvV19hUjZQaDlIM1Fmck5Bcjl5VWZsUDJWeE8wd2xDMUxuS0dwOG45UkhvMA?oc=5",
           "source": "Google News",
-          "blurb": "AI startup RapidCanvas snags $29M series B The Business Journals",
+          "blurb": "Managed AI execution startup RapidCanvas raises $29 million led by Vertex Ventures SEA & India Indian Startup News",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "New G2 Research: AI Agents Have Moved From Pilot to Production, But Oversight Comes at a Cost - Yahoo Finance",
-          "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOYVhqZml3WmxMZ0hzdWEwanAyXzJERWExYzVydXphWnA2bFRkci1aWER1UVlhSjdaNUprbU1DQjRucXozNlYzSG9oRDFnbkY5WGhqNzBqOGUzU01zU1dXNjI2QnRET1hiM3BtOS1WVV92ZGViaEt1cmgwb2JVYWtBQllBUDY2TnJ5TTNQNHZPSURXWTNOQWc?oc=5",
+          "title": "AI startup RapidCanvas snags $29M series B - The Business Journals",
+          "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPaDktU2VYMENHOEtPc1NFaVZyb1BIcUY1N2tYSVViY3ZubjdEN0JGeDVuTk5FeXQ2X0NQRzh4Y0F3Uzhxc01VeU1wbkdXRk9CRFdUWVE5RHhsLWdKR0Jma3Fxd2tOU0V1QnpVb0VHY2J1OEYzSzBGZFBpR3RqUFVWblN3azlVZ2x3RFZfTk5UcUlVY2V3bzlyYTB3ZFl3WEtU?oc=5",
           "source": "Google News",
-          "blurb": "New G2 Research: AI Agents Have Moved From Pilot to Production, But Oversight Comes at a Cost Yahoo Finance",
+          "blurb": "AI startup RapidCanvas snags $29M series B The Business Journals",
           "signal": "",
           "discussion_url": ""
         }
@@ -422,10 +422,10 @@
           "discussion_url": ""
         },
         {
-          "title": "Dutch Police Arrest ‘Reformed’ Hacker in Shiny Hunters Investigation",
-          "url": "https://krebsonsecurity.com/2026/09/dutch-police-arrest-reformed-hacker-in-shiny-hunters-investigation/",
-          "source": "Krebs on Security",
-          "blurb": "Authorities in the Netherlands have arrested a 23-year-old convicted cybercriminal on suspicion of aiding in data thefts and extortions by…",
+          "title": "Hackers breach Microsoft 365 tenants via ConnectWise supply-chain attack",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-breach-microsoft-365-tenants-via-connectwise-supply-chain-attack/",
+          "source": "BleepingComputer",
+          "blurb": "ConnectWise has shut down customer access to its Cloud Backup service (formerly SkyKick Cloud Backup) after hackers accessed application id…",
           "signal": "",
           "discussion_url": ""
         },
@@ -438,10 +438,10 @@
           "discussion_url": ""
         },
         {
-          "title": "Hackers breach Microsoft 365 tenants via ConnectWise supply-chain attack",
-          "url": "https://www.bleepingcomputer.com/news/security/hackers-breach-microsoft-365-tenants-via-connectwise-supply-chain-attack/",
-          "source": "BleepingComputer",
-          "blurb": "ConnectWise has shut down customer access to its Cloud Backup service (formerly SkyKick Cloud Backup) after hackers accessed application id…",
+          "title": "Dutch Police Arrest ‘Reformed’ Hacker in Shiny Hunters Investigation",
+          "url": "https://krebsonsecurity.com/2026/09/dutch-police-arrest-reformed-hacker-in-shiny-hunters-investigation/",
+          "source": "Krebs on Security",
+          "blurb": "Authorities in the Netherlands have arrested a 23-year-old convicted cybercriminal on suspicion of aiding in data thefts and extortions by…",
           "signal": "",
           "discussion_url": ""
         },
@@ -460,18 +460,26 @@
       "label": "India",
       "items": [
         {
-          "title": "MENA must classify AI data centres as critical loads, overhaul power planning amid rising demand: WEF",
-          "url": "https://www.livemint.com/technology/mena-must-classify-ai-data-centres-as-critical-loads-overhaul-power-planning-amid-rising-demand-wef-11792212023650.html",
-          "source": "Mint",
-          "blurb": "The World Economic Forum (WEF) has called for countries in the Middle East and North Africa (MENA) to classify artificial intelligence (AI)…",
+          "title": "UC Eyes More Capital, Burma Burma’s IPO & More",
+          "url": "https://inc42.com/buzz/uc-eyes-more-capital-burma-burmas-ipo-more/",
+          "source": "Inc42",
+          "blurb": "Inside UC’s ₹2,500 Cr Fundraise Plan A year after listing, Urban Company is back in the market for more funds.…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Decoding Urban Company’s ₹2,500 Cr Fundraise Proposal",
-          "url": "https://inc42.com/buzz/decoding-urban-companys-%e2%82%b92500-cr-fundraise-proposal/",
-          "source": "Inc42",
-          "blurb": "Listed home services major Urban Company’s board approved a proposal to raise up to ₹2,500 Cr yesterday, seeking to shore…",
+          "title": "AI race may depend more on access to power, infrastructure than chip supply: Morgan Stanley",
+          "url": "https://www.livemint.com/technology/ai-race-may-depend-more-on-access-to-power-infrastructure-than-chip-supply-morgan-stanley-11792231459245.html",
+          "source": "Mint",
+          "blurb": "The global race to expand artificial intelligence (AI) capabilities could increasingly be determined by which companies can secure enough e…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "India’s massive AI opportunity; Women entrepreneurs in this year’s Mann Ki Baat",
+          "url": "https://yourstory.com/2026/10/india-massive-ai-opportunity-women-entrepreneurship",
+          "source": "YourStory",
+          "blurb": "Unlike previous digital revolutions (internet and smartphones) that democratised access, AI is democratising intelligence itself, raising o…",
           "signal": "",
           "discussion_url": ""
         },
@@ -484,18 +492,10 @@
           "discussion_url": ""
         },
         {
-          "title": "FY26 Financial Tracker: Tracking The Financial Performance Of Indian Startups",
-          "url": "https://inc42.com/features/fy26-financial-tracker-tracking-the-financial-performance-of-indian-startups/",
+          "title": "Decoding Urban Company’s ₹2,500 Cr Fundraise Proposal",
+          "url": "https://inc42.com/buzz/decoding-urban-companys-%e2%82%b92500-cr-fundraise-proposal/",
           "source": "Inc42",
-          "blurb": "The Indian startup ecosystem continued to mature in FY26, with 22 new-age tech companies making their public market debut as…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "ixigo Swings To ₹63 Cr Profit In Q2, Revenue Rises 13% YoY",
-          "url": "https://inc42.com/buzz/ixigo-swings-to-%e2%82%b963-cr-profit-in-q2-revenue-rises-13-yoy/",
-          "source": "Inc42",
-          "blurb": "Online travel aggregator ixigo swung to a consolidated net profit of ₹63.4 Cr in the September quarter of FY27 from…",
+          "blurb": "Listed home services major Urban Company’s board approved a proposal to raise up to ₹2,500 Cr yesterday, seeking to shore…",
           "signal": "",
           "discussion_url": ""
         }
@@ -506,42 +506,42 @@
       "label": "Reddit",
       "items": [
         {
-          "title": "AI agents exceeded their assigned scope. What actually enforces the boundary before execution?",
-          "url": "https://www.reddit.com/r/AI_Agents/comments/1x8ait0/ai_agents_exceeded_their_assigned_scope_what/",
-          "source": "r/AI_Agents",
-          "blurb": "Three recent developments worth discussing together: CERT-In, October 15: India’s cybersecurity agency reported that AI agents under resear…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Closed my first client at $5k/month while working full time",
-          "url": "https://www.reddit.com/r/AI_Agents/comments/1x88kn3/closed_my_first_client_at_5kmonth_while_working/",
-          "source": "r/AI_Agents",
-          "blurb": "I work as a backend developer at a small fintech and built a voice agent after work hours which got p95 latency under 200ms on phone calls…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "I got tired of researching which skills and MCP servers to give my coding agent, so I built a tool that picks them from your project's stack (free tier)",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x89r72/i_got_tired_of_researching_which_skills_and_mcp/",
+          "title": "Rented someone else SaaS and scaled to $3.9k MRR 😅",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x97sm5/rented_someone_else_saas_and_scaled_to_39k_mrr/",
           "source": "r/SaaS",
-          "blurb": "https://preview.redd.it/fz9uf8i801wh1.png?width=2902&format=png&auto=webp&s=a33b81b80300d5ca98e95921161712b02623eb88 Every coding agent (Cl…",
+          "blurb": "I probably build 10+ SaaS nobody asked for. So I tried the opposite...found a SaaS which knows it has customer and offers whitelabeling. Pu…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "I made a web app that turns overwhelming tasks into micro steps",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x8d3mc/i_made_a_web_app_that_turns_overwhelming_tasks/",
+          "title": "$600+ MRR from one simple comment",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x9f2ng/600_mrr_from_one_simple_comment/",
           "source": "r/SaaS",
-          "blurb": "Hello, I'm not diagnosed with ADHD, but there are about a hundred projects still needing to be finished or marketed and for years people ar…",
+          "blurb": "Last week here on reddit I replied to an SEO thread explaining how I keep backlink outreach active every week for my saas the comment got 5…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "I went through 50 SaaS founders' numbers in 24 hours. 9 could tell me their payback period. That is the whole problem.",
-          "url": "https://www.reddit.com/r/SaaS/comments/1x8oac5/i_went_through_50_saas_founders_numbers_in_24/",
+          "title": "72 hours, four big open weights drops. The only one that fits in 24GB came from NVIDIA, of all companies.",
+          "url": "https://www.reddit.com/r/LocalLLaMA/comments/1x9d23j/72_hours_four_big_open_weights_drops_the_only_one/",
+          "source": "r/LocalLLaMA",
+          "blurb": "What a week. Quick recap, all numbers from the official repos and model cards: Thursday: Meta drops Muse Spark Open. 816B total, 42B active…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "I built a launch video generator SaaS and Generated over $1600+ in revenue.",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x93pr1/i_built_a_launch_video_generator_saas_and/",
           "source": "r/SaaS",
-          "blurb": "I put something out on another startup sub recently and ended up with around 50 founders in my DMs in a single day. I asked almost all of t…",
+          "blurb": "In Feburary 2026, I launched a Launch Video Generator SaaS product called Clickcast as a CS Student with literally Zero budget. No investor…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "38 Sign ups in the past 5 days. 5 Paying Users 61 Overall signups since launch in august.",
+          "url": "https://www.reddit.com/r/SaaS/comments/1x98682/38_sign_ups_in_the_past_5_days_5_paying_users_61/",
+          "source": "r/SaaS",
+          "blurb": "So we are now on a slow but steady climb this past week we have had 40 + users sign up for the platform to browse bids mainly coming from m…",
           "signal": "",
           "discussion_url": ""
         }
@@ -550,34 +550,18 @@
   ],
   "wire": [
     {
-      "title": "[AINews] Meta Muse Wonder & Wonder Full: MSL’s Claude 5.5-tier Frontier Model",
-      "url": "https://www.latent.space/p/ainews-meta-muse-wonder-and-wonder",
-      "source": "Latent Space",
-      "blurb": "MSL’s emergence as a frontier lab is finally complete.",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Meta removes language that raised scraping and AI training concerns",
-      "url": "https://techcrunch.com/2026/10/17/meta-removes-language-that-raised-scraping-and-ai-training-concerns/",
-      "source": "TechCrunch",
-      "blurb": "A Meta spokesperson insisted that the updated terms did not reflect a change in the way Meta crawls the web.",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "The Agent Said It Was Done. The Database Disagreed.",
-      "url": "https://huggingface.co/blog/microsoft/thinkingbox",
-      "source": "Hugging Face",
-      "blurb": "",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "IIT Madras alumni-founded AI video creation startup Clueso raises $10 million in funding - Indian Startup News",
-      "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOYUhRQ3doMVhuYUxabjZXVTl2dDFseDVscndnVFNYTXZ4Sk8wY2Z4SGc2RTIxVGNzeEtYaDFrTzVOM3hfQnJrMW5qRVZHVjU5V0c2Yl9sNHZjbXBNWFhzUVdvRWVPb0RTSXFNRHJSM3BpLVFiYVB0cnNhUFhpOGctOHh1SGlHb1RKSzdsdDY2ZkRia1RMQ0FXZ1QxOTk5LWl4dkdIdE1rX3BJVXlMTjBtVmFLRHhMbjh1eU15U29Lc05KZzVWN2ZndTVGMVdIR1HSAc8BQVVfeXFMTmFIUUN3aDFYbmFMWm42V1U5dnQxbHg1bHJ3Z1RTWE12eEpPMGNmeEhnNkUyMVRjc3hLWGgxa081TjN4X0JyazFuakVWR1Y1OVdHNmJfbDR2Y21wTVhYc1FXb0VlT29EU0lxTURyUjNwaS1RYmFQdHJzYVBYaThnLTh4dUhpR29USks3bHQ2NmZEYmtUTENBV2dUMTk5OS1peHZHSHRNa19wSVV5TE4wbVZhS0R4TG44dXlNeVNvS3NOSmc1VjdmZ3U1RjFXSEdR?oc=5",
+      "title": "Fragment Raises $12M Series A to Turn Agents into Financial Operators - AI Insider",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNNWNxeGpBcHluUjFWanFWajhWZVB4T1FhNHpaUkhNQjVHZG1Jdm9RQVZWRTJtOU1RWG5oclJ4UlF4bkgtSE9ibUFiaTNYeWI0NTE4c2NScFhsWGVkS0hiY2Y5MUZRRFBPTHZ4OTlfOU5BUUt0VnRadFpSYW1Ub3BDRHN6Sm94Z3RnN1NrNGRHbDhYTlotYkxvOUxSSXNNd0dwQWRzaGtPQl94UQ?oc=5",
       "source": "Google News",
-      "blurb": "IIT Madras alumni-founded AI video creation startup Clueso raises $10 million in funding Indian Startup News",
+      "blurb": "Fragment Raises $12M Series A to Turn Agents into Financial Operators AI Insider",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "SA-founded clinical AI startup Healthleap raises $38m seed, Series A funding - - Disrupt Africa",
+      "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQMHRHc2R1eVhkSkc4eE1uT3UwRFplTUo3QzFPLVZaWDJZMkZuSzFTNVN1SlZzTVhaY0FFSEM1cmRpMk1uVDBtXzY3UmVZV1pOc0ZvVlNvRlVVNTJFalhvMGF6MlVJek1EWnNYbUV4QktTdFU1M3ZJd2tIeWNuQnlMeVN3RHUzMVAteEs2eGVLd2gzVmhzZ25US1RhYTRnZjY4T3U0cTRRb3Fhcy03VWFiWnRR?oc=5",
+      "source": "Google News",
+      "blurb": "SA-founded clinical AI startup Healthleap raises $38m seed, Series A funding - Disrupt Africa",
       "signal": "",
       "discussion_url": ""
     },
@@ -598,26 +582,26 @@
       "discussion_url": ""
     },
     {
-      "title": "India becomes the latest country to report rogue AI agent activity",
-      "url": "https://techcrunch.com/2026/10/16/india-becomes-the-latest-country-to-report-rogue-ai-agent-activity/",
+      "title": "Meta removes language that raised scraping and AI training concerns",
+      "url": "https://techcrunch.com/2026/10/17/meta-removes-language-that-raised-scraping-and-ai-training-concerns/",
       "source": "TechCrunch",
-      "blurb": "The agents got in through credentials and connection settings left exposed in app configurations, public code repositories, and overly perm…",
+      "blurb": "A Meta spokesperson insisted that the updated terms did not reflect a change in the way Meta crawls the web.",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "[AINews] Modal’s $1B ARR, $16B Series D makes it NYC’s newest AI Infra Decacorn, 3x usage and 3x valuation in 5 months, 15x in 1 yr",
-      "url": "https://www.latent.space/p/ainews-modals-1b-arr-16b-series-d",
-      "source": "Latent Space",
-      "blurb": "Sandboxes are all you need.",
+      "title": "Replit makes OpenAI its default over Anthropic, CEO says",
+      "url": "https://techcrunch.com/2026/10/17/replit-is-no-longer-working-with-anthropic-ceo-says/",
+      "source": "TechCrunch",
+      "blurb": "Over the weekend, Masad clarified that OpenAI would replace Anthropic as its default model provider. Claude will still be available to cust…",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "AI startups are now swallowing roughly four out of five venture dollars in the US - Startup Fortune",
-      "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNd1FKNi1aM3VPUGFnOHB4WHVBaWcwUUtmcE1ibnlMVEc4MlA3QThMZEhTQWxZOURMU2QwaE50b0g3dzh3VkVxY3N5TEp6VFNLcDhnbHJiOGlJc19RcG5GMUdsTUc5Y3djSnF1OGM1NmZyM1RxU1owWU9PLUdEMm5qR2MtUmdHdWoya21CNndPY0lfUVZ4V2VCb0ZhckNuelExOXo5Qlk3SE5qNzNxMVE?oc=5",
-      "source": "Google News",
-      "blurb": "AI startups are now swallowing roughly four out of five venture dollars in the US Startup Fortune",
+      "title": "Run fast, private agents on-device with LFM2.5-24B-A2B",
+      "url": "https://huggingface.co/blog/LiquidAI/lfm25-24b-a2b",
+      "source": "Hugging Face",
+      "blurb": "",
       "signal": "",
       "discussion_url": ""
     },
@@ -638,17 +622,33 @@
       "discussion_url": ""
     },
     {
-      "title": "Welcome Muse Spark Open: open-weight frontier multimodal mixture-of-experts model from Meta",
-      "url": "https://huggingface.co/blog/meta-muse-spark-open",
+      "title": "[AINews] Modal’s $1B ARR, $16B Series D makes it NYC’s newest AI Infra Decacorn, 3x usage and 3x valuation in 5 months, 15x in 1 yr",
+      "url": "https://www.latent.space/p/ainews-modals-1b-arr-16b-series-d",
+      "source": "Latent Space",
+      "blurb": "Sandboxes are all you need.",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Introducing Falcon ASR",
+      "url": "https://huggingface.co/blog/tiiuae/falcon-asr",
       "source": "Hugging Face",
       "blurb": "",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Run fast, private agents on-device with LFM2.5-24B-A2B",
-      "url": "https://huggingface.co/blog/LiquidAI/lfm25-24b-a2b",
+      "title": "Welcome Beam: a 501B open model you can own, customize, and scale",
+      "url": "https://huggingface.co/blog/reflection-beam",
       "source": "Hugging Face",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Vercel and Shopify make agents first-class shoppers",
+      "url": "https://vercel.com/blog/vercel-and-shopify-make-agents-first-class-shoppers",
+      "source": "Vercel",
       "blurb": "",
       "signal": "",
       "discussion_url": ""
