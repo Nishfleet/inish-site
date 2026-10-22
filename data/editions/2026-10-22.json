@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-22",
+  "candidate_count": 419,
+  "editor_note": "I opened 18 of today's 419 candidates and kept 8. Gemini 4 Argon led the pile but was nine days old, so it sat out. Two funding rounds lost their place to the legal AI one. Reddit and the X feed failed again. What stood out: Walmart opened a door for buying agents while Amazon shut one, and DeepSeek gave away the software behind its margins.",
+  "stories": [
+    {
+      "title": "Google Cloud now sells OpenAI's models next to its own",
+      "url": "https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-brings-openai-models-to-customers",
+      "evidence_url": "https://cloud.google.com/blog/products/ai-machine-learning/google-cloud-brings-openai-models-to-customers",
+      "source": "Google Cloud blog",
+      "section": "AI",
+      "summary": "OpenAI's three newest models can now be bought through Google's cloud. Google says it is the only large cloud that sells all three big closed model families at once: OpenAI's, Anthropic's Claude, and its own Gemini. The practical part is billing. Usage lands on one Google invoice, counts against commitments a company has already signed, and needs no separate contract with OpenAI.",
+      "fact": "Google Cloud now carries GPT-6 Astra, GPT-6.1 Sol and GPT-6 Luna beside its own Gemini models and Anthropic's Claude.",
+      "take": "One invoice beats three vendor contracts for me. If my Google spend already covers models, trying a new one costs nothing but a few hours.",
+      "caveat": "Microsoft still calls itself OpenAI's primary cloud partner, and a model on a price list is not a workload anyone has tested yet."
+    },
+    {
+      "title": "Walmart opens its shelves to AI shopping agents while Amazon shuts them out",
+      "url": "https://techcrunch.com/2026/10/21/while-amazon-blocks-ai-agents-walmart-rolls-out-the-welcome-mat/",
+      "evidence_url": "https://techcrunch.com/2026/10/21/while-amazon-blocks-ai-agents-walmart-rolls-out-the-welcome-mat/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Walmart launched Agent Gateway, a connector that lets approved AI assistants search its stock and buy for a customer. It also promised Agent Profiles, which work like adding someone as an authorised card user: spending caps, per-agent purchase history and approval settings. Amazon went the other way and started blocking buying agents. Walmart says its normal returns policy covers an agent that buys the wrong thing.",
+      "fact": "Walmart's chief executive announced the gateway on 21 October, and Agent Profiles, which let a shopper cap an agent's spending, roll out next month.",
+      "take": "If one giant retailer pays for agent traffic and the other blocks it, I would build my product for Walmart's side of the street.",
+      "caveat": "Agent shopping is still tiny, and Walmart can rewrite its terms the first time a fraud case lands on its desk."
+    },
+    {
+      "title": "Anthropic built an agent that does a small business's admin while you sleep",
+      "url": "https://inc42.com/buzz/anthropic-takes-on-openai-meta-with-new-proactive-ai-agent-claude-duet/",
+      "evidence_url": "https://inc42.com/buzz/anthropic-takes-on-openai-meta-with-new-proactive-ai-agent-claude-duet/",
+      "source": "Inc42",
+      "section": "AI",
+      "summary": "Claude Duet watches the apps a business already uses, including Gmail, Stripe, QuickBooks and Slack, and sends one briefing a day on what needs a decision. It can chase unpaid invoices, draft replies and prepare payroll, running on its own cloud computer so it keeps working when your laptop is shut. Sending a message, paying, signing or deleting needs your approval, and moving money between accounts is banned outright.",
+      "fact": "Duet reaches more than 6,000 tools in the Claude Marketplace, and it checks connected accounts every few hours instead of continuously.",
+      "take": "I would hand Claude my invoice chasing first. The part that stings is the waitlist, open only to US subscribers.",
+      "caveat": "Anthropic calls it a research preview and admits it can misread urgency, and it draws on the same usage limits as the rest of Claude."
+    },
+    {
+      "title": "ChatGPT ads reached 100,000 advertisers in eight months",
+      "url": "https://openai.com/index/chatgpt-ads-expands-26-new-countries/",
+      "evidence_url": "https://openai.com/index/chatgpt-ads-expands-26-new-countries/",
+      "source": "OpenAI",
+      "section": "Product ideas",
+      "summary": "OpenAI added ads to 26 more countries, taking the total to 89, and says more than 100,000 advertisers have run campaigns since ads started about eight months ago. The new markets include Nigeria, South Africa, Bangladesh, Pakistan and Cambodia. Ads only appear on the Free and Go plans, so paid subscribers never see them, and advertisers buy through OpenAI's own Ads Manager or through partners.",
+      "fact": "OpenAI counts 1.2 billion weekly ChatGPT users, 100,000 advertisers, and 89 countries where ads now run.",
+      "take": "A crowded auction on day one is the warning here. I would start with a small budget and watch cost per signup before betting a month of spend.",
+      "caveat": "The inventory sits on free tiers only, which means the audience is made of people who chose not to pay for ChatGPT."
+    },
+    {
+      "title": "Legal AI startup Legora doubled its revenue in six months and raised $550M",
+      "url": "https://techcrunch.com/2026/10/21/legal-ai-startup-legora-raises-550m-series-e-at-8-8b-valuation/",
+      "evidence_url": "https://techcrunch.com/2026/10/21/legal-ai-startup-legora-raises-550m-series-e-at-8-8b-valuation/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "Legora sells AI that does legal paperwork for law firms, and it just raised $550 million at an $8.8 billion valuation, up from $5.6 billion in April. The revenue curve is the interesting part. Its recurring revenue went from $100 million in April to more than $200 million now. Its larger rival Harvey raised the same amount a month ago at a $15.5 billion valuation.",
+      "fact": "Legora's annual recurring revenue went from $100 million in April to over $200 million, and the new round values it at $8.8 billion.",
+      "take": "Lawyers paying this fast tells me professions with a paper trail and a billable hour open their AI budgets, and Legora just proved it again.",
+      "caveat": "Those revenue numbers are the company's own, and legal AI now looks like a two-horse race with Harvey."
+    },
+    {
+      "title": "Two holes in the software behind most websites need patching now",
+      "url": "https://techcrunch.com/2026/10/21/php-armageddon-openai-googles-wiz-find-ancient-holes-panicking-the-internet/",
+      "evidence_url": "https://techcrunch.com/2026/10/21/php-armageddon-openai-googles-wiz-find-ancient-holes-panicking-the-internet/",
+      "source": "TechCrunch",
+      "section": "Tools",
+      "summary": "America's National Security Agency warned that two serious holes were found in PHP, the language that builds most websites, and that a site which cannot be updated should be taken offline until it is. The flaws have been in every version since 2004, so old sites are the exposed ones. Fixes are out. One hole surfaced through OpenAI's Patch the Planet bug hunt, the other through the security firm Wiz, and researchers say AI also makes an attack far easier to adapt.",
+      "fact": "PHP runs roughly 70% of websites, the flaws date back to PHP 5 in 2004, and the current patched release is 8.5.12.",
+      "take": "My sites sit on shared hosting, so my question this week is which PHP version each host runs and when it moves.",
+      "caveat": "Nobody has reported an attack using these holes yet, and a managed host will probably patch this without telling you."
+    },
+    {
+      "title": "DeepSeek published the software that runs its AI, and the margins look huge",
+      "url": "https://www.latent.space/p/ainews-deepseek-deepinfer-open-source",
+      "evidence_url": "https://www.latent.space/p/ainews-deepseek-deepinfer-open-source",
+      "source": "Latent Space",
+      "section": "AI",
+      "summary": "DeepSeek released DeepInfer, the software it uses to serve its cut-price model, as free code anyone can run. Latent Space translated the announcement and did the arithmetic on DeepSeek's own production figures. Running the service earns an estimated gross margin above 80%, and the chips pay for themselves in about 81 days at that rate.",
+      "fact": "DeepSeek says its stack serves 155 trillion tokens a day, and Latent Space's calculation puts the payback on the hardware at 81 days.",
+      "take": "When DeepSeek hands out its own cost base, every rival price has to drift down toward it. I would expect cheaper models within weeks.",
+      "caveat": "The margin and payback come from Latent Space's estimate on DeepSeek's numbers, and DeepSeek is describing its own business."
+    },
+    {
+      "title": "An Indian certificate authority issued keys that took a second to crack",
+      "url": "https://scotthelme.co.uk/eight-bits-of-trust-emudhras-ca-keys-cracked-in-milliseconds/",
+      "evidence_url": "https://scotthelme.co.uk/eight-bits-of-trust-emudhras-ca-keys-cracked-in-milliseconds/",
+      "source": "Scott Helme",
+      "section": "Wildcard",
+      "summary": "A certificate is what makes the padlock on a website mean anything, and its security rests on a private key being an enormous random number. Eight certificates issued by eMudhra, an Indian authority trusted by browsers, used keys like 4 and 56 instead. A researcher reported it on 17 October, Chrome blocked them that evening, and Mozilla removed the authority's root from Firefox on 20 October.",
+      "fact": "Scott Helme recovered all eight private keys from their public certificates on his laptop in under a second, because the keys were values such as 4 and 56.",
+      "take": "Counting to four should never break a padlock. I want to know which of my sites shipped with those certificates before the browsers cut them off.",
+      "caveat": "Browsers blocked the certificates within hours of the report, so the window for abuse was short."
+    }
+  ]
+}
