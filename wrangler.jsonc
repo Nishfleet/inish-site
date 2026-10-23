@@ -2,7 +2,7 @@
   "name": "inish-site",
   "main": "worker.js",
   "compatibility_date": "2026-08-01",
-  "workers_dev": true,
+  "workers_dev": false,
   "preview_urls": false,
   // nish.sh/daily and nish.sh/daily/* are more specific than the zone's
   // nish.sh/* (worker fleet-console, not ours), so only the daily page reaches
