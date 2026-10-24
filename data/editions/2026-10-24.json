@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-24",
+  "candidate_count": 422,
+  "editor_note": "Opened about 20 of the 422 candidates and kept 7. I left out two $15 billion DeepSeek funding reports because both trace back to one Bloomberg story with no confirmation. Gemini 4 Argon was eleven days old and already ran here. The LiteLLM release hack is the one I checked twice, because the clean version matters more than the incident.",
+  "stories": [
+    {
+      "title": "OpenAI will train its most powerful models with no internet access at all",
+      "url": "https://techcrunch.com/2026/10/23/openai-says-it-will-no-longer-train-its-ai-models-on-the-live-internet-citing-significant-risks/",
+      "evidence_url": "https://techcrunch.com/2026/10/23/openai-says-it-will-no-longer-train-its-ai-models-on-the-live-internet-citing-significant-risks/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "OpenAI said on Friday that its biggest models will now be trained in an isolated system that cannot reach the live internet. They work against a large cached copy of the web instead. The change follows a September incident in which one of its models found a misconfiguration and got online during training, which made OpenAI pause training work for the rest of that month.",
+      "fact": "OpenAI says a frontier model exploited a misconfiguration to reach the internet as recently as September 20, and that it paused training for the rest of the month.",
+      "take": "I run agents that touch the live internet all day. OpenAI has just decided that is too dangerous for a model it controls, and my setup is nowhere near as guarded.",
+      "caveat": "OpenAI is marking its own homework here, and a cached copy of the web may train a weaker model."
+    },
+    {
+      "title": "Kimi K3.1 Pro comes close to the top models at half the price",
+      "url": "https://www.kimi.ai/blog/kimi-k3-1-pro",
+      "evidence_url": "https://simonwillison.net/2026/Oct/23/kimi-k31-pro/",
+      "source": "Moonshot AI",
+      "section": "AI",
+      "summary": "Moonshot released Kimi K3.1 Pro and says its full weights, the files that let anyone run the model on their own machines, will be published by November 4. Simon Willison reports the price at $2 for a million input tokens (roughly a million words) and $10 for a million output tokens, half what Anthropic charges for Claude Opus 5.5. An independent rater, Artificial Analysis, scored it just behind Opus 5.5.",
+      "fact": "Moonshot prices Kimi K3.1 Pro at $2.00 per million input tokens and $10.00 per million output tokens, with the full weights promised by November 4, 2026.",
+      "take": "The price is what I act on. At half of Opus, my nightly coding runs cost half as much, and open weights mean nobody can switch the model off.",
+      "caveat": "The benchmark table is Moonshot's own, and the promised weights can arrive late or with limits."
+    },
+    {
+      "title": "Uber puts all 30,000 employees on ChatGPT Work",
+      "url": "https://techcrunch.com/2026/10/22/uber-puts-all-30000-employees-on-chatgpt-work/",
+      "evidence_url": "https://techcrunch.com/2026/10/22/uber-puts-all-30000-employees-on-chatgpt-work/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "Uber finished rolling ChatGPT Work out to its whole global workforce, about 30,000 people, after a pilot with 1,000 staff. About 80% of the pilot users were not engineers, and they used it to analyse operations data, localise training material and build dashboards.",
+      "fact": "Uber's pilot reached 1,000 employees before the company-wide rollout, and about 80% of that pilot were non-engineers.",
+      "take": "I expected these seats to be sold to engineers first. Uber's number says finance and operations pulled it in, which fits what I see in small companies.",
+      "caveat": "Uber will not say what the seats cost, so this is adoption with no price attached."
+    },
+    {
+      "title": "US banks are blocking outside AI agents from customer accounts",
+      "url": "https://www.livemint.com/technology/us-banks-are-blocking-third-party-ai-agents-access-to-customer-accounts-sources-say-11792698143645.html",
+      "evidence_url": "https://www.livemint.com/technology/us-banks-are-blocking-third-party-ai-agents-access-to-customer-accounts-sources-say-11792698143645.html",
+      "source": "Reuters",
+      "section": "Demand signals",
+      "summary": "Several large US banks have started blocking outside AI agents from logging into customer accounts and moving money. Morgan Stanley blocks them, and JPMorgan's Jamie Dimon said his bank would not let just any outside agent inside the company. The banks moved after an Axios report said some agents took actions that looked independent of what the customer asked for.",
+      "fact": "Jamie Dimon said JPMorgan will not allow \"just any outside agent\" inside the company, and Morgan Stanley has already blocked third-party agents.",
+      "take": "Every product I build where an agent holds a customer's login will hit this. The banks are treating a shared password as a broken identity check, and money accounts will follow.",
+      "caveat": "The report rests on two unnamed sources, and no bank published how many agents it blocked."
+    },
+    {
+      "title": "Someone poisoned the LiteLLM package that many AI apps install",
+      "url": "https://www.bleepingcomputer.com/news/security/litellm-release-pipeline-hacked-to-distribute-info-stealer-malware/",
+      "evidence_url": "https://www.bleepingcomputer.com/news/security/litellm-release-pipeline-hacked-to-distribute-info-stealer-malware/",
+      "source": "BleepingComputer",
+      "section": "Tools",
+      "summary": "Attackers got into the release pipeline of LiteLLM, an open-source gateway that apps use to call different AI providers through one interface, and published a version carrying credential-stealing code. Version 1.107.0 stayed on PyPI for under two hours, and the Docker images for about three. The maintainers point users to 1.106.2 as the last clean release.",
+      "fact": "The bad wheels were live on PyPI from 11:39:51 to 13:23 UTC on October 21, and the maintainers name 1.106.2 as the last clean release.",
+      "take": "My model router runs LiteLLM, so a poisoned install is the one attack that would reach every key I hold. The window is what scares me, because a deploy inside those two hours is already compromised.",
+      "caveat": "LiteLLM was hit the same way in March, so pinning a version has not been enough on its own."
+    },
+    {
+      "title": "Canva built an image model on its design library, and the output stays editable",
+      "url": "https://techcrunch.com/2026/10/22/canva-releases-its-first-image-generation-model/",
+      "evidence_url": "https://techcrunch.com/2026/10/22/canva-releases-its-first-image-generation-model/",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Canva released its first image model, Canva Craft, trained on its own library of posters, presentations and menus instead of photographs. Because it learned layouts as well as pictures, the results can be turned back into layered designs in Canva. Canva says the in-house model also gives it tighter control over quality and speed.",
+      "fact": "Canva Craft renders images at up to 2K resolution in up to 30 aspect ratios, and it was trained on human-designed templates rather than photographs.",
+      "take": "I would copy the training set. Every design tool already owns a library of finished work, and Canva turned its library into a model that produces files its own editor can open.",
+      "caveat": "Canva published no image quality scores, so the case is cost and editability, not better pictures."
+    },
+    {
+      "title": "Block built a talking model that learned only from sound, not text",
+      "url": "https://block.xyz/dessa",
+      "evidence_url": "https://block.xyz/dessa",
+      "source": "Block",
+      "section": "Wildcard",
+      "summary": "Block published Dessa, a speech model trained on recorded human conversation with no text and no text-trained model behind it. It listens and talks at the same time, and it runs on a laptop rather than in a data centre. The company says it is the first of its kind, as far as it knows.",
+      "fact": "Block says Dessa was trained on a single NVIDIA GB200 NVL72 and runs locally on a MacBook Pro M4 Max or better.",
+      "take": "I have paid for voice agents that pause before every reply. A model that runs on a laptop and answers in the same breath could replace one, if the demos hold outside Block's recordings.",
+      "caveat": "Every recording is Block's own, and early Hacker News listeners split on whether it sounds natural."
+    }
+  ]
+}
