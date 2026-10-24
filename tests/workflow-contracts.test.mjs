@@ -162,6 +162,60 @@ test("lighthouse.yml audits the live page through the fleet-ops workflow", () =>
   assert.match(source, /urls:\s*\|\s*\n\s+https:\/\/nish\.sh\/daily/);
 });
 
+test("each off-switch row states its workflow's real schedule", () => {
+  const firesOn = new Map(
+    offSwitchRows().map((cells) => [cells[0].replace(/`/g, ""), cells[1]])
+  );
+  const weekdays = [
+    "mondays",
+    "tuesdays",
+    "wednesdays",
+    "thursdays",
+    "fridays",
+    "saturdays",
+    "sundays"
+  ];
+  for (const name of workflowNames()) {
+    const crons = [...triggerBlock(name).matchAll(/^\s+- cron:\s*['"]([^'"]+)['"]/gm)].map(
+      (match) => match[1]
+    );
+    if (crons.length === 0) continue;
+    const fires = firesOn.get(name) ?? "";
+    for (const cron of crons) {
+      const fields = cron.trim().split(/\s+/);
+      assert.equal(fields.length, 5, `${name} cron "${cron}" is not five fields`);
+      const [minute, hour, , , weekday] = fields;
+      if (/^\d+$/.test(hour) && /^\d+$/.test(minute)) {
+        const clock = `${String(Number(hour)).padStart(2, "0")}:${String(
+          Number(minute)
+        ).padStart(2, "0")} UTC`;
+        assert.ok(
+          fires.includes(clock),
+          `${name}'s off-switch row must state its ${clock} schedule`
+        );
+      } else if (/^\*\/\d+$/.test(hour)) {
+        const every = `every ${hour.slice(2)} hours`;
+        assert.ok(
+          fires.includes(every),
+          `${name}'s off-switch row must state its ${every} schedule`
+        );
+        const minuteMark = `minute ${Number(minute)}`;
+        assert.ok(
+          fires.includes(minuteMark),
+          `${name}'s off-switch row must state ${minuteMark} past`
+        );
+      }
+      if (/^\d+$/.test(weekday)) {
+        const day = weekdays[Number(weekday) - 1];
+        assert.ok(
+          new RegExp(`\\b${day}s?\\b`, "i").test(fires),
+          `${name}'s off-switch row must state it runs on ${day}`
+        );
+      }
+    }
+  }
+});
+
 test("the pinact config keeps the fleet-ops callee on main, and says why", () => {
   const pinact = readFileSync(path.join(REPO_ROOT, ".pinact.yaml"), "utf8");
   assert.match(pinact, /Nishfleet\/fleet-ops\/\.github\/workflows\/\.\*/);
