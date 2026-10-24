@@ -8,3 +8,12 @@ Success: days in the last 30 with a new edition live (target 30 of 30). Baseline
 - Keep the site lightweight: static HTML, CSS, JS, and the one Worker. No helper scripts.
 - Work on `main`. Run `npm test` before pushing; the push deploys.
 - Check visual changes in a browser at desktop and phone widths before pushing.
+
+## Run it and prove it
+
+Live: https://nish.sh/daily, one page served by `worker.js` from the static assets `inish_daily/build_daily.py` writes. `inish.in` answers 301 to that URL and nothing else. There is no health route: the page, `latest.json` and the feed are the whole surface, so the page is the check.
+
+- Run: `npm test` (node tests, then `python3 -m unittest`), then push to `main`; the push deploys.
+- Prove today's edition is live: `curl -s https://nish.sh/daily/latest.json | jq -r .date` prints the edition's day, and it is today in IST. A stale day means the daily build did not run (`inish_daily/build_daily.py`; the publish step is in `MEMORY.md`), and a 404 means the deploy has not landed.
+- Prove the page and the redirect: `curl -s https://nish.sh/daily | grep -o '<title>[^<]*</title>'` prints `<title>Nish’s Daily · <the same day></title>`, and `curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://inish.in/` prints `301 https://nish.sh/daily`.
+- Test login: none. Every path here is public.
