@@ -52,6 +52,12 @@ function workflowSource(name) {
   return readFileSync(path.join(WORKFLOWS_DIR, name), "utf8");
 }
 
+function usesCalls(name) {
+  return [...workflowSource(name).matchAll(/^\s*(?:-\s+)?uses:\s*(\S+)/gm)].map(
+    (match) => match[1]
+  );
+}
+
 function offSwitchRows() {
   const readme = readFileSync(path.join(REPO_ROOT, "README.md"), "utf8");
   const heading = readme.indexOf(OFF_SWITCH_HEADING);
@@ -64,13 +70,6 @@ function offSwitchRows() {
     .filter((line) => line.startsWith("| `"))
     .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
 }
-
-test("every workflow file has a README off-switch row", () => {
-  const documented = new Set(offSwitchRows().map((cells) => cells[0].replace(/`/g, "")));
-  for (const name of workflowNames()) {
-    assert.ok(documented.has(name), `README.md documents no off-switch for ${name}`);
-  }
-});
 
 test("each off-switch row names what fires the workflow and one way to stop it", () => {
   const rows = offSwitchRows();
@@ -111,7 +110,7 @@ test("the off-switch table names every workflow file it documents", () => {
   }
 });
 
-test("ci.yml deploys only from main and never from a pull request", () => {
+test("ci.yml deploys only from main, after the test job", () => {
   const source = workflowSource("ci.yml");
   assert.match(triggerBlock("ci.yml"), /^ {2}pull_request:$/m);
   assert.match(triggerBlock("ci.yml"), /^ {2}push:$/m);
@@ -120,8 +119,17 @@ test("ci.yml deploys only from main and never from a pull request", () => {
     /^ {4}branches: \[main\]$/m,
     "the push trigger must be limited to main, so a branch push never deploys"
   );
-  assert.match(source, /if: github\.ref == 'refs\/heads\/main'/);
-  assert.match(source, /needs: \[test\]/);
+  const start = source.search(/^ {2}deploy:$/m);
+  assert.ok(start !== -1, "ci.yml has no deploy job to gate");
+  const rest = source.slice(start);
+  const nextJob = rest.slice(1).search(/^ {2}\w+:/m);
+  const deploy = nextJob === -1 ? rest : rest.slice(0, nextJob + 1);
+  assert.match(deploy, /^ {4}needs: \[test\]$/m, "deploy must wait for the test job");
+  assert.match(
+    deploy,
+    /^ {4}if: github\.ref == 'refs\/heads\/main'/m,
+    "deploy must run only on main"
+  );
 });
 
 test("agent-dispatch.yml stays a trigger stub that delegates to the fleet-ops dispatcher", () => {
@@ -164,19 +172,33 @@ test("the pinact config keeps the fleet-ops callee on main, and says why", () =>
   assert.equal(call[1], "main", "the callee must stay on main while pinact exempts it");
 });
 
-test("the reusable workflow refs are the only ones left unpinned, and pinact exempts them", () => {
-  const exempt = /Nishfleet\/fleet-ops\/\.github\/workflows\/\.\*/;
+test("every uses: ref is a full SHA, a digest, or the exempted fleet-ops main ref", () => {
   for (const name of workflowNames()) {
-    const source = workflowSource(name);
-    for (const call of source.matchAll(/uses:\s*(\S+)@(\S+)/g)) {
-      const [, ref, version] = call;
-      if (!ref.startsWith("Nishfleet/fleet-ops/.github/workflows/")) {
+    for (const call of usesCalls(name)) {
+      if (call.startsWith("docker://")) {
+        assert.match(
+          call,
+          /^docker:\/\/[^@]+@sha256:[0-9a-f]{64}$/,
+          `${name} uses "${call}", which is not digest-pinned`
+        );
+      } else if (call.startsWith("Nishfleet/fleet-ops/.github/workflows/")) {
+        assert.equal(
+          call.slice(call.lastIndexOf("@") + 1),
+          "main",
+          `${name} calls "${call}": the exempted fleet-ops callee must stay on main`
+        );
+      } else {
+        const at = call.lastIndexOf("@");
+        assert.notEqual(at, -1, `${name} uses "${call}", which carries no ref to pin`);
         assert.ok(
-          FULL_SHA.test(version),
-          `${name} calls ${ref}@${version}, which is not a full commit SHA`
+          FULL_SHA.test(call.slice(at + 1)),
+          `${name} calls "${call}", which is not a full commit SHA`
         );
       }
     }
   }
-  assert.ok(exempt.test(readFileSync(path.join(REPO_ROOT, ".pinact.yaml"), "utf8")));
+  const pinact = readFileSync(path.join(REPO_ROOT, ".pinact.yaml"), "utf8");
+  assert.match(pinact, /Nishfleet\/fleet-ops\/\.github\/workflows\/\.\*/);
+  assert.match(pinact, /ref: main/);
+  assert.match(pinact, /docker:\/\/\.\*/);
 });

@@ -25,23 +25,25 @@ file must stay for a manual run.
 
 | Workflow | Fires on | Off-switch |
 | --- | --- | --- |
-| `ci.yml` | Every pull request, every push to `main`, and a manual run from the Actions tab | Delete the file. It reports the `test` check that the `main-no-force-push` ruleset requires, so clear that check under Settings → Rules → Rulesets first, or every pull request waits on a check that never reports. The push to `main` also deploys the worker, so the site stops updating until the file comes back. |
+| `ci.yml` | Every pull request, every push to `main`, and a manual run from the Actions tab | Delete the file. Every pull request then waits on the `test` check that no longer reports, and the push to `main` no longer deploys the worker, so the site stops updating until the file comes back. If branch rules require the `test` check (Settings → Rules → Rulesets), clear that requirement too, or merges stay blocked. |
 | `agent-dispatch.yml` | Issue labels and comments, pull-request events, a completed CI run, every 6 hours, and a manual run | Delete the file to stop the fleet from starting worker runs on this repo. Delete the `schedule:` block to keep event-driven dispatch and drop the 6-hour sweep. The dispatch logic lives in `Nishfleet/fleet-ops`, so this file is only a trigger stub and the site does not depend on it. |
-| `lighthouse.yml` | After a successful production deploy, Mondays at 04:41 UTC, and a manual run | Delete the file to stop the page audit. The site does not depend on it. |
+| `lighthouse.yml` | After a successful production deploy, Mondays at 04:53 UTC, and a manual run | Delete the file to stop the page audit. The site does not depend on it. |
 
 The two stubs above call reusable workflows in `Nishfleet/fleet-ops` at `@main`, and
 `.pinact.yaml` exempts that ref on purpose: the dispatch is addressed by name, so
-pinning the callee would fork it from the version the dispatcher runs.
+pinning the callee would fork it from the version the dispatcher runs. `docker://`
+image refs stay digest-pinned, and `.pinact.yaml` leaves image digests alone.
 
 ## Version tags
 
-A tag marks one published state of the site. `v0.1.0` is the first one, on the
-commit that closed the 2026-10-23 glue audit.
+A tag marks one published state of the site. No tag exists yet. `v0.1.0` will be
+the first one, cut on the commit that closes the 2026-10-23 glue audit, once the
+audit's own precondition holds: the fleet-ops half of the audit
+(Nishfleet/fleet-ops#10125) is landed.
 
-To cut the next one:
+To cut it, and each later one:
 
 1. Land the change on `main`.
-2. `git tag -a v0.1.1 -m "v0.1.1: <one line>" <merge commit>`.
-3. `git push origin v0.1.1`.
-
-The version in `package.json` tracks the tag.
+2. Set `version` in `package.json` to the tag number.
+3. `git tag -a v0.1.0 -m "v0.1.0: <one line>" <merge commit>`.
+4. `git push origin v0.1.0`.
