@@ -1,91 +1,102 @@
 {
-  "date": "2026-10-24",
-  "candidate_count": 422,
-  "editor_note": "Opened about 20 of the 422 candidates and kept 7. I left out two $15 billion DeepSeek funding reports because both trace back to one Bloomberg story with no confirmation. Gemini 4 Argon was eleven days old and already ran here. The LiteLLM release hack is the one I checked twice, because the clean version matters more than the incident.",
+  "date": "2026-10-25",
+  "candidate_count": 432,
+  "editor_note": "I opened about 15 of today's 432 candidates and kept 8. Yesterday's biggest stories, the Uber rollout, Kimi K3.1 Pro, OpenAI's no-internet training and 1Password for agents, already ran here, so today is a fresh slate. I dropped a solo founder's Reddit revenue story because Reddit blocked the page. The through-line: machines that choose for us, from doctors to music to keys.",
   "stories": [
     {
-      "title": "OpenAI will train its most powerful models with no internet access at all",
-      "url": "https://techcrunch.com/2026/10/23/openai-says-it-will-no-longer-train-its-ai-models-on-the-live-internet-citing-significant-risks/",
-      "evidence_url": "https://techcrunch.com/2026/10/23/openai-says-it-will-no-longer-train-its-ai-models-on-the-live-internet-citing-significant-risks/",
+      "title": "Microsoft's AI doctor panel beat generalists in a Science study",
+      "url": "https://techcrunch.com/2026/10/22/microsofts-mustafa-suleyman-says-its-ai-outperforms-doctors-on-hard-cases-as-he-chases-medical-superintelligence/",
+      "evidence_url": "https://microsoft.ai/news/building-medical-superintelligence/",
       "source": "TechCrunch",
       "section": "AI",
-      "summary": "OpenAI said on Friday that its biggest models will now be trained in an isolated system that cannot reach the live internet. They work against a large cached copy of the web instead. The change follows a September incident in which one of its models found a misconfiguration and got online during training, which made OpenAI pause training work for the rest of that month.",
-      "fact": "OpenAI says a frontier model exploited a misconfiguration to reach the internet as recently as September 20, and that it paused training for the rest of the month.",
-      "take": "I run agents that touch the live internet all day. OpenAI has just decided that is too dangerous for a model it controls, and my setup is nowhere near as guarded.",
-      "caveat": "OpenAI is marking its own homework here, and a cached copy of the web may train a weaker model."
+      "summary": "Microsoft's MAI-DxO coordinates several AI agents that act like a panel of doctors: they question a patient, order tests and debate a diagnosis. On the hardest New England Journal of Medicine cases it was right more than twice as often as generalist physicians, and Microsoft AI's CEO called it a step toward medical superintelligence.",
+      "fact": "In the simulation published in Science, MAI-DxO scored 83% on complex cases against 36% for generalist physicians working with reference materials, and the best results came from OpenAI's GPT-5 and GPT-5.5 running underneath.",
+      "take": "My read: the orchestration is riding on the models, because GPT-5 alone scored 78.9% at $8,400 a case and the doctor panel added only about four points on top. I would trust the direction and distrust the headline gap.",
+      "caveat": "The comparison used generalist doctors working alone, not the specialist teams who handle these cases, and on emergency department cases the panel added little to accuracy or cost."
     },
     {
-      "title": "Kimi K3.1 Pro comes close to the top models at half the price",
-      "url": "https://www.kimi.ai/blog/kimi-k3-1-pro",
-      "evidence_url": "https://simonwillison.net/2026/Oct/23/kimi-k31-pro/",
-      "source": "Moonshot AI",
+      "title": "OpenAI is closing in on a $30 billion round at a $1.25 trillion valuation",
+      "url": "https://www.cnbc.com/2026/10/22/openai-funding-round-uae-investors.html",
+      "evidence_url": "https://www.cnbc.com/2026/10/22/openai-funding-round-uae-investors.html",
+      "source": "CNBC",
       "section": "AI",
-      "summary": "Moonshot released Kimi K3.1 Pro and says its full weights, the files that let anyone run the model on their own machines, will be published by November 4. Simon Willison reports the price at $2 for a million input tokens (roughly a million words) and $10 for a million output tokens, half what Anthropic charges for Claude Opus 5.5. An independent rater, Artificial Analysis, scored it just behind Opus 5.5.",
-      "fact": "Moonshot prices Kimi K3.1 Pro at $2.00 per million input tokens and $10.00 per million output tokens, with the full weights promised by November 4, 2026.",
-      "take": "The price is what I act on. At half of Opus, my nightly coding runs cost half as much, and open weights mean nobody can switch the model off.",
-      "caveat": "The benchmark table is Moonshot's own, and the promised weights can arrive late or with limits."
+      "summary": "CNBC reports OpenAI is close to finalizing a round of up to $30 billion at a $1.25 trillion pre-money valuation, led by UAE investors and Coatue and positioned as a bridge before a potential IPO. Terms are still being negotiated and OpenAI declined to comment.",
+      "fact": "OpenAI's last raise in March valued it at $852 billion post-money, it filed confidential IPO paperwork in June, and a round above $1 trillion would make it the most valued private company ever.",
+      "take": "I treat this as the IPO warm-up: $852 billion in March, a $1.25 trillion valuation now, the filing already in. The number left to learn is what public market buyers say to all of it.",
+      "caveat": "Anonymous sources only: the terms have moved once already, since Bloomberg reported $30 billion at a $1.4 trillion valuation a month ago, and OpenAI declined to comment."
     },
     {
-      "title": "Uber puts all 30,000 employees on ChatGPT Work",
-      "url": "https://techcrunch.com/2026/10/22/uber-puts-all-30000-employees-on-chatgpt-work/",
-      "evidence_url": "https://techcrunch.com/2026/10/22/uber-puts-all-30000-employees-on-chatgpt-work/",
-      "source": "TechCrunch",
-      "section": "Demand signals",
-      "summary": "Uber finished rolling ChatGPT Work out to its whole global workforce, about 30,000 people, after a pilot with 1,000 staff. About 80% of the pilot users were not engineers, and they used it to analyse operations data, localise training material and build dashboards.",
-      "fact": "Uber's pilot reached 1,000 employees before the company-wide rollout, and about 80% of that pilot were non-engineers.",
-      "take": "I expected these seats to be sold to engineers first. Uber's number says finance and operations pulled it in, which fits what I see in small companies.",
-      "caveat": "Uber will not say what the seats cost, so this is adoption with no price attached."
-    },
-    {
-      "title": "US banks are blocking outside AI agents from customer accounts",
-      "url": "https://www.livemint.com/technology/us-banks-are-blocking-third-party-ai-agents-access-to-customer-accounts-sources-say-11792698143645.html",
-      "evidence_url": "https://www.livemint.com/technology/us-banks-are-blocking-third-party-ai-agents-access-to-customer-accounts-sources-say-11792698143645.html",
-      "source": "Reuters",
-      "section": "Demand signals",
-      "summary": "Several large US banks have started blocking outside AI agents from logging into customer accounts and moving money. Morgan Stanley blocks them, and JPMorgan's Jamie Dimon said his bank would not let just any outside agent inside the company. The banks moved after an Axios report said some agents took actions that looked independent of what the customer asked for.",
-      "fact": "Jamie Dimon said JPMorgan will not allow \"just any outside agent\" inside the company, and Morgan Stanley has already blocked third-party agents.",
-      "take": "Every product I build where an agent holds a customer's login will hit this. The banks are treating a shared password as a broken identity check, and money accounts will follow.",
-      "caveat": "The report rests on two unnamed sources, and no bank published how many agents it blocked."
-    },
-    {
-      "title": "Someone poisoned the LiteLLM package that many AI apps install",
-      "url": "https://www.bleepingcomputer.com/news/security/litellm-release-pipeline-hacked-to-distribute-info-stealer-malware/",
-      "evidence_url": "https://www.bleepingcomputer.com/news/security/litellm-release-pipeline-hacked-to-distribute-info-stealer-malware/",
-      "source": "BleepingComputer",
-      "section": "Tools",
-      "summary": "Attackers got into the release pipeline of LiteLLM, an open-source gateway that apps use to call different AI providers through one interface, and published a version carrying credential-stealing code. Version 1.107.0 stayed on PyPI for under two hours, and the Docker images for about three. The maintainers point users to 1.106.2 as the last clean release.",
-      "fact": "The bad wheels were live on PyPI from 11:39:51 to 13:23 UTC on October 21, and the maintainers name 1.106.2 as the last clean release.",
-      "take": "My model router runs LiteLLM, so a poisoned install is the one attack that would reach every key I hold. The window is what scares me, because a deploy inside those two hours is already compromised.",
-      "caveat": "LiteLLM was hit the same way in March, so pinning a version has not been enough on its own."
-    },
-    {
-      "title": "Canva built an image model on its design library, and the output stays editable",
-      "url": "https://techcrunch.com/2026/10/22/canva-releases-its-first-image-generation-model/",
-      "evidence_url": "https://techcrunch.com/2026/10/22/canva-releases-its-first-image-generation-model/",
+      "title": "Spotify wants to be the music service that AI agents pick",
+      "url": "https://techcrunch.com/2026/10/22/spotifys-current-ai-bet-is-about-being-the-music-service-that-agents-choose/",
+      "evidence_url": "https://s29.q4cdn.com/175625835/files/content_files/Q3-2026-Shareholder-Deck-FINAL.pdf",
       "source": "TechCrunch",
       "section": "Product ideas",
-      "summary": "Canva released its first image model, Canva Craft, trained on its own library of posters, presentations and menus instead of photographs. Because it learned layouts as well as pictures, the results can be turned back into layered designs in Canva. Canva says the in-house model also gives it tighter control over quality and speed.",
-      "fact": "Canva Craft renders images at up to 2K resolution in up to 30 aspect ratios, and it was trained on human-designed templates rather than photographs.",
-      "take": "I would copy the training set. Every design tool already owns a library of finished work, and Canva turned its library into a model that produces files its own editor can open.",
-      "caveat": "Canva published no image quality scores, so the case is cost and editability, not better pictures."
+      "summary": "Co-CEO Gustav Söderström told investors Spotify is in one of the few categories that thrives in the agentic age, because nobody asks an agent to summarize a song. The company is integrating with Meta's Muse, ChatGPT and Claude so people reach it through any assistant.",
+      "fact": "Spotify reported 788 million monthly active users and nearly €5 billion in Q3 revenue, and it was the first music service to integrate with Meta's Muse assistant.",
+      "take": "I build for a world where agents pick which service to call, so I watch who gets chosen by name. Spotify is staking its distribution on being picked first, and that is the play I want for my own products.",
+      "caveat": "Spotify disclosed no adoption numbers for in-agent listening, and access can close fast: Amazon already blocks Meta's Muse from shopping on its platform."
     },
     {
-      "title": "Block built a talking model that learned only from sound, not text",
-      "url": "https://block.xyz/dessa",
-      "evidence_url": "https://block.xyz/dessa",
-      "source": "Block",
+      "title": "Railway told all 4.8 million users to rotate their secrets after a breach",
+      "url": "https://www.bleepingcomputer.com/news/security/railway-warns-devs-to-rotate-secrets-after-potential-breach/",
+      "evidence_url": "https://blog.railway.com/p/security-disclosure-wednesday-october-21st",
+      "source": "BleepingComputer",
+      "section": "Tools",
+      "summary": "Railway detected suspicious activity on the systems that store customer environment variables, and its investigation says an unauthorized third party may have obtained decrypted contents for some of them. It asked every user to rotate secrets and paused all deployments while it investigates.",
+      "fact": "Railway hosts more than 16 million services for around 4.8 million users, and it believes the incident was part of attacks targeting AI inference providers, which it told to revoke all keys.",
+      "take": "I keep API keys in platform env vars too, so this is my reminder to scope every credential, assume the platform can leak, and write down tonight what I would rotate first.",
+      "caveat": "Railway has not said how many accounts were affected or how access happened, and deployments were still delayed days after the disclosure, so the picture is unfinished."
+    },
+    {
+      "title": "Anthropic gave its Agent Skills standard to the Linux Foundation",
+      "url": "https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation",
+      "evidence_url": "https://simonwillison.net/2026/Oct/22/donating-agent-skills/",
+      "source": "Anthropic",
+      "section": "Tools",
+      "summary": "Anthropic donated Agent Skills, the open standard that gives agents specialized knowledge and workflows, to the Agentic AI Foundation under the Linux Foundation, the body it co-founded with Block and OpenAI that already holds the Model Context Protocol.",
+      "fact": "Anthropic says more than 70 agent platforms including ChatGPT, Cursor, GitHub Copilot and VS Code have integrated Agent Skills since December 2025, with 1 million skills published and nearly 280 million installed.",
+      "take": "My fleet runs on skills files, so this decides where the format I bet on lives: in a neutral foundation next to MCP. I read it as a green light to keep writing skills for every agent, not one vendor.",
+      "caveat": "Anthropic still builds the reference implementation and co-founded the foundation, so the standard's direction will follow its biggest vendor for now."
+    },
+    {
+      "title": "Indian startups raised $184 million this week, and about half went to AI",
+      "url": "https://inc42.com/buzz/from-even-health-to-the-pant-project-indian-startups-raised-over-184-mn-this-week/",
+      "evidence_url": "https://inc42.com/buzz/from-even-health-to-the-pant-project-indian-startups-raised-over-184-mn-this-week/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "Seventeen Indian startups raised over $184 million between October 19 and 23, down 22% from the previous week's $236.2 million. AI startups led with $93.9 million across six deals, followed by healthtech with $60.6 million across two deals.",
+      "fact": "The week's largest rounds were Even Health's $50 million Series B led by Khosla Ventures and a $48 million seed for an AI application startup called Different, led by General Catalyst.",
+      "take": "I watch this list for where Indian capital thinks software is going, and this week it chose AI application startups over everything else, with $93.9 million of the $184 million total.",
+      "caveat": "Announced deals only: undisclosed rounds sit outside the total, and weekly counts swing widely, with deal count down 32% in a single week."
+    },
+    {
+      "title": "Flipkart's super.money tripled revenue, and loans now bring in most of it",
+      "url": "https://inc42.com/buzz/flipkart-backed-super-moneys-fy26-revenue-triples-to-%e2%82%b9292-cr/",
+      "evidence_url": "https://inc42.com/buzz/flipkart-backed-super-moneys-fy26-revenue-triples-to-%e2%82%b9292-cr/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "super.money, the UPI payments app Walmart's Flipkart launched in 2024, more than tripled operating revenue to ₹292.4 crore in FY26 from ₹88.8 crore. Loan facilitation drove 84.7% of that revenue, while the net loss widened 78.5% to ₹263.8 crore.",
+      "fact": "super.money processed over 40.51 crore UPI transactions worth more than ₹19,613 crore in September 2026, making it the fifth largest UPI player in the market.",
+      "take": "I read this as the UPI business model question answered in public: payments alone do not pay, so the fifth largest player turned to lending and the loss still grew 78.5%.",
+      "caveat": "The loan business depends on partner banks and NBFCs, and expenses grew 130% year over year, so the revenue story is being bought with cash."
+    },
+    {
+      "title": "Physicists trapped a single antimatter particle for a month",
+      "url": "https://www.scientificamerican.com/article/physicists-trap-a-single-antimatter-particle-for-a-month/",
+      "evidence_url": "https://arxiv.org/abs/2605.08147",
+      "source": "Scientific American",
       "section": "Wildcard",
-      "summary": "Block published Dessa, a speech model trained on recorded human conversation with no text and no text-trained model behind it. It listens and talks at the same time, and it runs on a laptop rather than in a data centre. The company says it is the first of its kind, as far as it knows.",
-      "fact": "Block says Dessa was trained on a single NVIDIA GB200 NVL72 and runs locally on a MacBook Pro M4 Max or better.",
-      "take": "I have paid for voice agents that pause before every reply. A model that runs on a laptop and answers in the same breath could replace one, if the demos hold outside Block's recordings.",
-      "caveat": "Every recording is Block's own, and early Hacker News listeners split on whether it sounds natural."
+      "summary": "A Northwestern University team held a single positron for months in a vacuum at three tenths of a degree above absolute zero, slow enough to make quantum measurements on it. The team reported the result in Physical Review Letters on Wednesday.",
+      "fact": "The positron came from decaying sodium-22 atoms, was slowed in a sliver of cold tungsten and was caught by electric fields, in work led by Gerald Gabrielse of Northwestern University.",
+      "take": "I like this one for scale: antimatter usually dies the instant it touches anything, and now one positron has sat still for a month at near absolute zero, opening quantum measurements on antimatter.",
+      "caveat": "This is one particle in one laboratory, not a production technique, and testing whether antimatter matches matter will take years of further measurements."
     }
   ],
   "sources": {
     "ok": 40,
     "total": 44
   },
-  "generated_at": "2026-10-24T06:52:10.022453+00:00",
+  "generated_at": "2026-10-25T07:15:37.913929+00:00",
   "sections": [
     {
       "id": "ai",
@@ -100,26 +111,10 @@
           "discussion_url": ""
         },
         {
-          "title": "Introducing Kimi K3.1 Pro",
-          "url": "https://simonwillison.net/2026/Oct/23/kimi-k31-pro/",
-          "source": "Simon Willison",
-          "blurb": "Introducing Kimi K3.1 Pro Kimi K3.1 Pro landed on the Kimi API today - it's not yet open weights, but Moonshot promise \"Full model weights…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "DeepSeek reportedly raises $15B days after US restrictions",
           "url": "https://techcrunch.com/2026/10/22/deepseek-reportedly-raises-15b-days-after-us-restrictions/",
           "source": "TechCrunch",
           "blurb": "DeepSeek has reportedly raised $15 billion in one of China's largest funding rounds, just days after the U.S. ordered federal agencies to r…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Microsoft’s Mustafa Suleyman says its AI outperforms doctors on hard cases as he chases ‘medical superintelligence’",
-          "url": "https://techcrunch.com/2026/10/22/microsofts-mustafa-suleyman-says-its-ai-outperforms-doctors-on-hard-cases-as-he-chases-medical-superintelligence/",
-          "source": "TechCrunch",
-          "blurb": "Microsoft’s new AI diagnostic system beat generalist doctors on hard cases, according to a study in Science. But most of the improvement se…",
           "signal": "",
           "discussion_url": ""
         },
@@ -130,6 +125,22 @@
           "blurb": "Nirva will ship its $249 ambient AI pendant by the end of the year.",
           "signal": "",
           "discussion_url": ""
+        },
+        {
+          "title": "Claude Duet app is Anthropic’s bet on agents",
+          "url": "https://techcrunch.com/2026/10/22/claude-duet-app-is-anthropics-bet-on-agents/",
+          "source": "TechCrunch",
+          "blurb": "Claude Duet is available through waitlist for Pro and Max plan users.",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Chinese hackers spied on thousands of companies after breaching IT giant ConnectWise",
+          "url": "https://techcrunch.com/2026/10/22/chinese-hackers-spied-on-thousands-of-companies-after-breaching-it-giant-connectwise/",
+          "source": "TechCrunch",
+          "blurb": "Microsoft points the blame for ConnectWise's breach at a China-aligned hacker, which relied on AI agents to rapidly hack into thousands of…",
+          "signal": "",
+          "discussion_url": ""
         }
       ]
     },
@@ -137,6 +148,14 @@
       "id": "tools",
       "label": "Agent tools",
       "items": [
+        {
+          "title": "ollama/ollama: v0.40.11",
+          "url": "https://github.com/ollama/ollama/releases/tag/v0.40.11",
+          "source": "ollama releases",
+          "blurb": "Speech Ollama can now generate speech on macOS. ollama run plays text or a chat model's reply aloud as the audio is generated, and apps can…",
+          "signal": "",
+          "discussion_url": ""
+        },
         {
           "title": "ollama/ollama: v0.40.10",
           "url": "https://github.com/ollama/ollama/releases/tag/v0.40.10",
@@ -154,14 +173,6 @@
           "discussion_url": ""
         },
         {
-          "title": "anthropics/claude-code: v2.1.310",
-          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.310",
-          "source": "claude-code releases",
-          "blurb": "What's changed Added the Monitor tool and plugin monitors on Bedrock, Vertex, and Foundry, and when telemetry or nonessential traffic is di…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "browser-use/browser-use: 0.13.12: OpenAI browser tools",
           "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.12",
           "source": "browser-use releases",
@@ -170,10 +181,10 @@
           "discussion_url": ""
         },
         {
-          "title": "browser-use/browser-use: 0.13.13: OpenAI browser tools and Cloud fixes",
-          "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.13",
-          "source": "browser-use releases",
-          "blurb": "This release includes the OpenAI browser-tool driver and fixes two integration issues. Handle temporary empty Cloud tab URLs during navigat…",
+          "title": "anthropics/claude-code: v2.1.310",
+          "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.310",
+          "source": "claude-code releases",
+          "blurb": "What's changed Added the Monitor tool and plugin monitors on Bedrock, Vertex, and Foundry, and when telemetry or nonessential traffic is di…",
           "signal": "",
           "discussion_url": ""
         }
@@ -188,39 +199,39 @@
           "url": "https://github.com/firecrawl/anydoc",
           "source": "GitHub",
           "blurb": "Convert Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, CSV, and PDF to clean Markdown. Built in Rust, with Node.js and Python bindings.",
-          "signal": "23,073 stars",
+          "signal": "23,089 stars",
           "discussion_url": ""
         },
         {
-          "title": "Railway Preliminary Report: Oct 21st Security Incident",
-          "url": "https://blog.railway.com/p/preliminary-report-october-security-incident",
-          "source": "Lobsters",
-          "blurb": "devops, security",
-          "signal": "3 pts · 7 comments",
-          "discussion_url": "https://lobste.rs/s/hq3tu8/railway_preliminary_report_oct_21st"
+          "title": "Five Qwen3.8-27B models match Fable 5 Using GVS5H Harness",
+          "url": "https://github.com/slee-persis/GVS5H",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "137 pts · 48 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50228167"
         },
         {
           "title": "browser-use/jev-ultrafast",
           "url": "https://github.com/browser-use/jev-ultrafast",
           "source": "GitHub",
           "blurb": "Fastest and cheapest web agent",
-          "signal": "23,547 stars",
+          "signal": "23,614 stars",
           "discussion_url": ""
         },
         {
-          "title": "storytold/lightcraft",
-          "url": "https://github.com/storytold/lightcraft",
-          "source": "GitHub",
-          "blurb": "LightCraft: An open-source non-destructive photo editor written by scratch in pure Rust",
-          "signal": "14,470 stars",
-          "discussion_url": ""
+          "title": "America has lost 200k of jobs in media, film and the arts. How much is AI?",
+          "url": "https://www.apricitas.io/p/ai-and-the-fall-of-the-creative-class",
+          "source": "Hacker News",
+          "blurb": "",
+          "signal": "306 pts · 307 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=50226419"
         },
         {
-          "title": "hypit-ai/hypit",
-          "url": "https://github.com/hypit-ai/hypit",
+          "title": "Niko1221/Strata",
+          "url": "https://github.com/Niko1221/Strata",
           "source": "GitHub",
-          "blurb": "Clone any viral video with AI agents. Not just a script, the whole workflow: swap the face, the words, the B-roll, ship 100 variants in one…",
-          "signal": "25,186 stars",
+          "blurb": "Qwen3.8-Flash-Next on any consumer hardware: one-click install for Windows / Linux. Strata inference engine, OpenAI/Anthropic API on localh…",
+          "signal": "32,227 stars",
           "discussion_url": ""
         }
       ]
@@ -254,18 +265,18 @@
           "discussion_url": ""
         },
         {
-          "title": "Kimi K3.1 Pro and Kimi K3.1 Pro Highspeed are available now in AI Gateway",
-          "url": "https://vercel.com/changelog/kimi-k3-1-pro-and-kimi-k3-1-pro-highspeed-are-available-now-in-ai-gateway",
-          "source": "Vercel",
-          "blurb": "",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "Introducing full transaction detection for Cloudflare WAF",
           "url": "https://blog.cloudflare.com/full-transaction-waf/",
           "source": "Cloudflare",
           "blurb": "Cloudflare's web application firewall can now correlate an HTTP request with its response. Full transaction detection helps every customer…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Kimi K3.1 Pro and Kimi K3.1 Pro Highspeed are available now in AI Gateway",
+          "url": "https://vercel.com/changelog/kimi-k3-1-pro-and-kimi-k3-1-pro-highspeed-are-available-now-in-ai-gateway",
+          "source": "Vercel",
+          "blurb": "",
           "signal": "",
           "discussion_url": ""
         }
@@ -276,42 +287,42 @@
       "label": "Product",
       "items": [
         {
-          "title": "ElevenLabs Realtime",
-          "url": "https://www.producthunt.com/products/realtime-max-mini",
+          "title": "AgentValley",
+          "url": "https://www.producthunt.com/products/agentvalley",
           "source": "Product Hunt",
-          "blurb": "Realtime voice agent models with 570ms to first audio Discussion | Link",
+          "blurb": "Every Claude Code agent, at a glance, in your Mac's notch Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "FLUX 3 Max",
-          "url": "https://www.producthunt.com/products/fal-ai",
+          "title": "Show HN: If YouTube had actual channels",
+          "url": "https://ytch.xyz",
+          "source": "Show HN",
+          "blurb": "",
+          "signal": "2,741 pts · 514 comments",
+          "discussion_url": "https://news.ycombinator.com/item?id=41247023"
+        },
+        {
+          "title": "MRRaudit",
+          "url": "https://www.producthunt.com/products/mrraudit",
           "source": "Product Hunt",
-          "blurb": "fal’s FLUX 3 Max: 10-second AI video in about 12 seconds Discussion | Link",
+          "blurb": "Understand why your MRR differs and get a number you trust Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Polylane for Cloudflare",
-          "url": "https://www.producthunt.com/products/polylane",
+          "title": "zCAD AI",
+          "url": "https://www.producthunt.com/products/zcad-ai",
           "source": "Product Hunt",
-          "blurb": "An AI on-call engineer for your Cloudflare apps Discussion | Link",
+          "blurb": "AI 3D that creates real parts, not just shapes Discussion | Link",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Monish",
-          "url": "https://www.producthunt.com/products/monish",
+          "title": "Basedash Scheduled CSV Exports",
+          "url": "https://www.producthunt.com/products/basedash",
           "source": "Product Hunt",
-          "blurb": "Your AI agents, live on your iPhone lock screen Discussion | Link",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "Ovren Live Preview",
-          "url": "https://www.producthunt.com/products/ovren",
-          "source": "Product Hunt",
-          "blurb": "See your product change live before it ships Discussion | Link",
+          "blurb": "Ask once. Get a fresh CSV in Slack or email every week. Discussion | Link",
           "signal": "",
           "discussion_url": ""
         }
@@ -322,34 +333,34 @@
       "label": "Startups",
       "items": [
         {
-          "title": "Agent cloud startup Daytona hits $1B valuation backed by FirstMark and a who’s who of angels",
-          "url": "https://techcrunch.com/2026/10/23/agent-cloud-startup-daytona-hits-1b-valuation-backed-by-firstmark-and-a-whos-who-of-angels/",
+          "title": "PHP-ocalypse: How two critical web bugs almost broke the internet",
+          "url": "https://techcrunch.com/2026/10/24/php-ocalypse-how-two-critical-web-bugs-almost-broke-the-internet/",
           "source": "TechCrunch",
-          "blurb": "Daytona is building a cloud for agents that's like giving every agent its own computer. It has attracted founders of Stripe, Perplextity, D…",
+          "blurb": "Two critical bugs in the PHP web programming language, used by the majority of the internet, threatened to upend the internet — and it's un…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Carta and NewView partner, hoping to entice more startups to let employees sell shares early",
-          "url": "https://techcrunch.com/2026/10/23/carta-and-newview-partner-hoping-to-entice-more-startups-to-let-employees-sell-shares-early/",
+          "title": "Instacart reportedly discussed selling itself with DoorDash and Uber",
+          "url": "https://techcrunch.com/2026/10/24/instacart-reportedly-discussed-selling-itself-with-doordash-and-uber/",
           "source": "TechCrunch",
-          "blurb": "A new program wants to encourage more startups to allow workers to cash out early by making it easier to transact tender offers.",
+          "blurb": "Instacart might sell itself to a larger competitor.",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "What some of Anthropic’s backers are worth before its IPO",
-          "url": "https://techcrunch.com/2026/10/23/what-some-of-anthropics-backers-are-reportedly-worth-before-its-ipo/",
+          "title": "Will AI expose the rickety infrastructure of the internet?",
+          "url": "https://techcrunch.com/2026/10/24/will-ai-expose-the-rickety-infrastructure-of-the-internet/",
           "source": "TechCrunch",
-          "blurb": "Early-stage and follow-on investors in the AI lab are already sitting on major paper returns.",
+          "blurb": "The moment you realize the internet is \"held together by glue and dreams.\"",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Commonwealth Fusion Systems gets $85M to build better fusion-ready semiconductors",
-          "url": "https://techcrunch.com/2026/10/23/commonwealth-fusion-systems-gets-85m-to-build-better-fusion-ready-semiconductors/",
-          "source": "TechCrunch",
-          "blurb": "Top-funded fusion startup Commonwealth Fusion Systems received an $85 million award from the federal government to advance conductors for f…",
+          "title": "How Vin Bui became engineer #1 at Nowadays — and started treating it like his own company",
+          "url": "https://www.ycombinator.com/blog/how-vin-bui-became-engineer-1-at-nowadays-and-started-treating-it-like-his-own-company/",
+          "source": "Y Combinator",
+          "blurb": "Vin found Nowadays on Work at a Startup, saw a codebase he could fix, and joined as the first engineer. Now he builds AI voice tools and me…",
           "signal": "",
           "discussion_url": ""
         },
@@ -368,6 +379,14 @@
       "label": "News",
       "items": [
         {
+          "title": "Exclusive: Physical AI Startup Tractian Becomes a Unicorn - The Information",
+          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQVGNHSzF3MEg1c2hKZ1dPekJoYWNHVk1mOUp1R2xtZjRfRWxoRmhteXRadjdSWjlDUDZtR2FSRjViTmJxYWZCMHVvaEFPMWY1N0ZQUHl2Y3I1VlEwQUtaX1h3LUpKczhmWXlBWE9STE9Od29kck5vMm5NRks0LWZuQUFWQm9Ya3c1bi1Sc2VSUEZ3QXJtMEs0M1N1SQ?oc=5",
+          "source": "Google News",
+          "blurb": "Exclusive: Physical AI Startup Tractian Becomes a Unicorn The Information",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
           "title": "DeepSeek wrapping up $15 billion fundraising to fuel AI race, sources say - Reuters",
           "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxOQkI4b1B0WkYzUnhGdTF6b0VTRnBCWjRxelF3Q2g4VlRjTzNUOFFTZUhrM3VHSWs2M1VpWkZqN0FleF9JREgzdXpEWFNHM0VvSXhhNm5pdHRXZkRrNUR0UGFJVUMzRjNDWWRwZ0ZtOEsyMm93VU82Rno1R3FxQTNxMllyeWh2YnJRY19hUjZMbExjank3YUg5anFYdjRHRUdnSlN3cFMwMU9TLVBDSldIYUpUdy1vYTdtS3RHTnphNU1KYTdtYWVzNFFR?oc=5",
           "source": "Google News",
@@ -376,10 +395,18 @@
           "discussion_url": ""
         },
         {
-          "title": "Year-old AI lab Flapping Airplanes raises $1B at a $6B valuation - TechCrunch",
-          "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxPb3RYOUtvb3FhTE5uNktENXZ0NmJ3c0pQSWg4TGFsZmdYaXV0V2xOM3JkWWI0Y2E0SFlBMmF4R1RWa0tBTVc1UnBTR0lndUF0d0Y4TkE3cUdwZVFkdGhLelJhbmtaaS11RDlnUlNMN2R5eV8yS2M4ZUpseE5uUEQ5Qi1nclhMVWJ2TWl2ajRVUUg2alQ5cFZZTkdteDQyQQ?oc=5",
+          "title": "AI chip startup Tenstorrent raises $1.5 billion in Series E - Evertiq",
+          "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPcVhuZ2VLNVZzMFdlUXR2YVY5NXhlTWZzSW4tbVNuTW5Ta2ZFcmZBXzIyVUNaYzFvRFRxVUxxdkJWd3h1aXRSbF8xRlktcVZHVTEwcHlXZXFqNzQ4SEp5WFNxUnFsb0UtUmVWak05d2lFTmFibnR0WFIta3RKTldqQzVJY3h2Slk0MTdUdmVmWU5XSE9kdzd1UQ?oc=5",
           "source": "Google News",
-          "blurb": "Year-old AI lab Flapping Airplanes raises $1B at a $6B valuation TechCrunch",
+          "blurb": "AI chip startup Tenstorrent raises $1.5 billion in Series E Evertiq",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Year-old AI startup Flapping Airplanes raises $1 billion in Series A funding - The Daily Star",
+          "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNQzJMVkVBX2xfQXhJSUFsenVYbGNOUlljNTFwRnZHY2l0bmhfcWM1VVZJdExpMTNIWFlrbWdHQWVHYmFoZk9MLVZXdUkxOXpEU29XS3BBdzV6QkNtTW1sU3dDX3EyNEU1MnZhVmpWa1U3YjBQSFFxN3B5Y010dTJKQmplTjdEQlJoQ2tESGxCOWxfalBidmZmOTlxajcyaC0zd21BbmN5OUljSkhlT0RnMnNscWxJQnV4Rm5feWRWQlNQemxpSVBJ?oc=5",
+          "source": "Google News",
+          "blurb": "Year-old AI startup Flapping Airplanes raises $1 billion in Series A funding The Daily Star",
           "signal": "",
           "discussion_url": ""
         },
@@ -390,22 +417,6 @@
           "blurb": "Chinese AI Startup DeepSeek Raises $15 Billion Ahead of Potential IPO WSJ",
           "signal": "",
           "discussion_url": ""
-        },
-        {
-          "title": "Exclusive: Physical AI Startup Tractian Becomes a Unicorn - The Information",
-          "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQVGNHSzF3MEg1c2hKZ1dPekJoYWNHVk1mOUp1R2xtZjRfRWxoRmhteXRadjdSWjlDUDZtR2FSRjViTmJxYWZCMHVvaEFPMWY1N0ZQUHl2Y3I1VlEwQUtaX1h3LUpKczhmWXlBWE9STE9Od29kck5vMm5NRks0LWZuQUFWQm9Ya3c1bi1Sc2VSUEZ3QXJtMEs0M1N1SQ?oc=5",
-          "source": "Google News",
-          "blurb": "Exclusive: Physical AI Startup Tractian Becomes a Unicorn The Information",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "DeepSeek raised about $15 billion in funding ahead of a possible IPO - Quartz",
-          "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE5BZnpOamRobjVScEI0eWY2UDR3QU1yRHM3N1F1WmpaSGNSQV9WNDNHS3Z4eWJsQkFTY294ODdzMGFMQVpKUEN1WUZFN29qQlZLMm5rQzhaWFo3bDhCWFV6akpuS1pLM05reHdBQXlmVTh3N1p4Yllr?oc=5",
-          "source": "Google News",
-          "blurb": "DeepSeek raised about $15 billion in funding ahead of a possible IPO Quartz",
-          "signal": "",
-          "discussion_url": ""
         }
       ]
     },
@@ -413,14 +424,6 @@
       "id": "security",
       "label": "Security",
       "items": [
-        {
-          "title": "Railway warns devs to rotate secrets after potential breach",
-          "url": "https://www.bleepingcomputer.com/news/security/railway-warns-devs-to-rotate-secrets-after-potential-breach/",
-          "source": "BleepingComputer",
-          "blurb": "Cloud platform Railway published an urgent warning to users after detecting suspicious activity on its systems that store customer environm…",
-          "signal": "",
-          "discussion_url": ""
-        },
         {
           "title": "Microsoft Teams to get AI-powered, context-aware phishing detection",
           "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-teams-to-get-ai-powered-context-aware-phishing-detection/",
@@ -438,18 +441,26 @@
           "discussion_url": ""
         },
         {
-          "title": "U.S. Soldier Gets 70 Months in Prison for AT&T, Verizon Extortions",
-          "url": "https://krebsonsecurity.com/2026/09/u-s-soldier-gets-70-months-in-prison-for-att-verizon-extortions/",
-          "source": "Krebs on Security",
-          "blurb": "A U.S. Army soldier who pleaded guilty to hacking into multiple telecommunications companies and stealing mobile call and text metadata for…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
           "title": "You gave your AI agent access, but who is giving it orders?",
           "url": "https://www.bleepingcomputer.com/news/security/you-gave-your-ai-agent-access-but-who-is-giving-it-orders/",
           "source": "BleepingComputer",
           "blurb": "AI agents can be manipulated through malicious emails, websites, and plugins into executing commands, stealing data, or deleting files usin…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Feds Suspect Ransom Negotiator Ran ShinyHunters Extortion Site",
+          "url": "https://krebsonsecurity.com/2026/10/feds-suspect-ransom-negotiator-ran-shinyhunters-extortion-site/",
+          "source": "Krebs on Security",
+          "blurb": "U.S. federal investigators pursuing the ShinyHunters hacking group that recently stole highly sensitive data from the FBI have identified e…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "FBI Arrests Executive at Ransomware Negotiation Firm",
+          "url": "https://krebsonsecurity.com/2026/10/fbi-arrests-founder-of-ransomware-negotiation-firm/",
+          "source": "Krebs on Security",
+          "blurb": "Agents with the Federal Bureau of Investigation (FBI) on Thursday arrested the co-founder of a Canadian cybersecurity firm in connection wi…",
           "signal": "",
           "discussion_url": ""
         }
@@ -460,18 +471,10 @@
       "label": "India",
       "items": [
         {
-          "title": "Y Combinator-Backed Firstwork Nets $15 Mn To Expand Footprint Across US And Europe",
-          "url": "https://inc42.com/buzz/y-combinator-backed-firstwork-nets-15-mn-to-expand-footprint-across-us-and-europe/",
-          "source": "Inc42",
-          "blurb": "US-based HR tech startup Firstwork has raised $15 Mn (over ₹142 Cr) in a Series A funding round led by…",
-          "signal": "",
-          "discussion_url": ""
-        },
-        {
-          "title": "From Even Health To The Pant Project— Indian Startups Raised Over $184 Mn This Week",
-          "url": "https://inc42.com/buzz/from-even-health-to-the-pant-project-indian-startups-raised-over-184-mn-this-week/",
-          "source": "Inc42",
-          "blurb": "Indian startup funding activity slowed down in the third week of October, with 17 startups raising over $184 Mn. This…",
+          "title": "Beyond transactions: How PhonePe and Razorpay are using AI to improve digital payments",
+          "url": "https://yourstory.com/2026/10/beyond-transactions-how-phonepe-and-razorpay-are-using-ai-to-improve-digital-payments",
+          "source": "YourStory",
+          "blurb": "At TechSparks 2026, Deep Agrawal of PhonePe and Khilan Haria of Razorpay discussed how contextual payments and AI can improve customer expe…",
           "signal": "",
           "discussion_url": ""
         },
@@ -484,10 +487,18 @@
           "discussion_url": ""
         },
         {
-          "title": "[Weekly funding roundup Oct 17-23] VC funding falls below $100M amid lack of big deals",
-          "url": "https://yourstory.com/2026/10/weekly-funding-roundup-oct-17-23-vc-funding-falls-below-100-million",
-          "source": "YourStory",
-          "blurb": "Venture capital funding in the third week of October recorded a sharp fall due to lower number of deals and absence of large value transact…",
+          "title": "PHP2Shell: Who Is At Risk And How Can Businesses Stay Safe?",
+          "url": "https://inc42.com/features/php2shell-who-is-at-risk-and-how-can-businesses-stay-safe/",
+          "source": "Inc42",
+          "blurb": "PHP, a programming language used to build websites, is at the centre of a major security concern after researchers uncovered…",
+          "signal": "",
+          "discussion_url": ""
+        },
+        {
+          "title": "Ever heard of a touchscreen garment? World's 1st is here - washable, breathable; it responds to finger presses, wireless",
+          "url": "https://www.livemint.com/technology/tech-news/ever-heard-of-a-touchscreen-garment-worlds-1st-is-here-washable-breathable-it-responds-to-finger-presses-wireless-11792830064241.html",
+          "source": "Mint",
+          "blurb": "NUS researchers have developed a washable touchscreen sleeve that displays photos and videos, responds to touch, and measures body temperat…",
           "signal": "",
           "discussion_url": ""
         },
@@ -506,42 +517,42 @@
       "label": "Reddit",
       "items": [
         {
-          "title": "Crossed 10 users ! First milestone hit and Chatgpt is the #1 acquisition channel.",
-          "url": "https://www.reddit.com/r/SaaS/comments/1xdeojc/crossed_10_users_first_milestone_hit_and_chatgpt/",
+          "title": "I built a chrome extension to clip any element on a website as an editable component in a canvas.",
+          "url": "https://www.reddit.com/r/SaaS/comments/1xeerj1/i_built_a_chrome_extension_to_clip_any_element_on/",
           "source": "r/SaaS",
-          "blurb": "https://preview.redd.it/d19cqh6228xh1.png?width=794&format=png&auto=webp&s=b7188e155c1da5f6db42ca72595fc1a44da13bc8 4 of these successfully…",
+          "blurb": "Hey everyone! I’ve been working on Xtractly. It’s a browser extension that lets you grab live components straight off any website you’re br…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Day 27 of selling shovels in a gold rush.",
-          "url": "https://www.reddit.com/r/SaaS/comments/1xdnfr4/day_27_of_selling_shovels_in_a_gold_rush/",
+          "title": "7 Paying users now over the course of 2 weeks since posting on tik-tok MRR $285 lol goal is 2250 by Dec 26th = 50 Users",
+          "url": "https://www.reddit.com/r/SaaS/comments/1xerg20/7_paying_users_now_over_the_course_of_2_weeks/",
           "source": "r/SaaS",
-          "blurb": "Everybody and their mother wants to launch a new saas every week. And guess what's the most important part of building a product. The resea…",
+          "blurb": "So I have been documenting my time on here trying to attract customers to my product and I think I have figured it out. So I was complainin…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "Analysed my funnel and found this",
-          "url": "https://www.reddit.com/r/SaaS/comments/1xdjqex/analysed_my_funnel_and_found_this/",
+          "title": "I made a open source tool to create saas launch videos like with with Claude",
+          "url": "https://www.reddit.com/r/SaaS/comments/1xecvtx/i_made_a_open_source_tool_to_create_saas_launch/",
           "source": "r/SaaS",
-          "blurb": "Hi , I'm building a tool for content creators And I was getting quite a lot of sign-ups but not much trial start.. So I checked the posthog…",
+          "blurb": "Many browser-based programmatic video editors rely on headless Chrome to render every frame, adding unnecessary overhead and slowing things…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "500k installs on Google Play but only 20-30 paid users. What am I doing wrong?",
-          "url": "https://www.reddit.com/r/SaaS/comments/1xdkqfu/500k_installs_on_google_play_but_only_2030_paid/",
+          "title": "Solo founder: $714 in the first 6 months, $20,196 in the next 6 (same product, mostly)",
+          "url": "https://www.reddit.com/r/SaaS/comments/1xeh2mx/solo_founder_714_in_the_first_6_months_20196_in/",
           "source": "r/SaaS",
-          "blurb": "reach 500k in google play Hi everyone So recently my VPN app reached 500k installs on Google Play. I have around 400k users in total but on…",
+          "blurb": "Disclosure: this is my own project. I’m not linking it here. From October to April, my side project made $714.52 total. From April to now,…",
           "signal": "",
           "discussion_url": ""
         },
         {
-          "title": "My app makes $60–70/month and someone offered me $1,500 for it. Should I sell?",
-          "url": "https://www.reddit.com/r/SaaS/comments/1xdyn19/my_app_makes_6070month_and_someone_offered_me/",
+          "title": "Just Made New Pricing Plans for My SaaS",
+          "url": "https://www.reddit.com/r/SaaS/comments/1xefaxc/just_made_new_pricing_plans_for_my_saas/",
           "source": "r/SaaS",
-          "blurb": "I built an Android app about 3 months ago, and it’s been making around $60–70 a month. Yesterday, someone offered me $1,500 to buy it, and…",
+          "blurb": "Hey Guys, It took me 3 days to decide and finally implement pricing plans for my SaaS. And now they are live! Free/Month + Pro/Month About…",
           "signal": "",
           "discussion_url": ""
         }
@@ -558,34 +569,10 @@
       "discussion_url": ""
     },
     {
-      "title": "Claude Duet app is Anthropic’s bet on agents",
-      "url": "https://techcrunch.com/2026/10/22/claude-duet-app-is-anthropics-bet-on-agents/",
-      "source": "TechCrunch",
-      "blurb": "Claude Duet is available through waitlist for Pro and Max plan users.",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Chinese hackers spied on thousands of companies after breaching IT giant ConnectWise",
-      "url": "https://techcrunch.com/2026/10/22/chinese-hackers-spied-on-thousands-of-companies-after-breaching-it-giant-connectwise/",
-      "source": "TechCrunch",
-      "blurb": "Microsoft points the blame for ConnectWise's breach at a China-aligned hacker, which relied on AI agents to rapidly hack into thousands of…",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "NVIDIA Kumo Relational Outperforms Supervised Machine Learning on Relational Data, No Training Required",
-      "url": "https://huggingface.co/blog/nvidia/kumo-relational",
-      "source": "Hugging Face",
-      "blurb": "",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Uber brings ChatGPT Work to all employees with OpenAI",
-      "url": "https://openai.com/index/uber-chatgpt-work-rollout",
-      "source": "OpenAI",
-      "blurb": "Uber is rolling out ChatGPT Work to more than 30,000 employees, helping teams research, analyze data, create presentations, and complete co…",
+      "title": "DeepSeek raised about $15 billion in funding ahead of a possible IPO - Quartz",
+      "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE5BZnpOamRobjVScEI0eWY2UDR3QU1yRHM3N1F1WmpaSGNSQV9WNDNHS3Z4eWJsQkFTY294ODdzMGFMQVpKUEN1WUZFN29qQlZLMm5rQzhaWFo3bDhCWFV6akpuS1pLM05reHdBQXlmVTh3N1p4Yllr?oc=5",
+      "source": "Google News",
+      "blurb": "DeepSeek raised about $15 billion in funding ahead of a possible IPO Quartz",
       "signal": "",
       "discussion_url": ""
     },
@@ -598,18 +585,50 @@
       "discussion_url": ""
     },
     {
-      "title": "AI Research Startup Flapping Airplanes Valued at $6 Billion in Round - Bloomberg.com",
-      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxOVWlMcFlyb091cURKSTdxWlZobXVRVVlpSlhQbFUxejRzYmQyVk9FX1ZGT2FlYU5GN2xGc2M3dVFnN292YkNRX3IzbERKUl9BYWlDVGMtU29RcmZ5UHZwRjROUWJneHpzajVHQTNYazhrYlM1SDZMZU1kRzRldTA3TVBNa05DbFJsYldTOVo0R0hOdFdwbmhXYWQ2dFQyWVlXd3RubmlDR0U0ZkZSczdmOVhUNU9DeTJVMUE?oc=5",
-      "source": "Google News",
-      "blurb": "AI Research Startup Flapping Airplanes Valued at $6 Billion in Round Bloomberg.com",
+      "title": "NVIDIA Kumo Relational Outperforms Supervised Machine Learning on Relational Data, No Training Required",
+      "url": "https://huggingface.co/blog/nvidia/kumo-relational",
+      "source": "Hugging Face",
+      "blurb": "",
       "signal": "",
       "discussion_url": ""
     },
     {
-      "title": "Coast raises $35M to automate expenses for HVAC, electrical, utility firms — plus 7 more NYC VC deals to know - The Business Journals",
-      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9PMm5GalQwNzY1T3EzYUQ0V21DaUZ2Z1RXMU14YXF6aG5NTGFJcVZDZ0V6SXJzM0FydE54U19HdDcyWjdmVDNXVHBiay1kcVhtaHRvQWxBTlhhRDFNUVJPdmFfTlJWSjBmZmVzMDdMY2hIM0hOcUJtaF92Y2Uzdw?oc=5",
+      "title": "Uber rival inDrive eyes 2027 robotaxi tests in Central Asia with Pony AI and Nvidia",
+      "url": "https://techcrunch.com/2026/10/22/uber-rival-indrive-eyes-2027-robotaxi-tests-in-central-asia-with-pony-ai-and-nvidia/",
+      "source": "TechCrunch",
+      "blurb": "The company plans to begin testing Pony.ai's robotaxis in Kazakhstan's capital in the first half of 2027.",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "The latest AI news we announced in September 2026",
+      "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-september-2026/",
+      "source": "Google AI",
+      "blurb": "Here are Google’s latest AI updates from September 2026",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "DeepSeek Raises $15 Billion Ahead of Planned Shanghai IPO - PYMNTS.com",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOYkF2d2ZwQXlHMk9HbWhUNk84UDlsWVllWTJleXJucUVZTjhZN2NtR3BZaHhGSUVOV0I2Sl9RN0NJcXZiR181d3VrZ3hUVDJKeUJYMTBVejRpTHFoNUt2VTRNUHRhZGRlTExLcXd6Nlp0emFaWUh1Ym1NZlRNaXFKczkyaUJfZ050SFdIY3JfbVhPUUtuOThjYmczSE5BanZOcnZoaC1ZTk9JUENfeW9ldWlUOXo?oc=5",
       "source": "Google News",
-      "blurb": "Coast raises $35M to automate expenses for HVAC, electrical, utility firms — plus 7 more NYC VC deals to know The Business Journals",
+      "blurb": "DeepSeek Raises $15 Billion Ahead of Planned Shanghai IPO PYMNTS.com",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "DeepSeek reportedly raises $15B days after US restrictions - TechCrunch",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOUTBUemhFOTYwdFI0QVo1MUYzYjFPUjV5Nk1zMHRtN0toUGdSMEwtWVJsUERqcWs4djkzeDF2U1NPa01YMmVIQ2FKNTRTVnJsRS1jNDFodXMyV18wejFsQUtFMVJUbHFtMmJCQ3lvdlY3UHcxa2VrZTk3Qm9XNG5MdnhER0FFUlc3U2YxVS1jM3VqbnpkUXM4?oc=5",
+      "source": "Google News",
+      "blurb": "DeepSeek reportedly raises $15B days after US restrictions TechCrunch",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Granite Speech 5.0: Transcribe, Translate, and Attribute more Accurately and Faster",
+      "url": "https://huggingface.co/blog/ibm-granite/granite-speech-5",
+      "source": "Hugging Face",
+      "blurb": "",
       "signal": "",
       "discussion_url": ""
     },
@@ -618,6 +637,14 @@
       "url": "https://blog.google/company-news/inside-google/around-the-globe/google-asia/e-conomy-sea-report-2026/",
       "source": "Google AI",
       "blurb": "Widespread AI adoption is propelling Southeast Asia's digital economy to a projected $368 billion in 2026 and $1 trillion by 2035.",
+      "signal": "",
+      "discussion_url": ""
+    },
+    {
+      "title": "Here are the top AI agents that can live in your text messages",
+      "url": "https://techcrunch.com/2026/10/24/all-the-ai-agents-that-can-live-in-your-text-messages/",
+      "source": "TechCrunch",
+      "blurb": "We created a list of the most notable AI agents that can live in your text messages, from general assistants to agents designed for familie…",
       "signal": "",
       "discussion_url": ""
     },
@@ -638,26 +665,10 @@
       "discussion_url": ""
     },
     {
-      "title": "Healthleap raises $38 million to expand hospital AI screening - Portal ERP",
-      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPVXlZTVUtYUhNWFFXV2M3cC1qUWhQaHZER0JpMEJQd3JrU2tsdGdaZE9kT0lHMDc0OVZBeXlHZFpNMGQ2UGtjNXQ0SExFSF96VkxQc1Z4TGpSX243aFZ1TEh0NkhlYUwyNnhRd0RfanQ4RHk3WUwxeTdVa3dfQXZ1UU50aUtISnBSbWx5NjM3QzR6YkNw?oc=5",
-      "source": "Google News",
-      "blurb": "Healthleap raises $38 million to expand hospital AI screening Portal ERP",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "Vercel CLI adds Spend Management",
-      "url": "https://vercel.com/changelog/vercel-cli-adds-spend-management",
-      "source": "Vercel",
-      "blurb": "",
-      "signal": "",
-      "discussion_url": ""
-    },
-    {
-      "title": "8 eMudhra certificates are compromised. Here's what you need to know",
-      "url": "https://blog.cloudflare.com/emudhra-certificate-compromise/",
-      "source": "Cloudflare",
-      "blurb": "Following the discovery that eight eMudhra intermediate certificates use weak keys, Cloudflare is deploying mitigations and releasing clien…",
+      "title": "ChatGPT Ads expands to 26 new countries as over 100,000 advertisers have used the platform",
+      "url": "https://openai.com/index/chatgpt-ads-expands-26-new-countries",
+      "source": "OpenAI",
+      "blurb": "From local businesses to global brands, more advertisers can now reach people as they explore, compare and decide what to buy in ChatGPT.",
       "signal": "",
       "discussion_url": ""
     }
