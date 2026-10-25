@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-25",
+  "candidate_count": 432,
+  "editor_note": "I opened about 15 of today's 432 candidates and kept 8. Yesterday's biggest stories, the Uber rollout, Kimi K3.1 Pro, OpenAI's no-internet training and 1Password for agents, already ran here, so today is a fresh slate. I dropped a solo founder's Reddit revenue story because Reddit blocked the page. The through-line: machines that choose for us, from doctors to music to keys.",
+  "stories": [
+    {
+      "title": "Microsoft's AI doctor panel beat generalists in a Science study",
+      "url": "https://techcrunch.com/2026/10/22/microsofts-mustafa-suleyman-says-its-ai-outperforms-doctors-on-hard-cases-as-he-chases-medical-superintelligence/",
+      "evidence_url": "https://microsoft.ai/news/building-medical-superintelligence/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Microsoft's MAI-DxO coordinates several AI agents that act like a panel of doctors: they question a patient, order tests and debate a diagnosis. On the hardest New England Journal of Medicine cases it was right more than twice as often as generalist physicians, and Microsoft AI's CEO called it a step toward medical superintelligence.",
+      "fact": "In the simulation published in Science, MAI-DxO scored 83% on complex cases against 36% for generalist physicians working with reference materials, and the best results came from OpenAI's GPT-5 and GPT-5.5 running underneath.",
+      "take": "My read: the orchestration is riding on the models, because GPT-5 alone scored 78.9% at $8,400 a case and the doctor panel added only about four points on top. I would trust the direction and distrust the headline gap.",
+      "caveat": "The comparison used generalist doctors working alone, not the specialist teams who handle these cases, and on emergency department cases the panel added little to accuracy or cost."
+    },
+    {
+      "title": "OpenAI is closing in on a $30 billion round at a $1.25 trillion valuation",
+      "url": "https://www.cnbc.com/2026/10/22/openai-funding-round-uae-investors.html",
+      "evidence_url": "https://www.cnbc.com/2026/10/22/openai-funding-round-uae-investors.html",
+      "source": "CNBC",
+      "section": "AI",
+      "summary": "CNBC reports OpenAI is close to finalizing a round of up to $30 billion at a $1.25 trillion pre-money valuation, led by UAE investors and Coatue and positioned as a bridge before a potential IPO. Terms are still being negotiated and OpenAI declined to comment.",
+      "fact": "OpenAI's last raise in March valued it at $852 billion post-money, it filed confidential IPO paperwork in June, and a round above $1 trillion would make it the most valued private company ever.",
+      "take": "I treat this as the IPO warm-up: $852 billion in March, a $1.25 trillion valuation now, the filing already in. The number left to learn is what public market buyers say to all of it.",
+      "caveat": "Anonymous sources only: the terms have moved once already, since Bloomberg reported $30 billion at a $1.4 trillion valuation a month ago, and OpenAI declined to comment."
+    },
+    {
+      "title": "Spotify wants to be the music service that AI agents pick",
+      "url": "https://techcrunch.com/2026/10/22/spotifys-current-ai-bet-is-about-being-the-music-service-that-agents-choose/",
+      "evidence_url": "https://s29.q4cdn.com/175625835/files/content_files/Q3-2026-Shareholder-Deck-FINAL.pdf",
+      "source": "TechCrunch",
+      "section": "Product ideas",
+      "summary": "Co-CEO Gustav Söderström told investors Spotify is in one of the few categories that thrives in the agentic age, because nobody asks an agent to summarize a song. The company is integrating with Meta's Muse, ChatGPT and Claude so people reach it through any assistant.",
+      "fact": "Spotify reported 788 million monthly active users and nearly €5 billion in Q3 revenue, and it was the first music service to integrate with Meta's Muse assistant.",
+      "take": "I build for a world where agents pick which service to call, so I watch who gets chosen by name. Spotify is staking its distribution on being picked first, and that is the play I want for my own products.",
+      "caveat": "Spotify disclosed no adoption numbers for in-agent listening, and access can close fast: Amazon already blocks Meta's Muse from shopping on its platform."
+    },
+    {
+      "title": "Railway told all 4.8 million users to rotate their secrets after a breach",
+      "url": "https://www.bleepingcomputer.com/news/security/railway-warns-devs-to-rotate-secrets-after-potential-breach/",
+      "evidence_url": "https://blog.railway.com/p/security-disclosure-wednesday-october-21st",
+      "source": "BleepingComputer",
+      "section": "Tools",
+      "summary": "Railway detected suspicious activity on the systems that store customer environment variables, and its investigation says an unauthorized third party may have obtained decrypted contents for some of them. It asked every user to rotate secrets and paused all deployments while it investigates.",
+      "fact": "Railway hosts more than 16 million services for around 4.8 million users, and it believes the incident was part of attacks targeting AI inference providers, which it told to revoke all keys.",
+      "take": "I keep API keys in platform env vars too, so this is my reminder to scope every credential, assume the platform can leak, and write down tonight what I would rotate first.",
+      "caveat": "Railway has not said how many accounts were affected or how access happened, and deployments were still delayed days after the disclosure, so the picture is unfinished."
+    },
+    {
+      "title": "Anthropic gave its Agent Skills standard to the Linux Foundation",
+      "url": "https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation",
+      "evidence_url": "https://simonwillison.net/2026/Oct/22/donating-agent-skills/",
+      "source": "Anthropic",
+      "section": "Tools",
+      "summary": "Anthropic donated Agent Skills, the open standard that gives agents specialized knowledge and workflows, to the Agentic AI Foundation under the Linux Foundation, the body it co-founded with Block and OpenAI that already holds the Model Context Protocol.",
+      "fact": "Anthropic says more than 70 agent platforms including ChatGPT, Cursor, GitHub Copilot and VS Code have integrated Agent Skills since December 2025, with 1 million skills published and nearly 280 million installed.",
+      "take": "My fleet runs on skills files, so this decides where the format I bet on lives: in a neutral foundation next to MCP. I read it as a green light to keep writing skills for every agent, not one vendor.",
+      "caveat": "Anthropic still builds the reference implementation and co-founded the foundation, so the standard's direction will follow its biggest vendor for now."
+    },
+    {
+      "title": "Indian startups raised $184 million this week, and about half went to AI",
+      "url": "https://inc42.com/buzz/from-even-health-to-the-pant-project-indian-startups-raised-over-184-mn-this-week/",
+      "evidence_url": "https://inc42.com/buzz/from-even-health-to-the-pant-project-indian-startups-raised-over-184-mn-this-week/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "Seventeen Indian startups raised over $184 million between October 19 and 23, down 22% from the previous week's $236.2 million. AI startups led with $93.9 million across six deals, followed by healthtech with $60.6 million across two deals.",
+      "fact": "The week's largest rounds were Even Health's $50 million Series B led by Khosla Ventures and a $48 million seed for an AI application startup called Different, led by General Catalyst.",
+      "take": "I watch this list for where Indian capital thinks software is going, and this week it chose AI application startups over everything else, with $93.9 million of the $184 million total.",
+      "caveat": "Announced deals only: undisclosed rounds sit outside the total, and weekly counts swing widely, with deal count down 32% in a single week."
+    },
+    {
+      "title": "Flipkart's super.money tripled revenue, and loans now bring in most of it",
+      "url": "https://inc42.com/buzz/flipkart-backed-super-moneys-fy26-revenue-triples-to-%e2%82%b9292-cr/",
+      "evidence_url": "https://inc42.com/buzz/flipkart-backed-super-moneys-fy26-revenue-triples-to-%e2%82%b9292-cr/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "super.money, the UPI payments app Walmart's Flipkart launched in 2024, more than tripled operating revenue to ₹292.4 crore in FY26 from ₹88.8 crore. Loan facilitation drove 84.7% of that revenue, while the net loss widened 78.5% to ₹263.8 crore.",
+      "fact": "super.money processed over 40.51 crore UPI transactions worth more than ₹19,613 crore in September 2026, making it the fifth largest UPI player in the market.",
+      "take": "I read this as the UPI business model question answered in public: payments alone do not pay, so the fifth largest player turned to lending and the loss still grew 78.5%.",
+      "caveat": "The loan business depends on partner banks and NBFCs, and expenses grew 130% year over year, so the revenue story is being bought with cash."
+    },
+    {
+      "title": "Physicists trapped a single antimatter particle for a month",
+      "url": "https://www.scientificamerican.com/article/physicists-trap-a-single-antimatter-particle-for-a-month/",
+      "evidence_url": "https://arxiv.org/abs/2605.08147",
+      "source": "Scientific American",
+      "section": "Wildcard",
+      "summary": "A Northwestern University team held a single positron for months in a vacuum at three tenths of a degree above absolute zero, slow enough to make quantum measurements on it. The team reported the result in Physical Review Letters on Wednesday.",
+      "fact": "The positron came from decaying sodium-22 atoms, was slowed in a sliver of cold tungsten and was caught by electric fields, in work led by Gerald Gabrielse of Northwestern University.",
+      "take": "I like this one for scale: antimatter usually dies the instant it touches anything, and now one positron has sat still for a month at near absolute zero, opening quantum measurements on antimatter.",
+      "caveat": "This is one particle in one laboratory, not a production technique, and testing whether antimatter matches matter will take years of further measurements."
+    }
+  ]
+}
