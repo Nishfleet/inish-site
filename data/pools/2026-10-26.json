@@ -1,0 +1,1962 @@
+{
+  "date": "2026-10-26",
+  "generated_at": "2026-10-26T07:24:00.414881+00:00",
+  "candidate_count": 423,
+  "ranked_by": "typesafe-ai/jev",
+  "sources": {
+    "ok": 40,
+    "total": 44
+  },
+  "items": [
+    {
+      "title": "Gemini 4 Argon: Built to solve your hardest problems",
+      "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "source": "Google AI",
+      "blurb": "We’re giving developers, enterprises, scientists, and consumers access to Gemini 4 Argon, our latest frontier model.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.835
+    },
+    {
+      "title": "Unacademy Cofounders Plan ₹700 Cr AI, Deeptech Fund Longshot Capital",
+      "url": "https://inc42.com/buzz/unacademy-cofounders-plan-%e2%82%b9700-cr-ai-deeptech-fund-longshot-capital/",
+      "source": "Inc42",
+      "blurb": "Unacademy cofounders Gaurav Munjal and Roman Saini are raising a ₹700 Cr venture capital fund to back AI and deeptech…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.718
+    },
+    {
+      "title": "AI chip startup Tenstorrent raises $1.5 billion in Series E - Evertiq",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPcVhuZ2VLNVZzMFdlUXR2YVY5NXhlTWZzSW4tbVNuTW5Ta2ZFcmZBXzIyVUNaYzFvRFRxVUxxdkJWd3h1aXRSbF8xRlktcVZHVTEwcHlXZXFqNzQ4SEp5WFNxUnFsb0UtUmVWak05d2lFTmFibnR0WFIta3RKTldqQzVJY3h2Slk0MTdUdmVmWU5XSE9kdzd1UQ?oc=5",
+      "source": "Google News",
+      "blurb": "AI chip startup Tenstorrent raises $1.5 billion in Series E Evertiq",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.69
+    },
+    {
+      "title": "Year-old AI startup Flapping Airplanes raises $1 billion in Series A funding - The Daily Star",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNQzJMVkVBX2xfQXhJSUFsenVYbGNOUlljNTFwRnZHY2l0bmhfcWM1VVZJdExpMTNIWFlrbWdHQWVHYmFoZk9MLVZXdUkxOXpEU29XS3BBdzV6QkNtTW1sU3dDX3EyNEU1MnZhVmpWa1U3YjBQSFFxN3B5Y010dTJKQmplTjdEQlJoQ2tESGxCOWxfalBidmZmOTlxajcyaC0zd21BbmN5OUljSkhlT0RnMnNscWxJQnV4Rm5feWRWQlNQemxpSVBJ?oc=5",
+      "source": "Google News",
+      "blurb": "Year-old AI startup Flapping Airplanes raises $1 billion in Series A funding The Daily Star",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.69
+    },
+    {
+      "title": "AI coding agents hijacked using AGENTS.md file in Downloads folder",
+      "url": "https://www.bleepingcomputer.com/news/security/ai-coding-agents-hijacked-using-agentsmd-file-in-downloads-folder/",
+      "source": "BleepingComputer",
+      "blurb": "Researchers found a malicious AGENTS markdown instruction file in a customer's Downloads folder that tricked an AI coding agent into instal…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.688
+    },
+    {
+      "title": "AI delivers ‘zero financial payoff’ to most companies, Apollo economist says",
+      "url": "https://techcrunch.com/2026/10/25/ai-delivers-zero-financial-payoff-to-most-companies-according-to-apollo-economist/",
+      "source": "TechCrunch",
+      "blurb": "\"Despite massive investments and widespread hype around artificial intelligence, the technology has delivered zero financial payoff to corp…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.677
+    },
+    {
+      "title": "NVIDIA Kumo Relational Outperforms Supervised Machine Learning on Relational Data, No Training Required",
+      "url": "https://huggingface.co/blog/nvidia/kumo-relational",
+      "source": "Hugging Face",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.672
+    },
+    {
+      "title": "DeepSeek Raises $15 Bn In Funding Round With CATL, Tencent Participation - BW Disrupt",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxNVlJFTHA2Vk9iLTExazI0M1o3NTJvMnMwdU9oMk03TnRBNE52MWhpaUY2cVFqWVRrU3JXWWVGa3JCaW81YXpPSjZFQmdRc1NQX2g4OUo3X3hTM3MwMDJsd19jNXJyYV82dVM1ZGZLM1hwQml6NkQ2MlZ4NHlONlI3VTRib3JNNmRrUTBkWlpwd3YzbU5JQTNuV3QwZGo2VTZEZkx6T3A3c01aT1F3Q2dISA?oc=5",
+      "source": "Google News",
+      "blurb": "DeepSeek Raises $15 Bn In Funding Round With CATL, Tencent Participation BW Disrupt",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.667
+    },
+    {
+      "title": "Chinese hackers spied on thousands of companies after breaching IT giant ConnectWise",
+      "url": "https://techcrunch.com/2026/10/22/chinese-hackers-spied-on-thousands-of-companies-after-breaching-it-giant-connectwise/",
+      "source": "TechCrunch",
+      "blurb": "Microsoft points the blame for ConnectWise's breach at a China-aligned hacker, which relied on AI agents to rapidly hack into thousands of…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.662
+    },
+    {
+      "title": "[AINews] DeepSeek DeepInfer: Open Source SOTA Inference running 155T toks/day/cluster making $22m/day at ~80% margin for a 81 day payback",
+      "url": "https://latent.space/p/ainews-deepseek-deepinfer-open-source/",
+      "source": "Latent Space",
+      "blurb": "An open source “bomb” drops from China",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.65
+    },
+    {
+      "title": "Vercel Connect adds managed Stripe API keys",
+      "url": "https://vercel.com/changelog/vercel-connect-adds-managed-stripe-api-keys",
+      "source": "Vercel",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.647
+    },
+    {
+      "title": "Uber rival inDrive eyes 2027 robotaxi tests in Central Asia with Pony AI and Nvidia",
+      "url": "https://techcrunch.com/2026/10/22/uber-rival-indrive-eyes-2027-robotaxi-tests-in-central-asia-with-pony-ai-and-nvidia/",
+      "source": "TechCrunch",
+      "blurb": "The company plans to begin testing Pony.ai's robotaxis in Kazakhstan's capital in the first half of 2027.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.645
+    },
+    {
+      "title": "SG-based industrial AI startup Ailytics raises $7.4m led by Tin Men Capital - DealStreetAsia",
+      "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxOZFFTU2tvTDBzSXI0WEpsZmtDQjBLQ0kyaVYwOGUtTmZINzM2ZGVZVGJNdFJydUd3QUVyckVPVWRlV2VDWEQxTnNfbF84alJxOHFfczcxWUdIU2J1bEJhNmY1VXVIRFFsMFd6d3hCMGtvZndfbkV6aW9YU1pSd3BjN2NKZ2FYZw?oc=5",
+      "source": "Google News",
+      "blurb": "SG-based industrial AI startup Ailytics raises $7.4m led by Tin Men Capital DealStreetAsia",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.642
+    },
+    {
+      "title": "Coast raises $35M to automate expenses for HVAC, electrical, utility firms — plus 7 more NYC VC deals to know - The Business Journals",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9PMm5GalQwNzY1T3EzYUQ0V21DaUZ2Z1RXMU14YXF6aG5NTGFJcVZDZ0V6SXJzM0FydE54U19HdDcyWjdmVDNXVHBiay1kcVhtaHRvQWxBTlhhRDFNUVJPdmFfTlJWSjBmZmVzMDdMY2hIM0hOcUJtaF92Y2Uzdw?oc=5",
+      "source": "Google News",
+      "blurb": "Coast raises $35M to automate expenses for HVAC, electrical, utility firms — plus 7 more NYC VC deals to know The Business Journals",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.642
+    },
+    {
+      "title": "AI code testing startup Blacksmith raises $66 million at $1 billion valuation - Indian Startup News",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxQLUJEZDVwRXZyMjJyakZLWmlXUFVBUk9Cdk9GcTB4dElhdFEwOWZ4MTNhc09oMkFfbjJPcnZfX2ZTWU1LYzBiRTkxTW9pelFOVnZ5cUUyZ1RXRnd2dWJIbkJOemZfanBMcUp5ZVV4MDUySVVCZ0JyTkFQaEVqaUdqdk90OHVRMDZhMFgzYWUtaU0wN3RVOEoyQ1ZjTWc0bmwtWGVHV2lob0JkVWFoaWR6cDkxYXJJVmRwYlp5NTlSd9IBvwFBVV95cUxQLUJEZDVwRXZyMjJyakZLWmlXUFVBUk9Cdk9GcTB4dElhdFEwOWZ4MTNhc09oMkFfbjJPcnZfX2ZTWU1LYzBiRTkxTW9pelFOVnZ5cUUyZ1RXRnd2dWJIbkJOemZfanBMcUp5ZVV4MDUySVVCZ0JyTkFQaEVqaUdqdk90OHVRMDZhMFgzYWUtaU0wN3RVOEoyQ1ZjTWc0bmwtWGVHV2lob0JkVWFoaWR6cDkxYXJJVmRwYlp5NTlSdw?oc=5",
+      "source": "Google News",
+      "blurb": "AI code testing startup Blacksmith raises $66 million at $1 billion valuation Indian Startup News",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.642
+    },
+    {
+      "title": "OpenAI and Anthropic cut their LLM prices by up to 80% within a few months. Why?",
+      "url": "https://minimaxir.com/2026/10/cheap-llms/",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "256 pts · 276 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50236102",
+      "group": "dev",
+      "priority": 0.635
+    },
+    {
+      "title": "The latest AI news we announced in September 2026",
+      "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-september-2026/",
+      "source": "Google AI",
+      "blurb": "Here are Google’s latest AI updates from September 2026",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.635
+    },
+    {
+      "title": "TechCrunch Mobility: Blue-green is the color of autonomy",
+      "url": "https://techcrunch.com/2026/10/25/techcrunch-mobility-blue-green-is-the-color-of-autonomy/",
+      "source": "TechCrunch",
+      "blurb": "Welcome back to TechCrunch Mobility, your hub for the future of transportation and now, more than ever, the role AI is playing in it.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.635
+    },
+    {
+      "title": "firecrawl/anydoc",
+      "url": "https://github.com/firecrawl/anydoc",
+      "source": "GitHub",
+      "blurb": "Convert Word, PowerPoint, Excel, OpenDocument, RTF, EPUB, CSV, and PDF to clean Markdown. Built in Rust, with Node.js and Python bindings.",
+      "signal": "23,117 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.627
+    },
+    {
+      "title": "IBM CEO says open weight models are now good and cheap on-prem",
+      "url": "https://www.theregister.com/systems/2026/10/22/ibm-ceo-says-open-weight-models-are-now-irresistibly-good-and-cheap-on-prem/5304640",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "174 pts · 95 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50238088",
+      "group": "dev",
+      "priority": 0.625
+    },
+    {
+      "title": "How Commerce.com and Cloudflare are getting storefronts ready for AI agents",
+      "url": "https://blog.cloudflare.com/webmcp-commerce/",
+      "source": "Cloudflare",
+      "blurb": "Almost 100,000 Commerce.com domains now give AI agents real shopping tools through WebMCP on Cloudflare. Here's how we turned it on across…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.625
+    },
+    {
+      "title": "Tin Men Capital leads US$7.4M Series A for Vision AI startup Ailytics to expand across APAC, US and Gulf - Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNWXY1YUhMSkFoMWhCZDhQUmIycWJEM0ZlcWJ3YW15WXNXNkE0UkxIcXgwbFZJUkw1bFlkV2lBQ0dPN1oya1drX0dseXZweXlpd3BMMHczX05rN3FWSDh4NG9yZjhweDkxSmRRRGw2MDl5a2dRci1PdFlvZkxTSnBXNHNUMG53dHpsaG1jUHFkc1ljUQ?oc=5",
+      "source": "Google News",
+      "blurb": "Tin Men Capital leads US$7.4M Series A for Vision AI startup Ailytics to expand across APAC, US and Gulf Yahoo Finance",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.625
+    },
+    {
+      "title": "Southeast Asia’s digital economy to hit $368 billion",
+      "url": "https://blog.google/company-news/inside-google/around-the-globe/google-asia/e-conomy-sea-report-2026/",
+      "source": "Google AI",
+      "blurb": "Widespread AI adoption is propelling Southeast Asia's digital economy to a projected $368 billion in 2026 and $1 trillion by 2035.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.615
+    },
+    {
+      "title": "Beyond transactions: How PhonePe and Razorpay are using AI to improve digital payments",
+      "url": "https://yourstory.com/2026/10/beyond-transactions-how-phonepe-and-razorpay-are-using-ai-to-improve-digital-payments",
+      "source": "YourStory",
+      "blurb": "At TechSparks 2026, Deep Agrawal of PhonePe and Khilan Haria of Razorpay discussed how contextual payments and AI can improve customer expe…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.615
+    },
+    {
+      "title": "Deepinder Goyal’s Temple brain wearable: ₹85,000 price, pre-order date and features",
+      "url": "https://www.livemint.com/technology/tech-news/deepinder-goyal-s-temple-brain-wearable-rs-85-000-price-pre-order-date-and-features-11792924840816.html",
+      "source": "Mint",
+      "blurb": "Deepinder Goyal’s Temple brain-monitoring wearable is reportedly priced at ₹85,000, including a lifetime subscription, with pre-orders open…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.615
+    },
+    {
+      "title": "Singapore's Ailytics raises $7.4M Series A led by Tin Men Capital, to expand vision AI across APAC, US, Gulf - TNGlobal",
+      "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNNmhiazc0X1JFYWhlSVI4YS13YjNSM1B0eXVkSzFCT1NjM1BoeFNieVRJMy1lV2wxbXhmOTJPbXB6WHpySXI1WVd0RlYtTGRCZk5wSUJxdlRiU0JFa2o1clVXZmNrYXlpN1JwX1ZnWE1OYjYzX05WbTQwd0pfdEpMRW02RW85ZjY4Vl82LS1lZE12SXFwQlQzSm1DS2VWbEowMXQxM19oa0c5SDg3MDZBUXBwemlVX3ctSnpuTl95Rl9mb2RBWS1HZFdzTGFFamJ2M2VpUlZB?oc=5",
+      "source": "Google News",
+      "blurb": "Singapore's Ailytics raises $7.4M Series A led by Tin Men Capital, to expand vision AI across APAC, US, Gulf TNGlobal",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.613
+    },
+    {
+      "title": "HMD 2660 Flip Senior Edition with AI Companion: What it offers specifically for senior citizens",
+      "url": "https://www.livemint.com/technology/hmd-2660-flip-senior-edition-with-ai-companion-what-it-offers-specifically-for-senior-citizens-11792779678315.html",
+      "source": "Mint",
+      "blurb": "AI companion Mary is available around the clock and can discuss topics such as history and nature, share stories, answer questions, play me…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.613
+    },
+    {
+      "title": "Granite Speech 5.0: Transcribe, Translate, and Attribute more Accurately and Faster",
+      "url": "https://huggingface.co/blog/ibm-granite/granite-speech-5",
+      "source": "Hugging Face",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.608
+    },
+    {
+      "title": "Here are the top AI agents that can live in your text messages",
+      "url": "https://techcrunch.com/2026/10/24/all-the-ai-agents-that-can-live-in-your-text-messages/",
+      "source": "TechCrunch",
+      "blurb": "We created a list of the most notable AI agents that can live in your text messages, from general assistants to agents designed for familie…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.605
+    },
+    {
+      "title": "[AINews] Kimi 3.1 Pro 104BA-2.8T: Fable-5.1-Class Open Weights narrows Closed-AI lead to 1 month... and Pro Highspeed API with 2-3× speed",
+      "url": "https://latent.space/p/ainews-kimi-31/",
+      "source": "Latent Space",
+      "blurb": "We have Fable at home... or so we are being told by paid shills",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.603
+    },
+    {
+      "title": "Why AI Compute Comes in Rectangles — Erik Bernhardsson, Modal CEO",
+      "url": "https://latent.space/p/modal-d/",
+      "source": "Latent Space",
+      "blurb": "Elastic GPUs, sandbox growth, and the economics of the agent cloud",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.6
+    },
+    {
+      "title": "Microsoft Teams to get AI-powered, context-aware phishing detection",
+      "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-teams-to-get-ai-powered-context-aware-phishing-detection/",
+      "source": "BleepingComputer",
+      "blurb": "Microsoft has announced plans to add AI-powered phishing detection to Teams messages starting in early November 2026. [...]",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.6
+    },
+    {
+      "title": "Microsoft Decision-1: 9B Qwen Model Launch Explained",
+      "url": "https://shattered.io/microsoft-decision-1-qwen3-5-9b-model-2026/",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "34 pts · 12 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50238620",
+      "group": "dev",
+      "priority": 0.595
+    },
+    {
+      "title": "Codex Cloud shipped with Tailscale support. Nobody told us.",
+      "url": "https://tailscale.com/blog/codex-cloud-tailscale",
+      "source": "Tailscale",
+      "blurb": "No partnership, no custom API. Just an auth key and a tailnet.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.595
+    },
+    {
+      "title": "A 10-year-old CNN outperforms frontier LLMs for skin cancer diagnosis",
+      "url": "https://lynchlab.net/llm-skin-cancer",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "522 pts · 230 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50233779",
+      "group": "dev",
+      "priority": 0.59
+    },
+    {
+      "title": "[AINews] Black October",
+      "url": "https://latent.space/p/ainews-black-october/",
+      "source": "Latent Space",
+      "blurb": "the Cyber onslaught continues.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.585
+    },
+    {
+      "title": "Google announces Gemini 4 flagship AI model after months of delays - DD News",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxOLUs2Q2JnR3E0NUQxRmVnSGxNUXh1UnNVTExaQ085Y1dxNml3Q2JBN0ZocDNQZkRYZkFJc09hTzAxYWVSQ3FEWTRDdE5Md0xkaE5aeDYtTWJ2enNWVWtoRXEtNGsxbFlPSnlJWDQzcUE4dUlKRDJfdlJpYTJ1eXFOWGpxSkZINm1hNUtQUTBYZGl2OVFROE93?oc=5",
+      "source": "Google News",
+      "blurb": "Google announces Gemini 4 flagship AI model after months of delays DD News",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.585
+    },
+    {
+      "title": "Tin Men Capital Leads $7.4M Series A for Vision AI Startup Ailytics - Asia Business Outlook",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxONkRhRlpxUERCbmM0ZFZDcUh1S1dGaUtFUy01TGk2eTN0Z19sYU1MUE5fYVdlVlNZUUxrTEptNjdjYVk1b0xEN25YWXlpWW1BdUZNSzhsTk8wcTFYTHFfTmttZ3JRMVVWdGZ5eWpjemdyTTdtMUFydS1yazlUSVc3NWx0bzB5NDFIOE5jVTdmRjdUdTQ0Ulo3dkZGOVlKelJlQThDcldLdFJOZmhWVTdHMVhkbk5yVGMwT0xqUk9Ebw?oc=5",
+      "source": "Google News",
+      "blurb": "Tin Men Capital Leads $7.4M Series A for Vision AI Startup Ailytics Asia Business Outlook",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.585
+    },
+    {
+      "title": "Moonshot curbs hacking ability in new Kimi model as fears grow over AI-powered cyberattacks - Reuters",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQWlpZNXVZQXBxZ1hCTzA4X0VZYUh0QkhJb281X3VmMUt0VVZRY0N2N1Fja1dyZlB4cGlsTGktdjRaRzEzSDgtR01QS1F4V0ZsN0lsbzdTRjhRbG1MMlhfMkluTkxwTXFhOG1XZVVpRlRJX29ULXBEcUdTQUpoa2NkUmRMZFhDbkF3a0N3SDlqbTg1QnR3aFkwSW9LS181X0hsbXM1bXF2a0ZTWldQdlBMSlJRSzFoOGI2aFRF?oc=5",
+      "source": "Google News",
+      "blurb": "Moonshot curbs hacking ability in new Kimi model as fears grow over AI-powered cyberattacks Reuters",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.58
+    },
+    {
+      "title": "Widespread PHP Flaw May Cause Many Site Outages Today",
+      "url": "https://krebsonsecurity.com/2026/10/widespread-php-flaw-may-cause-many-site-outages-today/",
+      "source": "Krebs on Security",
+      "blurb": "Expect to see quite a few websites serving \"404\" or \"Page Not Found\" errors today: Nearly 70 percent of websites need to update their core…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.578
+    },
+    {
+      "title": "OpenAI says it will no longer train its AI models on the live internet, citing “significant risks”",
+      "url": "https://techcrunch.com/2026/10/23/openai-says-it-will-no-longer-train-its-ai-models-on-the-live-internet-citing-significant-risks/",
+      "source": "TechCrunch",
+      "blurb": "OpenAI will cut frontier models off from the internet weeks after one of its engineers said that solution wouldn't work.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.575
+    },
+    {
+      "title": "Ever heard of a touchscreen garment? World's 1st is here - washable, breathable; it responds to finger presses, wireless",
+      "url": "https://www.livemint.com/technology/tech-news/ever-heard-of-a-touchscreen-garment-worlds-1st-is-here-washable-breathable-it-responds-to-finger-presses-wireless-11792830064241.html",
+      "source": "Mint",
+      "blurb": "NUS researchers have developed a washable touchscreen sleeve that displays photos and videos, responds to touch, and measures body temperat…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.575
+    },
+    {
+      "title": "The AI graveyard: a running list of projects and startups that didn’t make it",
+      "url": "https://techcrunch.com/2026/10/24/the-ai-graveyard-a-running-list-of-projects-and-startups-that-didnt-make-it/",
+      "source": "TechCrunch",
+      "blurb": "From Apple's repeatedly delayed Siri AI to OpenAI's messy \"super app\" launch, here's a look at the AI projects that shut down or missed exp…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.573
+    },
+    {
+      "title": "DeepSeek Just Secured $15 Billion Right After the US Banned Its AI - Android Headlines",
+      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxNZVVnTExUUzhkaFRFOVFLU3RMa0dCOVRmSjJObVBYdjNDNGpqYU1kYi15TlhsWWtHZEJZME1QWjJoMXpTUzM3bkx6QjI5bGgzZk82NEFGVG9Oc0VUWWtSNVdBZEdGVXl2VEhuYm1LU3Jjdm1hVlQtckwxUENTTFpuWjVjby01Y19XZmN6bXRmZHk?oc=5",
+      "source": "Google News",
+      "blurb": "DeepSeek Just Secured $15 Billion Right After the US Banned Its AI Android Headlines",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.57
+    },
+    {
+      "title": "browser-use/jev-ultrafast",
+      "url": "https://github.com/browser-use/jev-ultrafast",
+      "source": "GitHub",
+      "blurb": "Fastest and cheapest web agent",
+      "signal": "23,657 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.568
+    },
+    {
+      "title": "Grok releases the first seven minutes of its AI-generated ‘Odyssey’",
+      "url": "https://techcrunch.com/2026/10/25/grok-releases-the-first-seven-minutes-of-its-ai-generated-odyssey/",
+      "source": "TechCrunch",
+      "blurb": "The footage looks okay, as long as you're not seeking artistry, inspiration, or human interest.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.568
+    },
+    {
+      "title": "Introducing full transaction detection for Cloudflare WAF",
+      "url": "https://blog.cloudflare.com/full-transaction-waf/",
+      "source": "Cloudflare",
+      "blurb": "Cloudflare's web application firewall can now correlate an HTTP request with its response. Full transaction detection helps every customer…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.568
+    },
+    {
+      "title": "Introducing Kimi K3.1 Pro",
+      "url": "https://simonwillison.net/2026/Oct/23/kimi-k31-pro/",
+      "source": "Simon Willison",
+      "blurb": "Introducing Kimi K3.1 Pro Kimi K3.1 Pro landed on the Kimi API today - it's not yet open weights, but Moonshot promise \"Full model weights…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.56
+    },
+    {
+      "title": "OpenAI and Anthropic slash LLM prices up to 80% as open-weight competition intensifies - news.lavx.hu",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPVy1Ma3I1SEpycWhRaFAySWpOWFg1dW1kR0VnOU91RU1mWG9nOVY5T1lFUWxsYXM0STVEVGpOQ2s1b0dWOVk5VE4yMnlKUlYzX1VNdV9na1B1a3ZYcnJmdmt2XzFLMjl4bEFTQTM1cDlxVmpNMmxQSXZ5N2lKSklDVW5QZGVURUlXVGM3Y3ZfU2lORktBVWd6VEtYTFJqNHJCOUk1cVotWHVNcksybHFaVWplblU?oc=5",
+      "source": "Google News",
+      "blurb": "OpenAI and Anthropic slash LLM prices up to 80% as open-weight competition intensifies news.lavx.hu",
+      "signal": "",
+      "discussion_url": "",
+      "group": "ai",
+      "priority": 0.56
+    },
+    {
+      "title": "AI cost controls lag as CFOs' influence grows, Deloitte finds - TechTarget",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNUXFaem1uVnRrR1d1eUR4bmhXNWVVa1Q3dEpHaVExdUJVaEtBWnJhM0NVM3M3RFFIcFFWbk9aUHRQWUJzcHRyRFZYNXp6dDNGTW02NzY1NHJVZ3VNRkJWamc5RXNvSjM5U180QlFpZ0dDR0ZRbmNoRHNtV2tMU1hOckQ5b1o5ZkJjYlJuRWhjeGhXdHpCWnZucGhKVVZqd2FpR1NDTERhTGNydklBclpQRE5fNNIBuwFBVV95cUxNMVRscjVhajA3cmhJMWRmMEZXQ3VFQWVKaHdHTm1CclNsZzNOaGxwSFNtWlJQME5STkhDcEYxX1pkZ25BcWZMSW0wTDVPVUxOamswN191bDV0cEtzMWlRbHVUMVk3d1luSDhlODhETDNlSzBiN2xydTM1RlZYQWlOR3pkU29XdmJTZU5KT1JLMnl0Q2JLem1KV1ZnajRhNVotMTBMNG9CeUJoQzNkSndWczdtb3o1X3FXbmdn?oc=5",
+      "source": "Google News",
+      "blurb": "AI cost controls lag as CFOs' influence grows, Deloitte finds TechTarget",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.552
+    },
+    {
+      "title": "PHP2Shell: Who Is At Risk And How Can Businesses Stay Safe?",
+      "url": "https://inc42.com/features/php2shell-who-is-at-risk-and-how-can-businesses-stay-safe/",
+      "source": "Inc42",
+      "blurb": "PHP, a programming language used to build websites, is at the centre of a major security concern after researchers uncovered…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.552
+    },
+    {
+      "title": "yetone/magpie",
+      "url": "https://github.com/yetone/magpie",
+      "source": "GitHub",
+      "blurb": "Every agent's model. One place. Codex on DeepSeek, Claude Code on Kimi, from the menu bar.",
+      "signal": "21,822 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.55
+    },
+    {
+      "title": "8 eMudhra certificates are compromised. Here's what you need to know",
+      "url": "https://blog.cloudflare.com/emudhra-certificate-compromise/",
+      "source": "Cloudflare",
+      "blurb": "Following the discovery that eight eMudhra intermediate certificates use weak keys, Cloudflare is deploying mitigations and releasing clien…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.547
+    },
+    {
+      "title": "Amazon’s “digital pacifier” for toddlers",
+      "url": "https://oligarchwatch.substack.com/p/amazons-digital-pacifier-for-toddlers",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "158 pts · 222 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50185534",
+      "group": "dev",
+      "priority": 0.54
+    },
+    {
+      "title": "PHP-ocalypse: How two critical web bugs almost broke the internet",
+      "url": "https://techcrunch.com/2026/10/24/php-ocalypse-how-two-critical-web-bugs-almost-broke-the-internet/",
+      "source": "TechCrunch",
+      "blurb": "Two critical bugs in the PHP web programming language, used by the majority of the internet, threatened to upend the internet — and it's un…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.537
+    },
+    {
+      "title": "storytold/lightcraft",
+      "url": "https://github.com/storytold/lightcraft",
+      "source": "GitHub",
+      "blurb": "LightCraft: An open-source non-destructive photo editor written by scratch in pure Rust",
+      "signal": "14,680 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.532
+    },
+    {
+      "title": "Deep-tech defence startup Paar Autonomy raises Rs 10 Cr - Entrackr",
+      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNM1BYNEF6TnBTeGFIU2gxWHMtenJzMGFNOUxrdmlpSWc4NVlUaENkUUxiaXZiZ1o2d0hZUkVEMHJTbi1rWFdma2JlcF92WFlHUFN3bWVvVkYyR1drQ2ZDeGxodk95WTNWM1pLbHNMa2p1djBCQWF4TlFUcjdWbnNBOWl0bWNFV1d0WkZHT0d3M2Y3endtZFVnY3Zn0gGaAUFVX3lxTE0zUFg0QXpOcFN4YUhTaDFYcy16cnMwYU05TGt2aWlJZzg1WVRoQ2RRTGJpdmJnWjZ3SFlSRUQwclNuLWtYV2ZrYmVwX3ZYWUdQU3dtZW9WRjJHV2tDZkN4bGh2T3lZM1YzWktsc0xranV2MEJBYXhOUVRyN1Zuc0E5aXRtY0VXV3RaRkdPR3czZjd6d21kVWdjdmc?oc=5",
+      "source": "Google News",
+      "blurb": "Deep-tech defence startup Paar Autonomy raises Rs 10 Cr Entrackr",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.53
+    },
+    {
+      "title": "Soaring AI Bills Are Vexing Wall Street Executives - Bloomberg.com",
+      "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxOMV9ZUUJjbkZrbGRYOEwwbTVTbml5NGctdUw5OUgzZE5hU2NNVGo2dUtlRTFnaERqaDc2eUxSNTR4eE93empUelRPdDdJMDJNUDV4bENNb21FOFhPT2lQT1lDcnNnVFp5em1PZEZCNDhGd0Q1R3hGM19QdjZheldWdjVRcHkxeDhOQ1E1ZlVNbG93aXJia0dQS2tOMVVfOXRYUVdLSV80WDc4bFdW?oc=5",
+      "source": "Google News",
+      "blurb": "Soaring AI Bills Are Vexing Wall Street Executives Bloomberg.com",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.53
+    },
+    {
+      "title": "Festive Sales See Shoppers Log In But Hold Back On Big-Ticket Purchases",
+      "url": "https://inc42.com/features/festive-sales-see-shoppers-log-in-but-hold-back-on-big-ticket-purchases/",
+      "source": "Inc42",
+      "blurb": "The festive season, usually a time to splurge, is telling a different story this year. A smaller number of card…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.53
+    },
+    {
+      "title": "MiniMax M3.1 Flash",
+      "url": "https://www.producthunt.com/products/minimax-4",
+      "source": "Product Hunt",
+      "blurb": "MiniMax’s Flash model, 3x faster and 70% cheaper for agents Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.527
+    },
+    {
+      "title": "hypit-ai/hypit",
+      "url": "https://github.com/hypit-ai/hypit",
+      "source": "GitHub",
+      "blurb": "Clone any viral video with AI agents. Not just a script, the whole workflow: swap the face, the words, the B-roll, ship 100 variants in one…",
+      "signal": "25,705 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.525
+    },
+    {
+      "title": "Flipkart-Backed super.money’s FY26 Revenue Triples To ₹292 Cr",
+      "url": "https://inc42.com/buzz/flipkart-backed-super-moneys-fy26-revenue-triples-to-%e2%82%b9292-cr/",
+      "source": "Inc42",
+      "blurb": "UPI provider super.money reported a net loss of ₹263.8 Cr in FY26, 78.5% higher than ₹147.8 Cr loss incurred in…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.525
+    },
+    {
+      "title": "ManyAgents",
+      "url": "https://www.producthunt.com/products/manyagents",
+      "source": "Product Hunt",
+      "blurb": "Run a team of AI coding agents from one Mac window Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.517
+    },
+    {
+      "title": "Kimi K3.1 Pro and Kimi K3.1 Pro Highspeed are available now in AI Gateway",
+      "url": "https://vercel.com/changelog/kimi-k3-1-pro-and-kimi-k3-1-pro-highspeed-are-available-now-in-ai-gateway",
+      "source": "Vercel",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.517
+    },
+    {
+      "title": "From Even Health To The Pant Project— Indian Startups Raised Over $184 Mn This Week",
+      "url": "https://inc42.com/buzz/from-even-health-to-the-pant-project-indian-startups-raised-over-184-mn-this-week/",
+      "source": "Inc42",
+      "blurb": "Indian startup funding activity slowed down in the third week of October, with 17 startups raising over $184 Mn. This…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.515
+    },
+    {
+      "title": "SurgePix",
+      "url": "https://www.producthunt.com/products/surgepix",
+      "source": "Product Hunt",
+      "blurb": "AI visuals. Edit every layer. Agent-callable. Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.512
+    },
+    {
+      "title": "PaperPilot – Zero-Cloud, Pure-Rust PDF Engine with WASM and MCP",
+      "url": "https://github.com/KrushnaVardhanReddy/PaperPilot",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "79 pts · 20 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50238739",
+      "group": "dev",
+      "priority": 0.51
+    },
+    {
+      "title": "Indian government sites are serving revoked eMudhra certificates",
+      "url": "https://captnemo.in/blog/2026/10/23/emsign-revoked-gov-in/",
+      "source": "Lobsters",
+      "blurb": "security",
+      "signal": "73 pts · 18 comments",
+      "discussion_url": "https://lobste.rs/s/zug8xv/indian_government_sites_are_serving",
+      "group": "dev",
+      "priority": 0.507
+    },
+    {
+      "title": "dataelement/dsh-desktop",
+      "url": "https://github.com/dataelement/dsh-desktop",
+      "source": "GitHub",
+      "blurb": "DSHDesktop：DeepSeek Harness Desktop / DeepSeek Harness 桌面版",
+      "signal": "16,954 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.507
+    },
+    {
+      "title": "Kiwi",
+      "url": "https://www.producthunt.com/products/kiwi-7",
+      "source": "Product Hunt",
+      "blurb": "A proactive AI assistant that texts you before you ask Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.507
+    },
+    {
+      "title": "Instacart reportedly discussed selling itself with DoorDash and Uber",
+      "url": "https://techcrunch.com/2026/10/24/instacart-reportedly-discussed-selling-itself-with-doordash-and-uber/",
+      "source": "TechCrunch",
+      "blurb": "Instacart might sell itself to a larger competitor.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.507
+    },
+    {
+      "title": "VibeiDE",
+      "url": "https://www.producthunt.com/products/vibeide",
+      "source": "Product Hunt",
+      "blurb": "Queue agent tasks in parallel and review each result Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.505
+    },
+    {
+      "title": "Harness launches tool to monitor AI spending - The Drawdown",
+      "url": "https://news.google.com/rss/articles/CBMigwFBVV95cUxOQ2ZNRVFUMDZVWjRtRzZvNDdRZVgwVkFtRERyckM3ejVqR21fRlVlbHRLeDhtMEI2clYzNXdaUlp1dUhHbXF0TjJSOGd4dXpIZVNHay1oS2VkZllWV0tXRzBUU1YxWTMySU94WmRNTW52cG5hVmRETTA2WFRjWnBBMG5yOA?oc=5",
+      "source": "Google News",
+      "blurb": "Harness launches tool to monitor AI spending The Drawdown",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.505
+    },
+    {
+      "title": "We chose €15 one-time instead of a subscription for our app. Tell me why we're wrong",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xf6q0j/we_chose_15_onetime_instead_of_a_subscription_for/",
+      "source": "r/SaaS",
+      "blurb": "Two of us are about to sell a native Mac app that turns your Apple Music library into a map you explore. Every pricing thread here says \"go…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.505
+    },
+    {
+      "title": "FY26 Financial Tracker: Tracking The Financial Performance Of Indian Startups",
+      "url": "https://inc42.com/features/fy26-financial-tracker-tracking-the-financial-performance-of-indian-startups/",
+      "source": "Inc42",
+      "blurb": "The Indian startup ecosystem continued to mature in FY26, with 22 new-age tech companies making their public market debut as…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.5
+    },
+    {
+      "title": "Show HN: If YouTube had actual channels",
+      "url": "https://ytch.xyz",
+      "source": "Show HN",
+      "blurb": "",
+      "signal": "2,741 pts · 514 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=41247023",
+      "group": "product",
+      "priority": 0.495
+    },
+    {
+      "title": "Funding Wrap: The Pant Project, CureBay, Hunar AI raise fresh capital - ET Entrepreneur",
+      "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxORk5ESG1na2hvOW5xa1NRRDl6OUdpQ1hJdlB0VHl4VzZWc3FwS2lGeUV0UGh6Y2pGYVg5Z2NyenpiS1hQTUN0eWk3VXVZazlBd1Z4WVlIckVWZG1hdXVOS1pMc2locTVZVkVoWnktcmRnSHUxaFg3UWJTdFc5RXc0bGdoTXNtNFVFajBRNWthaTFibjF3dVZ2anhvc2l1U0Z0eXpUYmtrUF9Nek41Vno2b3VrNkFWVk04YWNKeEpZay1DOV81VlczaVRpazlweHk0QTdfUktR0gHbAUFVX3lxTE9GMGI2NF9xTWdHMGd1eXN6cjg0M3QyUl85bmRXejJCNkRaeVItRld5aUFYM3UzQllzdTRxVDQzbElJTmRzdjZtUEJIVXkybjNDcW1qNW02alRBMzZ5QVRXUDlNMXU3cTVzU3g4ckQ4TlV6WVZDN01ZQ2piXy0wcEEweTVZX2RLSm8tVzNNSTBoclV4eGVjUkszY3ZKN2JPQVVNajVFdkt1RFBDeDVsLUlGejY3d1BYbUdORXhFV28zMnZ2SmZ6RkpBU09hUHJlRjh0S2hUbVM3QjJocw?oc=5",
+      "source": "Google News",
+      "blurb": "Funding Wrap: The Pant Project, CureBay, Hunar AI raise fresh capital ET Entrepreneur",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.495
+    },
+    {
+      "title": "Railway warns devs to rotate secrets after potential breach",
+      "url": "https://www.bleepingcomputer.com/news/security/railway-warns-devs-to-rotate-secrets-after-potential-breach/",
+      "source": "BleepingComputer",
+      "blurb": "Cloud platform Railway published an urgent warning to users after detecting suspicious activity on its systems that store customer environm…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.495
+    },
+    {
+      "title": "I built Venio, a booking app for barbershops that charges per shop, not per barber",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfhpc4/i_built_venio_a_booking_app_for_barbershops_that/",
+      "source": "r/SaaS",
+      "blurb": "What it is: Venio is a booking and payments app built only for barbershops. Each shop gets its own branded booking site, so clients book in…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.495
+    },
+    {
+      "title": "lexmount/moli",
+      "url": "https://github.com/lexmount/moli",
+      "source": "GitHub",
+      "blurb": "Best headless browser for AI agents. Lite, Fast, High-Compatibility. Built in Rust",
+      "signal": "20,761 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.492
+    },
+    {
+      "title": "Neoclouds: Your Storage Layer Just Got a Public Grade",
+      "url": "https://www.backblaze.com/blog/neoclouds-your-storage-layer-just-got-a-public-grade/",
+      "source": "Backblaze",
+      "blurb": "SemiAnalysis’ ClusterMAX 3.0 puts neocloud storage under scrutiny. From performance to tenant isolation, default configurations can undermi…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.492
+    },
+    {
+      "title": "Enterprises are being stung by unexpected AI bills, and it’s disrupting IT budgets - IT Pro",
+      "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOeVNMd2RRTDVJWmpWRmltWWM5dWg1dUFGQjhwZTBQa1RBVV9xb2VoRlVobmZJYlhEa09EUkdzUDJJUzFBT092WTNxaDhNVTYxUGUtM0NCVnJkUmVWaUJ3ZW5ScG44XzZzR2N1NjZvck05bjBaWnQwWHBPYTlURThUcGVTNDJnNWZpYU13Yk9YUFhmOGZyMW1kX1o4VnhKbnNPd0tYZmRyYlhEc1hVeTM4eUlXalNZRGppOEZVSzZoakZ1VFl0WlBCclg5MUVGdmowR3g0?oc=5",
+      "source": "Google News",
+      "blurb": "Enterprises are being stung by unexpected AI bills, and it’s disrupting IT budgets IT Pro",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.492
+    },
+    {
+      "title": "ollama/ollama: v0.40.11",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.40.11",
+      "source": "ollama releases",
+      "blurb": "Speech Ollama can now generate speech on macOS. ollama run plays text or a chat model's reply aloud as the audio is generated, and apps can…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.49
+    },
+    {
+      "title": "You gave your AI agent access, but who is giving it orders?",
+      "url": "https://www.bleepingcomputer.com/news/security/you-gave-your-ai-agent-access-but-who-is-giving-it-orders/",
+      "source": "BleepingComputer",
+      "blurb": "AI agents can be manipulated through malicious emails, websites, and plugins into executing commands, stealing data, or deleting files usin…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.49
+    },
+    {
+      "title": "FBI Arrests Executive at Ransomware Negotiation Firm",
+      "url": "https://krebsonsecurity.com/2026/10/fbi-arrests-founder-of-ransomware-negotiation-firm/",
+      "source": "Krebs on Security",
+      "blurb": "Agents with the Federal Bureau of Investigation (FBI) on Thursday arrested the co-founder of a Canadian cybersecurity firm in connection wi…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.49
+    },
+    {
+      "title": "Tech Layoffs 2026: Job cuts near 2 lakh globally as big tech like Microsoft, Google, Oracle, Meta & more pivot to AI",
+      "url": "https://www.livemint.com/technology/tech-news/tech-layoffs-2026-job-cuts-near-2-lakh-globally-as-big-tech-like-microsoft-google-oracle-meta-more-pivot-to-ai-11792917241824.html",
+      "source": "Mint",
+      "blurb": "Tech companies are utilising job cuts to demonstrate a commitment to margin expansion, pushing stock prices higher even as they announce in…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.49
+    },
+    {
+      "title": "Jobmate AI",
+      "url": "https://www.producthunt.com/products/jobmate-ai-3",
+      "source": "Product Hunt",
+      "blurb": "The humanized AI Copilot for your entire Job search Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.487
+    },
+    {
+      "title": "tabsh",
+      "url": "https://www.producthunt.com/products/tabsh",
+      "source": "Product Hunt",
+      "blurb": "Work with agents with an IDE in your browser tab Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.487
+    },
+    {
+      "title": "desigma",
+      "url": "https://www.producthunt.com/products/desigma",
+      "source": "Product Hunt",
+      "blurb": "Free Figma alternative made on Rust Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.487
+    },
+    {
+      "title": "Growth Vs Profitability: Swiggy’s Tug-Of-War",
+      "url": "https://inc42.com/features/growth-vs-profitability-swiggys-tug-of-war/",
+      "source": "Inc42",
+      "blurb": "Swiggy’s results for the second quarter (Q2) of the financial year 2026-27 (FY27) show that the tug of war between…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.487
+    },
+    {
+      "title": "CloudKnife",
+      "url": "https://www.producthunt.com/products/cloudknife",
+      "source": "Product Hunt",
+      "blurb": "Cut your cloud bill, not your performance Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.485
+    },
+    {
+      "title": "N8N Chat UI",
+      "url": "https://www.producthunt.com/products/n8n-chat-ui-2",
+      "source": "Product Hunt",
+      "blurb": "Beautiful, no-code, on-brand AI chat widgets for n8n Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.485
+    },
+    {
+      "title": "Vercel CLI adds Spend Management",
+      "url": "https://vercel.com/changelog/vercel-cli-adds-spend-management",
+      "source": "Vercel",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.485
+    },
+    {
+      "title": "storytold/wordcraft",
+      "url": "https://github.com/storytold/wordcraft",
+      "source": "GitHub",
+      "blurb": "An open-source, clean-room reimplementation of Microsoft Word in pure Rust",
+      "signal": "16,096 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.482
+    },
+    {
+      "title": "AI Funding Rounds This Week: Tenstorrent $1.5B [2026] - https://tech-insider.org/",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOcEZvcTUtYjJ0cTRtXzdJVi1NS25PT2RFQmEyVDBaTUZXcm95N2tXWng5ZUY4Q3RoME5wdFVReVctSHdLZUxtVjJETDg4ZzRjY3NPRmg0Q0JZOEFLdlM1WER1ekxvZEV1NjhsNFRvTVNzUm5BQVJrSFd6dHJOWF8wcmduRTNRNURvX2x5UA?oc=5",
+      "source": "Google News",
+      "blurb": "AI Funding Rounds This Week: Tenstorrent $1.5B [2026] https://tech-insider.org/",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.482
+    },
+    {
+      "title": "Feds Suspect Ransom Negotiator Ran ShinyHunters Extortion Site",
+      "url": "https://krebsonsecurity.com/2026/10/feds-suspect-ransom-negotiator-ran-shinyhunters-extortion-site/",
+      "source": "Krebs on Security",
+      "blurb": "U.S. federal investigators pursuing the ShinyHunters hacking group that recently stole highly sensitive data from the FBI have identified e…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.482
+    },
+    {
+      "title": "AI Bridge",
+      "url": "https://www.producthunt.com/products/ai-bridge",
+      "source": "Product Hunt",
+      "blurb": "Every AI coding agent on your Mac, in its place Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.48
+    },
+    {
+      "title": "Southeast Asia is hungry for AI — and the money isn't just in subscriptions - CNBC",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOLVB4S0phOUtJdGN2X19yWURkaERESTRPcWh1cWl1ZkVHV2pfRFdkX2Uyanl3UzZqaEtGdzJWSkhYVzJUWXd4cjBIUjg2Q0xMYkVid2xUeFpHUGVidGFtQzVPd3JRbUZnS0p4c2IxTC1QSFFMYkJtcTh2bkRZTHZTOUU3bjZzQWvSAYwBQVVfeXFMT0JDb0pVVFRsRDQ3NlQ2VmMyVlRoMEY5UUV1R1lpY1hvaFM5dTY2bVgyYlhQYTFLdWJJQ01OWXNFRXZvWW0yQk5MbEV2VVZ3bXVGT3NZamxOVXdJMlpIQjdIYUhrdHRNaXpwVm1vU1pGallBRW5qRzZwNkV3ZXloZDhxdXlNelVpb1lnQlg?oc=5",
+      "source": "Google News",
+      "blurb": "Southeast Asia is hungry for AI — and the money isn't just in subscriptions CNBC",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.48
+    },
+    {
+      "title": "Dutch Police Arrest ‘Reformed’ Hacker in Shiny Hunters Investigation",
+      "url": "https://krebsonsecurity.com/2026/09/dutch-police-arrest-reformed-hacker-in-shiny-hunters-investigation/",
+      "source": "Krebs on Security",
+      "blurb": "Authorities in the Netherlands have arrested a 23-year-old convicted cybercriminal on suspicion of aiding in data thefts and extortions by…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.48
+    },
+    {
+      "title": "Show HN: ADRs for AI – Deliberation records for human–AI work, versioned in Git",
+      "url": "https://adrs.systems",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "32 pts · 20 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50227041",
+      "group": "dev",
+      "priority": 0.477
+    },
+    {
+      "title": "Show HN: Obsidian Canvas – An infinite space for your ideas",
+      "url": "https://obsidian.md/canvas",
+      "source": "Show HN",
+      "blurb": "",
+      "signal": "1,380 pts · 387 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=34066824",
+      "group": "product",
+      "priority": 0.477
+    },
+    {
+      "title": "Bringing post-quantum cryptography to geographically fenced key management",
+      "url": "https://blog.cloudflare.com/post-quantum-geo-key-manager/",
+      "source": "Cloudflare",
+      "blurb": "Cloudflare's new post-quantum GeoKey Manager protects geographically fenced decryption keys from harvest now, decrypt later attacks. Learn…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.472
+    },
+    {
+      "title": "storytold/photocraft",
+      "url": "https://github.com/storytold/photocraft",
+      "source": "GitHub",
+      "blurb": "PhotoCraft: An open-source, photo editor written by scratch in pure Rust",
+      "signal": "72,993 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.47
+    },
+    {
+      "title": "Cloudflare deploys protections against php2shell vulnerability",
+      "url": "https://blog.cloudflare.com/php-vulnerabilities-waf-protection/",
+      "source": "Cloudflare",
+      "blurb": "Cloudflare has deployed default web application firewall (WAF) protections for newly disclosed PHP vulnerabilities before public disclosure…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.47
+    },
+    {
+      "title": "Show HN: Beeper Mini – iMessage client for Android",
+      "url": "https://www.beeper.com/",
+      "source": "Show HN",
+      "blurb": "",
+      "signal": "1,521 pts · 874 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=38531759",
+      "group": "product",
+      "priority": 0.468
+    },
+    {
+      "title": "robbietilton/Compositor",
+      "url": "https://github.com/robbietilton/Compositor",
+      "source": "GitHub",
+      "blurb": "The Photoshop alternative for Mac",
+      "signal": "17,910 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.465
+    },
+    {
+      "title": "yc-software/qm",
+      "url": "https://github.com/yc-software/qm",
+      "source": "GitHub",
+      "blurb": "Multiplayer agent harness for work.",
+      "signal": "15,537 stars",
+      "discussion_url": "",
+      "group": "dev",
+      "priority": 0.463
+    },
+    {
+      "title": "PDF Accessibility Checker by WebYes",
+      "url": "https://www.producthunt.com/products/pdf-accessibility-checker",
+      "source": "Product Hunt",
+      "blurb": "Find PDF accessibility issues for free, with fix guidance Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.463
+    },
+    {
+      "title": "I just reached $160 MRR with my SaaS. Today I shipped a massive visual update to the homepage and SEO pages. I'm feeling nervous because organic traffic was trending upwards and this could disrupt it…",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfe3pd/i_just_reached_160_mrr_with_my_saas_today_i/",
+      "source": "r/SaaS",
+      "blurb": "submitted by /u/OnePunchFTW [link] [comments]",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.463
+    },
+    {
+      "title": "Iron Age salt-mining complex found beneath Hallstatt in Austria",
+      "url": "https://archaeologymag.com/2026/09/iron-age-salt-mining-complex-beneath-hallstatt/",
+      "source": "Hacker News",
+      "blurb": "",
+      "signal": "50 pts · 8 comments",
+      "discussion_url": "https://news.ycombinator.com/item?id=50200957",
+      "group": "dev",
+      "priority": 0.458
+    },
+    {
+      "title": "Will AI expose the rickety infrastructure of the internet?",
+      "url": "https://techcrunch.com/2026/10/24/will-ai-expose-the-rickety-infrastructure-of-the-internet/",
+      "source": "TechCrunch",
+      "blurb": "The moment you realize the internet is \"held together by glue and dreams.\"",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.458
+    },
+    {
+      "title": "How Interfaze serves 50 million requests a month on Vercel",
+      "url": "https://vercel.com/blog/how-interfaze-serves-50-million-requests-a-month-on-vercel",
+      "source": "Vercel",
+      "blurb": "",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.455
+    },
+    {
+      "title": "AllModels",
+      "url": "https://www.producthunt.com/products/allmodels-io",
+      "source": "Product Hunt",
+      "blurb": "Explore every abliterated model Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.453
+    },
+    {
+      "title": "WhoIsCooking",
+      "url": "https://www.producthunt.com/products/whoiscooking",
+      "source": "Product Hunt",
+      "blurb": "See which AI agent is heating your Mac. Cool it down. Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.453
+    },
+    {
+      "title": "India's voice AI challenges could shape global technology, says Murf AI co-founder",
+      "url": "https://yourstory.com/2026/10/india-voice-ai-murf-ai-sneha-roy-techsparks",
+      "source": "YourStory",
+      "blurb": "At TechSparks 2026, Sneha Roy, the co-founder and COO of Murf AI, explains how multilingual speech, smaller AI models, and cost-efficient i…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.448
+    },
+    {
+      "title": "Gone in 300 seconds! ₹3 lakh iPhone Duo foldable phone sells out on Blinkit; Is Apple's monthly lease worth it?",
+      "url": "https://www.livemint.com/technology/iphone-duo-at-rs-2-99-lakh-sells-out-on-blinkit-in-5-minutes-is-apples-monthly-lease-worth-it-11792813203796.html",
+      "source": "Mint",
+      "blurb": "Apple’s first foldable smartphone, the iPhone Duo, sold out on Blinkit within five minutes of going on sale in Delhi-NCR on October 23, 202…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.445
+    },
+    {
+      "title": "Network Stats Q3 2026: Higher Baselines, Shifting Patterns",
+      "url": "https://www.backblaze.com/blog/network-stats-q3-2026-higher-baselines-shifting-patterns/",
+      "source": "Backblaze",
+      "blurb": "Backblaze’s Q3 2026 Network Stats reveal higher traffic baselines, expanding neocloud activity, and regional shifts in data movement. Explo…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.443
+    },
+    {
+      "title": "ShinyHunters Extorted Boeing Spin-off Prior to Arrests",
+      "url": "https://krebsonsecurity.com/2026/10/shinyhunters-extorted-boeing-spin-off-prior-to-arrests/",
+      "source": "Krebs on Security",
+      "blurb": "A teenager from Amman, Jordan suspected of leading the prolific data theft and extortion group ShinyHunters has been detained and is report…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.443
+    },
+    {
+      "title": "U.S. Soldier Gets 70 Months in Prison for AT&T, Verizon Extortions",
+      "url": "https://krebsonsecurity.com/2026/09/u-s-soldier-gets-70-months-in-prison-for-att-verizon-extortions/",
+      "source": "Krebs on Security",
+      "blurb": "A U.S. Army soldier who pleaded guilty to hacking into multiple telecommunications companies and stealing mobile call and text metadata for…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.443
+    },
+    {
+      "title": "AVP",
+      "url": "https://www.producthunt.com/products/avp",
+      "source": "Product Hunt",
+      "blurb": "Open source alternative to Git for AI coding agents Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.44
+    },
+    {
+      "title": "ollama/ollama: v0.40.10",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.40.10",
+      "source": "ollama releases",
+      "blurb": "NVIDIA Nemotron 3.5 Bolt E4B Nemotron 3.5 Bolt E4B is NVIDIA’s smaller, Gemma 4-based vision-language model for fast local conversations, i…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.44
+    },
+    {
+      "title": "Sovereign AI starts with open infrastructure",
+      "url": "https://tailscale.com/blog/sovereign-ai-patricia-prewitt",
+      "source": "Tailscale",
+      "blurb": "Sovereign AI means control: choosing your own stack, data, and dependencies.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.44
+    },
+    {
+      "title": "PHP shares mitigation for new RCE vulnerability with no patch",
+      "url": "https://www.bleepingcomputer.com/news/security/php-shares-mitigation-for-new-and-unpatched-rce-vulnerability/",
+      "source": "BleepingComputer",
+      "blurb": "The PHP security team has shared mitigation measures for a new remote code execution vulnerability that affects systems with non-default co…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.435
+    },
+    {
+      "title": "Standfast",
+      "url": "https://www.producthunt.com/products/standfast",
+      "source": "Product Hunt",
+      "blurb": "Know if your Mac's GitHub Actions runners will get work Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.43
+    },
+    {
+      "title": "AI billing spikes threaten businesses with operational strain - CIO Dive",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxOX3l2SzdDa3BUTXc3TkJPREpqYjRrMW1ZRU9XeXpXelVZOUNBa2lILVFKZzRiaDh1d1MwU0YyeFBhSFhqWWlzZGdIVWlJOExRRWVXRUF4eHRtaVltM0E0MklJcVEzS0FEbTN4QmxfdjUzOW9CWHZ3N1lyRmV0enNnMlFBVTBibzJZOGdWenJqNHRtRFFxTW5CZQ?oc=5",
+      "source": "Google News",
+      "blurb": "AI billing spikes threaten businesses with operational strain CIO Dive",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.427
+    },
+    {
+      "title": "Do you use AI to build your SaaS? If so, how much do you spend a month?",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xf0rpz/do_you_use_ai_to_build_your_saas_if_so_how_much/",
+      "source": "r/SaaS",
+      "blurb": "Honest question, not a survey for a startup. I’ve been shipping with Claude Code almost daily for about a year now, first for a client’s pl…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.425
+    },
+    {
+      "title": "Lure-TTS and Lure-Turbo: 600M voice models to run 4x faster than real time, with inline (tags), direction, and voice cloning. Trained for under $200.",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xf14j2/luretts_and_lureturbo_600m_voice_models_to_run_4x/",
+      "source": "r/LocalLLaMA",
+      "blurb": "I trained Lure TTS by finetuning Qwen3-TTS using some of the latest developments in model training, such as RLVR, OPD, and multi-teacher OP…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.425
+    },
+    {
+      "title": "Helio",
+      "url": "https://www.producthunt.com/products/helio-7",
+      "source": "Product Hunt",
+      "blurb": "Know exactly what your rooftop solar made today Discussion | Link",
+      "signal": "",
+      "discussion_url": "",
+      "group": "product",
+      "priority": 0.42
+    },
+    {
+      "title": "What will it take for India’s fintech infrastructure to go global?",
+      "url": "https://yourstory.com/2026/10/what-will-it-take-for-indias-fintech-infrastructure-global",
+      "source": "YourStory",
+      "blurb": "At TechSparks 2026, Movin Jain of Skydo and Srijon Biswas of PhonePe discussed building payments infrastructure at scale, the challenges of…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.42
+    },
+    {
+      "title": "Indian Listed New-Age Tech Company Tracker: Market Cap, Revenue & More",
+      "url": "https://inc42.com/features/indian-listed-new-age-tech-company-tracker-market-cap-revenue-more/",
+      "source": "Inc42",
+      "blurb": "For years, we at Inc42 have tracked the Indian tech startup ecosystem and seen it grow from a kid to…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.41
+    },
+    {
+      "title": "Travel experiences booking platform Bucketlistt raises Rs 7.6 crore funding led by Kairon Capital - The Economic Times",
+      "url": "https://news.google.com/rss/articles/CBMi9wFBVV95cUxNOU5fUXlhV1M4bEFkWVhxbU9ta2xvUmF3RmY0RWtWWGJTX1ptYnZtMUpBTXZlQ1BwWHJrMUQtbXJqSmNlR19jR2V1aUdQUmN6R1RlTmxvbzBNazNQbDg3UThLaHpfR25IQXlGZmtrcGdfaHRmY2MtZGN1M25NMWRMei12TjlEWUVBalRXb2FGYy05ODVST3Y3M3VyOTZqdkJYWktibmNCSl9WdFNkaDdEMUcwdEUteV95aU5yNzVRRThadi12THg0MFF1eTZxbXdFU1NRV2hnemRFbXhGS3dHYnRFdmVDclZaZ1czbC0wVDdPcVhZbjI40gH8AUFVX3lxTFBETXpRRnJNanc5anR0eVBBWnlSb1dWOWlacmxITi1LaGp6SF9sNUI2RFI3S2lGTWd2cXg1VkVmU2E4WkR2ZUN6dUhTaW5HR1RNVXdoQWJZVWNlU2tzelFFbUJhTGxBQXU3VzZGR2dBZXNtRE04bkZtNXI1c2ZKTVFMS2VfQ0JaRnN6NURNeHQzZTJJbW9kREVpMk9HZlZDUTVtRDFaeUttQ2hPa1hxS0ZZanB6S1F2R0hBQnB3aklnY2Voa0thQldRb3I2M2h3cHliZGJxRGdQZURMa1dUWXJvTVNqekU3R09LNlE4SGJETzFvQ19RYnRuMkt1aw?oc=5",
+      "source": "Google News",
+      "blurb": "Travel experiences booking platform Bucketlistt raises Rs 7.6 crore funding led by Kairon Capital The Economic Times",
+      "signal": "",
+      "discussion_url": "",
+      "group": "news",
+      "priority": 0.407
+    },
+    {
+      "title": "How Vin Bui became engineer #1 at Nowadays — and started treating it like his own company",
+      "url": "https://www.ycombinator.com/blog/how-vin-bui-became-engineer-1-at-nowadays-and-started-treating-it-like-his-own-company/",
+      "source": "Y Combinator",
+      "blurb": "Vin found Nowadays on Work at a Startup, saw a codebase he could fix, and joined as the first engineer. Now he builds AI voice tools and me…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.405
+    },
+    {
+      "title": "Your agent, your network: How Meta’s Muse agent works with Tailscale",
+      "url": "https://tailscale.com/blog/meta-muse-ai-agent-tailscale",
+      "source": "Tailscale",
+      "blurb": "Meta's Muse connects to Tailscale. You decide what it can reach.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.403
+    },
+    {
+      "title": "Rapido rides ahead with Razorpay’s real‑time payments",
+      "url": "https://yourstory.com/2026/10/rapido-rides-ahead-with-razorpays-realtime-payments",
+      "source": "YourStory",
+      "blurb": "Rapido rides ahead with Razorpay’s real‑time payments Getting around an Indian city has always been harder than it should be. Cabs were exp…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.4
+    },
+    {
+      "title": "New-Age Tech Stocks Tumble This Week, Swiggy Leads Sell-Off With 24.5% Fall",
+      "url": "https://inc42.com/buzz/new-age-tech-stocks-tumble-this-week-swiggy-leads-sell-off-with-24-5-fall/",
+      "source": "Inc42",
+      "blurb": "New-age tech stocks lost over $11 Bn in combined market capitalisation this week, with Swiggy leading a broad sell-off amid…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.398
+    },
+    {
+      "title": "Microsoft Patches More Than 1,400 Security Flaws",
+      "url": "https://krebsonsecurity.com/2026/10/microsoft-patches-more-than-1400-security-flaws/",
+      "source": "Krebs on Security",
+      "blurb": "Microsoft today issued updates to fix more than 1,400 security vulnerabilities in its Windows operating systems and other software. Today's…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.395
+    },
+    {
+      "title": "Quest Diagnostics confirms data breach exposed patient records",
+      "url": "https://www.bleepingcomputer.com/news/security/quest-diagnostics-confirms-data-breach-exposed-patient-records/",
+      "source": "BleepingComputer",
+      "blurb": "American clinical laboratory company Quest Diagnostics disclosed that patient records have been exposed after a threat actor gained unautho…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.385
+    },
+    {
+      "title": "Oppo ColorOS 17 beta update rolls out early to OnePlus 15, Find X9 series: New features and AI upgrades and more",
+      "url": "https://www.livemint.com/technology/tech-news/oppo-coloros-17-beta-update-rolls-out-early-to-oneplus-15-find-x9-series-new-features-and-ai-upgrades-and-more-11792865007541.html",
+      "source": "Mint",
+      "blurb": "Oppo has begun rolling out ColorOS 17 ahead of schedule to the OnePlus 15 and Find X9 series. The Android 17-based update brings redesigned…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.38
+    },
+    {
+      "title": "HPE patches eight max severity RCE and auth bypass AOS flaws",
+      "url": "https://www.bleepingcomputer.com/news/security/hpe-patches-eight-max-severity-rce-and-auth-bypass-aos-flaws/",
+      "source": "BleepingComputer",
+      "blurb": "Hewlett Packard Enterprise (HPE) released security updates to patch 72 vulnerabilities in the Aruba Operating System (ArubaOS), including e…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.378
+    },
+    {
+      "title": "An update from the 40-year-old developer who couldn't figure out how to sell his software",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfohe4/an_update_from_the_40yearold_developer_who/",
+      "source": "r/SaaS",
+      "blurb": "Hey everyone, About three weeks ago, I posted here about being a 40-year-old developer who could build software but couldn't figure out how…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.37
+    },
+    {
+      "title": "MagicRoute: Routing without physical routers",
+      "url": "https://tailscale.com/blog/magicroute-beta",
+      "source": "Tailscale",
+      "blurb": "Smarter routing for subnet routers, app connectors, exit nodes, and Services.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.367
+    },
+    {
+      "title": "Microsoft: Windows Server 2016 reaches end of support in January",
+      "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-windows-server-2016-reaches-end-of-support-in-january/",
+      "source": "BleepingComputer",
+      "blurb": "Microsoft says Windows Server 2016 will stop receiving security updates after it reaches the end of support in January 2027. [...]",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.367
+    },
+    {
+      "title": "Life After 55: Cradle Of Life is reimagining senior living lifestyle for retired Indians",
+      "url": "https://yourstory.com/2026/09/life-after-55-cradle-of-life-is-reimagining-senior-living-lifestyle-for-retired-indians",
+      "source": "YourStory",
+      "blurb": "Sharad Gadsing on why senior living needs to move beyond real estate and ageing, and create communities designed around how people want to…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "india",
+      "priority": 0.367
+    },
+    {
+      "title": "The next developer interface is ambient intelligence",
+      "url": "https://github.blog/news-insights/company-news/the-next-developer-interface-is-ambient-intelligence/",
+      "source": "GitHub Blog",
+      "blurb": "AI, agents, voice, and physical controls are shifting software development from operating tools to expressing intent—and helping developers…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.362
+    },
+    {
+      "title": "Why Your Computer Backup Strategy Determines Whether You Pay the Ransom",
+      "url": "https://www.backblaze.com/blog/why-your-computer-backup-strategy-determines-whether-you-pay-the-ransom/",
+      "source": "Backblaze",
+      "blurb": "Ransomware recovery depends on more than having a backup. Learn how version history, deleted file retention, legal hold, and restore permis…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.36
+    },
+    {
+      "title": "I have a promising cafe/restaurant managment system that I don't know how to sell",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xez47w/i_have_a_promising_caferestaurant_managment/",
+      "source": "r/SaaS",
+      "blurb": "​ I spent months building Hosteria, a management system for hotels, cafes and restaurants. It started with a hotel in Dahab, Egypt, but the…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.36
+    },
+    {
+      "title": "Backblaze B2 x Suite Studios: S3 Native File Streaming Turns B2 Cloud Storage Into a High-Performance Drive",
+      "url": "https://www.backblaze.com/blog/backblaze-b2-x-suite-studios-s3-native-file-streaming-turns-b2-cloud-storage-into-a-high-performance-drive/",
+      "source": "Backblaze",
+      "blurb": "Backblaze B2 now integrates with Suite Studios S3 Native File Streaming, giving teams high-performance, drive-like access to cloud data. Wo…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.357
+    },
+    {
+      "title": "Localizing compliance at scale: achieving South Korea’s ISMS certification",
+      "url": "https://blog.cloudflare.com/k-isms/",
+      "source": "Cloudflare",
+      "blurb": "Cloudflare has achieved South Korea's ISMS certification following an audit across 80 controls. Learn how we localized user consent flows,…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.355
+    },
+    {
+      "title": "How to continue a GitHub Copilot app session in VS Code",
+      "url": "https://github.blog/ai-and-ml/github-copilot/how-to-continue-a-github-copilot-app-session-in-vs-code/",
+      "source": "GitHub Blog",
+      "blurb": "Learn how to move an agent session from the GitHub Copilot app into VS Code without losing the conversation, code changes, or working conte…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "infra",
+      "priority": 0.355
+    },
+    {
+      "title": "Month 1 Day 1 of Building My app",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfdj72/month_1_day_1_of_building_my_app/",
+      "source": "r/SaaS",
+      "blurb": "So for today im planning on finding some advertisers for my app that i made. DM me if you are interested in advertising my app or looking a…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.355
+    },
+    {
+      "title": "These clever apps show off the iPhone Duo’s potential",
+      "url": "https://techcrunch.com/2026/10/24/these-clever-apps-show-off-the-iphone-duos-potential/",
+      "source": "TechCrunch",
+      "blurb": "From retro cassette players and virtual notebooks to flight trackers and even a digital toaster, developers are finding creative ways to ta…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.338
+    },
+    {
+      "title": "Do not use DODO PAYMENTS For payments of your products, they have taken all of my balance",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xex42z/do_not_use_dodo_payments_for_payments_of_your/",
+      "source": "r/SaaS",
+      "blurb": "Dodo Payments has been very horrible, If you want to use it for your product or services, STOP! their unprofessional team decided that my s…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.335
+    },
+    {
+      "title": "PSA: llama.cpp CVE-2026-116096",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xfizft/psa_llamacpp_cve2026116096/",
+      "source": "r/LocalLLaMA",
+      "blurb": "https://nvd.nist.gov/vuln/detail/cve-2026-116096 25-10-2026 Description A weakness has been identified in ggml-org llama.cpp. Affected by t…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.335
+    },
+    {
+      "title": "Vivian Midha Shen and Raphael Schaad Join YC as General Partners",
+      "url": "https://www.ycombinator.com/blog/welcome-vivian-and-raphael/",
+      "source": "Y Combinator",
+      "blurb": "We’re thrilled to announce that Vivian Midha Shen and Raphael Schaad are joining Y Combinator as our newest General Partners.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.323
+    },
+    {
+      "title": "BlackX UEFI bootkit exploits Baton Drop flaw to bypass Secure Boot",
+      "url": "https://www.bleepingcomputer.com/news/security/blackx-uefi-bootkit-exploits-baton-drop-flaw-to-bypass-secure-boot/",
+      "source": "BleepingComputer",
+      "blurb": "A new UEFI bootkit named BlackX, deployed in an espionage campaign in early 2026, exploited the old Baton Drop vulnerability to bypass Secu…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.32
+    },
+    {
+      "title": "CrowdGPT - A collaboratively trained LLM.",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xff9e4/crowdgpt_a_collaboratively_trained_llm/",
+      "source": "r/LocalLLaMA",
+      "blurb": "Hello, I'm developing CrowdGPT, a project aiming to create an LLM without datacenters and without the usual millions of dollars spent by AI…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.32
+    },
+    {
+      "title": "Abandoned Popcorn Time app exposed millions of devices to RCE attacks",
+      "url": "https://www.bleepingcomputer.com/news/security/abandoned-popcorn-time-app-exposed-millions-of-device-to-rce-attacks/",
+      "source": "BleepingComputer",
+      "blurb": "Researchers remotely disabled a vulnerable updater in the abandoned Time4Popcorn app, a fork of the Popcorn Time BitTorrent client, closing…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.3
+    },
+    {
+      "title": "earendil-works/pi: v1.4.0",
+      "url": "https://github.com/earendil-works/pi/releases/tag/v1.4.0",
+      "source": "pi releases",
+      "blurb": "New Features Image input for classifiers: codemode models.classify() accepts images for TypeSafe's Jev and Cloudflare's Clef models on type…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.295
+    },
+    {
+      "title": "How to get to users in the slop coded noise?",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfa9kg/how_to_get_to_users_in_the_slop_coded_noise/",
+      "source": "r/SaaS",
+      "blurb": "I am currently working on a product which is as good as the best one out there and that too free. I was planning to make money just through…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.295
+    },
+    {
+      "title": "browser-use/browser-use: 0.13.12: OpenAI browser tools",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.12",
+      "source": "browser-use releases",
+      "blurb": "Add OpenAI browser tools backed by Browser Use Actor. Import BrowserUse from browser_use.integrations.openai. Install browser-use[openai-to…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.292
+    },
+    {
+      "title": "anthropics/claude-code: v2.1.310",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.310",
+      "source": "claude-code releases",
+      "blurb": "What's changed Added the Monitor tool and plugin monitors on Bedrock, Vertex, and Foundry, and when telemetry or nonessential traffic is di…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.285
+    },
+    {
+      "title": "Starlink seems to be working normally again in Ukraine",
+      "url": "https://techcrunch.com/2026/10/24/starlink-seems-to-be-working-normally-again-in-ukraine/",
+      "source": "TechCrunch",
+      "blurb": "Elon Musk reportedly ordered SpaceX to throttle Ukraine's Starlink access.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.273
+    },
+    {
+      "title": "Harshita Arora Joins YC as General Partner",
+      "url": "https://www.ycombinator.com/blog/welcome-harshita/",
+      "source": "Y Combinator",
+      "blurb": "We're thrilled to announce that Harshita Arora is joining Y Combinator as a General Partner. She brings deep fintech and infrastructure exp…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.27
+    },
+    {
+      "title": "Looking to Collaborate with AI Builders",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfjh10/looking_to_collaborate_with_ai_builders/",
+      "source": "r/SaaS",
+      "blurb": "Hey everyone! I'm looking to connect with people building genuinely useful AI products and SaaS tools. I've spent years in sales, GTM, and…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.27
+    },
+    {
+      "title": "How Ryder Kemper became employee #7 at Corgi Insurance — and never left San Francisco",
+      "url": "https://www.ycombinator.com/blog/how-ryder-kemper-became-employee-7-at-corgi-insurance-and-never-left-san-francisco/",
+      "source": "Y Combinator",
+      "blurb": "Ryder flew to SF for a work trial, moved furniture in a Mystery Machine bus, and decided to stay. Here's what building from day one looks l…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.265
+    },
+    {
+      "title": "How did you set the price for your first SaaS?",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfnnee/how_did_you_set_the_price_for_your_first_saas/",
+      "source": "r/SaaS",
+      "blurb": "Did you research it, copy a competitor, or just pick a number that felt right? I’m curious how many people got it right the first time, and…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.265
+    },
+    {
+      "title": "anthropics/claude-code: v2.1.309",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.309",
+      "source": "claude-code releases",
+      "blurb": "What's changed Fixed sandboxed Bash commands on macOS and Linux running the shell's startup files outside the sandbox before each command F…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.258
+    },
+    {
+      "title": "The hardest part of building SaaS isn't building the product. It's getting anyone to care.",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfkp97/the_hardest_part_of_building_saas_isnt_building/",
+      "source": "r/SaaS",
+      "blurb": "I've spent months building my SaaS, and I'm starting to understand something that I wish I'd taken more seriously from the beginning. You c…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.258
+    },
+    {
+      "title": "browser-use/browser-use: 0.13.13: OpenAI browser tools and Cloud fixes",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.13",
+      "source": "browser-use releases",
+      "blurb": "This release includes the OpenAI browser-tool driver and fixes two integration issues. Handle temporary empty Cloud tab URLs during navigat…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.255
+    },
+    {
+      "title": "browser-use/browser-use: 0.13.11",
+      "url": "https://github.com/browser-use/browser-use/releases/tag/0.13.11",
+      "source": "browser-use releases",
+      "blurb": "This release includes Browser Use toolsets for Claude, available at browser_use.integrations.toolsets_for_claude. The integration requires…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.255
+    },
+    {
+      "title": "‘Cyberselfish’ author takes aim at techno-libertarianism as her book returns from the dead",
+      "url": "https://techcrunch.com/2026/10/25/cyberselfish-author-takes-aim-at-techno-libertarianism-as-her-book-returns-from-the-dead/",
+      "source": "TechCrunch",
+      "blurb": "\"That's a 12-year-old view of the world.\"",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.255
+    },
+    {
+      "title": "unable to scale your SaaS? Underrated strategy that could work for you but...",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfmy8t/unable_to_scale_your_saas_underrated_strategy/",
+      "source": "r/SaaS",
+      "blurb": "before I start preaching, let me preface by saying, I am not some super duper successful startup founder ... but, I have talked to a lot of…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.253
+    },
+    {
+      "title": "Nanbeige/Nanbeige4.3-33B · Hugging Face",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xf0kz4/nanbeigenanbeige4333b_hugging_face/",
+      "source": "r/LocalLLaMA",
+      "blurb": "Stronger than Qwen3.8-27B across a range of benchmarks. but also lays the necessary foundation to power our upcoming small model distillati…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.25
+    },
+    {
+      "title": "Is the horror story about AI agent mass deleting your entire drive an old story or it still happen nowadays?",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xflw1l/is_the_horror_story_about_ai_agent_mass_deleting/",
+      "source": "r/LocalLLaMA",
+      "blurb": "not so long ago there was viral tweet about AI agent deleting stuff without permission. well it happen to me as well a vscode copilot agent…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.245
+    },
+    {
+      "title": "SMH, seriously? -->> NVIDIA Eyes Software Revenue With a $2,000 per GPU Yearly Figure From Huang",
+      "url": "https://www.reddit.com/r/LocalLLaMA/comments/1xfhhm4/smh_seriously_nvidia_eyes_software_revenue_with_a/",
+      "source": "r/LocalLLaMA",
+      "blurb": "submitted by /u/chemist_slime [link] [comments]",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.242
+    },
+    {
+      "title": "Congratulations to EquipmentShare on Going Public",
+      "url": "https://www.ycombinator.com/blog/congratulations-to-equipmentshare/",
+      "source": "Y Combinator",
+      "blurb": "Today, EquipmentShare (YC W15) goes public. From Missouri to 373 locations nationwide, they've built the operating system construction has…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.237
+    },
+    {
+      "title": "Adding Canada Back to Our List of Accepted Countries of Incorporation",
+      "url": "https://www.ycombinator.com/blog/adding-canada-back/",
+      "source": "Y Combinator",
+      "blurb": "After hearing feedback from Canadian founders in our network, we are adding Canada back to our list of accepted countries of incorporation.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.233
+    },
+    {
+      "title": "The best apps for tracking your reading and discovering new books",
+      "url": "https://techcrunch.com/2026/10/25/5-best-apps-track-reading-discover-new-books/",
+      "source": "TechCrunch",
+      "blurb": "There are numerous apps on the market that promise to do just that, so we’ve compiled a list of some of the best ones to help you pick the…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.225
+    },
+    {
+      "title": "Christopher Golda and Grey Baker Join YC as General Partners",
+      "url": "https://www.ycombinator.com/blog/chris-golda-and-grey-baker-general-partners/",
+      "source": "Y Combinator",
+      "blurb": "We're excited to announce that Christopher Golda and Grey Baker are joining YC as General Partners.",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.225
+    },
+    {
+      "title": "Diana Hu Is YC's Newest Managing Partner",
+      "url": "https://www.ycombinator.com/blog/diana-hu-managing-partner/",
+      "source": "Y Combinator",
+      "blurb": "We're thrilled to announce that Diana Hu has been promoted to Managing Partner at Y Combinator. Few people have built a startup from zero a…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.225
+    },
+    {
+      "title": "U.K. Sanctions Cryptomus for RU Money Laundering",
+      "url": "https://krebsonsecurity.com/2026/10/u-k-sanctions-cryptomus-for-ru-money-laundering/",
+      "source": "Krebs on Security",
+      "blurb": "The United Kingdom has issued economic sanctions against Cryptomus, a chameleonic cryptocurrency platform that experts say serves as a majo…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "security",
+      "priority": 0.22
+    },
+    {
+      "title": "anthropics/claude-code: v2.1.308",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.308",
+      "source": "claude-code releases",
+      "blurb": "What's changed Bug fixes and reliability improvements",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.217
+    },
+    {
+      "title": "At what stage of completion do you usually launch your projects?",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xfesyr/at_what_stage_of_completion_do_you_usually_launch/",
+      "source": "r/SaaS",
+      "blurb": "Curious how other builders handle this. Do you wait until a project is 100% polished before putting it out, or do you launch earlier (like…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "reddit",
+      "priority": 0.21
+    },
+    {
+      "title": "BerriAI/litellm: v1.105.5",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.105.5",
+      "source": "litellm releases",
+      "blurb": "Verify this release cosign verify \\ --key https://raw.githubusercontent.com/BerriAI/litellm/e82a3c646908ba0a6ee0beddc4310d7a6cac4065/cosign…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.195
+    },
+    {
+      "title": "earendil-works/pi: v1.3.0",
+      "url": "https://github.com/earendil-works/pi/releases/tag/v1.3.0",
+      "source": "pi releases",
+      "blurb": "New Features Choose where /share uploads: sessionShareDestination selects auto, gist, or radius. See Sessions and context and Export or sha…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.195
+    },
+    {
+      "title": "BerriAI/litellm: v1.106.4",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.106.4",
+      "source": "litellm releases",
+      "blurb": "Verify this release cosign verify \\ --key https://raw.githubusercontent.com/BerriAI/litellm/e82a3c646908ba0a6ee0beddc4310d7a6cac4065/cosign…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.19
+    },
+    {
+      "title": "ollama/ollama: v0.40.11-rc0: voice: add voice catalog for Phonon (#19242)",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.40.11-rc0",
+      "source": "ollama releases",
+      "blurb": "mlxrunner: import and list Phonon catalog voices docs: document Phonon voices",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.182
+    },
+    {
+      "title": "The Boox Palma 2 Pro finally got me to stop reading on my phone",
+      "url": "https://techcrunch.com/2026/10/24/the-boox-palma-2-pro-finally-got-me-to-stop-reading-on-my-phone/",
+      "source": "TechCrunch",
+      "blurb": "The $400 Boox Palma 2 Pro is a smartphone-sized e-reader designed for people who want to read books, articles, and documents on a small E I…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "startups",
+      "priority": 0.175
+    },
+    {
+      "title": "earendil-works/pi: v1.2.0",
+      "url": "https://github.com/earendil-works/pi/releases/tag/v1.2.0",
+      "source": "pi releases",
+      "blurb": "New Features Per-key OpenRouter model lists: with an OpenRouter key, Pi lists only the models that key may use, with the key's context size…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.155
+    },
+    {
+      "title": "BerriAI/litellm: v1.104.7",
+      "url": "https://github.com/BerriAI/litellm/releases/tag/v1.104.7",
+      "source": "litellm releases",
+      "blurb": "Verify this release cosign verify \\ --key https://raw.githubusercontent.com/BerriAI/litellm/e82a3c646908ba0a6ee0beddc4310d7a6cac4065/cosign…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.152
+    },
+    {
+      "title": "anomalyco/opencode: v2.1.3",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/v2.1.3",
+      "source": "opencode releases",
+      "blurb": "release: v2.1.3",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.113
+    },
+    {
+      "title": "gitleaks/gitleaks: v8.30.0",
+      "url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.0",
+      "source": "gitleaks releases",
+      "blurb": "Changelog 6eaad03 0 to 5 - notes on recursive decoding (#1994) 09242ce Add new Looker client ID and client secret rules (#1947) c98e5e0 fea…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.068
+    },
+    {
+      "title": "anomalyco/opencode: github-v1.2.28: chore(github): pin actions/cache to commit SHA in GitHub Action (#58769)",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/github-v1.2.28",
+      "source": "opencode releases",
+      "blurb": "Co-authored-by: rekram1-node rekram1-node@users.noreply.github.com",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.0
+    },
+    {
+      "title": "anomalyco/opencode: v2.1.4",
+      "url": "https://github.com/anomalyco/opencode/releases/tag/v2.1.4",
+      "source": "opencode releases",
+      "blurb": "release: v2.1.4",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.0
+    },
+    {
+      "title": "shadcn-ui/ui: shadcn@4.22.1",
+      "url": "https://github.com/shadcn-ui/ui/releases/tag/shadcn%404.22.1",
+      "source": "ui releases",
+      "blurb": "Patch Changes #12360 4381eeb Thanks @shadcn! - Fix shadcn add --all and the component picker to only include components available for the p…",
+      "signal": "",
+      "discussion_url": "",
+      "group": "tools",
+      "priority": 0.0
+    }
+  ]
+}

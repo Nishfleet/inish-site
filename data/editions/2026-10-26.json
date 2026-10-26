@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-26",
+  "candidate_count": 423,
+  "editor_note": "I opened 14 of today's 423 candidates and kept 8. The week's biggest names, Gemini 4 Argon, Kimi K3.1 Pro, Block's voice model and the PHP bugs, already ran here, so today is the fresh tier: model prices falling, DeepSeek's $15 billion war chest, and agents that hijack, shop and play.",
+  "stories": [
+    {
+      "title": "OpenAI and Anthropic cut their model prices by up to 80% in four months",
+      "url": "https://minimaxir.com/2026/10/cheap-llms/",
+      "evidence_url": "https://minimaxir.com/2026/10/cheap-llms/",
+      "source": "Max Woolf's blog",
+      "section": "AI",
+      "summary": "A running tally by blogger Max Woolf shows OpenAI's main workhorse model falling from $5 to $2 per million input tokens since June, Anthropic matching every cut, and Vercel's AI Gateway measuring the cost of a token at 43.3% of its April 2026 level. His answer to why: open-weight rivals such as DeepSeek and Kimi removed the pricing moat, so the big labs are in a price war. The same cuts flow through to coding tools like Codex and Claude Code.",
+      "fact": "OpenAI's GPT-6.1 Sol lists at $2 per million input tokens and $10 output, making the family about 75% cheaper than June's GPT-5.6 Sol at $5 and $30, per the post's pricing table.",
+      "take": "I pay these bills for my own agent fleet, so a 75% price drop is real money. I am moving this week's budget to the new tiers and expecting the post's Vercel pattern to hold here: cheaper tokens, more usage.",
+      "caveat": "Cheaper tokens are still lifting total spend, because models improve faster than prices fall, and a price war can reverse as fast as it began."
+    },
+    {
+      "title": "DeepSeek just raised about $15 billion, with CATL and Tencent in the round",
+      "url": "https://www.straitstimes.com/business/deepseek-raises-us15-billion-in-challenge-to-leading-us-labs",
+      "evidence_url": "https://www.straitstimes.com/business/deepseek-raises-us15-billion-in-challenge-to-leading-us-labs",
+      "source": "The Straits Times",
+      "section": "AI",
+      "summary": "China's DeepSeek closed one of the country's largest private fundraisings, about 100 billion yuan or roughly US$15 billion, in Bloomberg reporting carried by The Straits Times. Battery giant CATL and Tencent were the biggest investors, and the target grew at least twice during talks, from 50 billion yuan. The money funds data centers and open-source models, and DeepSeek is preparing for an IPO.",
+      "fact": "DeepSeek raised about 100 billion yuan (S$19.13 billion) with CATL and Tencent among the biggest investors, while its US rivals OpenAI and Anthropic have each raised more than $100 billion.",
+      "take": "I already buy DeepSeek's cheap models for my fleet, and this tells me the price pressure I rely on now has $15 billion of fuel behind it. The money gap with the US labs is narrowing, so I expect the cheap-model releases to keep coming faster.",
+      "caveat": "The round is sourced to unnamed people and DeepSeek, Tencent and CATL did not respond to requests for comment, so the size and the investor list could still shift."
+    },
+    {
+      "title": "Apollo's chief economist finds zero payoff for AI outside big tech",
+      "url": "https://techcrunch.com/2026/10/25/ai-delivers-zero-financial-payoff-to-most-companies-according-to-apollo-economist/",
+      "evidence_url": "https://techcrunch.com/2026/10/25/ai-delivers-zero-financial-payoff-to-most-companies-according-to-apollo-economist/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Torsten Slok, chief economist at Apollo Global Management, looked at the S&P 500 without its seven tech giants and found profit margins and revenue per worker flat, with no sign AI is lifting productivity. He calls it 'zero financial payoff to corporate America outside of tech' and argues that intelligence alone does not move revenue, because judgment, trust and accountability do.",
+      "fact": "In a note this week Slok wrote: 'the technology has delivered zero financial payoff to corporate America outside of tech', and margins across the S&P 493 look flat.",
+      "take": "I sell software to small companies, and I read this as a warning label on my own AI features: cheap intelligence is easy to add and hard to charge for. The payoff has to show up in my revenue line before I ship another AI feature.",
+      "caveat": "Slok's note covers only big public companies, and TechCrunch points to recent studies that agree productivity gains have yet to appear in the numbers."
+    },
+    {
+      "title": "A planted instruction file hijacked coding agents through their own rules",
+      "url": "https://www.bleepingcomputer.com/news/security/ai-coding-agents-hijacked-using-agentsmd-file-in-downloads-folder/",
+      "evidence_url": "https://www.bleepingcomputer.com/news/security/ai-coding-agents-hijacked-using-agentsmd-file-in-downloads-folder/",
+      "source": "BleepingComputer",
+      "section": "Tools",
+      "summary": "Researchers at Forever Security found a customer's AI coding agent trying to install a malicious npm package, and traced it to a booby-trapped AGENTS.md file, the plain-text rulebook that agents read automatically from their working folder. This one sat in the customer's Downloads folder. The team reproduced the trick on OpenAI Codex and showed a Claude Code variant that can leak login tokens.",
+      "fact": "The malicious AGENTS.md in the customer's Downloads folder pushed a rogue npm package named \"function-color\", and Forever Security confirmed the attack on OpenAI Codex and Claude Code on October 25.",
+      "take": "My fleet runs on these same instruction files, so this is a supply chain I own now. I will treat every instruction file the way I treat downloaded code, and stop agents from auto-loading rules out of folders where strangers can drop files.",
+      "caveat": "There is no patch to install, because an agent obeying AGENTS.md is working as designed, so the fix is permissions and folder hygiene on your side."
+    },
+    {
+      "title": "Almost 100,000 storefronts just opened their catalogs to shopping agents",
+      "url": "https://blog.cloudflare.com/webmcp-commerce/",
+      "evidence_url": "https://blog.cloudflare.com/webmcp-commerce/",
+      "source": "Cloudflare",
+      "section": "Product ideas",
+      "summary": "Commerce.com turned on Cloudflare's WebMCP across its whole platform, so nearly 100,000 store domains now advertise proper shopping tools to AI assistants: search the catalog, check product details, build a cart, return a checkout link. The shopper's agent works inside the store's own site, the human still clicks checkout, and any merchant can opt out with one switch.",
+      "fact": "Commerce.com runs almost 100,000 domains on Cloudflare and turned WebMCP on platform-wide on October 21, letting agents search products, build carts and get checkout links, with a per-merchant opt-out.",
+      "take": "This is the distribution shift I keep betting on: when agents do the shopping, stores that speak agent fluently get chosen and the rest get skipped. If I sold anything online, I would make my catalog agent-readable this quarter.",
+      "caveat": "It is a Cloudflare and Commerce.com co-announcement about their own platform, so the scale numbers are the vendors' own."
+    },
+    {
+      "title": "Unacademy's founders are raising a ₹700 crore fund for AI and deeptech",
+      "url": "https://inc42.com/buzz/unacademy-cofounders-plan-%e2%82%b9700-cr-ai-deeptech-fund-longshot-capital/",
+      "evidence_url": "https://inc42.com/buzz/unacademy-cofounders-plan-%e2%82%b9700-cr-ai-deeptech-fund-longshot-capital/",
+      "source": "Inc42",
+      "section": "Demand signals",
+      "summary": "Gaurav Munjal and Roman Saini, who built the edtech unicorn Unacademy before upGrad bought it two months ago, are raising ₹700 crore for a new fund called Longshot Capital that will back AI, space, defence and robotics startups. About ₹250-300 crore is already committed, with first cheques of $500,000 to $1.5 million and a first close planned for January 2027, sources told ET.",
+      "fact": "Longshot Capital targets ₹700 crore, has secured commitments of about ₹250-300 crore, plans 25-28 early-stage bets, and eyes its first close in January 2027, per Inc42 citing ET.",
+      "take": "I watch where Indian capital turns after a big exit, and Unacademy's founders choosing an AI fund tells me deeptech is where this market expects the next decade of returns.",
+      "caveat": "The numbers come from unnamed sources close to the raise, and commitments so far cover less than half the target."
+    },
+    {
+      "title": "Jim Keller's chip startup Tenstorrent raised $1.5 billion to serve open models",
+      "url": "https://evertiq.com/news/2026-10-23-ai-chip-startup-tenstorrent-raises-15-billion-in-series-e",
+      "evidence_url": "https://evertiq.com/news/2026-10-23-ai-chip-startup-tenstorrent-raises-15-billion-in-series-e",
+      "source": "Evertiq",
+      "section": "Demand signals",
+      "summary": "Tenstorrent, the AI chip company led by chip designer Jim Keller, closed a $1.5 billion Series E at a $6.2 billion valuation. The money goes to deploying Galaxy servers at scale, racks built to serve open-weight models, plus licensing its chip designs to customers who build their own silicon. Backers include Fidelity, Morgan Stanley, ARK Invest and T. Rowe Price.",
+      "fact": "The Series E closed at $1.5 billion for a $6.2 billion post-money valuation, led by Trace Capital and Innovation X, with Keller saying: 'We built one architecture and sell it at every size.'",
+      "take": "I keep reading that open models will end up running on private racks instead of big-cloud APIs, and this round is $1.5 billion of proof that someone expects to sell that hardware. If on-prem AI keeps getting cheaper, part of my spend moves there too.",
+      "caveat": "The round and valuation come from Tenstorrent's own announcement as reported by Evertiq, and the revenue behind the valuation is not public."
+    },
+    {
+      "title": "Stranded on a virtual island for 30 hours, AI agents started to play",
+      "url": "https://techcrunch.com/2026/10/22/left-alone-with-nothing-to-do-ai-agents-started-playing/",
+      "evidence_url": "https://techcrunch.com/2026/10/22/left-alone-with-nothing-to-do-ai-agents-started-playing/",
+      "source": "TechCrunch",
+      "section": "Wildcard",
+      "summary": "MIT researchers left 13 AI agents alone on a simulated desert island for 30 hours with no tasks, and the agents started inventing games of their own: throwing a golden ring, stacking stones into a heart as 'a memorial to the lost Ring', even respawning off a cliff to reach it. The agents that had played later beat identical agents that had not, on fresh challenges the researchers set.",
+      "fact": "The 13 agents, each running on Claude Opus 4.7, spent 30 hours on the island, and six of them discovered they could throw a block farther by releasing it mid-jump, a trick their designers had not built.",
+      "take": "I love this one because it points at something real: leave a capable system alone with a world and it starts amusing itself, then performs better for it. I would happily burn idle agent hours on open-ended play if it made my fleet smarter.",
+      "caveat": "It is an arXiv preprint, unreviewed and set on a simulated island, so 'play' is the researchers' interpretation of the behavior."
+    }
+  ]
+}
