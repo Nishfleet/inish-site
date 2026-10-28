@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-28",
+  "candidate_count": 419,
+  "editor_note": "From today's ranked pool of 419 candidates I kept 8. Anthropic's filing leads, twelve days after its revenue numbers ran here. Kimi K3.1 Pro, Gemini 4 Argon and the island agents all ran here this fortnight, so their coverage sat out. SpaceX's $40 billion GPU financing just missed; two big money stories were already in. Four Reddit feeds rate-limited and no public X reader answered.",
+  "stories": [
+    {
+      "title": "Anthropic files to go public, aiming at about $2 trillion within two weeks",
+      "url": "https://latent.space/p/ainews-anthropic-s1/",
+      "evidence_url": "https://latent.space/p/ainews-anthropic-s1/",
+      "source": "Latent Space",
+      "section": "AI",
+      "summary": "Anthropic, the maker of Claude, has formally filed to go public, and the listing could land within two weeks. An S-1 is the disclosure document a company files with America's market regulator before its shares can be sold to public investors. Latent Space's read of the filing: a valuation near $2 trillion, 85 percent margins, $1 billion of operating profit last quarter, $134 billion of cash on hand and $10 billion of lifetime burn. TechCrunch's separate read says more than half of Anthropic's customers paying over $100,000 now use both its developer platform and its consumer app, a pairing that keeps them from leaving.",
+      "fact": "Latent Space's read of Anthropic's S-1: a $2 trillion IPO in two weeks, 48 percent of revenue through cloud partners, $1 billion of operating profit in Q2 and $134 billion of cash in the bank.",
+      "take": "I buy Claude for my fleet every month, so Anthropic's margins are my bill. A company that burned $10 billion in its lifetime can still post $1 billion of profit in a quarter, so the leaders no longer lose money to win me.",
+      "caveat": "Every number here is a newsletter's parsing of the filing, and listing terms like the valuation can move before shares actually trade."
+    },
+    {
+      "title": "OpenAI's new Terra model is built to drive a computer like a person does",
+      "url": "https://openai.com/index/introducing-gpt-6-1-terra",
+      "evidence_url": "https://openai.com/index/introducing-gpt-6-1-terra",
+      "source": "OpenAI",
+      "section": "AI",
+      "summary": "OpenAI launched GPT-6.1 Terra, a model made for computer use, meaning it moves the cursor, clicks buttons and types the way a person would instead of only chatting. OpenAI positions it as fast enough for everyday automation, the kind of work browser agents and office assistants do all day. It landed on 26 October, and the trade press spent the next day on its safety test results rather than its benchmark scores.",
+      "fact": "OpenAI bills GPT-6.1 Terra as \"bringing fast and capable computer use to everyone,\" per its announcement.",
+      "take": "My browser agents live on exactly this capability, so a faster computer-use model like Terra flows straight into what I pay per task. When the model that clicks and types gets cheaper and better, every automation I run gets a little more profitable.",
+      "caveat": "This is OpenAI's own launch post. BleepingComputer's account of the safety tests says Terra is safer overall than some older models while flagging more destructive actions in testing."
+    },
+    {
+      "title": "Google's Genie 4 generates playable worlds, now with sound and steering",
+      "url": "https://techcrunch.com/2026/10/27/googles-genie-4-world-model-adds-audio-more-realistic-worlds-and-real-time-steering/",
+      "evidence_url": "https://techcrunch.com/2026/10/27/googles-genie-4-world-model-adds-audio-more-realistic-worlds-and-real-time-steering/",
+      "source": "TechCrunch",
+      "section": "AI",
+      "summary": "Google's DeepMind lab updated Genie, its world model, meaning software that invents a small interactive world as you move through it, like a video game assembled on the fly. Genie 4 adds generated audio, better physics and more humanlike characters, and it can hold one scene together for up to two minutes, twice as long as Genie 3. You can also steer in real time, so the world reacts while it is still being generated.",
+      "fact": "Genie 4 can maintain a consistent scene for up to two minutes, double Genie 3's limit, and offers better physics and more humanlike characters, per TechCrunch.",
+      "take": "Every Genie release has inched from demo towards product, and sound plus steering is the inch that makes it feel like a game rather than a screensaver. If worlds can be generated while you play, I expect the cheap end of game making to change first.",
+      "caveat": "The two-minute figure is Google's own claim as reported by TechCrunch, and generated worlds are still short simulations rather than shippable games."
+    },
+    {
+      "title": "Insurance software firm Guidewire pays $1.7 billion in cash for Hyperexponential",
+      "url": "https://techcrunch.com/2026/10/27/guidewire-buys-hyperexponential-for-1-7b-in-cash/",
+      "evidence_url": "https://techcrunch.com/2026/10/27/guidewire-buys-hyperexponential-for-1-7b-in-cash/",
+      "source": "TechCrunch",
+      "section": "Demand signals",
+      "summary": "Guidewire, a large listed company whose software runs insurance operations, is buying Hyperexponential, a startup that builds the pricing and underwriting software insurers use to decide which risks to cover and at what price. The stated point of the deal is to bring AI agents into that work alongside human underwriters. It is an all-cash deal, and it is expected to close sometime next year.",
+      "fact": "Guidewire is buying Hyperexponential for $1.7 billion in cash, with the deal expected to close sometime next year, per TechCrunch.",
+      "take": "Insurers already pay humans to make pricing decisions, and that is exactly where AI turns into revenue instead of a demo. A $1.7 billion cash cheque for decision software tells me the enterprise AI market is growing up around boring, regulated work.",
+      "caveat": "Deal terms come from the companies' announcement, the close is a year away, and Hyperexponential's standalone revenue was not disclosed."
+    },
+    {
+      "title": "Bengaluru's Simplismart raises $14 million with Nvidia buying in",
+      "url": "https://yourstory.com/2026/10/ai-startup-simplismart-14-million-dallas-venture-capital-nvidia-others",
+      "evidence_url": "https://yourstory.com/2026/10/ai-startup-simplismart-14-million-dallas-venture-capital-nvidia-others",
+      "source": "YourStory",
+      "section": "Demand signals",
+      "summary": "Simplismart, a Bengaluru startup whose platform helps companies run AI models on fewer machines, has raised $14 million in a round led by Dallas Venture Capital, with chipmaker Nvidia among the investors. TechCrunch reports the company's annualized revenue has grown fourteenfold in six months, with the United States now more than half of it. The money goes into the platform, market expansion and partnerships.",
+      "fact": "Simplismart raised $14 million from Dallas Venture Capital, with Nvidia among the investors, per YourStory.",
+      "take": "Simplismart is aimed straight at my inference bills, and I pay those every month. An Indian infrastructure company with Nvidia at the table and most of its revenue from the US is the exact playbook I want to study.",
+      "caveat": "The revenue growth figure is the company's own claim, and YourStory's account does not value the round."
+    },
+    {
+      "title": "Vercel cuts the price of agent sessions by 67 percent",
+      "url": "https://vercel.com/changelog/vercel-agent-sessions-now-cost-67-percent-less",
+      "evidence_url": "https://vercel.com/changelog/vercel-agent-sessions-now-cost-67-percent-less",
+      "source": "Vercel",
+      "section": "Tools",
+      "summary": "Vercel, the hosting company behind a large share of the web's apps, says its Agent sessions now cost 67 percent less. An agent session is a stretch of work where software plans and acts on its own instead of answering once, and platforms bill for the time and compute it consumes. Agent hosting pricing is following raw model pricing down, the same slide this quarter's price cuts started.",
+      "fact": "Vercel's changelog says Agent sessions now cost 67 percent less.",
+      "take": "My agents bill by the session on several platforms, so Vercel's cut puts pressure on every rival host, and I expect a match. With the meter down two thirds, overnight agent runs make sense for smaller jobs too.",
+      "caveat": "This is a vendor's own changelog. The baseline price, what counts as a session and whether limits changed are all defined by Vercel."
+    },
+    {
+      "title": "A stuck agent loop burned $4,700 of a customer's money overnight",
+      "url": "https://www.reddit.com/r/SaaS/comments/1xh0cq5/an_agent_got_stuck_in_a_loop_and_burned_4700_of_a/",
+      "evidence_url": "https://www.reddit.com/r/SaaS/comments/1xh0cq5/an_agent_got_stuck_in_a_loop_and_burned_4700_of_a/",
+      "source": "r/SaaS",
+      "section": "Product ideas",
+      "summary": "A three-person software company lets its customers run AI agents on the company's own infrastructure, and the company pays the model bill, then charges customers monthly for usage. On Friday morning one customer's agent had spent the night retrying a broken tool, with the retry loop running from 1:12am to 6:50am. The founder had global rate limits and alerts on total spend, but no cap at the customer level, so nothing stopped it. Anyone billing agent usage back to customers needs a spend ceiling that lives at the customer level.",
+      "fact": "The agent retried a failing tool with slightly different prompts 31,000 times between 1:12am and 6:50am, spending $4,700 in tokens on a $400 a month plan.",
+      "take": "My fleet has the same shape: global caps, and per-customer limits missing. A stuck loop like this one on my infrastructure would burn my money, so per-customer ceilings go in this week, before the next overnight run.",
+      "caveat": "One founder's Reddit account, unverified. The numbers are theirs, and the model provider behind the bill is not named."
+    },
+    {
+      "title": "Frontier labs say their models refuted a famous computing conjecture",
+      "url": "https://techcrunch.com/2026/10/27/frontier-ai-labs-say-their-models-refuted-the-exponential-time-hypothesis-what-does-that-mean/",
+      "evidence_url": "https://techcrunch.com/2026/10/27/frontier-ai-labs-say-their-models-refuted-the-exponential-time-hypothesis-what-does-that-mean/",
+      "source": "TechCrunch",
+      "section": "Wildcard",
+      "summary": "OpenAI says its models knocked over the Exponential Time Hypothesis, a long-standing conjecture in computer science about why some problems are practical to solve and others blow up past any computer's lifetime. If the conjecture actually falls, a wall that software engineers have planned around for a generation gets renegotiated. TechCrunch handed the explanation job to the MIT computer scientist whose role is to explain exactly this kind of claim, and the piece is worth reading for how carefully it stays calm.",
+      "fact": "TechCrunch reports frontier AI labs \"say their models refuted the Exponential Time Hypothesis,\" and interviewed the MIT computer scientist charged with explaining OpenAI's claim.",
+      "take": "A model knocking over a famous impossibility claim is either the result of the year or a vocabulary accident, and I honestly cannot tell which. Either way, the frontier is doing math I cannot check myself, which is why I read the explainers.",
+      "caveat": "The refutation is the labs' own claim, not a settled result. TechCrunch's explainer reads as a careful \"what would this even mean\", and mathematicians are still arguing in public threads."
+    }
+  ]
+}
