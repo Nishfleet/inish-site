@@ -1,3 +1,4 @@
+import io
 import json
 import os
 import sys
@@ -502,7 +503,9 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
                     mock.patch.object(fetch_candidates, "ROOT", Path(tmp)), \
                     mock.patch.object(sys, "argv", ["fetch_candidates", "--date", "2026-09-28"]), \
                     mock.patch.multiple(fetch_candidates, **loaders):
-                code = fetch_candidates.main()
+                with mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+                    code = fetch_candidates.main()
+                self.printed = out.getvalue()
             payload = json.loads((Path(tmp) / "data" / "candidates" / "2026-09-28.json").read_text())
         return code, payload
 
@@ -552,6 +555,7 @@ class FetchMainWithoutKeyTests(unittest.TestCase):
         self.assertEqual(seen["interests"], ["owner/repo: a tool"])
         self.assertEqual(payload["interests"]["lines"], ["owner/repo: a tool"])
         self.assertIn("interests: x-posts: RuntimeError: no public X reader answered (empty)", payload["source_errors"])
+        self.assertIn("interests=1 github-stars=1", self.printed)
 
     def test_an_empty_pool_with_a_key_says_why_ranked_by_is_null(self):
         env = {**os.environ, "TYPESAFE_API_KEY": "test-key"}
