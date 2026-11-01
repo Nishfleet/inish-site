@@ -13,26 +13,11 @@ route data in `public-paths.json`).
   `jev_rank.py` ranks them, `build_daily.py` renders `public/daily/`.
 - `npm run build` renders the page into `dist/`. `npm test` runs the Node and
   Python suites. `npm run dev` serves it locally.
-- Every push to `main` runs the CI workflow, which tests, deploys the worker, and
-  smoke-checks the live page. A pull request runs the tests only.
-
-## Automation Off-Switches
-
-Every workflow in `.github/workflows/`, what fires it, and how to switch it off.
-Deleting the file switches the workflow off, because GitHub runs only what that
-directory holds. Removing one trigger is the smaller step when the rest of the
-file must stay for a manual run.
-
-| Workflow | Fires on | Off-switch |
-| --- | --- | --- |
-| `ci.yml` | Every pull request, every push to `main`, and a manual run from the Actions tab | Delete the file. Every pull request then waits on the `test` check that no longer reports, and the push to `main` no longer deploys the worker, so the site stops updating until the file comes back. If branch rules require the `test` check (Settings → Rules → Rulesets), clear that requirement too, or merges stay blocked. |
-| `agent-dispatch.yml` | Issue labels and comments, pull-request events, a completed CI run, every 6 hours (minute 17), and a manual run | Delete the file to stop the fleet from starting worker runs on this repo. Delete the `schedule:` block to keep event-driven dispatch and drop the 6-hour sweep. The dispatch logic lives in `Nishfleet/fleet-ops`, so this file is only a trigger stub and the site does not depend on it. |
-| `lighthouse.yml` | After a successful production deploy, Mondays at 04:53 UTC, and a manual run | Delete the file to stop the page audit. The site does not depend on it. |
-
-The two stubs above call reusable workflows in `Nishfleet/fleet-ops` at `@main`, and
-`.pinact.yaml` exempts that ref on purpose: the dispatch is addressed by name, so
-pinning the callee would fork it from the version the dispatcher runs. `docker://`
-image refs stay digest-pinned, and `.pinact.yaml` leaves image digests alone.
+- One workflow, `.github/workflows/ci.yml`, runs on GitHub-hosted runners. Each
+  job says why it exists next to it. A pull request runs the tests and deploys a
+  preview, a push to `main` deploys the worker and smoke-checks the live page.
+- To switch CI off, delete `ci.yml` and clear the required checks in
+  Settings → Rules → Rulesets, or merges stay blocked.
 
 ## Version tags
 
