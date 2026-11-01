@@ -34,9 +34,10 @@ jobs:
   # link the owner can click is the last gate of every product PR. Cloudflare
   # Workers Previews through the official action; the job summary and the
   # "View deployment" button on the PR carry the link. Secrets never reach a
-  # fork (Cloudflare's own guard), so a fork PR skips this job.
+  # fork or a Dependabot run (GitHub docs, "Automating Dependabot with GitHub
+  # Actions"), so those PRs skip this job, and a skipped check passes the gate.
   preview:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
