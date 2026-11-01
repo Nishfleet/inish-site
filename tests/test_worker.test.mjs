@@ -45,8 +45,7 @@ test("inish.in: every request is a 301 to https://nish.sh/daily", async () => {
     "https://www.inish.in/",
     "https://www.inish.in/anything/at/all",
     "http://inish.in/",
-    "http://www.inish.in/x",
-    "https://inish-site.example.workers.dev/"
+    "http://www.inish.in/x"
   ];
   for (const url of samples) {
     for (const method of ["GET", "HEAD"]) {
@@ -82,6 +81,13 @@ test("nish.sh/daily and /daily/ serve the index page with a 200, no redirect", a
     assert.equal(await response.text(), "asset /daily/index.html");
     assert.deepEqual(assets.reads, ["/daily/index.html"]);
   }
+});
+
+test("a workers.dev preview host serves the page instead of redirecting to production", async () => {
+  const { response, assets } = await call("https://pr-7-inish-site.example.workers.dev/daily");
+  assert.equal(response.status, 200);
+  assert.deepEqual(assets.reads, ["/daily/index.html"]);
+  assert.equal(redirectFor(new URL("http://pr-7-inish-site.example.workers.dev/daily")), "https://pr-7-inish-site.example.workers.dev/daily");
 });
 
 test("nish.sh/daily?query still serves the page", async () => {
@@ -155,6 +161,13 @@ function wranglerConfig() {
     .join("\n");
   return JSON.parse(text);
 }
+
+test("wrangler: production is never on workers.dev, previews are", () => {
+  const config = wranglerConfig();
+  assert.equal(config.workers_dev, false);
+  assert.equal(config.preview_urls, true);
+  assert.deepEqual(config.previews, {});
+});
 
 test("wrangler routes: the daily page on nish.sh, redirects on inish.in, never the whole nish.sh zone", () => {
   const routes = wranglerConfig().routes.map((r) => `${r.zone_name} ${r.pattern}`);
