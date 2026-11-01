@@ -13,7 +13,7 @@ export const securityHeaders = Object.entries(routeContract.securityHeaders);
 export const notFoundAssetUrl = new URL("/404.html", dailyUrl).href;
 
 export function redirectFor(url) {
-  if (url.hostname !== canonicalHost) return dailyUrl;
+  if (url.hostname !== canonicalHost && !url.hostname.endsWith(".workers.dev")) return dailyUrl;
   if (url.protocol === "https:") return null;
   const secure = new URL(url);
   secure.protocol = "https:";
