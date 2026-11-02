@@ -68,6 +68,19 @@ jobs:
         env:
           PREVIEW_URL: ${{ steps.preview.outputs.preview-url }}
 
+  dependency-review:
+    # GitHub's own check: fails a PR that adds a dependency with a known vulnerability.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+
   # Deploy on merge (fleet-ops#10935 lane: issue, branch, PR, CI, review,
   # queue, deploy on merge). The smoke check is the proof rule: switched on
   # and proven by one real run, or not done.
@@ -91,11 +104,32 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
-      - run: npm run deploy
+      - name: Record the serving Worker version, the rollback target
+        run: |
+          target=$(npx wrangler deployments status --json | jq -r '[.versions[] | select(.percentage == 100) | .version_id][0]')
+          if [ -z "$target" ] || [ "$target" = "null" ]; then
+            echo "::error::Could not read the serving Worker version id. Refusing to deploy with no rollback target." >&2
+            exit 1
+          fi
+          echo "ROLLBACK_TARGET=$target" >> "$GITHUB_ENV"
+          echo "Rollback target: $target" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - id: deploy
+        run: npm run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Live smoke check
+        id: smoke
+        timeout-minutes: 3
         run: |
-          curl -fsS -o /dev/null --retry 5 --retry-all-errors --retry-delay 10 https://nish.sh/daily/latest.json
+          curl -fsS -o /dev/null --retry 10 --retry-all-errors --retry-delay 6 https://nish.sh/daily/latest.json
           test "$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://inish.in/)" = "301 https://nish.sh/daily"
+      - name: Roll back to the serving Worker version
+        if: always() && steps.deploy.outcome == 'success' && steps.smoke.outcome != 'success'
+        run: npx wrangler rollback "$ROLLBACK_TARGET" --yes --message "smoke failed $GITHUB_SHA"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
