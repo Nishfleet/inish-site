@@ -30,12 +30,12 @@ jobs:
           node-version: "24"
       - run: npm test
 
-  # Required check. Owner decision 2026-11-01 (fleet-ops#10935): a preview
-  # link the owner can click is the last gate of every product PR. Cloudflare
+  # Not a required check: the ruleset requires only `test`, so the preview
+  # stays visible on every PR but does not gate it (fleet-ops#10935). Cloudflare
   # Workers Previews through the official action; the job summary and the
-  # "View deployment" button on the PR carry the link. Secrets never reach a
-  # fork or a Dependabot run (GitHub docs, "Automating Dependabot with GitHub
-  # Actions"), so those PRs skip this job, and a skipped check passes the gate.
+  # "View deployment" button on the PR carry the link. It skips in the merge
+  # queue (no pull request) and for forks and Dependabot, whose runs get no
+  # Actions secrets (GitHub docs, "Automating Dependabot with GitHub Actions").
   preview:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
