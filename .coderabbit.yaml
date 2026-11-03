@@ -1,8 +1,9 @@
-# CodeRabbit is the LOCAL gate on this machine, run through `crgate` before a
-# commit. It is deliberately not a PR reviewer: Greptile reviews PRs, and having
-# both engines on the same diff at the same stage wastes two rations to learn
-# one thing. See ~/.codex/AGENTS.md.
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit is advisory here: it comments, it never requests changes and never
+# fails a check, so it can never block a merge. A repo file overrides the
+# CodeRabbit dashboard: https://docs.coderabbit.ai/guides/configuration-overview
+# Keys: https://docs.coderabbit.ai/reference/configuration
 reviews:
-  auto_review:
+  auto_approvals:
     enabled: false
-    drafts: false
+  fail_commit_status: false
