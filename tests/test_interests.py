@@ -33,7 +33,7 @@ class CollectTests(unittest.TestCase):
                 mock.patch.object(interests, "x_posts", return_value=["a post"]):
             lines, report, errors = interests.collect([self.STARS, self.POSTS])
         self.assertEqual(lines, ["a post"])
-        self.assertEqual([r["error"] for r in report], ["OSError", None])
+        self.assertEqual([r["error"] for r in report], ["OSError: down", None])
         self.assertEqual(errors, ["interests: github-stars: OSError: down"])
 
     def test_lines_are_capped(self):
