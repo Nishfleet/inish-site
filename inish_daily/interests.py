@@ -111,7 +111,7 @@ def collect(signals: list[dict] | None = None) -> tuple[list[str], list[dict], l
             else:
                 found = x_posts(user, limit)
         except Exception as exc:
-            reason = f"{type(exc).__name__}: {str(exc)[:120]}"
+            reason = f"{type(exc).__name__}: {' '.join(str(exc).split())[:120]}"
             errors.append(f"interests: {signal['id']}: {reason}")
             report.append({"id": signal["id"], "name": signal["name"], "count": 0, "error": reason})
             continue

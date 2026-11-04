@@ -36,6 +36,12 @@ class CollectTests(unittest.TestCase):
         self.assertEqual([r["error"] for r in report], ["OSError: down", None])
         self.assertEqual(errors, ["interests: github-stars: OSError: down"])
 
+    def test_a_multi_line_error_stays_on_one_log_line(self):
+        with mock.patch.object(interests, "github_stars", side_effect=OSError("bad gateway\n<html>\n  down")):
+            _lines, report, errors = interests.collect([self.STARS])
+        self.assertEqual(report[0]["error"], "OSError: bad gateway <html> down")
+        self.assertEqual(errors, ["interests: github-stars: OSError: bad gateway <html> down"])
+
     def test_lines_are_capped(self):
         many = [f"repo{i}" for i in range(interests.MAX_LINES + 5)]
         with mock.patch.object(interests, "github_stars", return_value=many):
