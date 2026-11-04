@@ -15,8 +15,7 @@ Run from the repo root. Pick a free port so two runs never share one server.
 npm ci
 PORT=8787
 OUT="/tmp/verify-inish-site/$(date +%Y%m%dT%H%M%S)"; mkdir -p "$OUT"
-setsid npm run dev -- --port "$PORT" > "$OUT/dev.log" 2>&1 &
-echo $! > "$OUT/dev.pid"
+setsid -f sh -c 'echo $$ > "$1/dev.pid"; exec npm run dev -- --port "$2" > "$1/dev.log" 2>&1' sh "$OUT" "$PORT"
 until grep -q "Ready on http://localhost:$PORT" "$OUT/dev.log"; do sleep 1; done
 ```
 
@@ -25,8 +24,7 @@ until grep -q "Ready on http://localhost:$PORT" "$OUT/dev.log"; do sleep 1; done
 - The `inish.in` redirect needs its own server. Local dev forwards every request to the host of the first route (`nish.sh`), and a `Host:` header does not change that ([Wrangler configuration, `dev.host`](https://developers.cloudflare.com/workers/wrangler/configuration/#local-development-settings)). Start the second server only when you drive `features/inish-in-redirect.md`:
 
 ```sh
-setsid npx cf dev --host inish.in --port 8788 > "$OUT/dev-inish-in.log" 2>&1 &
-echo $! > "$OUT/dev-inish-in.pid"
+setsid -f sh -c 'echo $$ > "$1/dev-inish-in.pid"; exec npx cf dev --host inish.in --port 8788 > "$1/dev-inish-in.log" 2>&1' sh "$OUT"
 until grep -q "Ready on http://localhost:8788" "$OUT/dev-inish-in.log"; do sleep 1; done
 ```
 
