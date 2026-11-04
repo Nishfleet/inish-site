@@ -10,7 +10,7 @@ Durable project truth that the code alone does not tell you.
 - `inish_daily/interests.json` lists where Nish's taste is read from (GitHub stars of nish3451; X posts and reposts of @NishantRArora, read free via X's embed timeline then Nitter/xcancel RSS; Nish said no paid X API). `interests.py` turns them into `reader_interests` for Jev; it ranks, it never adds stories.
 - Page: masthead and IST date, a "Compiled from X of Y sources" bar, section nav, lead, picks, one card per source group, a Wire column. No JS; the CSS is inlined at build (`build.mjs`, beasties) and allowed by CSP hash.
 - Every push to `main` runs the `CI` workflow: tests, then `wrangler deploy`, then a live smoke check. Pull requests run tests only. `main` takes direct pushes (ruleset `main-no-force-push` blocks only force-push and deletion).
-- Local: `npm run dev` (wrangler dev), `npm test` (Node + Python suites).
+- Local: `npm run dev` (`cf dev`, config in `cloudflare.config.ts`), `npm test` (Node + Python suites). `wrangler.jsonc` stays only because the CI deploy, preview and rollback steps still run Wrangler; a test keeps the two configs equal.
 - The daily edition is started by the fleet (`Nishfleet/fleet-ops` `agent.yml`, job `inish-daily`, 07:30 IST plus a 10:30 IST catch-up; by hand: `gh workflow run agent.yml --repo Nishfleet/fleet-ops -f job=inish-daily`) following `automation/HERMES_DAILY.md`. It publishes to nish.sh/daily.
 - Incident 2026-09-29 to 2026-10-10: the edition went stale because fleet-ops#8954 ("remove all unnecessary machinery") deleted the `inish-daily` job and its crons. A later fleet-ops PR restored it, retargeted to nish.sh/daily.
 

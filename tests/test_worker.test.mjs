@@ -188,6 +188,26 @@ test("wrangler routes: the daily page on nish.sh, redirects on inish.in, never t
   }
 });
 
+test("cf config deploys the same Worker as wrangler.jsonc", async () => {
+  const { default: cf } = await import("../cloudflare.config.ts");
+  const { default: build } = await import("../wrangler.config.ts");
+  const wrangler = wranglerConfig();
+  assert.equal(build.assetsDirectory, wrangler.assets.directory);
+  assert.equal(build.dev.upstreamProtocol, wrangler.dev.upstream_protocol);
+  assert.deepEqual(cf.worker.observability, wrangler.observability);
+  assert.equal(cf.worker.name, wrangler.name);
+  assert.equal(cf.worker.compatibilityDate, wrangler.compatibility_date);
+  assert.equal(cf.worker.entrypoint, wrangler.main);
+  assert.equal(cf.worker.workersDev, wrangler.workers_dev);
+  assert.equal(cf.worker.previewUrls, wrangler.preview_urls);
+  assert.deepEqual(cf.worker.assets.runWorkerFirst, wrangler.assets.run_worker_first);
+  assert.equal(cf.worker.assets.htmlHandling, wrangler.assets.html_handling);
+  assert.deepEqual(
+    cf.worker.triggers.map((t) => `${t.zone} ${t.pattern}`).sort(),
+    wrangler.routes.map((r) => `${r.zone_name} ${r.pattern}`).sort()
+  );
+});
+
 test("the committed site has every file the worker serves", () => {
   for (const path of CONTRACT.publicPaths) {
     assert.ok(existsSync(join(ROOT, "public", path)), `public${path} is missing`);
