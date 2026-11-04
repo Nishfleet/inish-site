@@ -8,6 +8,15 @@ import {
   withStyleHashes
 } from "./policy.js";
 
+/**
+ * @typedef {object} Env
+ * @property {Fetcher} ASSETS
+ */
+
+/**
+ * @param {Response} response
+ * @returns {Response}
+ */
 function withSecurityHeaders(response) {
   const headers = new Headers(response.headers);
   headers.set("Strict-Transport-Security", hstsHeader);
@@ -35,6 +44,11 @@ const notFoundHeaders = {
   "Content-Type": "text/html; charset=utf-8"
 };
 
+/**
+ * @param {Request} request
+ * @param {Env} env
+ * @returns {Promise<Response>}
+ */
 async function notFoundResponse(request, env) {
   if (request.method === "HEAD") {
     return new Response(null, { status: 404, headers: notFoundHeaders });
@@ -51,6 +65,9 @@ async function notFoundResponse(request, env) {
   return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
 }
 
+/**
+ * @type {ExportedHandler<Env>}
+ */
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
