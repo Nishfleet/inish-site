@@ -9,7 +9,7 @@ export const publicPaths = new Set(routeContract.publicPaths);
 export const hstsHeader = routeContract.hstsHeader;
 export const securityHeaders = Object.entries(routeContract.securityHeaders);
 
-// The ASSETS binding ignores the hostname of an internally constructed asset URL.
+// upstream: the ASSETS binding matches only the pathname, https://developers.cloudflare.com/workers/static-assets/binding/
 export const notFoundAssetUrl = new URL("/404.html", dailyUrl).href;
 
 /**
