@@ -371,7 +371,8 @@ def main() -> int:
     print(f"candidates={len(candidates)} by_class={by_class}")
     print(f"by_lens={by_lens} source_errors={len(errors)}")
     print(f"ranked_by={ranked_by}")
-    print(f"interests={len(taste)}")
+    by_signal = " ".join(f"{r['id']}={r['error'] or r['count']}" for r in taste_report)
+    print(f"interests={len(taste)} {by_signal}".rstrip())
     print(next((error[:300] for error in errors if error.startswith("jev:")), "jev: ok"))
     return 0 if candidates else 1
 
