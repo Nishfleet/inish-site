@@ -73,7 +73,7 @@ export default {
     const url = new URL(request.url);
     const moved = redirectFor(url);
     if (moved !== null) {
-      // Response.redirect() returns immutable headers, so HSTS cannot be added to it.
+      // upstream: Response.redirect() headers are immutable, https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static
       return withSecurityHeaders(new Response(null, { status: 301, headers: { Location: moved } }));
     }
     const path = assetFor(url.pathname);
