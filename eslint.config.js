@@ -6,7 +6,7 @@ const WORKAROUND_TERMS = ["todo", "fixme", "xxx", "hack", "workaround", "work ar
 const JSDOC_TYPES = "\\*(?:\\s+\\*)?\\s+@(?:param|returns|type|typedef|property)\\b";
 
 export default [
-  { ignores: ["node_modules/**", "public/**", "dist/**", ".wrangler/**"] },
+  { ignores: ["node_modules/**", "public/**", "dist/**", ".wrangler/**", ".cloudflare/**"] },
   js.configs.recommended,
   {
     languageOptions: { globals: { ...globals.node, ...globals.serviceworker } },
