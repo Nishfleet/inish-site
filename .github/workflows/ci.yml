@@ -28,17 +28,23 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
       - run: npm test
 
-  # Required check. Owner decision 2026-11-01 (fleet-ops#10935): a preview
-  # link the owner can click is the last gate of every product PR. Cloudflare
+  # Not a required check: the ruleset requires only `test`, so the preview
+  # stays visible on every PR but does not gate it (fleet-ops#10935). Cloudflare
   # Workers Previews through the official action; the job summary and the
-  # "View deployment" button on the PR carry the link. Secrets never reach a
-  # fork or a Dependabot run (GitHub docs, "Automating Dependabot with GitHub
-  # Actions"), so those PRs skip this job, and a skipped check passes the gate.
+  # "View deployment" button on the PR carry the link. It skips in the merge
+  # queue (no pull request) and for forks and Dependabot, whose runs get no
+  # Actions secrets (GitHub docs, "Automating Dependabot with GitHub Actions").
   preview:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    environment: preview
     timeout-minutes: 10
     permissions:
       contents: read
@@ -53,7 +59,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
-          cache: npm
+          # A job holding deploy secrets never restores the Actions cache (https://docs.zizmor.sh/audits/#cache-poisoning).
+          package-manager-cache: false
       - run: npm ci
       - run: npm run build
       - id: preview
@@ -102,7 +109,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
-          cache: npm
+          # A job holding deploy secrets never restores the Actions cache (https://docs.zizmor.sh/audits/#cache-poisoning).
+          package-manager-cache: false
       - run: npm ci
       - name: Record the serving Worker version, the rollback target
         run: |

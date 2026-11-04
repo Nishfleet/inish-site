@@ -1,0 +1,17 @@
+[dependency-groups]
+dev = ["ruff==0.17.3"]
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["ERA001", "FIX", "TD", "TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"urllib.request.urlopen".msg = "Outbound requests go through the fetch helpers in inish_daily/fetch_candidates.py, inish_daily/interests.py or inish_daily/jev_rank.py. Untrusted links go through jev_rank.page_text, which blocks internal addresses."
+"urllib.request.build_opener".msg = "Outbound requests go through the fetch helpers in inish_daily/fetch_candidates.py, inish_daily/interests.py or inish_daily/jev_rank.py. Untrusted links go through jev_rank.page_text, which blocks internal addresses."
+
+[tool.ruff.lint.per-file-ignores]
+"inish_daily/fetch_candidates.py" = ["TID251"]
+"inish_daily/interests.py" = ["TID251"]
+"inish_daily/jev_rank.py" = ["TID251"]
