@@ -190,7 +190,11 @@ test("wrangler routes: the daily page on nish.sh, redirects on inish.in, never t
 
 test("cf config deploys the same Worker as wrangler.jsonc", async () => {
   const { default: cf } = await import("../cloudflare.config.ts");
+  const { default: build } = await import("../wrangler.config.ts");
   const wrangler = wranglerConfig();
+  assert.equal(build.assetsDirectory, wrangler.assets.directory);
+  assert.equal(build.dev.upstreamProtocol, wrangler.dev.upstream_protocol);
+  assert.deepEqual(cf.worker.observability, wrangler.observability);
   assert.equal(cf.worker.name, wrangler.name);
   assert.equal(cf.worker.compatibilityDate, wrangler.compatibility_date);
   assert.equal(cf.worker.entrypoint, wrangler.main);
