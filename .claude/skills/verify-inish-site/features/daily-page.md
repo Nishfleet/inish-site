@@ -7,6 +7,7 @@ The daily page is Nish's Daily: the masthead with the edition date, a sources ba
 - `page-serve` serves the page at `/daily`, `/daily/` and `/daily/index.html`.
 - `page-title` puts the edition date in the title.
 - `page-headers` sends HSTS, the CSP with the style hash, and `no-transform`.
+- `page-assets` serves the stylesheet, the favicon and every font the page asks for.
 - `page-layout` reads well at phone and desktop widths.
 
 ## How to get to it (user POV)
@@ -23,6 +24,7 @@ Preconditions:
 - **Page.** Run `for p in /daily /daily/ /daily/index.html; do curl -s -o /dev/null -w "$p %{http_code}\n" "http://localhost:$PORT$p"; done | tee "$OUT/daily-paths.txt"`. Each line ends in `200`.
 - **Title.** Run `curl -s "http://localhost:$PORT/daily" | grep -o '<title>[^<]*</title>' | tee "$OUT/daily-title.txt"`. It prints `<title>Nish’s Daily · <date></title>`, and `<date>` equals `ls data/editions | tail -1` without `.json`.
 - **Headers.** Run `curl -sI "http://localhost:$PORT/daily" | tee "$OUT/daily-headers.txt"`. It has `Strict-Transport-Security: max-age=31536000`, `Cache-Control` with `no-transform`, and a `Content-Security-Policy` whose `style-src` has a `sha256-` hash and no `unsafe-inline`.
+- **Assets.** Run `for p in styles.css favicon.svg $(grep -o 'fonts/[a-zA-Z0-9.-]*' dist/daily/styles.css | sort -u); do curl -s -o /dev/null -w "$p %{http_code}\n" "http://localhost:$PORT/daily/$p"; done | tee "$OUT/daily-assets.txt"`. Every line ends in `200`. The page itself still answers `200` when one of these is missing, so the page checks above do not catch it.
 - **Layout.** Take the 390 px and 1280 px screenshots from the skill's Evidence section and open both. The masthead and date are visible, and only the section nav runs off the right edge at 390 px.
 
 ## Gotchas
