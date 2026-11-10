@@ -154,25 +154,22 @@ test("inline-style hashes published by the build widen style-src, nothing else",
   assert.ok(!CONTRACT.securityHeaders["Content-Security-Policy"].includes("unsafe-inline"));
 });
 
-function wranglerConfig() {
-  const text = readFileSync(join(ROOT, "wrangler.jsonc"), "utf8")
-    .split("\n")
-    .filter((line) => !line.trim().startsWith("//"))
-    .join("\n");
-  return JSON.parse(text);
+async function cfConfig() {
+  const { default: config } = await import("../cloudflare.config.ts");
+  return config;
 }
 
-test("wrangler: production is never on workers.dev, previews are", () => {
-  const config = wranglerConfig();
-  assert.equal(config.workers_dev, false);
-  assert.equal(config.preview_urls, true);
-  assert.deepEqual(config.previews, {});
+test("cf config: production is never on workers.dev, previews are", async () => {
+  const { worker } = await cfConfig();
+  assert.equal(worker.workersDev, false);
+  assert.equal(worker.previewUrls, true);
 });
 
-test("wrangler routes: the daily page on nish.sh, redirects on inish.in, never the whole nish.sh zone", () => {
-  const routes = wranglerConfig().routes.map((r) => `${r.zone_name} ${r.pattern}`);
+test("cf config routes: the daily page on nish.sh, redirects on inish.in, never the whole nish.sh zone", async () => {
+  const { worker } = await cfConfig();
+  const routes = worker.triggers.map((r) => `${r.zone} ${r.pattern}`).sort();
   assert.deepEqual(
-    routes.sort(),
+    routes,
     [
       "inish.in inish.in",
       "inish.in inish.in/*",
@@ -188,24 +185,11 @@ test("wrangler routes: the daily page on nish.sh, redirects on inish.in, never t
   }
 });
 
-test("cf config deploys the same Worker as wrangler.jsonc", async () => {
-  const { default: cf } = await import("../cloudflare.config.ts");
-  const { default: build } = await import("../wrangler.config.ts");
-  const wrangler = wranglerConfig();
-  assert.equal(build.assetsDirectory, wrangler.assets.directory);
-  assert.equal(build.dev.upstreamProtocol, wrangler.dev.upstream_protocol);
-  assert.deepEqual(cf.worker.observability, wrangler.observability);
-  assert.equal(cf.worker.name, wrangler.name);
-  assert.equal(cf.worker.compatibilityDate, wrangler.compatibility_date);
-  assert.equal(cf.worker.entrypoint, wrangler.main);
-  assert.equal(cf.worker.workersDev, wrangler.workers_dev);
-  assert.equal(cf.worker.previewUrls, wrangler.preview_urls);
-  assert.deepEqual(cf.worker.assets.runWorkerFirst, wrangler.assets.run_worker_first);
-  assert.equal(cf.worker.assets.htmlHandling, wrangler.assets.html_handling);
-  assert.deepEqual(
-    cf.worker.triggers.map((t) => `${t.zone} ${t.pattern}`).sort(),
-    wrangler.routes.map((r) => `${r.zone_name} ${r.pattern}`).sort()
-  );
+test("cf config serves the worker from the assets binding", async () => {
+  const { worker } = await cfConfig();
+  assert.equal(worker.assets.htmlHandling, "none");
+  assert.deepEqual(worker.assets.runWorkerFirst, ["/*"]);
+  assert.ok(worker.env.ASSETS !== undefined, "ASSETS binding must be wired");
 });
 
 test("the committed site has every file the worker serves", () => {
