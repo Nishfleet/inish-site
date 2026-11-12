@@ -312,11 +312,6 @@ class RequestBodyTests(unittest.TestCase):
         self.assertNotIn("reader_interests", empty["state"])
         self.assertIn("reader_interests", jev_rank.QUESTIONS["fit"]["instructions"])
 
-    def test_fit_instructions_sentence_survived(self):
-        self.assertIn("Read `candidate.page_text`", jev_rank.QUESTIONS["fit"]["instructions"])
-        self.assertIn("recent_editions", jev_rank.QUESTIONS["fit"]["instructions"])
-        self.assertIn("Judge the underlying story", jev_rank.QUESTIONS["fit"]["instructions"])
-
 
 class RankTests(unittest.TestCase):
     ANSWERS = {

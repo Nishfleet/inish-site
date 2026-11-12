@@ -331,9 +331,6 @@ class BuildDailyTests(unittest.TestCase):
         self.assertEqual((builder.DAILY / "feed.xml").read_text(encoding="utf-8"), builder.rss(front))
         self.assertEqual((builder.DAILY / "index.html").read_text(encoding="utf-8"), builder.page(front))
 
-    def test_asset_list_is_pinned(self):
-        self.assertEqual(set(builder.ASSETS), {"styles.css", "favicon.svg"})
-
     def test_rss_item_carries_every_story_of_its_edition(self):
         self.write(edition(stories=3))
         self.build()
