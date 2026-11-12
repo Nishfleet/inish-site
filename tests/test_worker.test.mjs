@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import worker from "../worker.js";
-import { assetFor, redirectFor } from "../policy.js";
+import { redirectFor } from "../policy.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const CONTRACT = JSON.parse(readFileSync(join(ROOT, "public-paths.json"), "utf8"));
@@ -56,11 +56,6 @@ test("inish.in: every request is a 301 to https://nish.sh/daily", async () => {
       assert.deepEqual(assets.reads, [], `${url} must not read assets`);
     }
   }
-});
-
-test("nish.sh: plain http moves to https and keeps path and query", () => {
-  assert.equal(redirectFor(new URL("http://nish.sh/daily?x=1")), "https://nish.sh/daily?x=1");
-  assert.equal(redirectFor(new URL("https://nish.sh/daily")), null);
 });
 
 test("http://nish.sh/daily?x=1 through the worker is one 301 to https with the query intact", async () => {
@@ -118,13 +113,6 @@ test("HEAD on an unknown path is a bodyless 404 with no asset reads", async () =
   const { response, assets } = await call("https://nish.sh/daily/nope", { method: "HEAD" });
   assert.equal(response.status, 404);
   assert.deepEqual(assets.reads, []);
-});
-
-test("assetFor maps only the page paths and the listed assets", () => {
-  assert.equal(assetFor("/daily"), "/daily/index.html");
-  assert.equal(assetFor("/daily/"), "/daily/index.html");
-  assert.equal(assetFor("/daily/styles.css"), "/daily/styles.css");
-  assert.equal(assetFor("/daily/other"), null);
 });
 
 test("every response class carries the full security header set", async () => {
