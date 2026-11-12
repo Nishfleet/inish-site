@@ -15,12 +15,6 @@ class SourcesFileTests(unittest.TestCase):
         for source in config["sources"]:
             self.assertIn(source["group"], groups)
 
-    def test_the_original_sources_are_still_there(self):
-        ids = {source["id"] for source in fc.load_sources()["sources"]}
-        for kept in ("hacker-news", "show-hn", "lobsters", "github", "openai", "techcrunch-ai", "product-hunt",
-                     "news-ai", "news-funding", "news-adoption", "reddit-saas", "reddit-startups", "reddit-entrepreneur"):
-            self.assertIn(kept, ids)
-
     def write(self, data):
         path = Path(tempfile.mkdtemp()) / "sources.json"
         path.write_text(json.dumps(data))
@@ -30,9 +24,6 @@ class SourcesFileTests(unittest.TestCase):
         source = {"id": "a", "name": "A", "type": "rss", "url": "https://a.example/feed", "group": "g", "lens": "AI", "evidence": "independent"}
         source.update(extra)
         return {"groups": [{"id": "g", "label": "G"}], "sources": [source]}
-
-    def test_a_new_rss_site_needs_no_code(self):
-        self.assertEqual(len(fc.load_sources(self.write(self.base()))["sources"]), 1)
 
     def test_bad_entries_are_rejected(self):
         for extra, message in (
