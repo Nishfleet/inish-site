@@ -6,6 +6,9 @@ name: answer
 on:
   pull_request_review:
     types: [submitted]
+  # A red CI run on an agent PR starts the lane too. The name is the CI workflow's own
+  # name (name: CI in .github/workflows/ci.yml), so a rename there would stop this
+  # trigger silently.
   workflow_run: # zizmor: ignore[dangerous-triggers] nothing from the pull request is checked out or run
     workflows: [CI]
     types: [completed]
@@ -15,5 +18,7 @@ jobs:
     # The lane's job dispatches agent.yml on main with the issue and the PR. A called
     # workflow can only lower the caller's GITHUB_TOKEN permissions, never raise them.
     permissions: {actions: write}
-    # @main, not a SHA, the same as the agent stub.
+    # @main, not a SHA, the same as the agent stub. The called workflow takes the
+    # workflow_run event, and its dispatch job's if matches a failed pull_request CI
+    # run on an agent/issue-* branch, so the trigger above starts the lane.
     uses: Nishfleet/fleet-ops/.github/workflows/answer.yml@main
