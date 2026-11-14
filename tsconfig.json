@@ -17,5 +17,5 @@
     "types": ["@cloudflare/workers-types"]
   },
   "include": ["**/*.ts", "worker.js", "policy.js", "public-paths.json"],
-  "exclude": ["node_modules", "dist", "public", ".wrangler", ".cloudflare"]
+  "exclude": ["node_modules", "dist", "public", ".cloudflare"]
 }

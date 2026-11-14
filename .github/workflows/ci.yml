@@ -37,10 +37,10 @@ jobs:
 
   # Not a required check: the ruleset requires only `test`, so the preview
   # stays visible on every PR but does not gate it (fleet-ops#10935). Cloudflare
-  # Workers Previews through the official action; the job summary and the
-  # "View deployment" button on the PR carry the link. It skips in the merge
-  # queue (no pull request) and for forks and Dependabot, whose runs get no
-  # Actions secrets (GitHub docs, "Automating Dependabot with GitHub Actions").
+  # Workers Previews through the cf CLI; the job summary carries the link. It
+  # skips in the merge queue (no pull request) and for forks and Dependabot,
+  # whose runs get no Actions secrets (GitHub docs, "Automating Dependabot
+  # with GitHub Actions").
   preview:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
@@ -48,7 +48,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      deployments: write
     concurrency:
       group: preview-${{ github.event.pull_request.number }}
       cancel-in-progress: true
@@ -64,16 +63,24 @@ jobs:
       - run: npm ci
       - run: npm run build
       - id: preview
-        uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: preview --name pr-${{ github.event.pull_request.number }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        # cf previews deploy builds the page and prints the result as JSON
+        # (docs, "Deploy a preview"); named after the PR it previews.
+        run: |
+          json=$(npx cf previews deploy "pr-${{ github.event.pull_request.number }}")
+          echo "$json"
+          url=$(echo "$json" | jq -r '[.preview_urls[], .deployment_urls[]] | first')
+          if [ -z "$url" ] || [ "$url" = "null" ]; then
+            echo "::error::The preview deploy returned no preview URL." >&2
+            exit 1
+          fi
+          echo PREVIEW_URL="$url" >> "$GITHUB_ENV"
+          echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          CF_SEND_TELEMETRY: "false"
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: The preview link serves the page
         run: test "$(curl -sS -o /dev/null -w '%{http_code}' --retry 5 --retry-all-errors --retry-delay 5 "$PREVIEW_URL/daily")" = 200
-        env:
-          PREVIEW_URL: ${{ steps.preview.outputs.preview-url }}
 
   dependency-review:
     # GitHub's own check: fails a PR that adds a dependency with a known vulnerability.
@@ -114,7 +121,8 @@ jobs:
       - run: npm ci
       - name: Record the serving Worker version, the rollback target
         run: |
-          target=$(npx wrangler deployments status --json | jq -r '[.versions[] | select(.percentage == 100) | .version_id][0]')
+          target=$(npx cf workers deployments list --worker inish-site \
+            | jq -r '[(.result.deployments // .deployments // .)[0] | .versions[] | select(.percentage == 100) | .version_id][0]')
           if [ -z "$target" ] || [ "$target" = "null" ]; then
             echo "::error::Could not read the serving Worker version id. Refusing to deploy with no rollback target." >&2
             exit 1
@@ -122,11 +130,13 @@ jobs:
           echo "ROLLBACK_TARGET=$target" >> "$GITHUB_ENV"
           echo "Rollback target: $target" >> "$GITHUB_STEP_SUMMARY"
         env:
+          CF_SEND_TELEMETRY: "false"
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - id: deploy
         run: npm run deploy
         env:
+          CF_SEND_TELEMETRY: "false"
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       - name: Live smoke check
@@ -137,7 +147,14 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://inish.in/)" = "301 https://nish.sh/daily"
       - name: Roll back to the serving Worker version
         if: always() && steps.deploy.outcome == 'success' && steps.smoke.outcome != 'success'
-        run: npx wrangler rollback "$ROLLBACK_TARGET" --yes --message "smoke failed $GITHUB_SHA"
+        # A deployment listing the recorded version at 100% is the rollback
+        # (docs, "Upload a version" / Rollbacks).
+        run: |
+          npx cf workers deployments create --worker inish-site \
+            --strategy percentage \
+            --versions "[{\"version_id\":\"$ROLLBACK_TARGET\",\"percentage\":100}]" \
+            --message "smoke failed $GITHUB_SHA"
         env:
+          CF_SEND_TELEMETRY: "false"
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

@@ -1,5 +1,4 @@
 .DS_Store
-.wrangler/
 .cloudflare/
 # Fleet-desk snapshot dropped at the repo root; not site content
 /data.json
